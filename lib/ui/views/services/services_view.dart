@@ -67,10 +67,9 @@ class ServicesView extends StackedView<ServicesViewModel> {
                   ),
                 ),
                 if (isExtended)
-                  Expanded(
-                      child: SizedBox(
+                  SizedBox(
                     width: 240,
-                  )),
+                  ),
                 CommonButton(
                   width: 180,
                   buttonColor: appGreen400,

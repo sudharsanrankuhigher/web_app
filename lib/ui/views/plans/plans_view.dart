@@ -63,10 +63,9 @@ class PlansView extends StackedView<PlansViewModel> {
                   ),
                 ),
                 if (isExtended)
-                  Expanded(
-                      child: SizedBox(
+                  SizedBox(
                     width: 240,
-                  )),
+                  ),
                 horizontalSpacing20,
                 // Filter Button
                 SizedBox(

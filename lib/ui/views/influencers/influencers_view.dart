@@ -62,10 +62,9 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                   ),
                 ),
                 if (isExtended)
-                  Expanded(
-                      child: SizedBox(
+                  SizedBox(
                     width: 240,
-                  )),
+                  ),
                 CommonButton(
                   width: 180,
                   buttonColor: appGreen400,

@@ -34,3 +34,13 @@ class MainApp extends StatelessWidget {
     );
   }
 }
+
+
+
+// git add .
+// git commit -m "Deploy web build"
+// git push -u origin web-deploy --force
+
+
+
+
