@@ -82,6 +82,7 @@ const horizontalSpacing10 = SizedBox(width: 10);
 const horizontalSpacing12 = SizedBox(width: 12);
 const horizontalSpacing16 = SizedBox(width: 16);
 const horizontalSpacing20 = SizedBox(width: 20);
+const horizontalSpacing60 = SizedBox(width: 60);
 
 //padding
 const zeroPadding = EdgeInsets.all(0);

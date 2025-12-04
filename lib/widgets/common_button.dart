@@ -35,7 +35,7 @@ class CommonButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
       child: Container(
         width: width ?? double.infinity,
@@ -55,8 +55,11 @@ class CommonButton extends StatelessWidget {
               horizontalSpacing10,
             ],
             Text(
+              overflow: TextOverflow.ellipsis,
               text,
-              style: textStyle ?? fontFamilyMedium.size14.black,
+              style: textStyle ??
+                  fontFamilyMedium.size14.black
+                      .copyWith(overflow: TextOverflow.ellipsis),
             ),
             if (icon1 != null) ...[
               horizontalSpacing10,

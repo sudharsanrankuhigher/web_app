@@ -1,0 +1,169 @@
+import 'package:data_table_2/data_table_2.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:stacked/stacked.dart';
+import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/widgets/common_button.dart';
+import 'users_viewmodel.dart';
+
+class UsersView extends StackedView<UsersViewModel> {
+  const UsersView({Key? key}) : super(key: key);
+
+  @override
+  Widget builder(
+    BuildContext context,
+    UsersViewModel viewModel,
+    Widget? child,
+  ) {
+    final bool isExtended = MediaQuery.of(context).size.width > 1000;
+
+    return Scaffold(
+      body: Padding(
+        padding: defaultPadding20 - topPadding20,
+        child: Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: defaultPadding16,
+                decoration: BoxDecoration(
+                  color: white,
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(12),
+                      bottomRight: Radius.circular(12)),
+                ),
+                child: Text(
+                  'User Management',
+                  style: fontFamilyBold.size26.black,
+                ),
+              ),
+              verticalSpacing12,
+              Wrap(
+                spacing: 40,
+                runSpacing: 16,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                alignment: WrapAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 45.h,
+                    width: 500,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: "Search name, email, phone...",
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onChanged: viewModel.searchUser,
+                    ),
+                  ),
+                  if (isExtended)
+                    Expanded(
+                        child: SizedBox(
+                      width: 240,
+                    )),
+                  // Filter Button
+                  SizedBox(
+                    width: 180,
+                    child: CommonButton(
+                      buttonColor: appGreen400,
+                      margin: EdgeInsets.zero,
+                      padding: defaultPadding8,
+                      text: isExtended ? "Filter & Sort" : "",
+                      icon1: Icon(Icons.filter_list),
+                      onTap: () async {
+                        final result =
+                            await viewModel.showSortingFilterDialog(context);
+                        if (result == null) return;
+
+                        bool isChecked = result["checkbox"];
+                        String sortType = result["sort"];
+
+                        viewModel.applySort(isChecked, sortType);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: 180,
+                    child: CommonButton(
+                      icon: Icon(Icons.add, color: white, size: 16),
+                      buttonColor: continueButton,
+                      textStyle: fontFamilyMedium.size14.white,
+                      margin: EdgeInsets.zero,
+                      borderRadius: 10,
+                      text: isExtended ? "Add Users" : "",
+                      onTap: () async {
+                        // final result = await CommonPlanDialog.show(
+                        //   StackedService.navigatorKey!.currentContext!,
+                        // );
+
+                        // if (result != null) {
+                        //   print('Plan Name: ${result['planName']}');
+                        //   print('Connections: ${result['connections']}');
+                        //   print('Amount: ${result['amount']}');
+                        //   print('Badge: ${result['badge']}');
+                        // }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              verticalSpacing20,
+              Expanded(
+                child: viewModel.users.isEmpty
+                    ? const Center(child: CircularProgressIndicator())
+                    : PaginatedDataTable2(
+                        headingRowColor:
+                            MaterialStateProperty.all(Colors.blueAccent),
+
+                        headingRowDecoration: const BoxDecoration(
+                          color: Colors.blueAccent,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            topRight: Radius.circular(12),
+                          ),
+                        ),
+                        headingTextStyle:
+                            fontFamilyBold.size14.white, // custom typography
+                        dataTextStyle: fontFamilyRegular.size12.black,
+                        columns: const [
+                          DataColumn(label: Text("S.No")),
+                          DataColumn(label: Text("Name")),
+                          DataColumn(label: Text("Email")),
+                          DataColumn(label: Text("Phone")),
+                          DataColumn(label: Text("Type")),
+                          DataColumn(label: Text("City/State")),
+                          DataColumn(label: Text("Plan")),
+                          DataColumn(label: Text("Connections")),
+                        ],
+                        source: viewModel.tableSource,
+                        columnSpacing: 20,
+                        horizontalMargin: 15,
+                        rowsPerPage: viewModel.tableSource.rowCount < 10
+                            ? viewModel.tableSource.rowCount
+                            : 10,
+                        minWidth: 1000,
+                      ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  UsersViewModel viewModelBuilder(
+    BuildContext context,
+  ) =>
+      UsersViewModel();
+
+  @override
+  void onViewModelReady(UsersViewModel viewModel) {
+    viewModel.loadUsers();
+    super.onViewModelReady(viewModel);
+  }
+}

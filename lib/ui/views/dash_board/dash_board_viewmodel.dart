@@ -5,6 +5,4 @@ class DashBoardViewModel extends BaseViewModel with NavigationMixin {
   DashBoardViewModel() {
     print('started...............');
   }
-
-  
 }

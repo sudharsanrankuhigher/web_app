@@ -20,7 +20,8 @@ class DashBoardCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 310, // Adaptive width for Wrap
+      width: 308, //MediaQuery.of(context).size.width *
+      // .20, //305, // Adaptive width for Wrap
       child: Card(
         color: white,
         child: Padding(

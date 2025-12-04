@@ -5,6 +5,7 @@ class InfoCard extends StatelessWidget {
   final IconData icon;
   final String text;
   final String count;
+  final bool? isExtended;
 
   const InfoCard({
     super.key,
@@ -12,6 +13,7 @@ class InfoCard extends StatelessWidget {
     required this.icon,
     required this.text,
     required this.count,
+    this.isExtended = false,
   });
 
   @override
@@ -30,8 +32,8 @@ class InfoCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             text,
-            style: const TextStyle(
-              fontSize: 14,
+            style: TextStyle(
+              fontSize: isExtended! ? 14 : 12,
               fontWeight: FontWeight.w600,
             ),
           ),

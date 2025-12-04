@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:webapp/app/app.bottomsheets.dart';
 import 'package:webapp/app/app.dialogs.dart';
 import 'package:webapp/app/app.locator.dart';
+import 'package:webapp/core/navigation/navigation_mixin.dart';
 import 'package:webapp/ui/common/app_strings.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/ui/views/dash_board/dash_board_view.dart';
+import 'package:webapp/ui/views/influencers/influencers_view.dart';
+import 'package:webapp/ui/views/plans/plans_view.dart';
+import 'package:webapp/ui/views/services/services_view.dart';
+import 'package:webapp/ui/views/users/users_view.dart';
 
-class HomeViewModel extends BaseViewModel {
+class HomeViewModel extends BaseViewModel with NavigationMixin {
   final _dialogService = locator<DialogService>();
   final _bottomSheetService = locator<BottomSheetService>();
 
@@ -57,12 +62,12 @@ class HomeViewModel extends BaseViewModel {
 
   final List<Widget> pages = [
     const DashBoardView(),
-    const Center(child: Text('Users', style: TextStyle(fontSize: 20))),
-    const Center(child: Text('Influencers', style: TextStyle(fontSize: 20))),
-    const Center(child: Text('Services', style: TextStyle(fontSize: 20))),
+    const UsersView(),
+    const InfluencersView(),
+    const ServicesView(),
     const Center(child: Text('City', style: TextStyle(fontSize: 20))),
     const Center(child: Text('State', style: TextStyle(fontSize: 20))),
-    const Center(child: Text('Plans', style: TextStyle(fontSize: 20))),
+    const PlansView(),
     const Center(child: Text('Requests', style: TextStyle(fontSize: 20))),
     const Center(
         child: Text('Promotion Projects', style: TextStyle(fontSize: 20))),

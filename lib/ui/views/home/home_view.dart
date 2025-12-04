@@ -116,7 +116,6 @@ class HomeView extends StackedView<HomeViewModel> {
 
                 verticalSpacing12,
 
-                // ─────────── PROFILE + LOGOUT ───────────
                 Column(
                   children: [
                     Row(
