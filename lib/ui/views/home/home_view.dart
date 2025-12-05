@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -36,8 +37,9 @@ class HomeView extends StackedView<HomeViewModel> {
                 Row(
                   children: [
                     const CircleAvatar(
+                      backgroundColor: white,
                       radius: 22,
-                      backgroundImage: AssetImage("assets/logo.png"),
+                      backgroundImage: AssetImage("assets/images/logo.png"),
                     ),
                     if (isExtended) ...[
                       const SizedBox(width: 10),
@@ -125,31 +127,53 @@ class HomeView extends StackedView<HomeViewModel> {
 
                 // Profile & Logout
                 Column(
+                  crossAxisAlignment: isExtended
+                      ? CrossAxisAlignment.start
+                      : CrossAxisAlignment.center,
                   children: [
                     Row(
                       children: [
-                        const CircleAvatar(
-                          radius: 22,
-                          backgroundImage: NetworkImage(
-                            "https://example.com/profile.jpg",
+                        CachedNetworkImage(
+                          imageUrl: "https://example.com/profile.jpg",
+                          imageBuilder: (context, imageProvider) =>
+                              CircleAvatar(
+                            radius: 22,
+                            backgroundImage: imageProvider,
+                          ),
+                          placeholder: (context, url) => const CircleAvatar(
+                            radius: 22,
+                            backgroundImage: AssetImage(
+                                "assets/images/user_placeholder.png"),
+                          ),
+                          errorWidget: (context, url, error) =>
+                              const CircleAvatar(
+                            radius: 22,
+                            child: Icon(Icons.error),
                           ),
                         ),
                         if (isExtended) ...[
                           const SizedBox(width: 10),
                           const Text(
                             "Sudharsan",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const Text(
-                            "Admin",
-                            style: TextStyle(color: Colors.grey),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                overflow: TextOverflow.ellipsis),
                           ),
                         ],
                       ],
                     ),
+                    if (isExtended)
+                      const Text(
+                        "Admin",
+                        style: TextStyle(color: Colors.grey),
+                      ),
                     verticalSpacing16,
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        viewModel.logOut(context);
+                      },
                       child: Row(
                         mainAxisAlignment: isExtended
                             ? MainAxisAlignment.start

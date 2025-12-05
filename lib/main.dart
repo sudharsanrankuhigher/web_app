@@ -6,12 +6,14 @@ import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/app/app.router.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/router.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setupLocator();
   setupDialogUi();
   setupBottomSheetUi();
+  setUrlStrategy(PathUrlStrategy()); // <-- removes the #
   runApp(const MainApp());
 }
 
@@ -40,12 +42,6 @@ class MainApp extends StatelessWidget {
   }
 }
 
-
-
 // git add .
 // git commit -m "Deploy web build"
 // git push -u origin web-deploy --force
-
-
-
-

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
-import 'package:webapp/ui/common/shared/styles.dart';
-import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/plans/model/plans_model.dart';
 import 'package:webapp/ui/views/plans/widgets/common_plans_dialog.dart';
 import 'package:webapp/ui/views/plans/widgets/plans_table_source.dart';
@@ -16,7 +14,7 @@ class PlansViewModel extends BaseViewModel {
   List<PlanModel> plans = [];
   late PlanTableSource tableSource;
 
-  // Form data (no controller)
+  // Form data
   String? planName;
   int? connections;
   int? amount;
@@ -42,7 +40,7 @@ class PlansViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  // Initial load (dummy)
+  // Initial load
   void loadPlans() {
     plans = [
       PlanModel(
@@ -58,47 +56,27 @@ class PlansViewModel extends BaseViewModel {
           amount: 499,
           badge: "Popular"),
     ];
-
-    tableSource = PlanTableSource(
-      plans: plans,
-      onEdit: editPlan,
-      onView: viewPlan,
-      onDelete: confirmDelete,
-    );
-
-    notifyListeners();
+    _refreshTable();
   }
 
   /// SEARCH
   void searchPlans(String query) {
-    query = query.toLowerCase();
-
-    final filtered = plans.where((inf) {
-      return inf.planName.toLowerCase().contains(query) ||
-          inf.badge.contains(query);
+    final filtered = plans.where((p) {
+      return p.planName.toLowerCase().contains(query.toLowerCase()) ||
+          p.badge.toLowerCase().contains(query.toLowerCase());
     }).toList();
 
-    tableSource = PlanTableSource(
-      plans: filtered,
-      onEdit: editPlan,
-      onView: viewPlan,
-      onDelete:
-          deletePlan, // <-- ADD THIS      // onDelete: (item) => print("Delete ${item.name}"),
-    );
-
-    notifyListeners();
+    _refreshTable(filtered: filtered);
   }
 
   // Add or update
   void saveOrUpdate(PlanModel plan) {
     final index = plans.indexWhere((p) => p.id == plan.id);
-
     if (index >= 0) {
-      plans[index] = plan; // update
+      plans[index] = plan;
     } else {
-      plans.add(plan); // add new
+      plans.add(plan);
     }
-
     _refreshTable();
   }
 
@@ -107,20 +85,21 @@ class PlansViewModel extends BaseViewModel {
     _refreshTable();
   }
 
-  void _refreshTable() {
+  // 🔹 Refresh table
+  void _refreshTable({List<PlanModel>? filtered}) {
+    final context = StackedService.navigatorKey!.currentContext!;
     tableSource = PlanTableSource(
-      plans: plans,
-      onEdit: editPlan,
-      onView: viewPlan,
-      onDelete: deletePlan,
+      plans: filtered ?? plans,
+      onEdit: (plan) => editPlan(context, plan),
+      onView: (plan) => viewPlan(context, plan),
+      onDelete: (plan) => confirmDelete(context, plan),
     );
     notifyListeners();
   }
 
-  // 🔥 Open common dialogs
+  // 🔥 Add Plan
   Future<void> addPlan(BuildContext context) async {
     final result = await CommonPlanDialog.show(context);
-
     if (result != null) {
       final newPlan = PlanModel(
         id: DateTime.now().millisecondsSinceEpoch,
@@ -129,17 +108,13 @@ class PlansViewModel extends BaseViewModel {
         amount: result['amount'],
         badge: result['badge'],
       );
-
       saveOrUpdate(newPlan);
     }
   }
 
-  Future<void> editPlan(PlanModel plan) async {
-    final result = await CommonPlanDialog.show(
-      StackedService.navigatorKey!.currentContext!,
-      initial: plan,
-    );
-
+  // 🔥 Edit Plan
+  Future<void> editPlan(BuildContext context, PlanModel plan) async {
+    final result = await CommonPlanDialog.show(context, initial: plan);
     if (result != null) {
       final updated = PlanModel(
         id: plan.id,
@@ -148,159 +123,51 @@ class PlansViewModel extends BaseViewModel {
         amount: result['amount'],
         badge: result['badge'],
       );
-
       saveOrUpdate(updated);
     }
   }
 
-  Future<void> viewPlan(PlanModel plan) async {
-    await CommonPlanDialog.show(
-      StackedService.navigatorKey!.currentContext!,
-      initial: plan,
-      isView: true,
-    );
-  }
-
-  Future<Map<String, dynamic>?> showSortingFilterDialog(BuildContext context) {
-    bool checkStatus = false;
-    String? selectedSort = "A-Z";
-
-    return showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (_) {
-        return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: const Text("Filters & Sorting"),
-          content: StatefulBuilder(
-            builder: (context, setState) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Sort By",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 6),
-                  RadioListTile(
-                    value: "A-Z",
-                    groupValue: selectedSort,
-                    title: const Text("A - Z"),
-                    onChanged: (value) {
-                      setState(() => selectedSort = value.toString());
-                    },
-                  ),
-                  RadioListTile(
-                    value: "newer",
-                    groupValue: selectedSort,
-                    title: const Text("Newer First"),
-                    onChanged: (value) {
-                      setState(() => selectedSort = value.toString());
-                    },
-                  ),
-                  RadioListTile(
-                    value: "older",
-                    groupValue: selectedSort,
-                    title: const Text("Older First"),
-                    onChanged: (value) {
-                      setState(() => selectedSort = value.toString());
-                    },
-                  ),
-                  RadioListTile(
-                    value: "clientAsc",
-                    groupValue: selectedSort,
-                    title: const Text("Client ID (Ascending → Descending)"),
-                    onChanged: (value) {
-                      setState(() => selectedSort = value.toString());
-                    },
-                  ),
-                ],
-              );
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context, {
-                  "checkbox": checkStatus,
-                  "sort": selectedSort,
-                });
-              },
-              child: const Text("Apply"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void openFilter() async {
-    final result = await showSortingFilterDialog(
-        StackedService.navigatorKey!.currentContext!);
-
-    if (result == null) return;
-
-    bool isChecked = result["checkbox"];
-    String sortType = result["sort"];
-
-    print("Checkbox: $isChecked");
-    print("Sort: $sortType");
-
-    // Apply sorting
-    applySort(isChecked, sortType);
+  // 🔥 View Plan
+  Future<void> viewPlan(BuildContext context, PlanModel plan) async {
+    await CommonPlanDialog.show(context, initial: plan, isView: true);
   }
 
   void applySort(bool specialFilter, String sortType) {
     if (specialFilter) {
-      // whatever you want...
+      // implement custom filter
     }
-
-    if (sortType == "A-Z") {
+    if (sortType == "A-Z")
       plans.sort((a, b) => a.planName.compareTo(b.planName));
-    }
-    // else if (sortType == "newer") {
-    //   influencers.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    // } else if (sortType == "older") {
-    //   influencers.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-    // }
-    else if (sortType == "clientAsc") {
+    else if (sortType == "clientAsc")
       plans.sort((a, b) => a.id.compareTo(b.id));
-    }
-
-    notifyListeners();
+    _refreshTable();
   }
 
-  void confirmDelete(PlanModel item) {
+  // 🔹 Confirm Delete
+  void confirmDelete(BuildContext context, PlanModel plan) {
     showDialog(
-      context: StackedService.navigatorKey!.currentContext!,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Confirm Delete"),
-          content: Text("Are you sure you want to delete ${item.planName}?"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context), // cancel
-              child: const Text("Cancel"),
-            ),
-            CommonButton(
-                width: 100,
-                margin: defaultPadding10,
-                padding: defaultPadding8,
-                buttonColor: Colors.red,
-                text: "Delete",
-                textStyle: fontFamilyMedium.size14.white,
-                onTap: () {
-                  deletePlan(item);
-                  Navigator.pop(context); // close dialog
-                }),
-          ],
-        );
-      },
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Confirm Delete"),
+        content: Text("Are you sure you want to delete ${plan.planName}?"),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel")),
+          CommonButton(
+            width: 100,
+            margin: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
+            buttonColor: Colors.red,
+            text: "Delete",
+            textStyle: const TextStyle(color: Colors.white),
+            onTap: () {
+              deletePlan(plan);
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
     );
   }
 }

@@ -105,7 +105,7 @@ class LoginView extends StackedView<LoginViewModel> {
                     width: 350,
                     text: 'Continue',
                     buttonColor: continueButton,
-                    onTap: () => viewModel.gohome(),
+                    onTap: () => viewModel.goHome(),
                   )
                 ],
               ),

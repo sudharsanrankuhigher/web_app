@@ -10,8 +10,11 @@ import 'package:webapp/ui/views/requests/requests_view.dart';
 import 'package:webapp/ui/views/login/login_view.dart';
 import 'package:webapp/ui/views/startup/startup_view.dart';
 
+final goRouterKey = GlobalKey<NavigatorState>();
+
 final GoRouter router = GoRouter(
-  initialLocation: '/home/dashboard',
+  navigatorKey: goRouterKey,
+  initialLocation: '/startup',
   routes: [
     ShellRoute(
       builder: (context, state, child) {
@@ -23,30 +26,37 @@ final GoRouter router = GoRouter(
       routes: [
         GoRoute(
           path: '/home/dashboard',
+          name: 'dashboard',
           builder: (context, state) => DashBoardView(),
         ),
         GoRoute(
           path: '/home/users',
+          name: 'users',
           builder: (context, state) => UsersView(),
         ),
         GoRoute(
           path: '/home/influencers',
+          name: 'influencers',
           builder: (context, state) => InfluencersView(),
         ),
         GoRoute(
           path: '/home/services',
+          name: 'services',
           builder: (context, state) => ServicesView(),
         ),
         GoRoute(
           path: '/home/plans',
+          name: 'plans',
           builder: (context, state) => PlansView(),
         ),
         GoRoute(
           path: '/home/requests',
+          name: 'requests',
           builder: (context, state) => RequestsView(),
         ),
         GoRoute(
           path: '/home/city',
+          name: 'city',
           builder: (context, state) => Container(
             child: Center(
               child: Text('city'),
@@ -55,6 +65,7 @@ final GoRouter router = GoRouter(
         ),
         GoRoute(
           path: '/home/state',
+          name: 'state',
           builder: (context, state) => Container(
             child: Center(
               child: Text('state'),
@@ -63,6 +74,7 @@ final GoRouter router = GoRouter(
         ),
         GoRoute(
           path: '/home/promotion-projects',
+          name: 'promotion-projects',
           builder: (context, state) => Container(
             child: Center(
               child: Text('promotion-projects'),
@@ -71,6 +83,7 @@ final GoRouter router = GoRouter(
         ),
         GoRoute(
           path: '/home/contact-support',
+          name: 'contact-support',
           builder: (context, state) => Container(
             child: Center(
               child: Text('contact-support'),
@@ -79,6 +92,7 @@ final GoRouter router = GoRouter(
         ),
         GoRoute(
           path: '/home/sub-admin',
+          name: 'sub-admin',
           builder: (context, state) => Container(
             child: Center(
               child: Text('sub-admin'),
@@ -89,6 +103,7 @@ final GoRouter router = GoRouter(
     ),
     GoRoute(
       path: '/login',
+      name: 'login',
       builder: (context, state) => LoginView(),
     ),
     GoRoute(

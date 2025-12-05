@@ -10,6 +10,7 @@ import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/services/widgets/service_add_edit_dialog.dart';
 import 'package:webapp/widgets/common_button.dart';
+import 'package:webapp/widgets/common_dialog.dart';
 
 import 'services_viewmodel.dart';
 
@@ -70,23 +71,25 @@ class ServicesView extends StackedView<ServicesViewModel> {
                   SizedBox(
                     width: 240,
                   ),
-                CommonButton(
+                SizedBox(
                   width: 180,
-                  buttonColor: appGreen400,
-                  padding: defaultPadding8,
-                  text: "Filter & Sort",
-                  icon1: Icon(Icons.filter_list),
-                  onTap: () async {
-                    final result =
-                        await viewModel.showSortingFilterDialog(context);
-                    if (result == null) return;
-
-                    bool isChecked = result["checkbox"];
-                    String sortType = result["sort"];
-
-                    // Apply filters/sorting
-                    viewModel.applySort(isChecked, sortType);
-                  },
+                  child: CommonButton(
+                    buttonColor: appGreen400,
+                    margin: EdgeInsets.zero,
+                    padding: defaultPadding8,
+                    text: isExtended ? "Filter & Sort" : "",
+                    icon1: const Icon(Icons.filter_list),
+                    onTap: () {
+                      CommonFilterDialog.show(
+                        context,
+                        initialCheckbox: false,
+                        initialSort: "A-Z",
+                        onApply: (isChecked, sortType) {
+                          viewModel.applySort(isChecked, sortType);
+                        },
+                      );
+                    },
+                  ),
                 ),
                 CommonButton(
                     width: 180,

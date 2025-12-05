@@ -7,6 +7,7 @@ import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/plans/widgets/common_plans_dialog.dart';
 import 'package:webapp/widgets/common_button.dart';
+import 'package:webapp/widgets/common_dialog.dart';
 
 import 'plans_viewmodel.dart';
 
@@ -75,16 +76,16 @@ class PlansView extends StackedView<PlansViewModel> {
                     margin: EdgeInsets.zero,
                     padding: defaultPadding8,
                     text: isExtended ? "Filter & Sort" : "",
-                    icon1: Icon(Icons.filter_list),
-                    onTap: () async {
-                      final result =
-                          await viewModel.showSortingFilterDialog(context);
-                      if (result == null) return;
-
-                      bool isChecked = result["checkbox"];
-                      String sortType = result["sort"];
-
-                      viewModel.applySort(isChecked, sortType);
+                    icon1: const Icon(Icons.filter_list),
+                    onTap: () {
+                      CommonFilterDialog.show(
+                        context,
+                        initialCheckbox: false,
+                        initialSort: "A-Z",
+                        onApply: (isChecked, sortType) {
+                          viewModel.applySort(isChecked, sortType);
+                        },
+                      );
                     },
                   ),
                 ),

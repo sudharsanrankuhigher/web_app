@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:webapp/app/app.bottomsheets.dart';
 import 'package:webapp/app/app.dialogs.dart';
 import 'package:webapp/app/app.locator.dart';
+import 'package:webapp/app/router.dart';
 import 'package:webapp/core/navigation/navigation_mixin.dart';
 import 'package:webapp/ui/common/app_strings.dart';
 import 'package:stacked/stacked.dart';
@@ -111,47 +112,47 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
 
     switch (index) {
       case 0:
-        context.go('/home/dashboard');
+        context.pushReplacementNamed('dashboard');
         _selectedIndex = 0;
         break;
       case 1:
-        context.go('/home/users');
+        context.pushReplacementNamed('users');
         _selectedIndex = 1;
         break;
       case 2:
-        context.go('/home/influencers');
+        context.pushReplacementNamed('influencers');
         _selectedIndex = 2;
         break;
       case 3:
-        context.go('/home/services');
+        context.pushReplacementNamed('services');
         _selectedIndex = 3;
         break;
       case 4:
-        context.go('/home/city');
+        context.pushReplacementNamed('city');
         _selectedIndex = 4;
         break;
       case 5:
-        context.go('/home/state');
+        context.pushReplacementNamed('state');
         _selectedIndex = 5;
         break;
       case 6:
-        context.go('/home/plans');
+        context.pushReplacementNamed('plans');
         _selectedIndex = 6;
         break;
       case 7:
-        context.go('/home/requests');
+        context.pushReplacementNamed('requests');
         _selectedIndex = 7;
         break;
       case 8:
-        context.go('/home/promotion-projects');
+        context.pushReplacementNamed('promotion-projects');
         _selectedIndex = 8;
         break;
       case 9:
-        context.go('/home/contact-support');
+        context.pushReplacementNamed('contact-support');
         _selectedIndex = 9;
         break;
       case 10:
-        context.go('/home/sub-admin');
+        context.pushReplacementNamed('sub-admin');
         _selectedIndex = 10;
         break;
     }
@@ -195,5 +196,9 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
       default:
         _selectedIndex = 0;
     }
+  }
+
+  void logOut(BuildContext context) {
+    context.pushReplacementNamed('login');
   }
 }
