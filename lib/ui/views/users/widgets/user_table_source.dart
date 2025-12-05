@@ -5,7 +5,6 @@ class UserTableSource extends DataTableSource {
   final List<UserModel> originalList;
   List<UserModel> filteredList;
 
-
   UserTableSource({
     required List<UserModel> users,
   })  : originalList = List.from(users),

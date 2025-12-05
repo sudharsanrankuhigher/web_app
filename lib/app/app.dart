@@ -1,6 +1,7 @@
 import 'package:webapp/ui/bottom_sheets/notice/notice_sheet.dart';
 import 'package:webapp/ui/dialogs/info_alert/info_alert_dialog.dart';
 import 'package:webapp/ui/views/home/home_view.dart';
+import 'package:webapp/ui/views/home/home_viewmodel.dart';
 import 'package:webapp/ui/views/startup/startup_view.dart';
 import 'package:stacked/stacked_annotations.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -15,21 +16,35 @@ import 'package:webapp/ui/views/requests/requests_view.dart';
 
 @StackedApp(
   routes: [
-    MaterialRoute(page: HomeView, path: '/Home'),
+    MaterialRoute(
+      page: HomeView,
+      path: '/home',
+      children: [
+        MaterialRoute(page: DashBoardView, path: 'dashboard'),
+        MaterialRoute(page: UsersView, path: 'users'),
+        MaterialRoute(page: InfluencersView, path: 'influencers'),
+        MaterialRoute(page: ServicesView, path: 'services'),
+        MaterialRoute(page: PlansView, path: 'plans'),
+        MaterialRoute(page: RequestsView, path: 'requests'),
+      ],
+    ),
+    // MaterialRoute(page: HomeView, path: '/home'),
     MaterialRoute(page: StartupView, path: "/startup"),
     MaterialRoute(page: LoginView, path: "/login"),
-    MaterialRoute(page: DashBoardView, path: "/dashBoard"),
-    MaterialRoute(page: UsersView),
-    MaterialRoute(page: InfluencersView),
-    MaterialRoute(page: ServicesView),
-    MaterialRoute(page: PlansView),
-    MaterialRoute(page: RequestsView),
+    // MaterialRoute(page: DashBoardView, path: "/dashBoard"),
+    // MaterialRoute(page: UsersView, path: "/users"),
+    // MaterialRoute(page: InfluencersView, path: "/influencers"),
+    // MaterialRoute(page: ServicesView, path: "/services"),
+    // MaterialRoute(page: PlansView, path: "/plans"),
+    // MaterialRoute(page: RequestsView, path: "/requests"),
 // @stacked-route
   ],
   dependencies: [
     LazySingleton(classType: BottomSheetService),
     LazySingleton(classType: DialogService),
     LazySingleton(classType: NavigationService),
+    LazySingleton(classType: HomeViewModel),
+
     // @stacked-service
   ],
   bottomsheets: [
