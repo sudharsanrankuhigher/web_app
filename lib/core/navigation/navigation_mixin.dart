@@ -7,7 +7,7 @@ mixin NavigationMixin {
 
   void goToHome() => _navigationService.navigateTo(Routes.homeView);
   void goToLogin() => _navigationService.navigateTo(Routes.loginView);
-  void goToDashboard() => _navigationService.navigateTo(Routes.dashBoardView);
-  void goToUsers() => _navigationService.navigateTo(Routes.usersView);
-  void goToServices() => _navigationService.navigateTo(Routes.servicesView);
+  // void goToDashboard() => _navigationService.navigateTo(Routes.dashBoardView);
+  // void goToUsers() => _navigationService.navigateTo(Routes.usersView);
+  // void goToServices() => _navigationService.navigateTo(Routes.servicesView);
 }

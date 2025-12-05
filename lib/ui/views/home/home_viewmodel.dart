@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:webapp/app/app.bottomsheets.dart';
 import 'package:webapp/app/app.dialogs.dart';
 import 'package:webapp/app/app.locator.dart';
@@ -13,25 +14,33 @@ import 'package:webapp/ui/views/services/services_view.dart';
 import 'package:webapp/ui/views/users/users_view.dart';
 
 class HomeViewModel extends BaseViewModel with NavigationMixin {
+  void init(context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      onMenuTap(0, context); // ✅ safe, called after build
+    });
+  }
+
   final _dialogService = locator<DialogService>();
   final _bottomSheetService = locator<BottomSheetService>();
 
-  String get counterLabel => 'Counter is: $_counter';
-
   int _counter = 0;
+  int get selectedIndex => _selectedIndex;
+  int _selectedIndex = 0;
+
+  final GlobalKey<NavigatorState> rightPanelNavigatorKey =
+      GlobalKey<NavigatorState>();
 
   void incrementCounter() {
     _counter++;
     rebuildUi();
   }
 
-  int _selectedIndex = 0;
-  int get selectedIndex => _selectedIndex;
   void selectedIndexes(int index) {
     _selectedIndex = index;
     notifyListeners();
   }
 
+  // ─── Left Menu Labels ───
   final List<String> railLabel = [
     'Dashboard',
     'Users',
@@ -76,7 +85,7 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
     const Center(child: Text('Sub Admin', style: TextStyle(fontSize: 20))),
   ];
 
-  // Bottom rail labels
+  // ─── Bottom Labels ───
   final List<String> bottomLabel = ['Profile', 'Logout'];
   final List<String> bottomIcons = ['assets/profile.png', 'assets/logout.png'];
 
@@ -94,5 +103,97 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
       title: ksHomeBottomSheetTitle,
       description: ksHomeBottomSheetDescription,
     );
+  }
+
+  void onMenuTap(int index, BuildContext context) {
+    _selectedIndex = index;
+    notifyListeners();
+
+    switch (index) {
+      case 0:
+        context.go('/home/dashboard');
+        _selectedIndex = 0;
+        break;
+      case 1:
+        context.go('/home/users');
+        _selectedIndex = 1;
+        break;
+      case 2:
+        context.go('/home/influencers');
+        _selectedIndex = 2;
+        break;
+      case 3:
+        context.go('/home/services');
+        _selectedIndex = 3;
+        break;
+      case 4:
+        context.go('/home/city');
+        _selectedIndex = 4;
+        break;
+      case 5:
+        context.go('/home/state');
+        _selectedIndex = 5;
+        break;
+      case 6:
+        context.go('/home/plans');
+        _selectedIndex = 6;
+        break;
+      case 7:
+        context.go('/home/requests');
+        _selectedIndex = 7;
+        break;
+      case 8:
+        context.go('/home/promotion-projects');
+        _selectedIndex = 8;
+        break;
+      case 9:
+        context.go('/home/contact-support');
+        _selectedIndex = 9;
+        break;
+      case 10:
+        context.go('/home/sub-admin');
+        _selectedIndex = 10;
+        break;
+    }
+  }
+
+  void updateIndexFromRoute(String path) {
+    switch (path) {
+      case '/home/dashboard':
+        _selectedIndex = 0;
+        break;
+      case '/home/users':
+        _selectedIndex = 1;
+        break;
+      case '/home/influencers':
+        _selectedIndex = 2;
+        break;
+      case '/home/services':
+        _selectedIndex = 3;
+        break;
+      case '/home/city':
+        _selectedIndex = 4;
+        break;
+      case '/home/state':
+        _selectedIndex = 5;
+        break;
+      case '/home/plans':
+        _selectedIndex = 6;
+        break;
+      case '/home/requests':
+        _selectedIndex = 7;
+        break;
+      case '/home/promotion-projects':
+        _selectedIndex = 8;
+        break;
+      case '/home/contact-support':
+        _selectedIndex = 9;
+        break;
+      case '/home/sub-admin':
+        _selectedIndex = 10;
+        break;
+      default:
+        _selectedIndex = 0;
+    }
   }
 }

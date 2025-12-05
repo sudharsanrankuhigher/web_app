@@ -132,8 +132,10 @@ const leftPadding4 = EdgeInsets.only(left: 4);
 const verticalDivider = VerticalDivider(width: 1.5, color: Colors.black87);
 const verticalDivider1 = VerticalDivider(width: 3, color: Colors.black87);
 const horizontalDivider = Divider(height: 1.5, color: Colors.black87);
-const horizontalDividerLight =
-    Divider(height: 1.5, color: lightContainerBorder);
+const horizontalDividerLight = Divider(
+  height: 1.5,
+  color: lightContainerBorder,
+);
 const horizontalDividerGrey = Divider(height: 1.5, color: Color(0xFFE5E5E5));
 
 //fontFamily
@@ -153,9 +155,7 @@ TextStyle greenGradientText(TextStyle baseStyle) {
           appGreen500, // Start green
           appGreen800, // End green
         ],
-      ).createShader(
-        const Rect.fromLTWH(0, 0, 400, 10),
-      ),
+      ).createShader(const Rect.fromLTWH(0, 0, 400, 10)),
   );
 }
 
