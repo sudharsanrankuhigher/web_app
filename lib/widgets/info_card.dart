@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 
 class InfoCard extends StatelessWidget {
   final Color boxColor;
@@ -28,22 +31,27 @@ class InfoCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(icon, size: 30),
-          const SizedBox(height: 10),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: isExtended! ? 14 : 12,
-              fontWeight: FontWeight.w600,
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withOpacity(0.2),
+            ),
+            padding: defaultPadding10,
+            child: SizedBox(
+              height: 26.h,
+              width: 26.w,
+              child: Image.asset('assets/images/promote_vector.png'),
             ),
           ),
-          const SizedBox(height: 10),
+          verticalSpacing10,
+          Text(text,
+              style: isExtended!
+                  ? fontFamilySemiBold.size14.white
+                  : fontFamilySemiBold.size12.white),
+          verticalSpacing10,
           Text(
             count,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+            style: fontFamilyBold.size16.white,
           ),
         ],
       ),

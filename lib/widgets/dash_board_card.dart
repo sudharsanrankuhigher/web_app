@@ -6,6 +6,7 @@ class DashBoardCard extends StatelessWidget {
   final String? title;
   final String? count;
   final IconData? icon;
+  final String? asset;
   final String? subtitle;
   final Color? textColor;
 
@@ -14,6 +15,7 @@ class DashBoardCard extends StatelessWidget {
       required this.title,
       this.count,
       this.icon,
+      this.asset,
       this.subtitle,
       this.textColor});
 
@@ -38,14 +40,26 @@ class DashBoardCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(count ?? '00', style: fontFamilySemiBold.size20.black),
-                  Icon(
-                    icon,
-                    color: textColor ?? Colors.black,
-                  ),
+                  if (asset == null)
+                    Icon(
+                      icon,
+                      color: textColor ?? Colors.black,
+                    ),
+                  Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: cardColor.withOpacity(0.1)),
+                    padding: defaultPadding8,
+                    child: Center(child: Image.asset(asset!)),
+                  )
                 ],
               ),
               verticalSpacing10,
-              Text(subtitle!),
+              Text(subtitle!,
+                  style: fontFamilyMedium.size12
+                      .copyWith(color: subText.withOpacity(0.60))),
             ],
           ),
         ),

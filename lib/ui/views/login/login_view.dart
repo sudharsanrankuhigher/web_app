@@ -35,7 +35,7 @@ class LoginView extends StackedView<LoginViewModel> {
                     begin: Alignment.topCenter,
                     end: Alignment.center,
                     colors: [
-                      Colors.blue,
+                      Color(0xffEEF3FA),
                       Colors.white,
                     ]),
                 color: Colors.white,
@@ -51,13 +51,17 @@ class LoginView extends StackedView<LoginViewModel> {
                     child: RichText(
                         textAlign: TextAlign.center,
                         text: TextSpan(children: [
-                          const WidgetSpan(child: Icon(Icons.rocket)),
-                          const WidgetSpan(child: verticalSpacing20),
+                          WidgetSpan(
+                              child: Image.asset(
+                            'assets/images/logo.png',
+                            height: 35,
+                          )),
+                          const WidgetSpan(child: horizontalSpacing12),
                           TextSpan(
                               text: 'Promote',
-                              style: fontFamilyBold.size28.blueText),
+                              style: fontFamilyBold.size30.blueText),
                           TextSpan(
-                              text: 'app', style: fontFamilyBold.size28.black)
+                              text: 'app', style: fontFamilyBold.size30.black)
                         ])),
                   ),
                   verticalSpacing12,
@@ -80,7 +84,7 @@ class LoginView extends StackedView<LoginViewModel> {
                           color: disableColor,
                         ),
                         hintText: 'Enter email address',
-                        fillColor: publisButtonColor.withOpacity(0.15),
+                        fillColor: Color(0xff01B8F91A),
                         radius: 10.r,
                       )),
                   verticalSpacing12,
@@ -95,7 +99,7 @@ class LoginView extends StackedView<LoginViewModel> {
                         preffixIcon:
                             const Icon(Icons.lock_outline, color: disableColor),
                         hintText: 'Enter password',
-                        fillColor: publisButtonColor.withOpacity(0.15),
+                        fillColor: Color(0xff01B8F91A),
                         radius: 10.r,
                       )),
                   verticalSpacing20,
@@ -104,6 +108,7 @@ class LoginView extends StackedView<LoginViewModel> {
                     height: 45,
                     width: 350,
                     text: 'Continue',
+                    textStyle: fontFamilySemiBold.size16.white,
                     buttonColor: continueButton,
                     onTap: () => viewModel.goHome(),
                   )

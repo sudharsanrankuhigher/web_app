@@ -35,7 +35,9 @@ class ServiceTableSource extends DataTableSource {
         DataCell(Text(service.name)), // Name
         DataCell(
           Row(
-            mainAxisSize: MainAxisSize.min,
+            // mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
                 icon: const Icon(Icons.edit, color: Colors.blue),

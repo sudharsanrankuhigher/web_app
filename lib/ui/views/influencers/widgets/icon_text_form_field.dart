@@ -14,6 +14,7 @@ class IconTextFormField extends StatelessWidget {
   final double? iconSize;
   final FontWeight? fontWeight;
   final bool? isView;
+  final String? Function(String?)? validator;
 
   IconTextFormField({
     super.key,
@@ -27,6 +28,7 @@ class IconTextFormField extends StatelessWidget {
     this.fontSize,
     this.iconSize,
     this.fontWeight,
+    this.validator,
   });
 
   @override
@@ -45,6 +47,7 @@ class IconTextFormField extends StatelessWidget {
         ),
         verticalSpacing8,
         InitialTextForm(
+          validator: validator,
           readOnly: isView!,
           radius: 10,
           controller: controller,

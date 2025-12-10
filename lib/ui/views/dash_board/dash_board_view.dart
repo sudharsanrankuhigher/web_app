@@ -31,6 +31,20 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Container(
+                width: double.infinity,
+                padding: defaultPadding16,
+                decoration: BoxDecoration(
+                  color: white,
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(12),
+                      bottomRight: Radius.circular(12)),
+                ),
+                child: Text(
+                  'Dashboard',
+                  style: fontFamilyBold.size26.black,
+                ),
+              ),
               Wrap(
                 spacing: 12,
                 runSpacing: 12,
@@ -38,28 +52,32 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                   DashBoardCard(
                     title: 'Total Client Projects',
                     count: '00',
-                    icon: Icons.wallet,
+                    // icon: Icons.wallet,
+                    asset: 'assets/images/total_client_project.png',
                     subtitle: '+0% From last month',
                     textColor: Colors.blueAccent,
                   ),
                   DashBoardCard(
                     title: 'Client Revenue',
                     count: '10',
-                    icon: Icons.person,
+                    // icon: Icons.person,
                     subtitle: '+5% From last month',
+                    asset: 'assets/images/client_revenue.png',
                     textColor: continueButton,
                   ),
                   DashBoardCard(
                     title: 'Promote Revenue',
                     count: '07',
-                    icon: Icons.task,
+                    // icon: Icons.task,
+                    asset: 'assets/images/promote_revenue.png',
                     subtitle: '+2% From last month',
                     textColor: appGreen800,
                   ),
                   DashBoardCard(
                     title: 'Influencers Count',
                     count: '50',
-                    icon: Icons.check_circle,
+                    // icon: Icons.check_circle,
+                    asset: 'assets/images/influencer_count.png',
                     subtitle: '+12% From last month',
                     textColor: red,
                   ),
@@ -160,7 +178,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                             ),
                             verticalSpacing20,
                             ClientProjectInfoCard(
-                              boxColor: greenShade,
+                              boxColor: greenShade1.withOpacity(0.10),
                               dotColor: appGreen500,
                               text: "Completed",
                               // text: isExtended ? "Completed" : "",
@@ -169,8 +187,8 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                               countColor: Colors.black,
                             ),
                             ClientProjectInfoCard(
-                              boxColor: Colors.blue[50]!,
-                              dotColor: Colors.blue[500]!,
+                              boxColor: onGoing.withOpacity(0.10),
+                              dotColor: onGoing,
                               text: "Ongoing",
                               // text: isExtended ? "Ongoing" : "",
                               textColor: Colors.blue[600]!,
@@ -178,8 +196,8 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                               countColor: Colors.black,
                             ),
                             ClientProjectInfoCard(
-                              boxColor: pendingColorShade,
-                              dotColor: pendingColor,
+                              boxColor: pending.withOpacity(0.10),
+                              dotColor: pending,
                               text: "Pending",
                               // text: isExtended ? "Pending" : "",
                               textColor: Colors.blue[600]!,
@@ -187,8 +205,8 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                               countColor: Colors.black,
                             ),
                             ClientProjectInfoCard(
-                              boxColor: participatedColor,
-                              dotColor: participatedTextColor,
+                              boxColor: monthlyProjects.withOpacity(0.10),
+                              dotColor: monthlyProjects,
                               text: "Monthly Project",
                               // text: isExtended ? "Monthly Project" : "",
                               textColor: Colors.blue[600]!,
@@ -217,7 +235,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                       text: 'Total projects',
                     ),
                   ),
-                  horizontalSpacing10,
+                  horizontalSpacing16,
                   Expanded(
                     child: InfoCard(
                       boxColor: continueButton,
@@ -226,7 +244,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                       text: 'Monthly Projects',
                     ),
                   ),
-                  horizontalSpacing10,
+                  horizontalSpacing16,
                   Expanded(
                     child: InfoCard(
                       boxColor: publisButtonColor,
@@ -235,7 +253,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                       text: 'In progress',
                     ),
                   ),
-                  horizontalSpacing10,
+                  horizontalSpacing16,
                   Expanded(
                     child: InfoCard(
                       boxColor: appGreen400,

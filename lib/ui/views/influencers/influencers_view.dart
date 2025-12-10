@@ -2,8 +2,10 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stacked/stacked.dart';
+import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/ui/views/influencers/widgets/add_edit_influencer_dialog.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_dialog.dart';
 
@@ -53,6 +55,7 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: "Search name, phone, city...",
+                      hintStyle: fontFamilyRegular.size14.grey,
                       prefixIcon: Icon(Icons.search),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -93,41 +96,63 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                     textStyle: fontFamilyMedium.size14.white,
                     borderRadius: 10,
                     text: "Add Influencer",
-                    onTap: () {}),
+                    onTap: () {
+                      showDialog(
+                        context: StackedService.navigatorKey!.currentContext!,
+                        builder: (_) => Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                                maxWidth: 800, minWidth: 400),
+                            child: InfluencerDialog(
+                              isView: false,
+                              influencer: null,
+                              onSave: (newInfluencer) {
+                                viewModel.influencers.add(newInfluencer);
+                                viewModel.notifyListeners();
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
               ],
             ),
             const SizedBox(height: 20),
             Expanded(
-              child: PaginatedDataTable2(
-                dataRowHeight: 65.h,
-                headingRowColor: MaterialStateProperty.all(Colors.blueAccent),
-                headingTextStyle: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold),
-                dataTextStyle: fontFamilyRegular.size12.black,
-                headingRowDecoration: const BoxDecoration(
-                  color: Colors.blueAccent,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  ),
-                ),
-                columns: const [
-                  DataColumn(label: Text("S.No")),
-                  DataColumn(label: Text("Name")),
-                  DataColumn(label: Text("Phone")),
-                  DataColumn(label: Text("City/State")),
-                  DataColumn(label: Text("Bank/UPI")),
-                  DataColumn(label: Text("Instagram")),
-                  DataColumn(label: Text("YouTube")),
-                  DataColumn(label: Text("Facebook")),
-                  DataColumn(label: Text("Actions")),
-                  DataColumn(label: Text("Status")),
-                ],
-                source: viewModel.tableSource,
-                rowsPerPage: viewModel.tableSource.rowCount < 10
-                    ? viewModel.tableSource.rowCount
-                    : 10,
-              ),
+              child: viewModel.influencers.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : PaginatedDataTable2(
+                      dataRowHeight: 65.h,
+                      headingRowColor:
+                          MaterialStateProperty.all(Colors.blueAccent),
+                      headingTextStyle: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                      dataTextStyle: fontFamilyRegular.size12.black,
+                      headingRowDecoration: const BoxDecoration(
+                        color: Colors.blueAccent,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          topRight: Radius.circular(12),
+                        ),
+                      ),
+                      columns: const [
+                        DataColumn(label: Text("S.No")),
+                        DataColumn(label: Text("Name")),
+                        DataColumn(label: Text("Phone")),
+                        DataColumn(label: Text("City/State")),
+                        DataColumn(label: Text("Bank/UPI")),
+                        DataColumn(label: Text("Instagram")),
+                        DataColumn(label: Text("YouTube")),
+                        DataColumn(label: Text("Facebook")),
+                        DataColumn(label: Text("Actions")),
+                        DataColumn(label: Text("Status")),
+                      ],
+                      source: viewModel.tableSource,
+                      rowsPerPage: viewModel.tableSource.rowCount < 10
+                          ? viewModel.tableSource.rowCount
+                          : 10,
+                      minWidth: 1000,
+                    ),
             ),
           ],
         ),

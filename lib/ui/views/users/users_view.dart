@@ -2,8 +2,10 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stacked/stacked.dart';
+import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/ui/views/users/widgets/common_user_dialog.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_dialog.dart';
 import 'users_viewmodel.dart';
@@ -53,6 +55,7 @@ class UsersView extends StackedView<UsersViewModel> {
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: "Search name, email, phone...",
+                        hintStyle: fontFamilyRegular.size14.grey,
                         prefixIcon: Icon(Icons.search),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -96,16 +99,17 @@ class UsersView extends StackedView<UsersViewModel> {
                       borderRadius: 10,
                       text: isExtended ? "Add Users" : "",
                       onTap: () async {
-                        // final result = await CommonPlanDialog.show(
-                        //   StackedService.navigatorKey!.currentContext!,
-                        // );
+                        final result = await CommonUserDialog.show(
+                          StackedService.navigatorKey!.currentContext!,
+                        );
 
-                        // if (result != null) {
-                        //   print('Plan Name: ${result['planName']}');
-                        //   print('Connections: ${result['connections']}');
-                        //   print('Amount: ${result['amount']}');
-                        //   print('Badge: ${result['badge']}');
-                        // }
+                        if (result != null) {
+                          print('name: ${result['name']}');
+                          print('email: ${result['email']}');
+                          print('phone: ${result['amount']}');
+                          print('city: ${result['city']}');
+                          print('state: ${result['state']}');
+                        }
                       },
                     ),
                   ),
@@ -138,6 +142,7 @@ class UsersView extends StackedView<UsersViewModel> {
                           DataColumn(label: Text("City/State")),
                           DataColumn(label: Text("Plan")),
                           DataColumn(label: Text("Connections")),
+                          DataColumn(label: Text("Actions")),
                         ],
                         source: viewModel.tableSource,
                         columnSpacing: 20,

@@ -52,6 +52,7 @@ extension TextStyleHelpers on TextStyle {
   TextStyle get completedColorShade => copyWith(color: const Color(0xFFEDFDF5));
   TextStyle get termsConditionBlue => copyWith(color: const Color(0xFF008CBE));
   TextStyle get campaignPartcipated => copyWith(color: const Color(0xFF4D0792));
+  TextStyle get subText => copyWith(color: const Color(0xFF095299));
 
   TextStyle get missedColor => copyWith(color: const Color(0xFFFFD5A2));
   TextStyle get availableCampaignColor =>

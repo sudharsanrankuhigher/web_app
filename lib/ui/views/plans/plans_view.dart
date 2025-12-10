@@ -20,7 +20,7 @@ class PlansView extends StackedView<PlansViewModel> {
     PlansViewModel viewModel,
     Widget? child,
   ) {
-    final bool isExtended = MediaQuery.of(context).size.width > 900;
+    final bool isExtended = MediaQuery.of(context).size.width > 1440;
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -51,10 +51,12 @@ class PlansView extends StackedView<PlansViewModel> {
               alignment: WrapAlignment.start,
               children: [
                 SizedBox(
+                  height: 45.h,
                   width: 450, // search field fixed width (responsive)
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: "Search plan name...",
+                      hintStyle: fontFamilyRegular.size14.grey,
                       prefixIcon: Icon(Icons.search),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -142,7 +144,9 @@ class PlansView extends StackedView<PlansViewModel> {
                             label: Text("Connections")),
                         DataColumn(label: Text("Amount")),
                         DataColumn(label: Text("Badge")),
-                        DataColumn(label: Text("Actions")),
+                        DataColumn(
+                            headingRowAlignment: MainAxisAlignment.center,
+                            label: Text("Actions")),
                       ],
                       source: viewModel.tableSource,
                       columnSpacing: 20,

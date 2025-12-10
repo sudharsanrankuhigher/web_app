@@ -3,6 +3,8 @@ import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/plans/model/plans_model.dart';
 import 'package:webapp/widgets/common_button.dart';
+import 'package:webapp/widgets/initial_textform.dart';
+import 'package:webapp/widgets/label_text.dart';
 
 class CommonPlanDialog {
   static Future<Map<String, dynamic>?> show(
@@ -81,19 +83,41 @@ class CommonPlanDialog {
     bool isNumber = false,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextFormField(
-        initialValue: initial,
-        readOnly: isView,
-        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-        onChanged: onChanged,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10)),
+      padding: EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          IconTextLabel(
+            icon: null,
+            text: label,
+            iconColor: Colors.black,
+            textColor: Colors.black,
+            iconSize: 16,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
           ),
-        ),
+          verticalSpacing8,
+          InitialTextForm(
+            readOnly: isView,
+            radius: 10,
+            hintText: label,
+            initialValue: initial ?? '',
+            onChanged: (val) => onChanged(val!),
+          ),
+        ],
       ),
+      // child: TextFormField(
+      //   initialValue: initial,
+      //   readOnly: isView,
+      //   keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+      //   onChanged: onChanged,
+      //   decoration: InputDecoration(
+      //     labelText: label,
+      //     border: const OutlineInputBorder(
+      //       borderRadius: BorderRadius.all(Radius.circular(10)),
+      //     ),
+      //   ),
+      // ),
     );
   }
 }

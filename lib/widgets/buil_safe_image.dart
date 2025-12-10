@@ -5,26 +5,36 @@ import 'package:flutter/material.dart';
 import 'package:webapp/ui/views/services/services_viewmodel.dart';
 
 Widget buildSafeImage(ServicesViewModel vm) {
-  final path = vm.imagePath!;
+  // 1) If Web bytes are set
+  if (vm.imageBytes != null) {
+    return Image.memory(
+      vm.imageBytes!,
+      fit: BoxFit.fill,
+      errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 50),
+    );
+  }
 
-  // If API sends URL
-  if (path.startsWith("http")) {
+  // 2) If API sends URL
+  if (vm.imagePath != null && vm.imagePath!.startsWith("http")) {
     return Image.network(
-      path,
-      fit: BoxFit.cover,
+      vm.imagePath!,
+      fit: BoxFit.fill,
       errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 50),
     );
   }
 
-  // If local file path
-  if (!kIsWeb && File(path).existsSync()) {
+  // 3) If local file path (mobile/desktop)
+  if (vm.imagePath != null &&
+      vm.imagePath!.isNotEmpty &&
+      !kIsWeb &&
+      File(vm.imagePath!).existsSync()) {
     return Image.file(
-      File(path),
-      fit: BoxFit.cover,
+      File(vm.imagePath!),
+      fit: BoxFit.fill,
       errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 50),
     );
   }
 
-  // If invalid data
+  // 4) Fallback
   return const Icon(Icons.broken_image, size: 50);
 }

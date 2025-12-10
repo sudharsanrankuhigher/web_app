@@ -1,35 +1,50 @@
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'dart:html' as html;
 import 'package:image_picker/image_picker.dart';
-import 'package:file_picker/file_picker.dart';
 
 class UniversalImagePicker {
   static Future<Map<String, dynamic>?> pickImage() async {
     if (kIsWeb) {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.image,
-        allowMultiple: false,
-        withData: true,
-      );
-
-      if (result != null && result.files.single.bytes != null) {
-        return {
-          'bytes': result.files.single.bytes,
-          'path': null,
-        };
-      }
-      return null;
+      return _pickImageWeb();
+    } else {
+      return _pickImageMobile();
     }
+  }
 
-    // ANDROID / IOS
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
+  // --- WEB PICKER ---
+  static Future<Map<String, dynamic>?> _pickImageWeb() async {
+    final html.FileUploadInputElement uploadInput =
+        html.FileUploadInputElement();
+    uploadInput.accept = 'image/*';
+    uploadInput.click();
 
-    if (picked != null) {
-      return {
-        'bytes': null,
-        'path': picked.path,
-      };
-    }
-    return null;
+    await uploadInput.onChange.first;
+
+    final file = uploadInput.files?.first;
+    if (file == null) return null;
+
+    final reader = html.FileReader();
+    reader.readAsArrayBuffer(file);
+    await reader.onLoad.first;
+
+    return {
+      'bytes': reader.result as Uint8List,
+      'path': null,
+    };
+  }
+
+  // --- MOBILE / DESKTOP PICKER ---
+  static Future<Map<String, dynamic>?> _pickImageMobile() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? file = await picker.pickImage(source: ImageSource.gallery);
+
+    if (file == null) return null;
+
+    return {
+      'path': file.path,
+      'bytes': null,
+    };
   }
 }

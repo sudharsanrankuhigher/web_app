@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class IconTextLabel extends StatelessWidget {
-  final IconData icon;
+  final IconData? icon;
   final String text;
   final Color iconColor;
   final Color textColor;
@@ -12,7 +12,7 @@ class IconTextLabel extends StatelessWidget {
 
   const IconTextLabel({
     super.key,
-    required this.icon,
+    this.icon,
     required this.text,
     this.iconColor = Colors.black,
     this.textColor = Colors.black,

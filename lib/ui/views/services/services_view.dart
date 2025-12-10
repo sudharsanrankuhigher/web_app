@@ -59,6 +59,7 @@ class ServicesView extends StackedView<ServicesViewModel> {
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: "Search service name...",
+                      hintStyle: fontFamilyRegular.size14.grey,
                       prefixIcon: Icon(Icons.search),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -134,7 +135,7 @@ class ServicesView extends StackedView<ServicesViewModel> {
                         DataColumn(label: Text("S.No")),
                         DataColumn(label: Text("Name")),
                         DataColumn(
-                            headingRowAlignment: MainAxisAlignment.start,
+                            headingRowAlignment: MainAxisAlignment.center,
                             label: Text("Actions")),
                       ],
                       source: viewModel.tableSource,

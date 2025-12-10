@@ -23,7 +23,6 @@ class HomeView extends StackedView<HomeViewModel> {
       backgroundColor: Colors.white,
       body: Row(
         children: [
-          // ─────────── LEFT MENU ───────────
           Container(
             width: isExtended ? 230 : 80,
             color: Colors.white,
@@ -34,39 +33,42 @@ class HomeView extends StackedView<HomeViewModel> {
                   : CrossAxisAlignment.center,
               children: [
                 // Logo + App Name
-                Row(
-                  children: [
-                    const CircleAvatar(
-                      backgroundColor: white,
-                      radius: 22,
-                      backgroundImage: AssetImage("assets/images/logo.png"),
-                    ),
-                    if (isExtended) ...[
-                      const SizedBox(width: 10),
-                      RichText(
-                        text: const TextSpan(
-                          children: [
-                            TextSpan(
-                              text: "promote",
-                              style: TextStyle(
-                                color: Colors.blue,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                            TextSpan(
-                              text: "app",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ],
-                        ),
+                InkWell(
+                  onTap: () => viewModel.onMenuTap(0, context),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        backgroundColor: white,
+                        radius: 22,
+                        backgroundImage: AssetImage("assets/images/logo.png"),
                       ),
+                      if (isExtended) ...[
+                        const SizedBox(width: 10),
+                        RichText(
+                          text: const TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "promote",
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              TextSpan(
+                                text: "app",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
                 verticalSpacing16,
 
@@ -93,11 +95,15 @@ class HomeView extends StackedView<HomeViewModel> {
                             ),
                             child: Row(
                               children: [
-                                Icon(
-                                  viewModel.railIcons[index],
-                                  size: 20,
-                                  color:
-                                      selected ? Colors.white : Colors.black87,
+                                SizedBox(
+                                  height: !isExtended ? 44.h : 24.h,
+                                  width: !isExtended ? 44.w : 24.w,
+                                  child: Image.asset(
+                                    viewModel.railIcon[index],
+                                    color: selected
+                                        ? Colors.white
+                                        : Colors.black87,
+                                  ),
                                 ),
                                 if (isExtended) ...[
                                   const SizedBox(width: 12),
@@ -142,8 +148,8 @@ class HomeView extends StackedView<HomeViewModel> {
                           ),
                           placeholder: (context, url) => const CircleAvatar(
                             radius: 22,
-                            backgroundImage: AssetImage(
-                                "assets/images/user_placeholder.png"),
+                            backgroundImage:
+                                AssetImage("assets/images/user.png"),
                           ),
                           errorWidget: (context, url, error) =>
                               const CircleAvatar(
@@ -194,7 +200,6 @@ class HomeView extends StackedView<HomeViewModel> {
               ],
             ),
           ),
-
           Expanded(
             child: child ?? Center(child: CircularProgressIndicator()),
           ),

@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/views/users/model/users_model.dart';
+import 'common_user_dialog.dart'; // import your dialog
 
 class UserTableSource extends DataTableSource {
   final List<UserModel> originalList;
   List<UserModel> filteredList;
+  final void Function(UserModel) onEdit;
+  final Function(UserModel) onDelete;
 
   UserTableSource({
     required List<UserModel> users,
+    required this.onEdit,
+    required this.onDelete,
   })  : originalList = List.from(users),
         filteredList = List.from(users);
 
@@ -27,16 +33,15 @@ class UserTableSource extends DataTableSource {
     notifyListeners();
   }
 
-  // ------------------------- ROW UI ----------------------------
+  // ---------------------- ROW UI ----------------------
   @override
   DataRow? getRow(int index) {
     if (filteredList.isEmpty) {
       return DataRow(
         cells: List.generate(
-          9, // total columns
+          9,
           (i) {
             if (i == 4) {
-              // column index where message should show
               return const DataCell(
                 Center(
                   child: Text(
@@ -49,11 +54,12 @@ class UserTableSource extends DataTableSource {
                 ),
               );
             }
-            return const DataCell(Text("")); // other cells empty
+            return const DataCell(Text(""));
           },
         ),
       );
     }
+
     final user = filteredList[index];
 
     return DataRow(
@@ -72,16 +78,20 @@ class UserTableSource extends DataTableSource {
         DataCell(Text("${user.city}/${user.state}")),
         DataCell(Text(user.plan)),
         DataCell(Text("${user.connections}")),
-        // DataCell(CommonButton(
-        //   icon: Icon(Icons.add, color: white, size: 16),
-        //   text: 'Add',
-        //   textStyle: fontFamilyMedium.size14.white,
-        //   borderRadius: 12,
-        //   buttonColor: continueButton,
-        //   margin: defaultPadding10 - leftPadding10,
-        //   padding: zeroPadding,
-        // )
-        // ),
+        DataCell(
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.edit, color: Colors.blue),
+                onPressed: () => onEdit(user),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete, color: red),
+                onPressed: () => onDelete(user),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

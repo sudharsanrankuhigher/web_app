@@ -56,18 +56,18 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
     'Sub Admin',
   ];
 
-  final List<IconData> railIcons = [
-    Icons.dashboard,
-    Icons.people,
-    Icons.person_search,
-    Icons.miscellaneous_services,
-    Icons.location_city,
-    Icons.map,
-    Icons.subscriptions,
-    Icons.request_page,
-    Icons.campaign,
-    Icons.support_agent,
-    Icons.admin_panel_settings,
+  final List<String> railIcon = [
+    'assets/images/dash_board.png',
+    'assets/images/user.png',
+    'assets/images/influencer_dashboard.png',
+    'assets/images/service_dashboard.png',
+    'assets/images/city.png',
+    'assets/images/city.png',
+    'assets/images/plans_dashboard.png',
+    'assets/images/requests_dashboard.png',
+    'assets/images/promotes_proj_dashboard.png',
+    'assets/images/support_dashboard.png',
+    'assets/images/sub-admin_dashboard.png',
   ];
 
   final List<Widget> pages = [
