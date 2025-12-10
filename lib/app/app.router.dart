@@ -5,31 +5,49 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:flutter/material.dart' as _i5;
+import 'package:flutter/material.dart' as _i11;
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart' as _i1;
 import 'package:stacked_services/stacked_services.dart' as _i12;
-import 'package:webapp/ui/views/dash_board/dash_board_view.dart' as _i6;
+import 'package:webapp/ui/views/dash_board/dash_board_view.dart' as _i5;
 import 'package:webapp/ui/views/home/home_view.dart' as _i2;
-import 'package:webapp/ui/views/influencers/influencers_view.dart' as _i8;
+import 'package:webapp/ui/views/influencers/influencers_view.dart' as _i7;
 import 'package:webapp/ui/views/login/login_view.dart' as _i4;
-import 'package:webapp/ui/views/plans/plans_view.dart' as _i10;
-import 'package:webapp/ui/views/requests/requests_view.dart' as _i11;
-import 'package:webapp/ui/views/services/services_view.dart' as _i9;
+import 'package:webapp/ui/views/plans/plans_view.dart' as _i9;
+import 'package:webapp/ui/views/requests/requests_view.dart' as _i10;
+import 'package:webapp/ui/views/services/services_view.dart' as _i8;
 import 'package:webapp/ui/views/startup/startup_view.dart' as _i3;
-import 'package:webapp/ui/views/users/users_view.dart' as _i7;
+import 'package:webapp/ui/views/users/users_view.dart' as _i6;
 
 class Routes {
-  static const homeView = '/home';
+  static const homeView = '/Home';
 
   static const startupView = '/startup';
 
   static const loginView = '/login';
 
+  static const dashBoardView = '/dashBoard';
+
+  static const usersView = '/users-view';
+
+  static const influencersView = '/influencers-view';
+
+  static const servicesView = '/services-view';
+
+  static const plansView = '/plans-view';
+
+  static const requestsView = '/requests-view';
+
   static const all = <String>{
     homeView,
     startupView,
     loginView,
+    dashBoardView,
+    usersView,
+    influencersView,
+    servicesView,
+    plansView,
+    requestsView,
   };
 }
 
@@ -47,149 +65,84 @@ class StackedRouter extends _i1.RouterBase {
       Routes.loginView,
       page: _i4.LoginView,
     ),
+    _i1.RouteDef(
+      Routes.dashBoardView,
+      page: _i5.DashBoardView,
+    ),
+    _i1.RouteDef(
+      Routes.usersView,
+      page: _i6.UsersView,
+    ),
+    _i1.RouteDef(
+      Routes.influencersView,
+      page: _i7.InfluencersView,
+    ),
+    _i1.RouteDef(
+      Routes.servicesView,
+      page: _i8.ServicesView,
+    ),
+    _i1.RouteDef(
+      Routes.plansView,
+      page: _i9.PlansView,
+    ),
+    _i1.RouteDef(
+      Routes.requestsView,
+      page: _i10.RequestsView,
+    ),
   ];
 
   final _pagesMap = <Type, _i1.StackedRouteFactory>{
     _i2.HomeView: (data) {
-      final args = data.getArgs<HomeViewArguments>(nullOk: false);
-      return _i5.MaterialPageRoute<dynamic>(
-        builder: (context) => _i2.HomeView(key: args.key, child: args.child),
+      return _i11.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i2.HomeView(),
         settings: data,
       );
     },
     _i3.StartupView: (data) {
-      return _i5.MaterialPageRoute<dynamic>(
+      return _i11.MaterialPageRoute<dynamic>(
         builder: (context) => const _i3.StartupView(),
         settings: data,
       );
     },
     _i4.LoginView: (data) {
-      return _i5.MaterialPageRoute<dynamic>(
+      return _i11.MaterialPageRoute<dynamic>(
         builder: (context) => const _i4.LoginView(),
         settings: data,
       );
     },
-  };
-
-  @override
-  List<_i1.RouteDef> get routes => _routes;
-
-  @override
-  Map<Type, _i1.StackedRouteFactory> get pagesMap => _pagesMap;
-}
-
-class HomeViewArguments {
-  const HomeViewArguments({
-    this.key,
-    required this.child,
-  });
-
-  final _i5.Key? key;
-
-  final _i5.Widget child;
-
-  @override
-  String toString() {
-    return '{"key": "$key", "child": "$child"}';
-  }
-
-  @override
-  bool operator ==(covariant HomeViewArguments other) {
-    if (identical(this, other)) return true;
-    return other.key == key && other.child == child;
-  }
-
-  @override
-  int get hashCode {
-    return key.hashCode ^ child.hashCode;
-  }
-}
-
-class HomeViewRoutes {
-  static const dashBoardView = 'dashboard';
-
-  static const usersView = 'users';
-
-  static const influencersView = 'influencers';
-
-  static const servicesView = 'services';
-
-  static const plansView = 'plans';
-
-  static const requestsView = 'requests';
-
-  static const all = <String>{
-    dashBoardView,
-    usersView,
-    influencersView,
-    servicesView,
-    plansView,
-    requestsView,
-  };
-}
-
-class HomeViewRouter extends _i1.RouterBase {
-  final _routes = <_i1.RouteDef>[
-    _i1.RouteDef(
-      HomeViewRoutes.dashBoardView,
-      page: _i6.DashBoardView,
-    ),
-    _i1.RouteDef(
-      HomeViewRoutes.usersView,
-      page: _i7.UsersView,
-    ),
-    _i1.RouteDef(
-      HomeViewRoutes.influencersView,
-      page: _i8.InfluencersView,
-    ),
-    _i1.RouteDef(
-      HomeViewRoutes.servicesView,
-      page: _i9.ServicesView,
-    ),
-    _i1.RouteDef(
-      HomeViewRoutes.plansView,
-      page: _i10.PlansView,
-    ),
-    _i1.RouteDef(
-      HomeViewRoutes.requestsView,
-      page: _i11.RequestsView,
-    ),
-  ];
-
-  final _pagesMap = <Type, _i1.StackedRouteFactory>{
-    _i6.DashBoardView: (data) {
-      return _i5.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i6.DashBoardView(),
+    _i5.DashBoardView: (data) {
+      return _i11.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i5.DashBoardView(),
         settings: data,
       );
     },
-    _i7.UsersView: (data) {
-      return _i5.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i7.UsersView(),
+    _i6.UsersView: (data) {
+      return _i11.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i6.UsersView(),
         settings: data,
       );
     },
-    _i8.InfluencersView: (data) {
-      return _i5.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i8.InfluencersView(),
+    _i7.InfluencersView: (data) {
+      return _i11.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i7.InfluencersView(),
         settings: data,
       );
     },
-    _i9.ServicesView: (data) {
-      return _i5.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i9.ServicesView(),
+    _i8.ServicesView: (data) {
+      return _i11.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i8.ServicesView(),
         settings: data,
       );
     },
-    _i10.PlansView: (data) {
-      return _i5.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i10.PlansView(),
+    _i9.PlansView: (data) {
+      return _i11.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i9.PlansView(),
         settings: data,
       );
     },
-    _i11.RequestsView: (data) {
-      return _i5.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i11.RequestsView(),
+    _i10.RequestsView: (data) {
+      return _i11.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i10.RequestsView(),
         settings: data,
       );
     },
@@ -203,17 +156,14 @@ class HomeViewRouter extends _i1.RouterBase {
 }
 
 extension NavigatorStateExtension on _i12.NavigationService {
-  Future<dynamic> navigateToHomeView({
-    _i5.Key? key,
-    required _i5.Widget child,
+  Future<dynamic> navigateToHomeView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  }) async {
+  ]) async {
     return navigateTo<dynamic>(Routes.homeView,
-        arguments: HomeViewArguments(key: key, child: child),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
@@ -248,101 +198,98 @@ extension NavigatorStateExtension on _i12.NavigationService {
         transition: transition);
   }
 
-  Future<dynamic> navigateToNestedDashBoardViewInHomeViewRouter([
+  Future<dynamic> navigateToDashBoardView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   ]) async {
-    return navigateTo<dynamic>(HomeViewRoutes.dashBoardView,
+    return navigateTo<dynamic>(Routes.dashBoardView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
         transition: transition);
   }
 
-  Future<dynamic> navigateToNestedUsersViewInHomeViewRouter([
+  Future<dynamic> navigateToUsersView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   ]) async {
-    return navigateTo<dynamic>(HomeViewRoutes.usersView,
+    return navigateTo<dynamic>(Routes.usersView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
         transition: transition);
   }
 
-  Future<dynamic> navigateToNestedInfluencersViewInHomeViewRouter([
+  Future<dynamic> navigateToInfluencersView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   ]) async {
-    return navigateTo<dynamic>(HomeViewRoutes.influencersView,
+    return navigateTo<dynamic>(Routes.influencersView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
         transition: transition);
   }
 
-  Future<dynamic> navigateToNestedServicesViewInHomeViewRouter([
+  Future<dynamic> navigateToServicesView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   ]) async {
-    return navigateTo<dynamic>(HomeViewRoutes.servicesView,
+    return navigateTo<dynamic>(Routes.servicesView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
         transition: transition);
   }
 
-  Future<dynamic> navigateToNestedPlansViewInHomeViewRouter([
+  Future<dynamic> navigateToPlansView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   ]) async {
-    return navigateTo<dynamic>(HomeViewRoutes.plansView,
+    return navigateTo<dynamic>(Routes.plansView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
         transition: transition);
   }
 
-  Future<dynamic> navigateToNestedRequestsViewInHomeViewRouter([
+  Future<dynamic> navigateToRequestsView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   ]) async {
-    return navigateTo<dynamic>(HomeViewRoutes.requestsView,
+    return navigateTo<dynamic>(Routes.requestsView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
         transition: transition);
   }
 
-  Future<dynamic> replaceWithHomeView({
-    _i5.Key? key,
-    required _i5.Widget child,
+  Future<dynamic> replaceWithHomeView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  }) async {
+  ]) async {
     return replaceWith<dynamic>(Routes.homeView,
-        arguments: HomeViewArguments(key: key, child: child),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
@@ -377,84 +324,84 @@ extension NavigatorStateExtension on _i12.NavigationService {
         transition: transition);
   }
 
-  Future<dynamic> replaceWithNestedDashBoardViewInHomeViewRouter([
+  Future<dynamic> replaceWithDashBoardView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   ]) async {
-    return replaceWith<dynamic>(HomeViewRoutes.dashBoardView,
+    return replaceWith<dynamic>(Routes.dashBoardView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
         transition: transition);
   }
 
-  Future<dynamic> replaceWithNestedUsersViewInHomeViewRouter([
+  Future<dynamic> replaceWithUsersView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   ]) async {
-    return replaceWith<dynamic>(HomeViewRoutes.usersView,
+    return replaceWith<dynamic>(Routes.usersView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
         transition: transition);
   }
 
-  Future<dynamic> replaceWithNestedInfluencersViewInHomeViewRouter([
+  Future<dynamic> replaceWithInfluencersView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   ]) async {
-    return replaceWith<dynamic>(HomeViewRoutes.influencersView,
+    return replaceWith<dynamic>(Routes.influencersView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
         transition: transition);
   }
 
-  Future<dynamic> replaceWithNestedServicesViewInHomeViewRouter([
+  Future<dynamic> replaceWithServicesView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   ]) async {
-    return replaceWith<dynamic>(HomeViewRoutes.servicesView,
+    return replaceWith<dynamic>(Routes.servicesView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
         transition: transition);
   }
 
-  Future<dynamic> replaceWithNestedPlansViewInHomeViewRouter([
+  Future<dynamic> replaceWithPlansView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   ]) async {
-    return replaceWith<dynamic>(HomeViewRoutes.plansView,
+    return replaceWith<dynamic>(Routes.plansView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
         transition: transition);
   }
 
-  Future<dynamic> replaceWithNestedRequestsViewInHomeViewRouter([
+  Future<dynamic> replaceWithRequestsView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
   ]) async {
-    return replaceWith<dynamic>(HomeViewRoutes.requestsView,
+    return replaceWith<dynamic>(Routes.requestsView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,

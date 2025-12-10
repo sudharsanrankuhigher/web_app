@@ -61,9 +61,10 @@ class UsersView extends StackedView<UsersViewModel> {
                     ),
                   ),
                   if (isExtended)
-                    SizedBox(
+                    Expanded(
+                        child: SizedBox(
                       width: 240,
-                    ),
+                    )),
                   // Filter Button
                   SizedBox(
                     width: 180,

@@ -1,28 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:stacked/stacked.dart';
-import 'package:stacked_services/stacked_services.dart';
-
 import 'package:webapp/ui/common/shared/styles.dart';
+
 import 'home_viewmodel.dart';
 
 class HomeView extends StackedView<HomeViewModel> {
-  final Widget child;
-  const HomeView({Key? key, required this.child}) : super(key: key);
+  const HomeView({Key? key}) : super(key: key);
 
   @override
-  Widget builder(BuildContext context, HomeViewModel viewModel, Widget? _) {
+  Widget builder(BuildContext context, HomeViewModel viewModel, Widget? child) {
     final bool isExtended = MediaQuery.of(context).size.width > 900;
-    final currentLocation =
-        GoRouter.of(context).routerDelegate.currentConfiguration.fullPath;
-    viewModel.updateIndexFromRoute(currentLocation);
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: Row(
         children: [
-          // ─────────── LEFT MENU ───────────
           Container(
             width: isExtended ? 230 : 80,
             color: Colors.white,
@@ -32,7 +25,7 @@ class HomeView extends StackedView<HomeViewModel> {
                   ? CrossAxisAlignment.start
                   : CrossAxisAlignment.center,
               children: [
-                // Logo + App Name
+                // ─────────── LOGO + TEXT ───────────
                 Row(
                   children: [
                     const CircleAvatar(
@@ -63,12 +56,12 @@ class HomeView extends StackedView<HomeViewModel> {
                           ],
                         ),
                       ),
-                    ],
+                    ]
                   ],
                 ),
                 verticalSpacing16,
 
-                // Menu Items
+                // ─────────── MENU ITEMS ───────────
                 Expanded(
                   child: ListView.builder(
                     itemCount: viewModel.railLabel.length,
@@ -78,7 +71,7 @@ class HomeView extends StackedView<HomeViewModel> {
                       return Padding(
                         padding: defaultPadding4,
                         child: GestureDetector(
-                          onTap: () => viewModel.onMenuTap(index, context),
+                          onTap: () => viewModel.selectedIndexes(index),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 250),
                             height: 48.h,
@@ -111,7 +104,7 @@ class HomeView extends StackedView<HomeViewModel> {
                                           : FontWeight.w500,
                                     ),
                                   ),
-                                ],
+                                ]
                               ],
                             ),
                           ),
@@ -123,7 +116,6 @@ class HomeView extends StackedView<HomeViewModel> {
 
                 verticalSpacing12,
 
-                // Profile & Logout
                 Column(
                   children: [
                     Row(
@@ -134,16 +126,14 @@ class HomeView extends StackedView<HomeViewModel> {
                             "https://example.com/profile.jpg",
                           ),
                         ),
+                        horizontalSpacing10,
                         if (isExtended) ...[
-                          const SizedBox(width: 10),
-                          const Text(
-                            "Sudharsan",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const Text(
-                            "Admin",
-                            style: TextStyle(color: Colors.grey),
-                          ),
+                          const SizedBox(height: 10),
+                          const Text("Sudharsan",
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          const Text("Admin",
+                              style: TextStyle(color: Colors.grey)),
+                          const SizedBox(height: 20),
                         ],
                       ],
                     ),
@@ -156,23 +146,22 @@ class HomeView extends StackedView<HomeViewModel> {
                             : MainAxisAlignment.center,
                         children: [
                           const Icon(Icons.logout, color: Colors.red),
-                          if (isExtended) const SizedBox(width: 10),
+                          if (isExtended) horizontalSpacing10,
                           if (isExtended)
-                            const Text(
-                              "Logout",
-                              style: TextStyle(color: Colors.red),
-                            ),
+                            const Text("Logout",
+                                style: TextStyle(color: Colors.red)),
                         ],
                       ),
-                    ),
+                    )
                   ],
                 ),
               ],
             ),
           ),
 
+          // RIGHT SIDE PAGE CONTENT
           Expanded(
-            child: child ?? Center(child: CircularProgressIndicator()),
+            child: viewModel.pages[viewModel.selectedIndex],
           ),
         ],
       ),
@@ -181,9 +170,4 @@ class HomeView extends StackedView<HomeViewModel> {
 
   @override
   HomeViewModel viewModelBuilder(BuildContext context) => HomeViewModel();
-
-  @override
-  void onViewModelReady(HomeViewModel viewModel) {
-    viewModel.init(StackedService.navigatorKey!.currentContext!);
-  }
 }

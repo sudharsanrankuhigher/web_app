@@ -11,5 +11,3 @@ flutter test --update-goldens
 ```
 
 The golden test screenshots will be stored under `test/golden/`.
-
-

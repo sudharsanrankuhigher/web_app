@@ -20,7 +20,9 @@ class MessageDialog extends StatelessWidget {
     return WillPopScope(
       onWillPop: () async => false,
       child: Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
         backgroundColor: Colors.white70,
         child: Column(
           mainAxisSize: MainAxisSize.min,
