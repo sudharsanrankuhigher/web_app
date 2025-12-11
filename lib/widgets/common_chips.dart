@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 
@@ -48,7 +49,7 @@ class CommonStatusChip extends StatelessWidget {
             SizedBox(
               height: 40,
               width: 40,
-              child: Image.asset(
+              child: SvgPicture.asset(
                 imagePath,
                 color: imageColor,
               ),

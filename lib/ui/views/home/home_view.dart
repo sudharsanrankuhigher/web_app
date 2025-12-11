@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'home_viewmodel.dart';
@@ -95,15 +96,22 @@ class HomeView extends StackedView<HomeViewModel> {
                             ),
                             child: Row(
                               children: [
-                                SizedBox(
-                                  height: !isExtended ? 44.h : 24.h,
-                                  width: !isExtended ? 44.w : 24.w,
-                                  child: Image.asset(
-                                    viewModel.railIcon[index],
-                                    color: selected
-                                        ? Colors.white
-                                        : Colors.black87,
-                                  ),
+                                // SizedBox(
+                                //   height: !isExtended ? 44.h : 24.h,
+                                //   width: !isExtended ? 44.w : 24.w,
+                                //   child: Image.asset(
+                                //     viewModel.railIcon[index],
+                                //     color: selected
+                                //         ? Colors.white
+                                //         : Colors.black87,
+                                //   ),
+                                // ),
+                                SvgPicture.asset(
+                                  viewModel.railIcon[index],
+                                  height: isExtended ? 24.h : 34.h,
+                                  width: isExtended ? 24.w : 34.w,
+                                  color:
+                                      selected ? Colors.white : Colors.black87,
                                 ),
                                 if (isExtended) ...[
                                   const SizedBox(width: 12),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:stacked/stacked.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
@@ -48,7 +49,7 @@ class RequestsView extends StackedView<RequestsViewModel> {
                     Wrap(spacing: 12, runSpacing: 12, children: [
                       CommonStatusChip(
                         text: "Requested",
-                        imagePath: "assets/images/requested.png",
+                        imagePath: "assets/images/requested.svg",
                         textStyle: viewModel.isSelected == 0
                             ? fontFamilySemiBold.size14.white
                             : fontFamilySemiBold.size14.black,
@@ -64,7 +65,7 @@ class RequestsView extends StackedView<RequestsViewModel> {
                       ),
                       CommonStatusChip(
                         text: "Pending",
-                        imagePath: "assets/images/pending.png",
+                        imagePath: "assets/images/pending.svg",
                         textStyle: viewModel.isSelected == 1
                             ? fontFamilySemiBold.size14.white
                             : fontFamilySemiBold.size14.black,
@@ -79,7 +80,7 @@ class RequestsView extends StackedView<RequestsViewModel> {
                       ),
                       CommonStatusChip(
                         text: "Accepted",
-                        imagePath: "assets/images/accepted.png",
+                        imagePath: "assets/images/accepted.svg",
                         textStyle: viewModel.isSelected == 2
                             ? fontFamilySemiBold.size14.white
                             : fontFamilySemiBold.size14.black,
@@ -94,7 +95,7 @@ class RequestsView extends StackedView<RequestsViewModel> {
                       ),
                       CommonStatusChip(
                         text: "Completed Pending List",
-                        imagePath: "assets/images/complete-pending-list.png",
+                        imagePath: "assets/images/complete-pending-list.svg",
                         textStyle: viewModel.isSelected == 3
                             ? fontFamilySemiBold.size14.white
                             : fontFamilySemiBold.size14.black,
@@ -109,7 +110,7 @@ class RequestsView extends StackedView<RequestsViewModel> {
                       ),
                       CommonStatusChip(
                         text: "Completed",
-                        imagePath: "assets/images/complete-pending-list.png",
+                        imagePath: "assets/images/complete-pending-list.svg",
                         textStyle: viewModel.isSelected == 4
                             ? fontFamilySemiBold.size14.white
                             : fontFamilySemiBold.size14.black,
@@ -124,7 +125,7 @@ class RequestsView extends StackedView<RequestsViewModel> {
                       ),
                       CommonStatusChip(
                         text: "Cancelled",
-                        imagePath: "assets/images/cancelled.png",
+                        imagePath: "assets/images/cancelled.svg",
                         textStyle: viewModel.isSelected == 5
                             ? fontFamilySemiBold.size14.white
                             : fontFamilySemiBold.size14.black,
@@ -139,7 +140,7 @@ class RequestsView extends StackedView<RequestsViewModel> {
                       ),
                       CommonStatusChip(
                         text: "Promote Verified",
-                        imagePath: "assets/images/verified.png",
+                        imagePath: "assets/images/verified.svg",
                         textStyle: viewModel.isSelected == 6
                             ? fontFamilySemiBold.size14.white
                             : fontFamilySemiBold.size14.black,
@@ -154,7 +155,7 @@ class RequestsView extends StackedView<RequestsViewModel> {
                       ),
                       CommonStatusChip(
                         text: "Promote Pay",
-                        imagePath: "assets/images/pay.png",
+                        imagePath: "assets/images/pay.svg",
                         textStyle: viewModel.isSelected == 7
                             ? fontFamilySemiBold.size14.white
                             : fontFamilySemiBold.size14.black,
@@ -169,7 +170,7 @@ class RequestsView extends StackedView<RequestsViewModel> {
                       ),
                       CommonStatusChip(
                         text: "Promote Commission",
-                        imagePath: "assets/images/comission.png",
+                        imagePath: "assets/images/comission.svg",
                         textStyle: viewModel.isSelected == 8
                             ? fontFamilySemiBold.size14.white
                             : fontFamilySemiBold.size14.black,
@@ -184,7 +185,7 @@ class RequestsView extends StackedView<RequestsViewModel> {
                       ),
                       CommonStatusChip(
                         text: "Rejected",
-                        imagePath: "assets/images/rejected.png",
+                        imagePath: "assets/images/rejected.svg",
                         textStyle: viewModel.isSelected == 9
                             ? fontFamilySemiBold.size14.white
                             : fontFamilySemiBold.size14.black,
@@ -227,10 +228,16 @@ class RequestsView extends StackedView<RequestsViewModel> {
                             borderRadius: 10,
                             textStyle: fontFamilyMedium.size14.white
                                 .copyWith(overflow: TextOverflow.ellipsis),
-                            icon: SizedBox(
+                            icon: Container(
                                 height: 35,
                                 width: 35,
-                                child: Image.asset('assets/images/filter.png')),
+                                padding: defaultPadding4,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: white,
+                                ),
+                                child: SvgPicture.asset(
+                                    'assets/images/filter.svg')),
                             onTap: () {
                               CommonFilterDialog.show(
                                 context,

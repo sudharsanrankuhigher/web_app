@@ -1,6 +1,7 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
@@ -83,7 +84,7 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                     icon: SizedBox(
                         height: 35,
                         width: 35,
-                        child: Image.asset('assets/images/filter.png')),
+                        child: SvgPicture.asset('assets/images/filter.svg')),
                     onTap: () {
                       CommonFilterDialog.show(
                         context,

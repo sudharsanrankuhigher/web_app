@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 
@@ -40,7 +41,7 @@ class InfoCard extends StatelessWidget {
             child: SizedBox(
               height: 26.h,
               width: 26.w,
-              child: Image.asset('assets/images/promote_vector.png'),
+              child: SvgPicture.asset('assets/images/promote_vector.svg'),
             ),
           ),
           verticalSpacing10,

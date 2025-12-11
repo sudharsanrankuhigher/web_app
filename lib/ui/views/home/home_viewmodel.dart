@@ -57,17 +57,17 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
   ];
 
   final List<String> railIcon = [
-    'assets/images/dash_board.png',
-    'assets/images/user.png',
-    'assets/images/influencer_dashboard.png',
-    'assets/images/service_dashboard.png',
-    'assets/images/city.png',
-    'assets/images/city.png',
-    'assets/images/plans_dashboard.png',
-    'assets/images/requests_dashboard.png',
-    'assets/images/promotes_proj_dashboard.png',
-    'assets/images/support_dashboard.png',
-    'assets/images/sub-admin_dashboard.png',
+    'assets/images/dash_board.svg',
+    'assets/images/user.svg',
+    'assets/images/influencer_dashboard.svg',
+    'assets/images/service_dashboard.svg',
+    'assets/images/city.svg',
+    'assets/images/city.svg',
+    'assets/images/plans_dashboard.svg',
+    'assets/images/requests_dashboard.svg',
+    'assets/images/promotes_proj_dashboard.svg',
+    'assets/images/support_dashboard.svg',
+    'assets/images/sub-admin_dashboard.svg',
   ];
 
   final List<Widget> pages = [

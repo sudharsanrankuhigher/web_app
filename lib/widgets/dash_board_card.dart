@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 
@@ -52,7 +53,7 @@ class DashBoardCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(15),
                         color: cardColor.withOpacity(0.1)),
                     padding: defaultPadding8,
-                    child: Center(child: Image.asset(asset!)),
+                    child: Center(child: SvgPicture.asset(asset!)),
                   )
                 ],
               ),
