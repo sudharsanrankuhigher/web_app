@@ -10,6 +10,7 @@ import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/services/widgets/service_add_edit_dialog.dart';
 import 'package:webapp/widgets/common_button.dart';
+import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
 
 import 'services_viewmodel.dart';
@@ -65,7 +66,7 @@ class ServicesView extends StackedView<ServicesViewModel> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    // onChanged: viewModel.searcServices,
+                    // onChanged: viewModel.searchServices,
                   ),
                 ),
                 if (isExtended)
@@ -75,11 +76,17 @@ class ServicesView extends StackedView<ServicesViewModel> {
                 SizedBox(
                   width: 180,
                   child: CommonButton(
-                    buttonColor: appGreen400,
+                    buttonColor: continueButton,
                     margin: EdgeInsets.zero,
-                    padding: defaultPadding8,
+                    padding: defaultPadding4 - leftPadding4,
                     text: isExtended ? "Filter & Sort" : "",
-                    icon1: const Icon(Icons.filter_list),
+                    borderRadius: 10,
+                    textStyle: fontFamilyMedium.size14.white
+                        .copyWith(overflow: TextOverflow.ellipsis),
+                    icon: SizedBox(
+                        height: 35,
+                        width: 35,
+                        child: Image.asset('assets/images/filter.png')),
                     onTap: () {
                       CommonFilterDialog.show(
                         context,
@@ -115,38 +122,22 @@ class ServicesView extends StackedView<ServicesViewModel> {
             ),
             verticalSpacing20,
             Expanded(
-              child: viewModel.services.isEmpty
-                  ? const Center(child: CircularProgressIndicator())
-                  : PaginatedDataTable2(
-                      headingRowColor:
-                          MaterialStateProperty.all(Colors.blueAccent),
-
-                      headingRowDecoration: const BoxDecoration(
-                        color: Colors.blueAccent,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          topRight: Radius.circular(12),
-                        ),
-                      ),
-                      headingTextStyle:
-                          fontFamilyBold.size14.white, // custom typography
-                      dataTextStyle: fontFamilyRegular.size12.black,
-                      columns: const [
-                        DataColumn(label: Text("S.No")),
-                        DataColumn(label: Text("Name")),
-                        DataColumn(
-                            headingRowAlignment: MainAxisAlignment.center,
-                            label: Text("Actions")),
-                      ],
-                      source: viewModel.tableSource,
-                      columnSpacing: 20,
-                      horizontalMargin: 15,
-                      rowsPerPage: viewModel.tableSource.rowCount < 10
-                          ? viewModel.tableSource.rowCount
-                          : 10,
-                      minWidth: 1000,
-                    ),
-            ),
+                child: viewModel.services.isEmpty
+                    ? const Center(child: CircularProgressIndicator())
+                    : CommonPaginatedTable(
+                        columns: [
+                          DataColumn(label: Text("S.No")),
+                          DataColumn(label: Text("Name")),
+                          DataColumn(
+                              headingRowAlignment: MainAxisAlignment.center,
+                              label: Text("Actions")),
+                        ],
+                        rowsperPage: viewModel.tableSource.rowCount < 10
+                            ? viewModel.tableSource.rowCount
+                            : 10,
+                        source: viewModel.tableSource,
+                        minWidth: 1000,
+                      )),
           ],
         ),
       ),

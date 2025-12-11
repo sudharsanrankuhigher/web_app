@@ -7,6 +7,7 @@ import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/influencers/widgets/add_edit_influencer_dialog.dart';
 import 'package:webapp/widgets/common_button.dart';
+import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
 
 import 'influencers_viewmodel.dart';
@@ -72,11 +73,17 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                 SizedBox(
                   width: 180,
                   child: CommonButton(
-                    buttonColor: appGreen400,
+                    buttonColor: continueButton,
                     margin: EdgeInsets.zero,
-                    padding: defaultPadding8,
+                    padding: defaultPadding4 - leftPadding4,
                     text: isExtended ? "Filter & Sort" : "",
-                    icon1: const Icon(Icons.filter_list),
+                    borderRadius: 10,
+                    textStyle: fontFamilyMedium.size14.white
+                        .copyWith(overflow: TextOverflow.ellipsis),
+                    icon: SizedBox(
+                        height: 35,
+                        width: 35,
+                        child: Image.asset('assets/images/filter.png')),
                     onTap: () {
                       CommonFilterDialog.show(
                         context,
@@ -121,20 +128,8 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
             Expanded(
               child: viewModel.influencers.isEmpty
                   ? const Center(child: CircularProgressIndicator())
-                  : PaginatedDataTable2(
+                  : CommonPaginatedTable(
                       dataRowHeight: 65.h,
-                      headingRowColor:
-                          MaterialStateProperty.all(Colors.blueAccent),
-                      headingTextStyle: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                      dataTextStyle: fontFamilyRegular.size12.black,
-                      headingRowDecoration: const BoxDecoration(
-                        color: Colors.blueAccent,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          topRight: Radius.circular(12),
-                        ),
-                      ),
                       columns: const [
                         DataColumn(label: Text("S.No")),
                         DataColumn(label: Text("Name")),
@@ -148,7 +143,7 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                         DataColumn(label: Text("Status")),
                       ],
                       source: viewModel.tableSource,
-                      rowsPerPage: viewModel.tableSource.rowCount < 10
+                      rowsperPage: viewModel.tableSource.rowCount < 10
                           ? viewModel.tableSource.rowCount
                           : 10,
                       minWidth: 1000,

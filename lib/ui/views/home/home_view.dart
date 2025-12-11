@@ -50,7 +50,7 @@ class HomeView extends StackedView<HomeViewModel> {
                               TextSpan(
                                 text: "promote",
                                 style: TextStyle(
-                                  color: Colors.blue,
+                                  color: Color(0xff0B0952),
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
                                 ),
@@ -58,7 +58,7 @@ class HomeView extends StackedView<HomeViewModel> {
                               TextSpan(
                                 text: "app",
                                 style: TextStyle(
-                                  color: Colors.black,
+                                  color: Colors.blue,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
                                 ),

@@ -38,7 +38,7 @@ class CommonButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: width ?? double.infinity,
+        width: width,
         height: height,
         margin: margin,
         padding: padding,
