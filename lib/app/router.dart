@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/ui/views/dash_board/dash_board_view.dart';
+import 'package:webapp/ui/views/state/state_view.dart';
+import 'package:webapp/ui/views/sub_admin/sub_admin_view.dart';
 import 'package:webapp/ui/views/users/users_view.dart';
 import 'package:webapp/ui/views/influencers/influencers_view.dart';
 import 'package:webapp/ui/views/services/services_view.dart';
@@ -27,56 +29,51 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/home/dashboard',
           name: 'dashboard',
-          builder: (context, state) => DashBoardView(),
+          builder: (context, state) => const DashBoardView(),
         ),
         GoRoute(
           path: '/home/users',
           name: 'users',
-          builder: (context, state) => UsersView(),
+          builder: (context, state) => const UsersView(),
         ),
         GoRoute(
           path: '/home/influencers',
           name: 'influencers',
-          builder: (context, state) => InfluencersView(),
+          builder: (context, state) => const InfluencersView(),
         ),
         GoRoute(
           path: '/home/services',
           name: 'services',
-          builder: (context, state) => ServicesView(),
+          builder: (context, state) => const ServicesView(),
         ),
         GoRoute(
           path: '/home/plans',
           name: 'plans',
-          builder: (context, state) => PlansView(),
+          builder: (context, state) => const PlansView(),
         ),
         GoRoute(
           path: '/home/requests',
           name: 'requests',
-          builder: (context, state) => RequestsView(),
+          builder: (context, state) => const RequestsView(),
         ),
         GoRoute(
           path: '/home/city',
           name: 'city',
           builder: (context, state) => Container(
-            child: Center(
+            child: const Center(
               child: Text('city'),
             ),
           ),
         ),
         GoRoute(
-          path: '/home/state',
-          name: 'state',
-          builder: (context, state) => Container(
-            child: Center(
-              child: Text('state'),
-            ),
-          ),
-        ),
+            path: '/home/state',
+            name: 'state',
+            builder: (context, state) => StateView()),
         GoRoute(
           path: '/home/promotion-projects',
           name: 'promotion-projects',
           builder: (context, state) => Container(
-            child: Center(
+            child: const Center(
               child: Text('promotion-projects'),
             ),
           ),
@@ -85,7 +82,7 @@ final GoRouter router = GoRouter(
           path: '/home/contact-support',
           name: 'contact-support',
           builder: (context, state) => Container(
-            child: Center(
+            child: const Center(
               child: Text('contact-support'),
             ),
           ),
@@ -93,22 +90,18 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/home/sub-admin',
           name: 'sub-admin',
-          builder: (context, state) => Container(
-            child: Center(
-              child: Text('sub-admin'),
-            ),
-          ),
+          builder: (context, state) => const SubAdminView(),
         ),
       ],
     ),
     GoRoute(
       path: '/login',
       name: 'login',
-      builder: (context, state) => LoginView(),
+      builder: (context, state) => const LoginView(),
     ),
     GoRoute(
       path: '/startup',
-      builder: (context, state) => StartupView(),
+      builder: (context, state) => const StartupView(),
     ),
   ],
 );

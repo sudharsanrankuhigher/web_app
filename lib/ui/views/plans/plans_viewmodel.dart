@@ -20,6 +20,10 @@ class PlansViewModel extends BaseViewModel {
   int? amount;
   String? badge;
 
+  String countryValue = "";
+  String stateValue = "";
+  String cityValue = "";
+
   void setPlanName(String v) {
     planName = v;
     notifyListeners();
@@ -48,13 +52,22 @@ class PlansViewModel extends BaseViewModel {
           planName: "Basic",
           connections: 1,
           amount: 199,
-          badge: "Starter"),
+          badge: "Starter",
+          category: "Influencers"),
       PlanModel(
           id: 2,
           planName: "Pro",
           connections: 3,
           amount: 499,
-          badge: "Popular"),
+          badge: "Popular",
+          category: "Tv Star"),
+      PlanModel(
+          id: 3,
+          planName: "star",
+          connections: 30,
+          amount: 4999,
+          badge: "celeberity",
+          category: "Movie Star"),
     ];
     _refreshTable();
   }
@@ -102,12 +115,12 @@ class PlansViewModel extends BaseViewModel {
     final result = await CommonPlanDialog.show(context);
     if (result != null) {
       final newPlan = PlanModel(
-        id: DateTime.now().millisecondsSinceEpoch,
-        planName: result['planName'],
-        connections: result['connections'],
-        amount: result['amount'],
-        badge: result['badge'],
-      );
+          id: DateTime.now().millisecondsSinceEpoch,
+          planName: result['planName'],
+          connections: result['connections'],
+          amount: result['amount'],
+          badge: result['badge'],
+          category: result['category']);
       saveOrUpdate(newPlan);
     }
   }
@@ -117,12 +130,12 @@ class PlansViewModel extends BaseViewModel {
     final result = await CommonPlanDialog.show(context, initial: plan);
     if (result != null) {
       final updated = PlanModel(
-        id: plan.id,
-        planName: result['planName'],
-        connections: result['connections'],
-        amount: result['amount'],
-        badge: result['badge'],
-      );
+          id: plan.id,
+          planName: result['planName'],
+          connections: result['connections'],
+          amount: result['amount'],
+          badge: result['badge'],
+          category: result['category']);
       saveOrUpdate(updated);
     }
   }
@@ -136,9 +149,9 @@ class PlansViewModel extends BaseViewModel {
     if (specialFilter) {
       // implement custom filter
     }
-    if (sortType == "A-Z")
+    if (sortType == "A-Z") {
       plans.sort((a, b) => a.planName.compareTo(b.planName));
-    else if (sortType == "clientAsc")
+    } else if (sortType == "clientAsc")
       plans.sort((a, b) => a.id.compareTo(b.id));
     _refreshTable();
   }

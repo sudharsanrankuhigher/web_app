@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/influencers/model/influencers_model.dart';
 import 'package:webapp/ui/views/influencers/widgets/icon_text_form_field.dart';
 import 'package:webapp/widgets/common_button.dart';
@@ -25,6 +27,8 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
 
   Uint8List? pickedBytes;
   String? pickedPath;
+
+  bool? _isView = false;
 
   late TextEditingController nameController;
   late TextEditingController emailController;
@@ -80,6 +84,8 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
     ifscController = TextEditingController(text: inf?.ifsc ?? '');
     upiController = TextEditingController(text: inf?.upi ?? '');
     descriptionController = TextEditingController();
+
+    _isView = widget.isView;
   }
 
   @override
@@ -88,25 +94,51 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
       insetPadding: const EdgeInsets.all(30),
       child: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Form(
             key: formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                widget.isView == true
+                _isView == true
                     ? Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [Text('edit')],
+                        children: [
+                          CommonButton(
+                            padding: defaultPadding4,
+                            text: 'Edit',
+                            textStyle: fontFamilySemiBold.size12.black,
+                            buttonColor: redShade,
+                            width: 70,
+                            onTap: () {
+                              setState(() {
+                                _isView = false;
+                              });
+                            },
+                            icon: Icon(
+                              Icons.edit,
+                              size: 20,
+                            ),
+                          )
+                        ],
                       )
-                    : const SizedBox(height: 16),
+                    : InkWell(
+                        onTap: () {
+                          Navigator.pop(
+                              StackedService.navigatorKey!.currentContext!);
+                        },
+                        child: const SizedBox(
+                          height: 16,
+                          child: Icon(Icons.close),
+                        ),
+                      ),
 
                 Center(
                   child: Text(
                     widget.influencer == null
                         ? "Add New Influencer"
-                        : widget.isView == true
+                        : _isView == true
                             ? "View Influencer"
                             : "Edit Influencer",
                     style: const TextStyle(
@@ -119,7 +151,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                 const SizedBox(height: 16),
 
                 IgnorePointer(
-                  ignoring: widget.isView == true ? true : false,
+                  ignoring: _isView == true ? true : false,
                   child: Center(
                     child: ProfileImageEdit(
                       imageUrl: widget.influencer?.image,
@@ -148,7 +180,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                   children: [
                     Expanded(
                       child: IconTextFormField(
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.person,
                         label: "Name",
                         controller: nameController,
@@ -157,7 +189,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: IconTextFormField(
-                          isView: widget.isView,
+                          isView: _isView,
                           icon: Icons.email,
                           label: "Email",
                           controller: emailController,
@@ -174,6 +206,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                               }
                               return null;
                             }
+                            return null;
                           }),
                     ),
                   ],
@@ -184,7 +217,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                   children: [
                     Expanded(
                       child: IconTextFormField(
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.phone,
                         label: "Phone",
                         controller: phoneController,
@@ -201,7 +234,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           }
                           return null;
                         },
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.calendar_month,
                         label: "DOB",
                         controller: dobController,
@@ -215,7 +248,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                   children: [
                     Expanded(
                       child: IconTextFormField(
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.phone,
                         label: "Alternative Phone",
                         controller: altPhoneController,
@@ -244,7 +277,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                   children: [
                     Expanded(
                       child: IconTextFormField(
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.map,
                         label: "State",
                         controller: stateController,
@@ -259,7 +292,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           }
                           return null;
                         },
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.lock,
                         label: "Password",
                         controller: passwordController,
@@ -273,7 +306,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                   children: [
                     Expanded(
                       child: IconTextFormField(
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.design_services,
                         label: "Service",
                         controller: serviceController,
@@ -288,7 +321,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           }
                           return null;
                         },
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.location_city,
                         label: "City",
                         controller: cityController,
@@ -309,7 +342,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                   children: [
                     Expanded(
                       child: IconTextFormField(
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.note,
                         label: "description",
                         controller: descriptionController,
@@ -329,7 +362,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           }
                           return null;
                         },
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.camera,
                         label: "Instagram Link",
                         controller: instagramLinkController,
@@ -344,7 +377,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           }
                           return null;
                         },
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.camera,
                         label: "Instagram Followers",
                         controller: instagramFollowersController,
@@ -360,7 +393,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                   children: [
                     Expanded(
                       child: IconTextFormField(
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.facebook,
                         label: "facebook Link",
                         controller: facebookLinkController,
@@ -375,7 +408,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           }
                           return null;
                         },
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.facebook,
                         label: "facebook Followers",
                         controller: facebookFollowersController,
@@ -394,7 +427,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           }
                           return null;
                         },
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.youtube_searched_for,
                         label: "youtube Link",
                         controller: youtubeLinkController,
@@ -409,7 +442,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           }
                           return null;
                         },
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.video_label,
                         label: "youtube Followers",
                         controller: youtubeFollowersController,
@@ -437,7 +470,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           }
                           return null;
                         },
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.account_balance,
                         label: "Account Number",
                         controller: bankAccountController,
@@ -452,7 +485,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           }
                           return null;
                         },
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.person_2,
                         label: "Account Holder Name",
                         controller: bankHolderController,
@@ -471,7 +504,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           }
                           return null;
                         },
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.factory_outlined,
                         label: "IFSC Code",
                         controller: ifscController,
@@ -486,7 +519,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           }
                           return null;
                         },
-                        isView: widget.isView,
+                        isView: _isView,
                         icon: Icons.person_2,
                         label: "UPI ID",
                         controller: upiController,
@@ -496,7 +529,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                 ),
 
                 verticalSpacing20,
-                if (widget.isView != true)
+                if (_isView != true)
                   // SAVE BUTTON
                   Center(
                     child: CommonButton(
@@ -539,6 +572,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                         }
                       },
                       text: 'Save',
+                      textStyle: fontFamilySemiBold.size16.white,
                     ),
                   ),
               ],

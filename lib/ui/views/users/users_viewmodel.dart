@@ -45,7 +45,11 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
     ];
 
     tableSource = UserTableSource(
-        users: users, onEdit: editUser, onDelete: confirmDelete);
+      users: users,
+      // onEdit: editUser,
+      // onDelete: confirmDelete
+      onAdd: () {},
+    );
     notifyListeners();
   }
 
@@ -69,8 +73,9 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
     users.remove(user);
     tableSource = UserTableSource(
       users: users,
-      onEdit: editUser,
-      onDelete: confirmDelete,
+      // onEdit: editUser,
+      // onDelete: confirmDelete,
+      onAdd: () {},
     );
     notifyListeners();
   }

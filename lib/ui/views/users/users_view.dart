@@ -33,7 +33,7 @@ class UsersView extends StackedView<UsersViewModel> {
               Container(
                 width: double.infinity,
                 padding: defaultPadding16,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: white,
                   borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(12),
@@ -45,20 +45,17 @@ class UsersView extends StackedView<UsersViewModel> {
                 ),
               ),
               verticalSpacing12,
-              Wrap(
-                spacing: 40,
-                runSpacing: 16,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                alignment: WrapAlignment.start,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
                     height: 45.h,
-                    width: 500,
+                    width: isExtended ? 500 : 200,
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: "Search name, email, phone...",
                         hintStyle: fontFamilyRegular.size14.grey,
-                        prefixIcon: Icon(Icons.search),
+                        prefixIcon: const Icon(Icons.search),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -66,13 +63,8 @@ class UsersView extends StackedView<UsersViewModel> {
                       onChanged: viewModel.searchUser,
                     ),
                   ),
-                  if (isExtended)
-                    SizedBox(
-                      width: 240,
-                    ),
-                  // Filter Button
                   SizedBox(
-                    width: 180,
+                    width: isExtended ? 180 : null,
                     child: CommonButton(
                       buttonColor: continueButton,
                       margin: EdgeInsets.zero,
@@ -82,9 +74,17 @@ class UsersView extends StackedView<UsersViewModel> {
                       textStyle: fontFamilyMedium.size14.white
                           .copyWith(overflow: TextOverflow.ellipsis),
                       icon: SizedBox(
-                          height: 35,
-                          width: 35,
-                          child: SvgPicture.asset('assets/images/filter.svg')),
+                        height: 35,
+                        width: 35,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(80),
+                          child: Image.asset(
+                            height: 34,
+                            width: 34,
+                            'assets/images/filter.jpg',
+                          ),
+                        ),
+                      ),
                       onTap: () {
                         CommonFilterDialog.show(
                           context,
@@ -94,30 +94,6 @@ class UsersView extends StackedView<UsersViewModel> {
                             viewModel.applySort(isChecked, sortType);
                           },
                         );
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    width: 180,
-                    child: CommonButton(
-                      icon: Icon(Icons.add, color: white, size: 16),
-                      buttonColor: continueButton,
-                      textStyle: fontFamilyMedium.size14.white,
-                      margin: EdgeInsets.zero,
-                      borderRadius: 10,
-                      text: isExtended ? "Add Users" : "",
-                      onTap: () async {
-                        final result = await CommonUserDialog.show(
-                          StackedService.navigatorKey!.currentContext!,
-                        );
-
-                        if (result != null) {
-                          print('name: ${result['name']}');
-                          print('email: ${result['email']}');
-                          print('phone: ${result['amount']}');
-                          print('city: ${result['city']}');
-                          print('state: ${result['state']}');
-                        }
                       },
                     ),
                   ),

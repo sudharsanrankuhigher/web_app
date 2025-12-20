@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
@@ -16,6 +17,26 @@ class CommonPlanDialog {
     String? conn = initial?.connections.toString();
     String? amt = initial?.amount.toString();
     String? badge = initial?.badge;
+
+    String category = initial?.category ?? '';
+
+    InputDecoration _decoration(String label) => InputDecoration(
+          labelText: label,
+          fillColor: white,
+          filled: true,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: disableColor, width: 1.5)),
+          enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: disableColor, width: 1.5)),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: appGreen400, width: 1.5),
+          ),
+        );
 
     return showDialog<Map<String, dynamic>>(
       barrierDismissible: false,
@@ -41,6 +62,39 @@ class CommonPlanDialog {
                 _field("Amount", amt, (v) => amt = v,
                     isView: isView, isNumber: true),
                 _field("Badge", badge, (v) => badge = v, isView: isView),
+                verticalSpacing8,
+                const Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    IconTextLabel(
+                      icon: null,
+                      text: 'Category',
+                      iconColor: Colors.black,
+                      textColor: Colors.black,
+                      iconSize: 16,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ],
+                ),
+                verticalSpacing8,
+                IgnorePointer(
+                  ignoring: isView,
+                  child: DropdownButtonFormField<String>(
+                    value: category.isEmpty ? null : category,
+                    decoration: _decoration("Category"),
+                    items: const ["Influencers", "Movie Stars", "TV Stars"]
+                        .map(
+                          (category) => DropdownMenuItem<String>(
+                            value: category,
+                            child: Text(category),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (_) => null,
+                    validator: (v) => v == null ? "Select Category" : null,
+                  ),
+                ),
               ],
             ),
           ),
@@ -83,7 +137,7 @@ class CommonPlanDialog {
     bool isNumber = false,
   }) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

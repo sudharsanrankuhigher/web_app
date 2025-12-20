@@ -1,6 +1,4 @@
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'dart:html' as html;
 import 'package:image_picker/image_picker.dart';
 

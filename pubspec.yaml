@@ -20,6 +20,8 @@ dependencies:
   go_router: ^17.0.0
   cached_network_image: ^3.4.1
   flutter_svg: ^2.2.3
+  dropdown_search: ^6.0.2
+
 
 
 dev_dependencies:
@@ -50,4 +52,5 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/json/cities.json
 

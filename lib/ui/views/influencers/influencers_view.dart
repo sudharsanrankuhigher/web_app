@@ -33,7 +33,7 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
             Container(
               width: double.infinity,
               padding: defaultPadding16,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: white,
                 borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(12),
@@ -58,7 +58,7 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                     decoration: InputDecoration(
                       hintText: "Search name, phone, city...",
                       hintStyle: fontFamilyRegular.size14.grey,
-                      prefixIcon: Icon(Icons.search),
+                      prefixIcon: const Icon(Icons.search),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -68,7 +68,7 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                   ),
                 ),
                 if (isExtended)
-                  SizedBox(
+                  const SizedBox(
                     width: 240,
                   ),
                 SizedBox(
@@ -82,9 +82,17 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                     textStyle: fontFamilyMedium.size14.white
                         .copyWith(overflow: TextOverflow.ellipsis),
                     icon: SizedBox(
-                        height: 35,
-                        width: 35,
-                        child: SvgPicture.asset('assets/images/filter.svg')),
+                      height: 35,
+                      width: 35,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(80),
+                        child: Image.asset(
+                          height: 34,
+                          width: 34,
+                          'assets/images/filter.jpg',
+                        ),
+                      ),
+                    ),
                     onTap: () {
                       CommonFilterDialog.show(
                         context,
@@ -99,7 +107,7 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                 ),
                 CommonButton(
                     width: 180,
-                    icon: Icon(Icons.add, color: white, size: 16),
+                    icon: const Icon(Icons.add, color: white, size: 16),
                     buttonColor: continueButton,
                     textStyle: fontFamilyMedium.size14.white,
                     borderRadius: 10,
@@ -133,10 +141,14 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                       dataRowHeight: 65.h,
                       columns: const [
                         DataColumn(label: Text("S.No")),
+                        DataColumn(label: Text("IF.ID")),
                         DataColumn(label: Text("Name")),
                         DataColumn(label: Text("Phone")),
                         DataColumn(label: Text("City/State")),
-                        DataColumn(label: Text("Bank/UPI")),
+                        DataColumn(label: Text("Service Type")),
+                        DataColumn(
+                            label: Text("Category Type"),
+                            tooltip: "Category Type"),
                         DataColumn(label: Text("Instagram")),
                         DataColumn(label: Text("YouTube")),
                         DataColumn(label: Text("Facebook")),

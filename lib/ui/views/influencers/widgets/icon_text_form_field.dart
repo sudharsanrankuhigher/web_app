@@ -16,7 +16,7 @@ class IconTextFormField extends StatelessWidget {
   final bool? isView;
   final String? Function(String?)? validator;
 
-  IconTextFormField({
+  const IconTextFormField({
     super.key,
     required this.icon,
     required this.label,

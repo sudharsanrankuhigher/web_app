@@ -23,7 +23,7 @@ class RequestsView extends StackedView<RequestsViewModel> {
     final bool isExtended = MediaQuery.of(context).size.width > 900;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Stack(
         children: [
           Container(
@@ -228,16 +228,14 @@ class RequestsView extends StackedView<RequestsViewModel> {
                             borderRadius: 10,
                             textStyle: fontFamilyMedium.size14.white
                                 .copyWith(overflow: TextOverflow.ellipsis),
-                            icon: Container(
-                                height: 35,
-                                width: 35,
-                                padding: defaultPadding4,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: white,
-                                ),
-                                child: SvgPicture.asset(
-                                    'assets/images/filter.svg')),
+                            icon: ClipRRect(
+                              borderRadius: BorderRadius.circular(80),
+                              child: Image.asset(
+                                height: 34,
+                                width: 34,
+                                'assets/images/filter.jpg',
+                              ),
+                            ),
                             onTap: () {
                               CommonFilterDialog.show(
                                 context,

@@ -106,12 +106,16 @@ class HomeView extends StackedView<HomeViewModel> {
                                 //         : Colors.black87,
                                 //   ),
                                 // ),
-                                SvgPicture.asset(
-                                  viewModel.railIcon[index],
-                                  height: isExtended ? 24.h : 34.h,
-                                  width: isExtended ? 24.w : 34.w,
-                                  color:
-                                      selected ? Colors.white : Colors.black87,
+                                Tooltip(
+                                  message: viewModel.railLabel[index],
+                                  child: SvgPicture.asset(
+                                    viewModel.railIcon[index],
+                                    height: isExtended ? 24.h : 34.h,
+                                    width: isExtended ? 24.w : 34.w,
+                                    color: selected
+                                        ? Colors.white
+                                        : Colors.black87,
+                                  ),
                                 ),
                                 if (isExtended) ...[
                                   const SizedBox(width: 12),
@@ -157,7 +161,7 @@ class HomeView extends StackedView<HomeViewModel> {
                           placeholder: (context, url) => const CircleAvatar(
                             radius: 22,
                             backgroundImage:
-                                AssetImage("assets/images/user.png"),
+                                AssetImage("assets/images/logo.png"),
                           ),
                           errorWidget: (context, url, error) =>
                               const CircleAvatar(
@@ -209,7 +213,7 @@ class HomeView extends StackedView<HomeViewModel> {
             ),
           ),
           Expanded(
-            child: child ?? Center(child: CircularProgressIndicator()),
+            child: child ?? const Center(child: CircularProgressIndicator()),
           ),
         ],
       ),
@@ -219,8 +223,8 @@ class HomeView extends StackedView<HomeViewModel> {
   @override
   HomeViewModel viewModelBuilder(BuildContext context) => HomeViewModel();
 
-  @override
-  void onViewModelReady(HomeViewModel viewModel) {
-    viewModel.init(StackedService.navigatorKey!.currentContext!);
-  }
+  // @override
+  // void onViewModelReady(HomeViewModel viewModel) {
+  //   viewModel.init(StackedService.navigatorKey!.currentContext!);
+  // }
 }

@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:webapp/app/app.bottomsheets.dart';
 import 'package:webapp/app/app.dialogs.dart';
 import 'package:webapp/app/app.locator.dart';
-import 'package:webapp/app/router.dart';
 import 'package:webapp/core/navigation/navigation_mixin.dart';
 import 'package:webapp/ui/common/app_strings.dart';
 import 'package:stacked/stacked.dart';
@@ -15,11 +14,10 @@ import 'package:webapp/ui/views/services/services_view.dart';
 import 'package:webapp/ui/views/users/users_view.dart';
 
 class HomeViewModel extends BaseViewModel with NavigationMixin {
-  void init(context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      onMenuTap(0, context); // ✅ safe, called after build
-    });
-  }
+  // void init(context) {
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //   });
+  // }
 
   final _dialogService = locator<DialogService>();
   final _bottomSheetService = locator<BottomSheetService>();

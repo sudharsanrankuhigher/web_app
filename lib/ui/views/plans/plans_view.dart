@@ -1,7 +1,5 @@
-import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
@@ -10,6 +8,7 @@ import 'package:webapp/ui/views/plans/widgets/common_plans_dialog.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
+import 'package:webapp/widgets/state_city_drop_down.dart';
 
 import 'plans_viewmodel.dart';
 
@@ -25,7 +24,7 @@ class PlansView extends StackedView<PlansViewModel> {
     final bool isExtended = MediaQuery.of(context).size.width > 1440;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Container(
         padding: defaultPadding20 - topPadding20,
         child: Column(
@@ -34,7 +33,7 @@ class PlansView extends StackedView<PlansViewModel> {
             Container(
               width: double.infinity,
               padding: defaultPadding16,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: white,
                 borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(12),
@@ -59,7 +58,7 @@ class PlansView extends StackedView<PlansViewModel> {
                     decoration: InputDecoration(
                       hintText: "Search plan name...",
                       hintStyle: fontFamilyRegular.size14.grey,
-                      prefixIcon: Icon(Icons.search),
+                      prefixIcon: const Icon(Icons.search),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -68,7 +67,7 @@ class PlansView extends StackedView<PlansViewModel> {
                   ),
                 ),
                 if (isExtended)
-                  SizedBox(
+                  const SizedBox(
                     width: 240,
                   ),
                 horizontalSpacing20,
@@ -84,9 +83,17 @@ class PlansView extends StackedView<PlansViewModel> {
                     textStyle: fontFamilyMedium.size14.white
                         .copyWith(overflow: TextOverflow.ellipsis),
                     icon: SizedBox(
-                        height: 35,
-                        width: 35,
-                        child: SvgPicture.asset('assets/images/filter.svg')),
+                      height: 35,
+                      width: 35,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(80),
+                        child: Image.asset(
+                          height: 34,
+                          width: 34,
+                          'assets/images/filter.jpg',
+                        ),
+                      ),
+                    ),
                     onTap: () {
                       CommonFilterDialog.show(
                         context,
@@ -104,7 +111,7 @@ class PlansView extends StackedView<PlansViewModel> {
                 SizedBox(
                   width: 180,
                   child: CommonButton(
-                    icon: Icon(Icons.add, color: white, size: 16),
+                    icon: const Icon(Icons.add, color: white, size: 16),
                     buttonColor: continueButton,
                     textStyle: fontFamilyMedium.size14.white,
                     margin: EdgeInsets.zero,
@@ -126,6 +133,20 @@ class PlansView extends StackedView<PlansViewModel> {
                 ),
               ],
             ),
+            verticalSpacing10,
+            // StateCityDropdown(
+            //   showCity: true, // true to show both State and City dropdown
+            //   initialState: viewModel.stateValue,
+            //   initialCity: '',
+            //   onStateChanged: (state) {
+            //     viewModel.stateValue = state;
+            //     viewModel.cityValue = ''; // reset city when state changes
+            //     viewModel.notifyListeners();
+            //   },
+            //   // onCityChanged: (city) {
+            //   //   viewModel.stateValue = city.toString();
+            //   // },
+            // ),
             verticalSpacing20,
             Expanded(
               child: viewModel.plans.isEmpty

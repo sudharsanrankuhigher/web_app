@@ -49,10 +49,10 @@ class MonthlyBarChart extends StatelessWidget {
 
             // Only left and bottom titles
             titlesData: FlTitlesData(
-              topTitles: AxisTitles(
+              topTitles: const AxisTitles(
                 sideTitles: SideTitles(showTitles: false),
               ),
-              rightTitles: AxisTitles(
+              rightTitles: const AxisTitles(
                 sideTitles: SideTitles(showTitles: false),
               ),
               leftTitles: AxisTitles(
@@ -112,7 +112,7 @@ class MonthlyBarChart extends StatelessWidget {
               ),
             ),
 
-            barTouchData: BarTouchData(enabled: false),
+            barTouchData: const BarTouchData(enabled: false),
           ),
         ),
       ),

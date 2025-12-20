@@ -84,7 +84,7 @@ class LoginView extends StackedView<LoginViewModel> {
                           color: disableColor,
                         ),
                         hintText: 'Enter email address',
-                        fillColor: Color(0xff01B8F91A),
+                        fillColor: const Color(0xff01b8f91a),
                         radius: 10.r,
                       )),
                   verticalSpacing12,
@@ -99,7 +99,7 @@ class LoginView extends StackedView<LoginViewModel> {
                         preffixIcon:
                             const Icon(Icons.lock_outline, color: disableColor),
                         hintText: 'Enter password',
-                        fillColor: Color(0xff01B8F91A),
+                        fillColor: const Color(0xff01b8f91a),
                         radius: 10.r,
                       )),
                   verticalSpacing20,

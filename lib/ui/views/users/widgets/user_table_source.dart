@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/users/model/users_model.dart';
+import 'package:webapp/widgets/common_button.dart';
 import 'common_user_dialog.dart'; // import your dialog
 
 class UserTableSource extends DataTableSource {
   final List<UserModel> originalList;
   List<UserModel> filteredList;
-  final void Function(UserModel) onEdit;
-  final Function(UserModel) onDelete;
+  // final void Function(UserModel) onEdit;
+  // final Function(UserModel) onDelete;
+  final Function() onAdd;
 
   UserTableSource({
     required List<UserModel> users,
-    required this.onEdit,
-    required this.onDelete,
+    // required this.onEdit,
+    // required this.onDelete,
+    required this.onAdd,
   })  : originalList = List.from(users),
         filteredList = List.from(users);
 
@@ -63,8 +67,8 @@ class UserTableSource extends DataTableSource {
     final user = filteredList[index];
 
     return DataRow(
-      color: MaterialStateProperty.resolveWith<Color?>(
-        (Set<MaterialState> states) {
+      color: WidgetStateProperty.resolveWith<Color?>(
+        (Set<WidgetState> states) {
           if (index.isEven) return Colors.white;
           return Colors.grey.shade100;
         },
@@ -78,20 +82,33 @@ class UserTableSource extends DataTableSource {
         DataCell(Text("${user.city}/${user.state}")),
         DataCell(Text(user.plan)),
         DataCell(Text("${user.connections}")),
-        DataCell(
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.edit, color: Colors.blue),
-                onPressed: () => onEdit(user),
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete, color: red),
-                onPressed: () => onDelete(user),
-              ),
-            ],
+        DataCell(CommonButton(
+          text: 'ADD',
+          textStyle: fontFamilyBold.size12.white,
+          buttonColor: continueButton,
+          width: 85,
+          padding: zeroPadding,
+          margin: zeroPadding,
+          icon: Icon(
+            Icons.add,
+            color: white,
           ),
-        ),
+          onTap: () => onAdd(),
+          height: 30,
+        )
+            // Row(
+            //   children: [
+            //     IconButton(
+            //       icon: const Icon(Icons.edit, color: Colors.blue),
+            //       onPressed: () => onEdit(user),
+            //     ),
+            //     IconButton(
+            //       icon: const Icon(Icons.delete, color: red),
+            //       onPressed: () => onDelete(user),
+            //     ),
+            //   ],
+            // ),
+            ),
       ],
     );
   }

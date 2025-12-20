@@ -34,7 +34,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
               Container(
                 width: double.infinity,
                 padding: defaultPadding16,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: white,
                   borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(12),
@@ -45,7 +45,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                   style: fontFamilyBold.size26.black,
                 ),
               ),
-              Wrap(
+              const Wrap(
                 spacing: 12,
                 runSpacing: 12,
                 children: [
@@ -99,7 +99,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
                             color: white,
-                            boxShadow: [BoxShadow(color: disableColor)]),
+                            boxShadow: const [BoxShadow(color: disableColor)]),
                         child: Column(
                           children: [
                             Row(
@@ -119,7 +119,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                 )
                               ],
                             ),
-                            MonthlyBarChart(
+                            const MonthlyBarChart(
                               ongoing: [
                                 20000,
                                 30000,
@@ -167,7 +167,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           color: white,
-                          boxShadow: [BoxShadow(color: disableColor)],
+                          boxShadow: const [BoxShadow(color: disableColor)],
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,7 +225,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                 'Promote Projects Clients',
                 style: fontFamilySemiBold.size18.black,
               ),
-              Row(
+              const Row(
                 children: [
                   Expanded(
                     child: InfoCard(

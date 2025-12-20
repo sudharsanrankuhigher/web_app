@@ -15,7 +15,7 @@ class RequestTableSource extends DataTableSource {
     final model = data[index];
 
     return DataRow.byIndex(
-      color: MaterialStateProperty.resolveWith<Color?>(
+      color: WidgetStateProperty.resolveWith<Color?>(
         (states) => index.isEven ? Colors.white : Colors.grey.shade100,
       ),
       index: index,
@@ -58,7 +58,7 @@ class RequestTableSource extends DataTableSource {
           DataCell(Text("${m.clientPhone}")),
           DataCell(Text("${m.influencerPhone}")),
           DataCell(Text("${m.requestedDate}")),
-          DataCell(Icon(Icons.more_vert)),
+          const DataCell(Icon(Icons.more_vert)),
         ];
 
       case "complete_pending_list":
@@ -70,7 +70,7 @@ class RequestTableSource extends DataTableSource {
           DataCell(Text("${m.influencerName}")),
           DataCell(Text("${m.requestedDate}")),
           DataCell(Text("${m.completedDate}")),
-          DataCell(Icon(Icons.more_vert)),
+          const DataCell(Icon(Icons.more_vert)),
         ];
 
       case "cancelled":
@@ -106,7 +106,7 @@ class RequestTableSource extends DataTableSource {
           DataCell(Text("${m.completedDate}")),
           DataCell(Text("${m.influencerBankDetails}")),
           DataCell(Text("${m.paymentAmount}")),
-          DataCell(Icon(Icons.more_vert)),
+          const DataCell(Icon(Icons.more_vert)),
         ];
 
       case "promote_commission":
@@ -129,7 +129,7 @@ class RequestTableSource extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => data.length > 0 ? data.length : 0;
+  int get rowCount => data.isNotEmpty ? data.length : 0;
 
   @override
   int get selectedRowCount => 0;

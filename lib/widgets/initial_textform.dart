@@ -28,7 +28,7 @@ class InitialTextForm extends StatelessWidget {
     super.key,
     this.keys,
     this.controller,
-    this.maxLines,
+    this.maxLines = 1,
     this.fillColor,
     this.borderColor,
     this.onSaved,

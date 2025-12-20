@@ -19,7 +19,7 @@ class CommonFilterDialog extends StatelessWidget {
     String selectedSort = initialSort;
 
     return Dialog(
-      constraints: BoxConstraints(maxWidth: 400),
+      constraints: const BoxConstraints(maxWidth: 400),
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: StatefulBuilder(

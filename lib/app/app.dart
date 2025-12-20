@@ -12,6 +12,8 @@ import 'package:webapp/ui/views/influencers/influencers_view.dart';
 import 'package:webapp/ui/views/services/services_view.dart';
 import 'package:webapp/ui/views/plans/plans_view.dart';
 import 'package:webapp/ui/views/requests/requests_view.dart';
+import 'package:webapp/ui/views/sub_admin/sub_admin_view.dart';
+import 'package:webapp/ui/views/state/state_view.dart';
 // @stacked-import
 
 @StackedApp(
@@ -37,6 +39,8 @@ import 'package:webapp/ui/views/requests/requests_view.dart';
     // MaterialRoute(page: ServicesView, path: "/services"),
     // MaterialRoute(page: PlansView, path: "/plans"),
     // MaterialRoute(page: RequestsView, path: "/requests"),
+    MaterialRoute(page: SubAdminView),
+    MaterialRoute(page: StateView),
 // @stacked-route
   ],
   dependencies: [

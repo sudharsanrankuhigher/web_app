@@ -37,7 +37,7 @@ class InfluencersViewModel extends BaseViewModel {
           context: StackedService.navigatorKey!.currentContext!,
           builder: (_) => Center(
             child: ConstrainedBox(
-              constraints: BoxConstraints(
+              constraints: const BoxConstraints(
                 maxWidth: 800, // set your desired width
                 minWidth: 400,
               ),
@@ -61,7 +61,7 @@ class InfluencersViewModel extends BaseViewModel {
           context: StackedService.navigatorKey!.currentContext!,
           builder: (_) => Center(
             child: ConstrainedBox(
-              constraints: BoxConstraints(
+              constraints: const BoxConstraints(
                 maxWidth: 800, // set your desired width
                 minWidth: 400,
               ),
@@ -79,7 +79,7 @@ class InfluencersViewModel extends BaseViewModel {
         );
         notifyListeners();
       },
-      onDelete: confirmDelete, // <-- ADD THIS
+      // onDelete: confirmDelete, // <-- ADD THIS
       // onDelete: (item) => print("Delete ${item.name}"),
       onToggle: (item) {
         item.isActive = !item.isActive;
@@ -105,8 +105,8 @@ class InfluencersViewModel extends BaseViewModel {
       influencers: filtered,
       onEdit: openEditDialog,
       onView: openEditDialog,
-      onDelete:
-          confirmDelete, // <-- ADD THIS      // onDelete: (item) => print("Delete ${item.name}"),
+      // onDelete:
+      //     confirmDelete, // <-- ADD THIS      // onDelete: (item) => print("Delete ${item.name}"),
       onToggle: (item) {
         item.isActive = !item.isActive;
         notifyListeners();
@@ -132,8 +132,8 @@ class InfluencersViewModel extends BaseViewModel {
       influencers: filtered,
       onEdit: openEditDialog,
       onView: openEditDialog,
-      onDelete:
-          confirmDelete, // <-- ADD THIS      // onDelete: (item) => print("Delete ${item.name}"),
+      // onDelete:
+      //     confirmDelete, // <-- ADD THIS      // onDelete: (item) => print("Delete ${item.name}"),
       onToggle: (item) {
         item.isActive = !item.isActive;
         notifyListeners();

@@ -1,29 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
-import 'package:webapp/ui/views/plans/model/plans_model.dart';
+import 'package:webapp/ui/views/state/model/state_model.dart';
 
-class PlanTableSource extends DataTableSource {
-  final List<PlanModel> plans;
-  final Function(PlanModel) onEdit;
-  final Function(PlanModel) onView;
-  final Function(PlanModel) onDelete;
+class StateTableSource extends DataTableSource {
+  final List<StateModel> states;
+  final Function(StateModel) onEdit;
+  final Function(StateModel) onDelete;
 
-  PlanTableSource({
-    required this.plans,
+  StateTableSource({
+    required this.states,
     required this.onEdit,
-    required this.onView,
     required this.onDelete,
   });
 
   @override
   DataRow? getRow(int index) {
     // if (index >= plans.length) return null;
-    if (plans.isEmpty) {
+    if (states.isEmpty) {
       return DataRow(
         cells: List.generate(
-          6, // total columns
+          3, // total columns
           (i) {
-            if (i == 3) {
+            if (i == 2) {
               // column index where message should show
               return const DataCell(
                 Center(
@@ -43,7 +41,7 @@ class PlanTableSource extends DataTableSource {
       );
     }
 
-    final plan = plans[index];
+    final plan = states[index];
     final sNo = index + 1;
 
     return DataRow(
@@ -55,29 +53,11 @@ class PlanTableSource extends DataTableSource {
         ),
         cells: [
           DataCell(Text("$sNo")),
-          DataCell(Text(plan.planName)),
-          DataCell(Text("${plan.connections}")),
-          DataCell(Text("₹${plan.amount}")),
-          DataCell(Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8), color: Colors.blue),
-            child: Text(
-              plan.badge,
-              style: const TextStyle(color: Colors.white),
-            ),
-          )),
+          DataCell(Text(plan.name)),
           DataCell(Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(
-                  icon: const Icon(
-                    Icons.visibility,
-                    size: 16,
-                    color: Colors.blue,
-                  ),
-                  onPressed: () => onView(plan)),
               IconButton(
                   icon: const Icon(
                     Icons.edit,
@@ -90,6 +70,7 @@ class PlanTableSource extends DataTableSource {
                   onPressed: () => onDelete(plan)),
             ],
           )),
+          DataCell(Text(plan.status)),
         ]);
   }
 
@@ -97,7 +78,7 @@ class PlanTableSource extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => plans.isEmpty ? 1 : plans.length;
+  int get rowCount => states.isEmpty ? 1 : states.length;
 
   @override
   int get selectedRowCount => 0;

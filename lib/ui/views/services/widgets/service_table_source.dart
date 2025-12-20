@@ -15,11 +15,11 @@ class ServiceTableSource extends DataTableSource {
   @override
   DataRow? getRow(int index) {
     if (services.isEmpty) {
-      return DataRow(
+      return const DataRow(
         cells: [
-          const DataCell(Text("")),
-          const DataCell(Center(child: Text("No data found"))),
-          const DataCell(Text("")),
+          DataCell(Text("")),
+          DataCell(Center(child: Text("No data found"))),
+          DataCell(Text("")),
         ],
       );
     }
@@ -27,7 +27,7 @@ class ServiceTableSource extends DataTableSource {
     final service = services[index];
 
     return DataRow(
-      color: MaterialStateProperty.resolveWith<Color?>(
+      color: WidgetStateProperty.resolveWith<Color?>(
         (states) => index.isEven ? Colors.white : Colors.grey.shade100,
       ),
       cells: [

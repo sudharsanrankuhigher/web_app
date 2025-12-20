@@ -5,13 +5,13 @@ class InfluencerTableSource extends DataTableSource {
   final List<InfluencerModel> influencers;
   final Function(InfluencerModel, bool) onEdit;
   final Function(InfluencerModel, bool)? onView;
-  final Function(InfluencerModel) onDelete;
+  // final Function(InfluencerModel) onDelete;
   final Function(InfluencerModel) onToggle;
 
   InfluencerTableSource({
     required this.influencers,
     required this.onEdit,
-    required this.onDelete,
+    // required this.onDelete,
     this.onView,
     required this.onToggle,
   });
@@ -52,8 +52,8 @@ class InfluencerTableSource extends DataTableSource {
     final item = influencers[index];
 
     return DataRow(
-      color: MaterialStateProperty.resolveWith<Color?>(
-        (Set<MaterialState> states) {
+      color: WidgetStateProperty.resolveWith<Color?>(
+        (Set<WidgetState> states) {
           if (index.isEven) return Colors.white;
           return Colors.grey.shade100;
         },
@@ -61,9 +61,11 @@ class InfluencerTableSource extends DataTableSource {
       cells: [
         DataCell(Text("${index + 1}")),
 
+        DataCell(Text(item.id.toString())),
         DataCell(Text(item.name)),
         DataCell(Text(item.phone)),
         DataCell(Text("${item.city}/${item.state}")),
+        DataCell(Text(item.category)),
         DataCell(Text(item.category)),
 
         DataCell(Text(item.instagramFollowers ?? "")),
@@ -72,26 +74,26 @@ class InfluencerTableSource extends DataTableSource {
 
         /// ACTION BUTTONS
         DataCell(
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              GestureDetector(
-                onTap: () => onView?.call(item, true),
-                child:
-                    const Icon(Icons.visibility, size: 16, color: Colors.blue),
-              ),
-              const SizedBox(width: 8),
-              GestureDetector(
-                onTap: () => onEdit(item, false),
-                child: const Icon(Icons.edit, size: 16, color: Colors.blue),
-              ),
-              const SizedBox(width: 8),
-              GestureDetector(
-                onTap: () => onDelete(item),
-                child: const Icon(Icons.delete, size: 16, color: Colors.red),
-              ),
-            ],
+          GestureDetector(
+            onTap: () => onView?.call(item, true),
+            child: const Icon(Icons.visibility, size: 20, color: Colors.blue),
           ),
+          // Row(
+          //   mainAxisSize: MainAxisSize.min,
+          //   children: [
+
+          //     const SizedBox(width: 8),
+          //     GestureDetector(
+          //       onTap: () => onEdit(item, false),
+          //       child: const Icon(Icons.edit, size: 16, color: Colors.blue),
+          //     ),
+          //     const SizedBox(width: 8),
+          //     GestureDetector(
+          //       // onTap: () => onDelete(item),
+          //       child: const Icon(Icons.delete, size: 16, color: Colors.red),
+          //     ),
+          //   ],
+          // ),
         ),
 
         /// TOGGLE SWITCH

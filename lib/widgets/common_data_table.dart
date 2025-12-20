@@ -31,7 +31,7 @@ class CommonPaginatedTable extends StatelessWidget {
       showFirstLastButtons: true,
       headingRowHeight: 48,
       dataRowHeight: dataRowHeight,
-      headingRowColor: MaterialStateProperty.all(appGreen400),
+      headingRowColor: WidgetStateProperty.all(appGreen400),
       headingRowDecoration: const BoxDecoration(
         color: appGreen400,
         borderRadius: BorderRadius.only(
