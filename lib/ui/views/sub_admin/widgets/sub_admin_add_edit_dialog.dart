@@ -9,6 +9,7 @@ import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/initial_textform.dart';
 import 'package:webapp/widgets/multi_select_form_field.dart';
 import 'package:webapp/widgets/profile_image.dart';
+import 'package:webapp/widgets/state_city_drop_down.dart';
 
 class CommonSubAdminDialog {
   static Future<Map<String, dynamic>?> show(
@@ -34,6 +35,9 @@ class CommonSubAdminDialog {
 
     String profileImage = model?.imageUrl ?? '';
     String idImage = model?.idImageUrl ?? '';
+
+    bool? isStateError = false;
+    bool? isCityError = false;
 
     final states = ["Tamil Nadu", "Kerala", "Karnataka"];
     final cities = {
@@ -199,46 +203,66 @@ class CommonSubAdminDialog {
                     verticalSpacing10,
 
                     /// State
-                    DropdownButtonFormField<String>(
-                      value: state.isEmpty ? null : state,
-                      decoration: _decoration("State"),
-                      items: states
-                          .map(
-                            (e) => DropdownMenuItem(value: e, child: Text(e)),
-                          )
-                          .toList(),
-                      onChanged: (v) {
-                        setState(() {
-                          state = v!;
-                          city = ''; // reset city when state changes
-                        });
+                    // DropdownButtonFormField<String>(
+                    //   value: state.isEmpty ? null : state,
+                    //   decoration: _decoration("State"),
+                    //   items: states
+                    //       .map(
+                    //         (e) => DropdownMenuItem(value: e, child: Text(e)),
+                    //       )
+                    //       .toList(),
+                    //   onChanged: (v) {
+                    //     setState(() {
+                    //       state = v!;
+                    //       city = ''; // reset city when state changes
+                    //     });
+                    //   },
+                    //   validator: (v) => v == null ? "Select state" : null,
+                    // ),
+
+                    StateCityDropdown(
+                      showCity: true,
+                      initialState: state.isEmpty ? null : state,
+                      initialCity: city.isEmpty ? null : city,
+                      isStateError: isStateError,
+                      isCityError: isCityError,
+                      onStateChanged: (state) {
+                        model?.state = state;
                       },
-                      validator: (v) => v == null ? "Select state" : null,
+                      onCityChanged: (city) {
+                        model?.city = city!;
+                      },
+                      stateValidator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please select a state";
+                        }
+                        return null;
+                      },
                     ),
 
-                    verticalSpacing10,
+                    // verticalSpacing10,
 
                     /// City
-                    DropdownButtonFormField<String>(
-                      value: city.isEmpty ? null : city,
-                      decoration: _decoration("City"),
-                      items: state.isEmpty
-                          ? []
-                          : cities[state]!
-                              .map(
-                                (e) =>
-                                    DropdownMenuItem(value: e, child: Text(e)),
-                              )
-                              .toList(),
-                      onChanged: state.isEmpty
-                          ? null
-                          : (v) {
-                              setState(() {
-                                city = v!;
-                              });
-                            },
-                      validator: (v) => v == null ? "Select city" : null,
-                    ),
+                    // DropdownButtonFormField<String>(
+                    //   value: city.isEmpty ? null : city,
+                    //   decoration: _decoration("City"),
+                    //   items: state.isEmpty
+                    //       ? []
+                    //       : cities[state]!
+                    //           .map(
+                    //             (e) =>
+                    //                 DropdownMenuItem(value: e, child: Text(e)),
+                    //           )
+                    //           .toList(),
+                    //   onChanged: state.isEmpty
+                    //       ? null
+                    //       : (v) {
+                    //           setState(() {
+                    //             city = v!;
+                    //           });
+                    //         },
+                    //   validator: (v) => v == null ? "Select city" : null,
+                    // ),
 
                     verticalSpacing16,
 
@@ -311,6 +335,26 @@ class CommonSubAdminDialog {
               text: isEdit ? "Update" : "Create",
               textStyle: fontFamilyBold.size14.white,
               onTap: () {
+                if (state == null || state.isEmpty) {
+                  setState(() {
+                    isStateError = true;
+                  });
+                  return;
+                } else {
+                  setState(() {
+                    isStateError = false;
+                  });
+                }
+                if (city == null || city.isEmpty) {
+                  setState(() {
+                    isCityError = true;
+                  });
+                  return;
+                } else {
+                  setState(() {
+                    isCityError = false;
+                  });
+                }
                 if (!formKey.currentState!.validate()) return;
 
                 Navigator.pop(StackedService.navigatorKey!.currentContext!, {

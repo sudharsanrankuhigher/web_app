@@ -54,13 +54,14 @@ class CommonButton extends StatelessWidget {
               icon!,
               horizontalSpacing10,
             ],
-            Text(
-              overflow: TextOverflow.ellipsis,
-              text,
-              style: textStyle ??
-                  fontFamilyMedium.size14.black
-                      .copyWith(overflow: TextOverflow.ellipsis),
-            ),
+            if (text.isNotEmpty || textStyle != null)
+              Text(
+                overflow: TextOverflow.ellipsis,
+                text,
+                style: textStyle ??
+                    fontFamilyMedium.size14.black
+                        .copyWith(overflow: TextOverflow.ellipsis),
+              ),
             if (icon1 != null) ...[
               horizontalSpacing10,
               icon1!,

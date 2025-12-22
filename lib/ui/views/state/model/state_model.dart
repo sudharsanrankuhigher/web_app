@@ -4,7 +4,7 @@ class StateModel {
   final String status;
 
   StateModel({
-     this.id,
+    this.id,
     required this.name,
     required this.status,
   });

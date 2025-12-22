@@ -13,6 +13,8 @@ class StateCityDropdown extends StatefulWidget {
   final Function(String?)? onCityChanged;
   final String? Function(dynamic?)? stateValidator;
   final String? Function(dynamic?)? cityValidator;
+  final bool? isCityError;
+  final bool? isStateError;
 
   const StateCityDropdown({
     super.key,
@@ -23,6 +25,8 @@ class StateCityDropdown extends StatefulWidget {
     this.onCityChanged,
     this.cityValidator,
     this.stateValidator,
+    this.isCityError = false,
+    this.isStateError = false,
   });
 
   @override
@@ -88,7 +92,24 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
           decoratorProps: DropDownDecoratorProps(
             decoration: InputDecoration(
               labelText: "State",
-              border: const OutlineInputBorder(),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: widget.isStateError == true ? Colors.red : Colors.grey,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: widget.isStateError == true ? Colors.red : Colors.blue,
+                  width: 2,
+                ),
+              ),
+              errorText:
+                  widget.isStateError == true ? "Please select a state" : null,
+              border: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              ),
             ),
           ),
           onChanged: (value) {
@@ -131,7 +152,26 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
             decoratorProps: DropDownDecoratorProps(
               decoration: InputDecoration(
                 labelText: "City",
-                border: const OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color:
+                        widget.isCityError == true ? Colors.red : Colors.grey,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color:
+                        widget.isCityError == true ? Colors.red : Colors.blue,
+                    width: 2,
+                  ),
+                ),
+                errorText:
+                    widget.isCityError == true ? "Please select a City" : null,
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
               ),
             ),
             onChanged: (value) {

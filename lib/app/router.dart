@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'package:webapp/ui/views/city/city_view.dart';
+import 'package:webapp/ui/views/contact_support/contact_support_view.dart';
 import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/ui/views/dash_board/dash_board_view.dart';
+import 'package:webapp/ui/views/promote_projects/promote_projects_view.dart';
 import 'package:webapp/ui/views/state/state_view.dart';
 import 'package:webapp/ui/views/sub_admin/sub_admin_view.dart';
 import 'package:webapp/ui/views/users/users_view.dart';
@@ -59,11 +62,7 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/home/city',
           name: 'city',
-          builder: (context, state) => Container(
-            child: const Center(
-              child: Text('city'),
-            ),
-          ),
+          builder: (context, state) => CityView(),
         ),
         GoRoute(
             path: '/home/state',
@@ -72,20 +71,12 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/home/promotion-projects',
           name: 'promotion-projects',
-          builder: (context, state) => Container(
-            child: const Center(
-              child: Text('promotion-projects'),
-            ),
-          ),
+          builder: (context, state) => PromoteProjectsView(),
         ),
         GoRoute(
           path: '/home/contact-support',
           name: 'contact-support',
-          builder: (context, state) => Container(
-            child: const Center(
-              child: Text('contact-support'),
-            ),
-          ),
+          builder: (context, state) => ContactSupportView(),
         ),
         GoRoute(
           path: '/home/sub-admin',

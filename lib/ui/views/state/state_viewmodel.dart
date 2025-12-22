@@ -63,7 +63,8 @@ class StateViewModel extends BaseViewModel with NavigationMixin {
 
   // 🔥 Add Plan
   Future<void> addPlan() async {
-    final result = await AddEditStatePage.show(StackedService.navigatorKey!.currentContext!);
+    final result = await AddEditStatePage.show(
+        StackedService.navigatorKey!.currentContext!);
     if (result != null) {
       final newPlan =
           StateModel(name: result['name'], status: result['status']);

@@ -9,6 +9,7 @@ class CommonPaginatedTable extends StatelessWidget {
   final double minWidth;
   final int? rowsperPage;
   final double dataRowHeight;
+  final bool enableCheckBox;
 
   const CommonPaginatedTable({
     super.key,
@@ -17,6 +18,7 @@ class CommonPaginatedTable extends StatelessWidget {
     this.minWidth = 800,
     this.rowsperPage = 10,
     this.dataRowHeight = 48,
+    this.enableCheckBox = false,
   });
 
   @override
@@ -41,6 +43,7 @@ class CommonPaginatedTable extends StatelessWidget {
       ),
       headingTextStyle: fontFamilyBold.size14.white, // custom typography
       dataTextStyle: fontFamilyRegular.size12.black,
+      showCheckboxColumn: enableCheckBox,
     );
   }
 }

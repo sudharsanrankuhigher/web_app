@@ -157,6 +157,7 @@ class CommonPlanDialog {
             hintText: label,
             initialValue: initial ?? '',
             onChanged: (val) => onChanged(val!),
+            keyboardType: isNumber ? TextInputType.number : TextInputType.text,
           ),
         ],
       ),

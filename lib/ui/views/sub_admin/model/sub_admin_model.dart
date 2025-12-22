@@ -6,8 +6,8 @@ class SubAdminModel {
   final String gender;
   final DateTime dob;
 
-  final String state;
-  final String city;
+  String state;
+  String city;
 
   final List<String> access;
 

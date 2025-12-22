@@ -51,18 +51,18 @@ class StateView extends StackedView<StateViewModel> {
               // alignment: WrapAlignment.start,
               children: [
                 SizedBox(
+                  height: 45.h,
                   width: isExtended ? 500 : 200,
-                  child: StateCityDropdown(
-                    showCity:
-                        false, // true to show both State and City dropdown
-                    initialState: viewModel.stateValue,
-                    initialCity: '',
-                    onStateChanged: (state) {
-                      viewModel.setCity(state);
-                    },
-                    // onCityChanged: (city) {
-                    //   viewModel.stateValue = city.toString();
-                    // },
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: "Search state name...",
+                      hintStyle: fontFamilyRegular.size14.grey,
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    // onChanged: viewModel.searchState,
                   ),
                 ),
                 Row(
@@ -101,6 +101,7 @@ class StateView extends StackedView<StateViewModel> {
                         },
                       ),
                     ),
+                    horizontalSpacing10,
                     CommonButton(
                         width: isExtended ? 180 : null,
                         icon: const Icon(Icons.add, color: white, size: 16),
