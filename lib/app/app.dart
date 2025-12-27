@@ -17,6 +17,9 @@ import 'package:webapp/ui/views/state/state_view.dart';
 import 'package:webapp/ui/views/city/city_view.dart';
 import 'package:webapp/ui/views/contact_support/contact_support_view.dart';
 import 'package:webapp/ui/views/promote_projects/promote_projects_view.dart';
+import 'package:webapp/ui/views/report/report_view.dart';
+import 'package:webapp/ui/views/permissions/permissions_view.dart';
+import 'package:webapp/ui/views/roles/roles_view.dart';
 // @stacked-import
 
 @StackedApp(
@@ -47,6 +50,9 @@ import 'package:webapp/ui/views/promote_projects/promote_projects_view.dart';
     MaterialRoute(page: CityView),
     MaterialRoute(page: ContactSupportView),
     MaterialRoute(page: PromoteProjectsView),
+    MaterialRoute(page: ReportView),
+    MaterialRoute(page: PermissionsView),
+    MaterialRoute(page: RolesView),
 // @stacked-route
   ],
   dependencies: [

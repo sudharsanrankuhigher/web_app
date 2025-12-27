@@ -6,6 +6,7 @@ extension TextStyleHelpers on TextStyle {
   TextStyle get size10 => copyWith(fontSize: 10 * scale);
   TextStyle get size11 => copyWith(fontSize: 11 * scale);
   TextStyle get size12 => copyWith(fontSize: 12 * scale);
+  TextStyle get size13 => copyWith(fontSize: 13 * scale);
   TextStyle get size14 => copyWith(fontSize: 14 * scale);
   TextStyle get size16 => copyWith(fontSize: 16 * scale);
   TextStyle get size18 => copyWith(fontSize: 18 * scale);

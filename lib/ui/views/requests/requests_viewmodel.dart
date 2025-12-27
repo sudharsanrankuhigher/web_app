@@ -8,8 +8,8 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
   RequestsViewModel() {
     setSelected(0);
   }
-  int _isSelected = 0;
   String? _selectedString;
+  int _isSelected = 0;
   int get isSelected => _isSelected;
   String? get selectedString => _selectedString;
 

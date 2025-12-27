@@ -52,6 +52,9 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
     'Promotion Projects',
     'Contact Support',
     'Sub Admin',
+    'Report',
+    'Roles',
+    'Permissions',
   ];
 
   final List<String> railIcon = [
@@ -65,6 +68,9 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
     'assets/images/requests_dashboard.svg',
     'assets/images/promotes_proj_dashboard.svg',
     'assets/images/support_dashboard.svg',
+    'assets/images/sub-admin_dashboard.svg',
+    'assets/images/sub-admin_dashboard.svg',
+    'assets/images/sub-admin_dashboard.svg',
     'assets/images/sub-admin_dashboard.svg',
   ];
 
@@ -153,6 +159,18 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
         context.pushReplacementNamed('sub-admin');
         _selectedIndex = 10;
         break;
+      case 11:
+        context.pushReplacementNamed('report');
+        _selectedIndex = 11;
+        break;
+      case 13:
+        context.pushReplacementNamed('permissions');
+        _selectedIndex = 13;
+        break;
+      case 12:
+        context.pushReplacementNamed('roles');
+        _selectedIndex = 12;
+        break;
     }
   }
 
@@ -190,6 +208,14 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
         break;
       case '/home/sub-admin':
         _selectedIndex = 10;
+        break;
+      case '/home/report':
+        _selectedIndex = 11;
+        break;
+      case '/home/permissions':
+        _selectedIndex = 13;
+      case '/home/roles':
+        _selectedIndex = 12;
         break;
       default:
         _selectedIndex = 0;

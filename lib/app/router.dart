@@ -4,7 +4,10 @@ import 'package:webapp/ui/views/city/city_view.dart';
 import 'package:webapp/ui/views/contact_support/contact_support_view.dart';
 import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/ui/views/dash_board/dash_board_view.dart';
+import 'package:webapp/ui/views/permissions/permissions_view.dart';
 import 'package:webapp/ui/views/promote_projects/promote_projects_view.dart';
+import 'package:webapp/ui/views/report/report_view.dart';
+import 'package:webapp/ui/views/roles/roles_view.dart';
 import 'package:webapp/ui/views/state/state_view.dart';
 import 'package:webapp/ui/views/sub_admin/sub_admin_view.dart';
 import 'package:webapp/ui/views/users/users_view.dart';
@@ -82,6 +85,21 @@ final GoRouter router = GoRouter(
           path: '/home/sub-admin',
           name: 'sub-admin',
           builder: (context, state) => const SubAdminView(),
+        ),
+        GoRoute(
+          path: '/home/report',
+          name: 'report',
+          builder: (context, state) => const ReportView(),
+        ),
+        GoRoute(
+          path: '/home/roles',
+          name: 'roles',
+          builder: (context, state) => const RolesView(),
+        ),
+        GoRoute(
+          path: '/home/permissions',
+          name: 'permissions',
+          builder: (context, state) => const PermissionsView(),
         ),
       ],
     ),

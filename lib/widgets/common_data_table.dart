@@ -10,6 +10,9 @@ class CommonPaginatedTable extends StatelessWidget {
   final int? rowsperPage;
   final double dataRowHeight;
   final bool enableCheckBox;
+  final bool hidePaginator;
+  final Color? heddingRowColor;
+  final TextStyle? headingTextStyle;
 
   const CommonPaginatedTable({
     super.key,
@@ -19,12 +22,16 @@ class CommonPaginatedTable extends StatelessWidget {
     this.rowsperPage = 10,
     this.dataRowHeight = 48,
     this.enableCheckBox = false,
+    this.heddingRowColor,
+    this.headingTextStyle,
+    this.hidePaginator = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return PaginatedDataTable2(
       columns: columns,
+      hidePaginator: hidePaginator ?? false,
       source: source,
       columnSpacing: 14,
       minWidth: minWidth,
@@ -34,14 +41,15 @@ class CommonPaginatedTable extends StatelessWidget {
       headingRowHeight: 48,
       dataRowHeight: dataRowHeight,
       headingRowColor: WidgetStateProperty.all(appGreen400),
-      headingRowDecoration: const BoxDecoration(
-        color: appGreen400,
+      headingRowDecoration: BoxDecoration(
+        color: heddingRowColor ?? appGreen400,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(12),
           topRight: Radius.circular(12),
         ),
       ),
-      headingTextStyle: fontFamilyBold.size14.white, // custom typography
+      headingTextStyle:
+          headingTextStyle ?? fontFamilyBold.size14.white, // custom typography
       dataTextStyle: fontFamilyRegular.size12.black,
       showCheckboxColumn: enableCheckBox,
     );
