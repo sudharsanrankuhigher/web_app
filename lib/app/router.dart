@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'package:webapp/ui/views/add_company/add_company_view.dart';
 import 'package:webapp/ui/views/city/city_view.dart';
 import 'package:webapp/ui/views/contact_support/contact_support_view.dart';
 import 'package:webapp/ui/views/home/home_view.dart';
@@ -80,6 +81,11 @@ final GoRouter router = GoRouter(
           path: '/home/contact-support',
           name: 'contact-support',
           builder: (context, state) => ContactSupportView(),
+        ),
+        GoRoute(
+          path: '/home/company',
+          name: 'company',
+          builder: (context, state) => AddCompanyView(),
         ),
         GoRoute(
           path: '/home/sub-admin',

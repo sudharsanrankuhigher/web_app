@@ -20,6 +20,7 @@ import 'package:webapp/ui/views/promote_projects/promote_projects_view.dart';
 import 'package:webapp/ui/views/report/report_view.dart';
 import 'package:webapp/ui/views/permissions/permissions_view.dart';
 import 'package:webapp/ui/views/roles/roles_view.dart';
+import 'package:webapp/ui/views/add_company/add_company_view.dart';
 // @stacked-import
 
 @StackedApp(
@@ -53,6 +54,7 @@ import 'package:webapp/ui/views/roles/roles_view.dart';
     MaterialRoute(page: ReportView),
     MaterialRoute(page: PermissionsView),
     MaterialRoute(page: RolesView),
+    MaterialRoute(page: AddCompanyView),
 // @stacked-route
   ],
   dependencies: [

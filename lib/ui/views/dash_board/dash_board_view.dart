@@ -27,7 +27,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
       body: SingleChildScrollView(
         // <-- Scroll enabled
         child: Padding(
-          padding: defaultPadding12,
+          padding: defaultPadding12 - topPadding12,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

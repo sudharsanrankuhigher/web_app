@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
+import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/core/navigation/navigation_mixin.dart';
 import 'package:webapp/ui/views/promote_projects/model/prmote_table_model.dart';
 import 'package:webapp/ui/views/promote_projects/model/promote_project_model.dart';
@@ -54,6 +55,12 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     tableSource = PromoteProjectsTableSource(
       data: filteredPlans,
       vm: this,
+      // onEdit: (project) {
+      //   editProject(StackedService.navigatorKey!.currentContext!, project);
+      // },
+      onView: (project) {
+        viewProject(StackedService.navigatorKey!.currentContext!, project);
+      },
     );
 
     notifyListeners();
@@ -70,6 +77,25 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       onSave: (project) {
         addProject(project);
       },
+    );
+  }
+
+  void editProject(BuildContext context, ProjectModel project) {
+    ProjectDetailsDialog.show(
+      context,
+      model: project,
+      isEdit: true,
+      onSave: (updatedProject) {
+        updateProject(updatedProject);
+      },
+    );
+  }
+
+  void viewProject(BuildContext context, ProjectModel project) {
+    ProjectDetailsDialog.show(
+      context,
+      model: project,
+      isEdit: false, // 👈 read-only
     );
   }
 
@@ -125,6 +151,11 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           'https://i.pravatar.cc/150?img=${i + 1}',
           'https://i.pravatar.cc/150?img=${i + 2}',
           'https://i.pravatar.cc/150?img=${i + 3}',
+        ],
+        influencers: [
+          'Influencer $i',
+          'Influencer $i',
+          'Influencer $i',
         ],
         projectImages: [],
         note: 'Design work',

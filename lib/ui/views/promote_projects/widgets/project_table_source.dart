@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/views/promote_projects/model/promote_project_model.dart';
 import 'package:webapp/ui/views/promote_projects/promote_projects_viewmodel.dart';
 import 'package:webapp/widgets/over_lapping_avatar.dart';
 
 class PromoteProjectsTableSource extends DataTableSource {
   List<ProjectModel> data;
+  final Function(ProjectModel) onView;
   final PromoteProjectsViewModel vm;
 
   PromoteProjectsTableSource({
     required this.data,
     required this.vm,
+    required this.onView,
   });
 
   /// 🔥 Update table data
@@ -61,12 +64,19 @@ class PromoteProjectsTableSource extends DataTableSource {
       DataCell(Text(
         '${item.assignedDate!.day}/${item.assignedDate!.month}/${item.assignedDate!.year}',
       )),
-      DataCell(
-        IconButton(
-          icon: const Icon(Icons.check_circle, color: Colors.green),
-          onPressed: () => vm.toggleProjectStatus(item),
-        ),
-      ),
+      DataCell(Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+              icon: const Icon(
+                Icons.visibility,
+                size: 16,
+                color: Colors.blue,
+              ),
+              onPressed: () => onView(item)),
+        ],
+      )),
     ];
   }
 

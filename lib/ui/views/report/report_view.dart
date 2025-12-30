@@ -45,7 +45,7 @@ class ReportView extends StackedView<ReportViewModel> {
                   ),
                 ),
                 child: Text(
-                  'Requests',
+                  'Reports',
                   style: fontFamilyBold.size26.black,
                 ),
               ),
@@ -177,7 +177,7 @@ class ReportView extends StackedView<ReportViewModel> {
                       child: InfoSalesProjectCard(
                         title: 'Payment Processed',
                         count: '27',
-                        subtitle: 'Partner Companies',
+                        subtitle: 'Payment Processed successfully',
                         iconPath: 'assets/images/payment_processed.svg',
                       ),
                     ),
@@ -186,7 +186,7 @@ class ReportView extends StackedView<ReportViewModel> {
                       child: InfoSalesProjectCard(
                         title: 'Add Platforms',
                         count: '27',
-                        subtitle: 'Partner Companies',
+                        subtitle: 'Added to this platform',
                         iconPath: 'assets/images/add_platform.svg',
                       ),
                     ),

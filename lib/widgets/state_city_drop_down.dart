@@ -4,6 +4,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webapp/core/model/cities_model.dart';
+import 'package:webapp/ui/common/shared/styles.dart';
 
 class StateCityDropdown extends StatefulWidget {
   final bool showCity;
@@ -94,6 +95,8 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                 ),
                 decoratorProps: DropDownDecoratorProps(
                   decoration: InputDecoration(
+                    fillColor: white,
+                    filled: true,
                     labelText: "State",
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -160,6 +163,8 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                   ),
                   decoratorProps: DropDownDecoratorProps(
                     decoration: InputDecoration(
+                      fillColor: white,
+                      filled: true,
                       labelText: "City",
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),

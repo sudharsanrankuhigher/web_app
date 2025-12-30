@@ -51,6 +51,7 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
     'Requests',
     'Promotion Projects',
     'Contact Support',
+    'Company',
     'Sub Admin',
     'Report',
     'Roles',
@@ -68,26 +69,11 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
     'assets/images/requests_dashboard.svg',
     'assets/images/promotes_proj_dashboard.svg',
     'assets/images/support_dashboard.svg',
+    'assets/images/support_dashboard.svg',
     'assets/images/sub-admin_dashboard.svg',
     'assets/images/sub-admin_dashboard.svg',
     'assets/images/sub-admin_dashboard.svg',
     'assets/images/sub-admin_dashboard.svg',
-  ];
-
-  final List<Widget> pages = [
-    const DashBoardView(),
-    const UsersView(),
-    const InfluencersView(),
-    const ServicesView(),
-    const Center(child: Text('City', style: TextStyle(fontSize: 20))),
-    const Center(child: Text('State', style: TextStyle(fontSize: 20))),
-    const PlansView(),
-    const Center(child: Text('Requests', style: TextStyle(fontSize: 20))),
-    const Center(
-        child: Text('Promotion Projects', style: TextStyle(fontSize: 20))),
-    const Center(
-        child: Text('Contact Support', style: TextStyle(fontSize: 20))),
-    const Center(child: Text('Sub Admin', style: TextStyle(fontSize: 20))),
   ];
 
   // ─── Bottom Labels ───
@@ -156,20 +142,24 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
         _selectedIndex = 9;
         break;
       case 10:
-        context.pushReplacementNamed('sub-admin');
+        context.pushReplacementNamed('company');
         _selectedIndex = 10;
         break;
       case 11:
-        context.pushReplacementNamed('report');
+        context.pushReplacementNamed('sub-admin');
         _selectedIndex = 11;
         break;
+      case 12:
+        context.pushReplacementNamed('report');
+        _selectedIndex = 12;
+        break;
       case 13:
-        context.pushReplacementNamed('permissions');
+        context.pushReplacementNamed('roles');
         _selectedIndex = 13;
         break;
-      case 12:
-        context.pushReplacementNamed('roles');
-        _selectedIndex = 12;
+      case 14:
+        context.pushReplacementNamed('permissions');
+        _selectedIndex = 14;
         break;
     }
   }
@@ -206,16 +196,20 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
       case '/home/contact-support':
         _selectedIndex = 9;
         break;
-      case '/home/sub-admin':
+      case '/home/company':
         _selectedIndex = 10;
         break;
-      case '/home/report':
+      case '/home/sub-admin':
         _selectedIndex = 11;
         break;
-      case '/home/permissions':
-        _selectedIndex = 13;
-      case '/home/roles':
+      case '/home/report':
         _selectedIndex = 12;
+        break;
+      case '/home/roles':
+        _selectedIndex = 13;
+        break;
+      case '/home/permissions':
+        _selectedIndex = 14;
         break;
       default:
         _selectedIndex = 0;

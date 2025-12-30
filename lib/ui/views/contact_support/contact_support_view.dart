@@ -37,7 +37,7 @@ class ContactSupportView extends StackedView<ContactSupportViewModel> {
                     bottomRight: Radius.circular(12)),
               ),
               child: Text(
-                'City Management',
+                'Contact Support Management',
                 style: fontFamilyBold.size26.black,
               ),
             ),

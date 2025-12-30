@@ -12,6 +12,7 @@ class ProjectModel {
   final String service;
 
   final List<String> influencerImages;
+  List<String> influencers;
   final List<String> projectImages;
 
   final String note;
@@ -36,6 +37,7 @@ class ProjectModel {
     required this.city,
     required this.service,
     required this.influencerImages,
+    required this.influencers,
     required this.projectImages,
     required this.note,
     required this.payment,
@@ -51,6 +53,7 @@ class ProjectModel {
     double? payment,
     double? commission,
     List<String>? projectImages,
+    List<String>? influencers,
     bool? isCompleted,
     DateTime? completedDate,
     required String projectCode,
@@ -70,6 +73,7 @@ class ProjectModel {
       state: state,
       city: city,
       service: service,
+      influencers: influencers ?? this.influencers,
       influencerImages: influencerImages,
       projectImages: projectImages ?? this.projectImages,
       note: note ?? this.note,
@@ -93,6 +97,7 @@ class ProjectModel {
       state: '',
       city: '',
       service: '',
+      influencers: [],
       note: '',
       payment: 0,
       commission: 0,

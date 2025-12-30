@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/core/enum/permission_enum.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/views/permissions/permissions_viewmodel.dart';
 import 'package:webapp/widgets/permissions_cells.dart';
 
 Widget permissionTable(PermissionsViewModel vm) {
+  final bool isExtended =
+      MediaQuery.of(StackedService.navigatorKey!.currentContext!).size.width >
+          1440;
+
   return Container(
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
@@ -17,13 +22,13 @@ Widget permissionTable(PermissionsViewModel vm) {
         // Header Row
         Row(
           children: [
-            Checkbox(value: false, onChanged: (_) {}),
+            // Checkbox(value: false, onChanged: (_) {}),
             const Text(
               'Admin Module',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const Spacer(),
-            const Text('Select All Submenu Permissions'),
+            if (isExtended) Text('Select All Submenu Permissions'),
             Checkbox(
               value: vm.selectAll,
               onChanged: (v) => vm.toggleSelectAll(v ?? false),
@@ -31,12 +36,12 @@ Widget permissionTable(PermissionsViewModel vm) {
           ],
         ),
 
-        const SizedBox(height: 12),
+        verticalSpacing12,
 
         // Table Header
         Container(
           color: Colors.grey.shade300,
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 10) + leftPadding8,
           child: Row(
             children: const [
               HeaderCell('Submenu', TextAlign.start, flex: 3),

@@ -21,8 +21,7 @@ class CommonRoleDialog {
           ),
           builder: (context, model, _) {
             return AlertDialog(
-              title:
-                  Text(existingName == null ? "Add Roles" : "Edit Roles"),
+              title: Text(existingName == null ? "Add Roles" : "Edit Roles"),
               content: SingleChildScrollView(
                 child: Form(
                   key: formKey, // ✅ Attach key

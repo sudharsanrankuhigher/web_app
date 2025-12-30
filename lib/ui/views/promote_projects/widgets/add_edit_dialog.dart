@@ -1,6 +1,17 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/promote_projects/model/promote_project_model.dart';
+import 'package:webapp/ui/views/promote_projects/widgets/project_images.dart';
+import 'package:webapp/widgets/common_button.dart';
+import 'package:webapp/widgets/image_picker.dart';
 import 'package:webapp/widgets/initial_textform.dart';
+import 'package:webapp/widgets/multi_select_form_field.dart';
 import 'package:webapp/widgets/state_city_drop_down.dart';
 
 class ProjectDetailsDialog extends StatefulWidget {
@@ -39,6 +50,7 @@ class ProjectDetailsDialog extends StatefulWidget {
 class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
   int selectedImageIndex = 0;
   bool isView = false;
+  bool isEdit = false;
 
   late TextEditingController codeCtrl;
   late TextEditingController companyCtrl;
@@ -55,6 +67,14 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
 
   final List<String> genders = ['Male', 'Female', 'Other'];
   final ScrollController thumbnailScrollController = ScrollController();
+
+  final List<String> influencerOptions = [
+    'Influencer 0',
+    'Influencer 1',
+    'Influencer 2',
+    'Influencer 3',
+    'Influencer 4',
+  ];
 
   @override
   void initState() {
@@ -93,7 +113,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
     return Dialog(
       insetPadding: const EdgeInsets.all(16),
       child: SizedBox(
-        width: 900,
+        width: 700,
         height: 650,
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -104,7 +124,11 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    isView ? 'View Project' : 'Add Project',
+                    isView
+                        ? 'View Project'
+                        : isEdit == true
+                            ? 'Edit Project'
+                            : 'Add Project',
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   Row(
@@ -115,14 +139,15 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                           onPressed: () {
                             setState(() {
                               isView = false;
+                              isEdit = true;
                             });
                           },
                         ),
-                      if (isView)
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => Navigator.pop(context, 'delete'),
-                        ),
+                      // if (isView)
+                      //   IconButton(
+                      //     icon: const Icon(Icons.delete, color: Colors.red),
+                      //     onPressed: () => Navigator.pop(context, 'delete'),
+                      //   ),
                       IconButton(
                         icon: const Icon(Icons.close),
                         onPressed: () => Navigator.pop(context),
@@ -140,7 +165,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                   children: [
                     /// LEFT: Image Section
                     Expanded(
-                      flex: 4,
+                      flex: 5,
                       child: Column(
                         children: [
                           /// MAIN IMAGE
@@ -155,67 +180,68 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                   ? const Center(child: Text('No Image'))
                                   : ClipRRect(
                                       borderRadius: BorderRadius.circular(8),
-                                      child: Image.network(
-                                        images[selectedImageIndex],
-                                        fit: BoxFit.cover,
-                                      ),
+                                      child: buildImage(
+                                          images[selectedImageIndex]),
                                     ),
                             ),
                           ),
 
-                          const SizedBox(height: 12),
-
-                          /// THUMBNAILS
-                          SizedBox(
-                            height: 80,
-                            child: ListView.separated(
-                              controller: thumbnailScrollController,
-                              scrollDirection: Axis.horizontal,
-                              itemCount: images.length,
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(width: 8),
-                              itemBuilder: (_, index) {
-                                final selected = index == selectedImageIndex;
-                                return GestureDetector(
-                                  onTap: () => setState(() {
-                                    selectedImageIndex = index;
-                                  }),
-                                  child: Container(
-                                    width: 80,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: selected
-                                            ? Colors.blue
-                                            : Colors.grey,
-                                        width: selected ? 2 : 1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(6),
-                                      child: Image.network(
-                                        images[index],
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
+                          verticalSpacing12,
                         ],
                       ),
                     ),
 
-                    const SizedBox(width: 16),
+                    verticalSpacing12,
 
                     /// RIGHT: Form Section
                     Expanded(
-                      flex: 5,
+                      flex: 6,
                       child: SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            /// THUMBNAILS
+                            SizedBox(
+                              height: 80,
+                              child: ListView.separated(
+                                controller: thumbnailScrollController,
+                                scrollDirection: Axis.horizontal,
+                                itemCount: images.length,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(width: 8),
+                                itemBuilder: (_, index) {
+                                  final selected = index == selectedImageIndex;
+                                  return GestureDetector(
+                                    onTap: () => setState(() {
+                                      selectedImageIndex = index;
+                                    }),
+                                    child: Container(
+                                      width: 80,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: selected
+                                              ? Colors.blue
+                                              : Colors.grey,
+                                          width: selected ? 2 : 1,
+                                        ),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                          child: buildImage(images[index])),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            verticalSpacing16,
+                            ElevatedButton.icon(
+                              onPressed: isView ? null : _pickImages,
+                              icon: const Icon(Icons.upload),
+                              label: const Text('Upload Image'),
+                            ),
+
                             /// Project Code & Company
                             Row(
                               children: [
@@ -244,7 +270,46 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 12),
+                            verticalSpacing12,
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildField(
+                                    label: 'Project Title',
+                                    child: InitialTextForm(
+                                      radius: 10,
+                                      controller: codeCtrl,
+                                      hintText: 'Project Title',
+                                      readOnly: isView,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: _buildField(
+                                      label: 'Influencers',
+                                      child: MultiSelectFormField(
+                                        hintText: 'Influencers',
+                                        initialValue: widget.model.influencers,
+                                        items: influencerOptions.toList(),
+                                        onChanged: (val) {
+                                          setState(() {
+                                            widget.model.influencers = val;
+                                          });
+                                        },
+                                      )
+
+                                      // InitialTextForm(
+                                      //   radius: 10,
+                                      //   controller: companyCtrl,
+                                      //   hintText: 'Influencers',
+                                      //   readOnly: isView,
+                                      // ),
+                                      ),
+                                ),
+                              ],
+                            ),
+                            verticalSpacing12,
 
                             /// Gender & Service
                             Row(
@@ -293,17 +358,20 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                             const SizedBox(height: 12),
 
                             /// Location (FULL WIDTH)
-                            _buildField(
-                              label: 'Location',
-                              child: StateCityDropdown(
-                                isVertical: true,
-                                showCity: true,
-                                initialState: state,
-                                initialCity: city,
-                                isStateError: false,
-                                isCityError: false,
-                                onStateChanged: (val) => state = val,
-                                onCityChanged: (val) => city = val ?? '',
+                            IgnorePointer(
+                              ignoring: isView,
+                              child: _buildField(
+                                label: 'Location',
+                                child: StateCityDropdown(
+                                  isVertical: true,
+                                  showCity: true,
+                                  initialState: state,
+                                  initialCity: city,
+                                  isStateError: false,
+                                  isCityError: false,
+                                  onStateChanged: (val) => state = val,
+                                  onCityChanged: (val) => city = val ?? '',
+                                ),
                               ),
                             ),
                             const SizedBox(height: 12),
@@ -357,18 +425,21 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                             /// ACTION BUTTONS
                             if (!isView)
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  ElevatedButton.icon(
-                                    onPressed: _pickImages,
-                                    icon: const Icon(Icons.upload),
-                                    label: const Text('Upload Image'),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  ElevatedButton(
-                                    onPressed: _save,
-                                    child: const Text('Save'),
-                                  ),
+                                  // ElevatedButton(
+                                  //   onPressed: _save,
+                                  //   child: const Text('Save'),
+                                  // ),
+                                  CommonButton(
+                                    text: 'Save',
+                                    buttonColor: continueButton,
+                                    onTap: _save,
+                                    padding: defaultPadding8 +
+                                        rightPadding8 +
+                                        leftPadding8,
+                                    textStyle: fontFamilySemiBold.size14.white,
+                                  )
                                 ],
                               ),
                           ],
@@ -385,10 +456,25 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
     );
   }
 
-  void _pickImages() {
+  Future<void> _pickImages() async {
     if (images.length >= 10) return;
+
+    final result = await UniversalImagePicker.pickImage();
+    if (result == null) return;
+
     setState(() {
-      images.add('https://via.placeholder.com/400');
+      // MOBILE
+      if (result['path'] != null) {
+        images.add(result['path']);
+      }
+      // WEB
+      else if (result['bytes'] != null) {
+        images.add(
+          base64Encode(result['bytes']),
+        );
+      }
+
+      selectedImageIndex = images.length - 1;
     });
   }
 
@@ -401,6 +487,33 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
         child,
       ],
     );
+  }
+
+  Widget buildImage(String pathOrData) {
+    if (kIsWeb) {
+      // On Web: treat it as base64 string
+      final bytes = base64Decode(pathOrData);
+      return Image.memory(
+        bytes,
+        fit: BoxFit.contain,
+        errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
+      );
+    } else {
+      // Mobile
+      if (pathOrData.startsWith('http')) {
+        return Image.network(
+          pathOrData,
+          fit: BoxFit.contain,
+          errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
+        );
+      } else {
+        return Image.file(
+          File(pathOrData),
+          fit: BoxFit.contain,
+          errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
+        );
+      }
+    }
   }
 
   void _save() {

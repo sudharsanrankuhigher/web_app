@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 
 class HeaderCell extends StatelessWidget {
   final String text;
@@ -33,7 +34,10 @@ class TextCell extends StatelessWidget {
       flex: flex,
       child: Padding(
         padding: const EdgeInsets.only(left: 8),
-        child: Text(text),
+        child: Text(
+          text,
+          style: fontFamilyBold.size14.black,
+        ),
       ),
     );
   }

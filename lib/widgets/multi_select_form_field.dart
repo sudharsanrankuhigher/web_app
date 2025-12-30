@@ -45,6 +45,7 @@ class MultiSelectFormField extends FormField<List<String>> {
                           ? hintText
                           : state.value!.join(", "),
                       style: TextStyle(
+                        overflow: TextOverflow.ellipsis,
                         color: (state.value == null || state.value!.isEmpty)
                             ? Colors.grey
                             : Colors.black,
