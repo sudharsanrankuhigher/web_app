@@ -67,12 +67,15 @@ class SubAdminTableSource extends DataTableSource {
         DataCell(
 
             // Text(row.imageUrl)
-            Padding(
-          padding: defaultPadding4,
-          child: ProfileImageEdit(
-            imageUrl: row.idImageUrl,
-            radius: 30,
-            onImageSelected: (_, a) {},
+            IgnorePointer(
+          ignoring: true,
+          child: Padding(
+            padding: defaultPadding4,
+            child: ProfileImageEdit(
+              imageUrl: row.idImageUrl,
+              radius: 30,
+              onImageSelected: (_, a) {},
+            ),
           ),
         )),
         DataCell(Text(row.name)),

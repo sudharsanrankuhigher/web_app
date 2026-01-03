@@ -8,15 +8,15 @@ class PermissionsViewModel extends BaseViewModel {
 
   final List<PermissionRow> permissions = [
     PermissionRow(
-      name: 'Dashboard',
+      name: 'dashboard',
       allowed: {PermissionType.view},
     ),
     PermissionRow(
-      name: 'Users',
+      name: 'users',
       allowed: {PermissionType.view},
     ),
     PermissionRow(
-      name: 'Influencers',
+      name: 'influencers',
       allowed: {
         PermissionType.view,
         PermissionType.add,
@@ -24,45 +24,51 @@ class PermissionsViewModel extends BaseViewModel {
         PermissionType.delete
       },
     ),
-    PermissionRow(name: 'Services', allowed: {
+    PermissionRow(name: 'services', allowed: {
       PermissionType.add,
       PermissionType.view,
       PermissionType.edit,
       PermissionType.delete
     }),
-    PermissionRow(name: 'City', allowed: {
+    PermissionRow(name: 'city', allowed: {
       PermissionType.add,
       PermissionType.view,
       PermissionType.edit,
       PermissionType.delete
     }),
-    PermissionRow(name: 'State', allowed: {
+    PermissionRow(name: 'state', allowed: {
       PermissionType.add,
       PermissionType.view,
       PermissionType.edit,
       PermissionType.delete
     }),
-    PermissionRow(name: 'Plans', allowed: {
+    PermissionRow(name: 'plans', allowed: {
       PermissionType.add,
       PermissionType.view,
       PermissionType.edit,
       PermissionType.delete
     }),
     PermissionRow(
-        name: 'Requests', allowed: {PermissionType.view, PermissionType.edit}),
-    PermissionRow(name: 'Promote Projects', allowed: {
+        name: 'requests', allowed: {PermissionType.view, PermissionType.edit}),
+    PermissionRow(name: 'promote_projects', allowed: {
       PermissionType.add,
       PermissionType.view,
       PermissionType.edit
     }),
-    PermissionRow(name: 'Contact Supports', allowed: {PermissionType.delete}),
-    PermissionRow(name: 'Sub Admin', allowed: {
+    PermissionRow(name: 'contact_supports', allowed: {PermissionType.delete}),
+    PermissionRow(name: 'company', allowed: {
+      PermissionType.view,
+      PermissionType.edit,
+      PermissionType.delete,
+      PermissionType.add
+    }),
+    PermissionRow(name: 'sub_admin', allowed: {
       PermissionType.add,
       PermissionType.view,
       PermissionType.edit,
       PermissionType.delete
     }),
-    PermissionRow(name: 'Reports', allowed: {PermissionType.view}),
+    PermissionRow(name: 'reports', allowed: {PermissionType.view}),
   ];
 
   void toggleSelectAll(bool value) {
@@ -70,22 +76,26 @@ class PermissionsViewModel extends BaseViewModel {
     for (final p in permissions) {
       if (p.add != value) {
         p.add = value;
-        print('Row: ${p.name} | Permission: add | Value: $value');
+        // print('Row: ${p.name} | Permission: add | Value: $value');
+        print('Row: ${p.name}_add | Value: $value');
       }
 
       if (p.view != value) {
         p.view = value;
-        print('Row: ${p.name} | Permission: view | Value: $value');
+        // print('Row: ${p.name} | Permission: view | Value: $value');
+        print('Row: ${p.name}_view | Value: $value');
       }
 
       if (p.edit != value) {
         p.edit = value;
-        print('Row: ${p.name} | Permission: edit | Value: $value');
+        // print('Row: ${p.name} | Permission: edit | Value: $value');
+        print('Row: ${p.name}_edit | Value: $value');
       }
 
       if (p.delete != value) {
         p.delete = value;
-        print('Row: ${p.name} | Permission: delete | Value: $value');
+        // print('Row: ${p.name} | Permission: delete | Value: $value');
+        print('Row: ${p.name}_delete | Value: $value');
       }
     }
 
@@ -103,5 +113,6 @@ class PermissionsViewModel extends BaseViewModel {
     print(
       'Row: $rowName | Permission: $permission | Value: $value',
     );
+    print('Row: ${rowName}_$permission | Value: $value');
   }
 }

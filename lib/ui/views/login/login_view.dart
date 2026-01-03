@@ -59,9 +59,9 @@ class LoginView extends StackedView<LoginViewModel> {
                           const WidgetSpan(child: horizontalSpacing12),
                           TextSpan(
                               text: 'Promote',
-                              style: fontFamilyBold.size30.blueText),
+                              style: fontFamilyBold.size30.black),
                           TextSpan(
-                              text: 'app', style: fontFamilyBold.size30.black)
+                              text: 'app', style: fontFamilyBold.size30.blueText)
                         ])),
                   ),
                   verticalSpacing12,
