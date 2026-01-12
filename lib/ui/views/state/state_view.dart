@@ -62,7 +62,7 @@ class StateView extends StackedView<StateViewModel> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    // onChanged: viewModel.searchState,
+                    onChanged: (value) => viewModel.applySearch(value),
                   ),
                 ),
                 Row(
@@ -111,7 +111,7 @@ class StateView extends StackedView<StateViewModel> {
                         borderRadius: 10,
                         text: isExtended ? "Add State" : '',
                         onTap: () async {
-                          viewModel.addPlan();
+                          viewModel.addState();
                         }),
                   ],
                 ),
@@ -119,7 +119,7 @@ class StateView extends StackedView<StateViewModel> {
             ),
             verticalSpacing20,
             Expanded(
-                child: viewModel.states.isEmpty
+                child: viewModel.states.isEmpty || viewModel.isLoading!
                     ? const Center(child: CircularProgressIndicator())
                     : CommonPaginatedTable(
                         columns: const [
@@ -128,7 +128,6 @@ class StateView extends StackedView<StateViewModel> {
                           DataColumn(
                               headingRowAlignment: MainAxisAlignment.center,
                               label: Text("Actions")),
-                          DataColumn(label: Text("Status")),
                         ],
                         rowsperPage: viewModel.tableSource.rowCount < 10
                             ? viewModel.tableSource.rowCount

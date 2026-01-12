@@ -4,6 +4,7 @@ import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/ui/views/plans/model/plans_model.dart' as plan_model;
 import 'package:webapp/ui/views/plans/widgets/common_plans_dialog.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_data_table.dart';
@@ -123,10 +124,26 @@ class PlansView extends StackedView<PlansViewModel> {
                       );
 
                       if (result != null) {
-                        print('Plan Name: ${result['planName']}');
-                        print('Connections: ${result['connections']}');
-                        print('Amount: ${result['amount']}');
-                        print('Badge: ${result['badge']}');
+                        final newPlan = {
+                          "id": null,
+                          "name": result['planName'],
+                          "connections": result['connections'] is int
+                              ? result['connections']
+                              : int.tryParse(
+                                      result['connections']?.toString() ??
+                                          '0') ??
+                                  0,
+                          "amount": (result['amount'] is int
+                                  ? result['amount']
+                                  : int.tryParse(result['amount']?.toString() ??
+                                          '0') ??
+                                      0)
+                              .toString(),
+                          "badge": result['badge'],
+                          "category": result['category'],
+                        };
+
+                        viewModel.saveOrUpdate(newPlan);
                       }
                     },
                   ),
@@ -149,7 +166,7 @@ class PlansView extends StackedView<PlansViewModel> {
             // ),
             verticalSpacing20,
             Expanded(
-              child: viewModel.plans.isEmpty
+              child: viewModel.plans.isEmpty || viewModel.isLoading == true
                   ? const Center(child: CircularProgressIndicator())
                   : CommonPaginatedTable(
                       columns: const [

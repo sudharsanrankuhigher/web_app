@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:webapp/services/user_authentication_service.dart';
 import 'package:webapp/ui/bottom_sheets/notice/notice_sheet.dart';
 import 'package:webapp/ui/dialogs/info_alert/info_alert_dialog.dart';
 import 'package:webapp/ui/views/home/home_view.dart';
@@ -21,6 +23,7 @@ import 'package:webapp/ui/views/report/report_view.dart';
 import 'package:webapp/ui/views/permissions/permissions_view.dart';
 import 'package:webapp/ui/views/roles/roles_view.dart';
 import 'package:webapp/ui/views/add_company/add_company_view.dart';
+import 'package:webapp/services/api_service.dart';
 // @stacked-import
 
 @StackedApp(
@@ -62,8 +65,12 @@ import 'package:webapp/ui/views/add_company/add_company_view.dart';
     LazySingleton(classType: DialogService),
     LazySingleton(classType: NavigationService),
     LazySingleton(classType: HomeViewModel),
-
-    // @stacked-service
+    Presolve(
+        classType: SharedPreferences,
+        presolveUsing: SharedPreferences.getInstance),
+    LazySingleton(classType: UserAuthenticationService),
+    LazySingleton(classType: ApiService, resolveUsing: ApiService.init),
+// @stacked-service
   ],
   bottomsheets: [
     StackedBottomsheet(classType: NoticeSheet),

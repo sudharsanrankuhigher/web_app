@@ -85,8 +85,8 @@ class CommonFilterDialog extends StatelessWidget {
                     const SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.pop(context); // close dialog
                         onApply(checkStatus, selectedSort); // return result
+                        Navigator.pop(context); // close dialog
                       },
                       child: const Text("Apply"),
                     ),

@@ -1,21 +1,34 @@
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/ui/views/city/widget/state_city_dropdown.dart';
 import 'package:webapp/ui/views/influencers/model/influencers_model.dart';
 import 'package:webapp/ui/views/influencers/widgets/icon_text_form_field.dart';
+import 'package:webapp/ui/views/services/model/service_model.dart'
+    as service_model;
 import 'package:webapp/widgets/common_button.dart';
+import 'package:webapp/widgets/dob_field.dart';
+import 'package:webapp/widgets/drop_down_widget.dart';
+import 'package:webapp/widgets/label_text.dart';
 import 'package:webapp/widgets/profile_image.dart';
+import 'package:webapp/widgets/state_city_drop_down.dart';
 
 class InfluencerDialog extends StatefulWidget {
   final InfluencerModel? influencer;
-  final Function(InfluencerModel) onSave;
+  final Function(dynamic) onSave;
   final bool? isView;
+  final List<service_model.Datum>? service;
 
   const InfluencerDialog(
-      {Key? key, this.influencer, required this.onSave, this.isView})
+      {Key? key,
+      this.influencer,
+      required this.onSave,
+      this.isView,
+      this.service})
       : super(key: key);
 
   @override
@@ -28,7 +41,15 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
   Uint8List? pickedBytes;
   String? pickedPath;
 
+  int? serviceId;
+
   bool? _isView = false;
+
+  DateTime? dob;
+  bool dobError = false;
+  List<dynamic> selectedServices = [];
+  List<dynamic> selectedService = [];
+  String? dobString;
 
   late TextEditingController nameController;
   late TextEditingController emailController;
@@ -225,21 +246,56 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: IconTextFormField(
-                        validator: (phone) {
-                          if (phoneController.text.isEmpty ||
-                              !RegExp(r'^\d{10}$')
-                                  .hasMatch(phoneController.text)) {
-                            return 'Please enter a valid 10-digit phone number';
-                          }
-                          return null;
-                        },
-                        isView: _isView,
-                        icon: Icons.calendar_month,
-                        label: "DOB",
-                        controller: dobController,
-                      ),
-                    ),
+                        child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        IconTextLabel(
+                          icon: Icons.calendar_month,
+                          text: "DOB",
+                          iconColor: Colors.black,
+                          textColor: Colors.black,
+                          iconSize: 16,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        verticalSpacing10,
+                        DOBField(
+                          label: "Date of Birth",
+                          selectedDate: dob,
+                          isError: dobError,
+                          onDateSelected: (date) {
+                            setState(() {
+                              if (date != null) {
+                                dobString = "${date.year}"
+                                    "${date.month.toString().padLeft(2, '0')}-"
+                                    "${date.day.toString().padLeft(2, '0')}-";
+                                dob = date;
+                                dobError = false;
+                              } else {
+                                dobController.text = '';
+                                dobError = true;
+                                return;
+                              }
+                            });
+                          },
+                        )
+                      ],
+                    )
+                        //  IconTextFormField(
+                        //   validator: (phone) {
+                        //     if (phoneController.text.isEmpty ||
+                        //         !RegExp(r'^\d{10}$')
+                        //             .hasMatch(phoneController.text)) {
+                        //       return 'Please enter a valid 10-digit phone number';
+                        //     }
+                        //     return null;
+                        //   },
+                        //   isView: _isView,
+                        //   icon: Icons.calendar_month,
+                        //   label: "DOB",
+                        //   controller: dobController,
+                        // ),
+                        ),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -273,17 +329,84 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                 ),
                 const SizedBox(height: 8),
 
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    IconTextLabel(
+                      icon: Icons.location_on,
+                      text: "State / City",
+                      iconColor: Colors.black,
+                      textColor: Colors.black,
+                      iconSize: 16,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    verticalSpacing10,
+                    StateCityDropdown(
+                      isVertical: true,
+                      showCity: true,
+                      onStateChanged: (value) {
+                        stateController.text = value ?? '';
+                      },
+                      onCityChanged: (value) {
+                        cityController.text = value ?? '';
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
                 Row(
                   children: [
                     Expanded(
-                      child: IconTextFormField(
-                        isView: _isView,
-                        icon: Icons.map,
-                        label: "State",
-                        controller: stateController,
-                      ),
-                    ),
+                        child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        IconTextLabel(
+                          icon: Icons.design_services,
+                          text: "Service",
+                          iconColor: Colors.black,
+                          textColor: Colors.black,
+                          iconSize: 16,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        verticalSpacing10,
+                        DynamicMultiSearchDropdown(
+                            selectedItems: selectedServices,
+                            items: widget.service!
+                                .map((e) => {
+                                      'id': e.id,
+                                      'name': e.name,
+                                    })
+                                .toList(),
+                            onChanged: (values) {
+                              setState(() {
+                                selectedServices = values;
+                                final ids = values.map((e) => e['id']).toList();
+                                print(ids);
+                              });
+
+                              // Extract IDs
+                              final ids = values.map((e) => e['id']).toList();
+                              selectedService = ids;
+                              print(ids);
+                            },
+                            label: 'Service')
+                      ],
+                    )
+
+                        //  IconTextFormField(
+                        //   isView: _isView,
+                        //   icon: Icons.design_services,
+                        //   label: "Service",
+                        //   controller: serviceController,
+                        // ),
+                        ),
                     const SizedBox(width: 12),
+
+                    // icon: Icons.design_services,
+                    //
                     Expanded(
                       child: IconTextFormField(
                         validator: (value) {
@@ -296,35 +419,6 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                         icon: Icons.lock,
                         label: "Password",
                         controller: passwordController,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: IconTextFormField(
-                        isView: _isView,
-                        icon: Icons.design_services,
-                        label: "Service",
-                        controller: serviceController,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: IconTextFormField(
-                        validator: (value) {
-                          if (cityController.text.isEmpty) {
-                            return 'Please enter City';
-                          }
-                          return null;
-                        },
-                        isView: _isView,
-                        icon: Icons.location_city,
-                        label: "City",
-                        controller: cityController,
                       ),
                     ),
                   ],
@@ -539,33 +633,54 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           rightPadding40,
                       buttonColor: Colors.blue,
                       onTap: () {
-                        if (formKey.currentState!.validate()) {
-                          final updated = InfluencerModel(
-                            id: widget.influencer?.id ?? 0,
-                            name: nameController.text,
-                            email: emailController.text,
-                            phone: phoneController.text,
-                            dob: dobController.text,
-                            altPhone: altPhoneController.text,
-                            idNumber: idController.text,
-                            state: stateController.text,
-                            password: passwordController.text,
-                            service: serviceController.text,
-                            city: cityController.text,
-                            instagram: instagramLinkController.text,
-                            instagramFollowers:
-                                instagramFollowersController.text,
-                            instagramDesc: instagramDescController.text,
-                            facebook: facebookLinkController.text,
-                            facebookFollowers: facebookFollowersController.text,
-                            youtube: youtubeLinkController.text,
-                            youtubeFollowers: youtubeFollowersController.text,
-                            bankAccount: bankAccountController.text,
-                            bankHolder: bankHolderController.text,
-                            ifsc: ifscController.text,
-                            upi: upiController.text,
-                            category: '',
+                        if (pickedBytes == null && widget.influencer == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Please select an image')),
                           );
+                          return;
+                        }
+
+                        if (formKey.currentState!.validate()) {
+                          final Map<String, dynamic> updated = {
+                            if (widget.influencer?.id != null)
+                              "id": widget.influencer!.id,
+                            "name": nameController.text,
+                            "email": emailController.text,
+                            "phone": phoneController.text,
+                            "dob": dob,
+                            "altPhone": altPhoneController.text,
+                            "inf_id": idController.text,
+                            "state": stateController.text,
+                            "password": passwordController.text,
+                            "service": selectedService,
+                            "city": cityController.text,
+                            "instagram": instagramLinkController.text,
+                            "instagramFollowers":
+                                instagramFollowersController.text,
+                            "facebook": facebookLinkController.text,
+                            "facebookFollowers":
+                                facebookFollowersController.text,
+                            "youtube": youtubeLinkController.text,
+                            "youtubeFollowers": youtubeFollowersController.text,
+                            "bankAccount": bankAccountController.text,
+                            "bankHolder": bankHolderController.text,
+                            "ifsc": ifscController.text,
+                            "upi": upiController.text,
+                            "description": descriptionController.text,
+                          };
+
+                          // ✅ IMAGE DATA (WEB)
+                          if (pickedBytes != null) {
+                            updated["imageBytes"] = pickedBytes;
+                          } else {
+                            updated["existing_image"] =
+                                widget.influencer?.image;
+                          }
+
+                          // ❌ DO NOT LOG FULL MAP
+                          debugPrint(
+                              "Saving influencer (keys): ${updated.keys}");
 
                           widget.onSave(updated);
                           Navigator.pop(context);

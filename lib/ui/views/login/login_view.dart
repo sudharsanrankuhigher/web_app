@@ -41,78 +41,96 @@ class LoginView extends StackedView<LoginViewModel> {
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(8)),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 350,
-                    alignment: Alignment.center,
-                    child: RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(children: [
-                          WidgetSpan(
-                              child: Image.asset(
-                            'assets/images/logo.png',
-                            height: 35,
-                          )),
-                          const WidgetSpan(child: horizontalSpacing12),
-                          TextSpan(
-                              text: 'Promote',
-                              style: fontFamilyBold.size30.black),
-                          TextSpan(
-                              text: 'app', style: fontFamilyBold.size30.blueText)
-                        ])),
-                  ),
-                  verticalSpacing12,
-                  Text(
-                    textAlign: TextAlign.left,
-                    "Admin panel",
-                    style: fontFamilyBold.size18.black,
-                  ),
-                  verticalSpacing40,
-                  Text(
-                    'Email Address',
-                    style: fontFamilySemiBold.size16.black,
-                  ),
-                  verticalSpacing8,
-                  SizedBox(
+              child: Form(
+                key: viewModel.formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
                       width: 350,
-                      child: InitialTextForm(
-                        preffixIcon: const Icon(
-                          Icons.mail_outline,
-                          color: disableColor,
-                        ),
-                        hintText: 'Enter email address',
-                        fillColor: const Color(0xff01b8f91a),
-                        radius: 10.r,
-                      )),
-                  verticalSpacing12,
-                  Text(
-                    'Password',
-                    style: fontFamilySemiBold.size16.black,
-                  ),
-                  verticalSpacing8,
-                  SizedBox(
+                      alignment: Alignment.center,
+                      child: RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(children: [
+                            WidgetSpan(
+                                child: Image.asset(
+                              'assets/images/logo.png',
+                              height: 35,
+                            )),
+                            const WidgetSpan(child: horizontalSpacing12),
+                            TextSpan(
+                                text: 'Promote',
+                                style: fontFamilyBold.size30.black),
+                            TextSpan(
+                                text: 'app',
+                                style: fontFamilyBold.size30.blueText)
+                          ])),
+                    ),
+                    verticalSpacing12,
+                    Text(
+                      textAlign: TextAlign.left,
+                      "Admin panel",
+                      style: fontFamilyBold.size18.black,
+                    ),
+                    verticalSpacing40,
+                    Text(
+                      'Email Address',
+                      style: fontFamilySemiBold.size16.black,
+                    ),
+                    verticalSpacing8,
+                    SizedBox(
+                        width: 350,
+                        child: InitialTextForm(
+                          validator: (val) {
+                            if (val == null || val.isEmpty) {
+                              return 'Please enter email';
+                            }
+                            return null;
+                          },
+                          preffixIcon: const Icon(
+                            Icons.mail_outline,
+                            color: disableColor,
+                          ),
+                          hintText: 'Enter email address',
+                          fillColor: const Color(0xff01b8f91a),
+                          radius: 10.r,
+                          onSaved: (val) => viewModel.saveEmail(val),
+                        )),
+                    verticalSpacing12,
+                    Text(
+                      'Password',
+                      style: fontFamilySemiBold.size16.black,
+                    ),
+                    verticalSpacing8,
+                    SizedBox(
+                        width: 350,
+                        child: InitialTextForm(
+                          validator: (val) {
+                            if (val == null || val.isEmpty) {
+                              return 'Please enter password';
+                            }
+                            return null;
+                          },
+                          preffixIcon: const Icon(Icons.lock_outline,
+                              color: disableColor),
+                          hintText: 'Enter password',
+                          fillColor: const Color(0xff01b8f91a),
+                          radius: 10.r,
+                          onSaved: (val) => viewModel.savePassword(val),
+                        )),
+                    verticalSpacing20,
+                    verticalSpacing20,
+                    CommonButton(
+                      height: 45,
                       width: 350,
-                      child: InitialTextForm(
-                        preffixIcon:
-                            const Icon(Icons.lock_outline, color: disableColor),
-                        hintText: 'Enter password',
-                        fillColor: const Color(0xff01b8f91a),
-                        radius: 10.r,
-                      )),
-                  verticalSpacing20,
-                  verticalSpacing20,
-                  CommonButton(
-                    height: 45,
-                    width: 350,
-                    text: 'Continue',
-                    textStyle: fontFamilySemiBold.size16.white,
-                    buttonColor: continueButton,
-                    onTap: () => viewModel.goHome(),
-                  )
-                ],
+                      text: 'Continue',
+                      textStyle: fontFamilySemiBold.size16.white,
+                      buttonColor: continueButton,
+                      onTap: () => viewModel.validateAndSubmit(),
+                    )
+                  ],
+                ),
               ),
             ),
           ),

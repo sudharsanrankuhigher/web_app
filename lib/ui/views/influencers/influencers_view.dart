@@ -120,10 +120,13 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                             constraints: const BoxConstraints(
                                 maxWidth: 800, minWidth: 400),
                             child: InfluencerDialog(
+                              service: viewModel.services,
                               isView: false,
                               influencer: null,
                               onSave: (newInfluencer) {
-                                viewModel.influencers.add(newInfluencer);
+                                print(newInfluencer.toString());
+
+                                viewModel.addInfluencer(newInfluencer);
                                 viewModel.notifyListeners();
                               },
                             ),
@@ -135,7 +138,7 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
             ),
             const SizedBox(height: 20),
             Expanded(
-              child: viewModel.influencers.isEmpty
+              child: viewModel.isBusy || viewModel.isLoading == true
                   ? const Center(child: CircularProgressIndicator())
                   : CommonPaginatedTable(
                       dataRowHeight: 65.h,

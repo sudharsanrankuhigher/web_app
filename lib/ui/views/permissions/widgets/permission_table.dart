@@ -42,8 +42,8 @@ Widget permissionTable(PermissionsViewModel vm) {
         Container(
           color: Colors.grey.shade300,
           padding: const EdgeInsets.symmetric(vertical: 10) + leftPadding8,
-          child: Row(
-            children: const [
+          child: const Row(
+            children: [
               HeaderCell('Submenu', TextAlign.start, flex: 3),
               HeaderCell('Add', TextAlign.center),
               HeaderCell('View', TextAlign.center),

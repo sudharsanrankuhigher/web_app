@@ -12,6 +12,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setupLocator();
   setupDialogUi();
+
   setupBottomSheetUi();
   setUrlStrategy(PathUrlStrategy()); // <-- removes the #
   runApp(const MainApp());

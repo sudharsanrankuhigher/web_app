@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
-import 'package:webapp/ui/views/plans/model/plans_model.dart';
+import 'package:webapp/ui/views/plans/model/plans_model.dart' as plan_model;
 
 class PlanTableSource extends DataTableSource {
-  final List<PlanModel> plans;
-  final Function(PlanModel) onEdit;
-  final Function(PlanModel) onView;
-  final Function(PlanModel) onDelete;
+  final List<plan_model.Datum> plans;
+  final Function(plan_model.Datum) onEdit;
+  final Function(plan_model.Datum) onView;
+  final Function(plan_model.Datum) onDelete;
 
   PlanTableSource({
     required this.plans,
@@ -55,7 +55,7 @@ class PlanTableSource extends DataTableSource {
         ),
         cells: [
           DataCell(Text("$sNo")),
-          DataCell(Text(plan.planName)),
+          DataCell(Text(plan.name!)),
           DataCell(Text("${plan.connections}")),
           DataCell(Text("₹${plan.amount}")),
           DataCell(Container(
@@ -63,7 +63,7 @@ class PlanTableSource extends DataTableSource {
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8), color: Colors.blue),
             child: Text(
-              plan.badge,
+              plan.badge!,
               style: const TextStyle(color: Colors.white),
             ),
           )),

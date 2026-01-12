@@ -110,7 +110,7 @@ class CityView extends StackedView<CityViewModel> {
                         borderRadius: 10,
                         text: isExtended ? "Add State" : '',
                         onTap: () async {
-                          viewModel.addPlan();
+                          viewModel.addCity();
                         }),
                   ],
                 ),
@@ -118,7 +118,7 @@ class CityView extends StackedView<CityViewModel> {
             ),
             verticalSpacing20,
             Expanded(
-                child: viewModel.cities.isEmpty
+                child: viewModel.cities.isEmpty || viewModel.isLoading == true
                     ? const Center(child: CircularProgressIndicator())
                     : CommonPaginatedTable(
                         columns: const [
@@ -127,7 +127,7 @@ class CityView extends StackedView<CityViewModel> {
                           DataColumn(
                               headingRowAlignment: MainAxisAlignment.center,
                               label: Text("Actions")),
-                          DataColumn(label: Text("Status")),
+                          // DataColumn(label: Text("Status")),
                         ],
                         rowsperPage: viewModel.tableSource.rowCount < 10
                             ? viewModel.tableSource.rowCount

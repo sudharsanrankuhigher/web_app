@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:webapp/ui/views/services/model/service_model.dart';
+import 'package:webapp/ui/views/services/model/service_model.dart'
+    as service_model;
 
 class ServiceTableSource extends DataTableSource {
-  final List<ServiceModel> services;
-  final Function(ServiceModel) onEdit;
-  final Function(ServiceModel) onDelete;
+  final List<service_model.Datum> services;
+  final Function(service_model.Datum) onEdit;
+  final Function(service_model.Datum) onDelete;
 
   ServiceTableSource({
     required this.services,
@@ -32,7 +33,7 @@ class ServiceTableSource extends DataTableSource {
       ),
       cells: [
         DataCell(Text("${index + 1}")), // S.No
-        DataCell(Text(service.name)), // Name
+        DataCell(Text(service.name!)), // Name
         DataCell(
           Row(
             // mainAxisSize: MainAxisSize.min,

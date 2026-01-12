@@ -67,7 +67,7 @@ class ServicesView extends StackedView<ServicesViewModel> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    // onChanged: viewModel.searchServices,
+                    onChanged: viewModel.applySearch,
                   ),
                 ),
                 if (isExtended)
@@ -124,6 +124,9 @@ class ServicesView extends StackedView<ServicesViewModel> {
                       if (result != null) {
                         print('Service Name: ${result['serviceName']}');
                         print('Image Path: ${result['imagePath']}');
+                        print('Image Bytes: ${result['imageBytes']}');
+                        result['id'] = null;
+                        viewModel.addService(result);
                         // You can save to API or database here
                       }
                     }),
@@ -131,7 +134,7 @@ class ServicesView extends StackedView<ServicesViewModel> {
             ),
             verticalSpacing20,
             Expanded(
-                child: viewModel.services.isEmpty
+                child: viewModel.isBusy || viewModel.isLoading == true
                     ? const Center(child: CircularProgressIndicator())
                     : CommonPaginatedTable(
                         columns: const [

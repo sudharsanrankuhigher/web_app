@@ -1,12 +1,8 @@
-import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:stacked/stacked.dart';
-import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
-import 'package:webapp/ui/views/users/widgets/common_user_dialog.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
@@ -49,15 +45,20 @@ class UsersView extends StackedView<UsersViewModel> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
-                    height: 45.h,
+                    height: 48.h,
                     width: isExtended ? 500 : 200,
                     child: TextField(
                       decoration: InputDecoration(
+                        isDense: true,
                         hintText: "Search name, email, phone...",
-                        hintStyle: fontFamilyRegular.size14.grey,
+                        hintStyle: fontFamilyRegular.size13.grey,
                         prefixIcon: const Icon(Icons.search),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 12,
                         ),
                       ),
                       onChanged: viewModel.searchUser,

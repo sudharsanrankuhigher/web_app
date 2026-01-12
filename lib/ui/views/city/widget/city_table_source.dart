@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
-import 'package:webapp/ui/views/city/model/city_model.dart';
+import 'package:webapp/ui/views/city/model/city_model.dart' as city_model;
 
 class CityTableSource extends DataTableSource {
-  final List<CityShowModel> cities;
-  final Function(CityShowModel) onEdit;
-  final Function(CityShowModel) onDelete;
+  final List<city_model.Datum> cities;
+  final Function(city_model.Datum) onEdit;
+  final Function(city_model.Datum) onDelete;
 
   CityTableSource({
     required this.cities,
@@ -53,7 +53,7 @@ class CityTableSource extends DataTableSource {
         ),
         cells: [
           DataCell(Text("$sNo")),
-          DataCell(Text(city.cityName)),
+          DataCell(Text(city.name!)),
           DataCell(Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -70,7 +70,7 @@ class CityTableSource extends DataTableSource {
                   onPressed: () => onDelete(city)),
             ],
           )),
-          DataCell(Text(city.status)),
+          // DataCell(Text(city.status)),
         ]);
   }
 

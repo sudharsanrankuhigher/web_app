@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webapp/core/model/cities_model.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 
 class StateCityDropdown extends StatefulWidget {
   final bool showCity;
@@ -18,6 +19,9 @@ class StateCityDropdown extends StatefulWidget {
   final bool? isStateError;
   final bool? isVertical;
 
+  final List<String>? states;
+  final List<CityModel>? cities;
+
   const StateCityDropdown({
     super.key,
     this.showCity = false,
@@ -30,6 +34,8 @@ class StateCityDropdown extends StatefulWidget {
     this.isCityError = false,
     this.isStateError = false,
     this.isVertical = false,
+    this.states,
+    this.cities,
   });
 
   @override
@@ -45,21 +51,36 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
   @override
   void initState() {
     super.initState();
-    loadCities();
+    if (widget.states != null && widget.states!.isNotEmpty) {
+      /// 🔥 External states provided
+      states = widget.states!;
+      cities = widget.cities ?? [];
+      _setInitialValues();
+    } else {
+      /// 🔥 Fallback to asset JSON
+      loadCities();
+    }
   }
 
-  Future<void> loadCities() async {
-    final String data = await rootBundle.loadString('assets/json/cities.json');
-    final List jsonData = json.decode(data);
-    cities = jsonData.map((e) => CityModel.fromJson(e)).toList();
-    states = cities.map((e) => e.state).toSet().toList();
+  void _setInitialValues() {
     setState(() {
       selectedState = widget.initialState;
       selectedCity = widget.initialCity;
     });
   }
 
+  Future<void> loadCities() async {
+    final String data = await rootBundle.loadString('assets/json/cities.json');
+    final List jsonData = json.decode(data);
+
+    cities = jsonData.map((e) => CityModel.fromJson(e)).toList();
+    states = cities.map((e) => e.state).toSet().toList();
+
+    _setInitialValues();
+  }
+
   List<String> getCitiesByState(String state) {
+    if (cities.isEmpty) return [];
     return cities.where((c) => c.state == state).map((c) => c.name).toList();
   }
 
@@ -74,15 +95,17 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                 selectedItem: selectedState,
                 validator: widget.stateValidator,
                 items: (String filter, LoadProps? props) async {
-                  return states
-                      .where((s) =>
-                          filter.isEmpty ||
-                          s.toLowerCase().contains(filter.toLowerCase()))
-                      .toList();
+                  final search =
+                      filter.trim().toLowerCase().replaceAll(' ', '');
+
+                  return states.where((s) {
+                    if (search.isEmpty) return true;
+                    return s.toLowerCase().replaceAll(' ', '').contains(search);
+                  }).toList();
                 },
                 dropdownBuilder: (context, selectedItem) => Text(
                   selectedItem ?? "",
-                  style: const TextStyle(fontSize: 14),
+                  style: fontFamilyMedium.size12.black,
                 ),
                 popupProps: PopupProps.menu(
                   showSearchBox: true,
@@ -95,15 +118,16 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                 ),
                 decoratorProps: DropDownDecoratorProps(
                   decoration: InputDecoration(
-                    fillColor: white,
+                    fillColor: backgroundColor,
                     filled: true,
                     labelText: "State",
+                    labelStyle: fontFamilyMedium.size12.greyColor,
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                       borderSide: BorderSide(
                         color: widget.isStateError == true
                             ? Colors.red
-                            : Colors.grey,
+                            : disableColor,
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
@@ -116,7 +140,7 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                       ),
                     ),
                     errorText: widget.isStateError == true
-                        ? "Please select a state"
+                        ? "Please select a states"
                         : null,
                     border: const OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -149,7 +173,7 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                   },
                   dropdownBuilder: (context, selectedItem) => Text(
                     selectedItem ?? "",
-                    style: const TextStyle(fontSize: 14),
+                    style: fontFamilyMedium.size12.black,
                   ),
                   popupProps: PopupProps.menu(
                     showSearchBox: true,
@@ -163,15 +187,16 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                   ),
                   decoratorProps: DropDownDecoratorProps(
                     decoration: InputDecoration(
-                      fillColor: white,
+                      fillColor: backgroundColor,
                       filled: true,
                       labelText: "City",
+                      labelStyle: fontFamilyMedium.size12.greyColor,
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide(
                           color: widget.isCityError == true
                               ? Colors.red
-                              : Colors.grey,
+                              : disableColor,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -213,15 +238,20 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                   selectedItem: selectedState,
                   validator: widget.stateValidator,
                   items: (String filter, LoadProps? props) async {
-                    return states
-                        .where((s) =>
-                            filter.isEmpty ||
-                            s.toLowerCase().contains(filter.toLowerCase()))
-                        .toList();
+                    final search =
+                        filter.trim().toLowerCase().replaceAll(' ', '');
+
+                    return states.where((s) {
+                      if (search.isEmpty) return true;
+                      return s
+                          .toLowerCase()
+                          .replaceAll(' ', '')
+                          .contains(search);
+                    }).toList();
                   },
                   dropdownBuilder: (context, selectedItem) => Text(
                     selectedItem ?? "",
-                    style: const TextStyle(fontSize: 14),
+                    style: fontFamilyMedium.size12.black,
                   ),
                   popupProps: PopupProps.menu(
                     showSearchBox: true,
@@ -236,14 +266,17 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                   decoratorProps: DropDownDecoratorProps(
                     decoration: InputDecoration(
                       labelText: "State",
+                      labelStyle: fontFamilyMedium.size12.greyColor,
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide(
                           color: widget.isStateError == true
                               ? Colors.red
-                              : Colors.grey,
+                              : disableColor,
                         ),
                       ),
+                      fillColor: backgroundColor,
+                      filled: true,
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide(
@@ -254,7 +287,7 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                         ),
                       ),
                       errorText: widget.isStateError == true
-                          ? "Please select a state"
+                          ? "Please select a states"
                           : null,
                       border: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -292,7 +325,7 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                     },
                     dropdownBuilder: (context, selectedItem) => Text(
                       selectedItem ?? "",
-                      style: const TextStyle(fontSize: 14),
+                      style: fontFamilyMedium.size12.black,
                     ),
                     popupProps: PopupProps.menu(
                       showSearchBox: true,
@@ -307,14 +340,17 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                     decoratorProps: DropDownDecoratorProps(
                       decoration: InputDecoration(
                         labelText: "City",
+                        labelStyle: fontFamilyMedium.size12.greyColor,
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide(
                             color: widget.isCityError == true
                                 ? Colors.red
-                                : Colors.grey,
+                                : disableColor,
                           ),
                         ),
+                        fillColor: backgroundColor,
+                        filled: true,
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide(

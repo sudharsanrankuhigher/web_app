@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
-import 'package:webapp/ui/views/state/model/state_model.dart';
+import 'package:webapp/ui/views/state/model/state_model.dart' as state_model;
 import 'package:webapp/widgets/state_city_drop_down.dart';
 
 class AddEditStatePage {
   static Future<Map<String, dynamic>?> show(
     BuildContext context, {
-    StateModel? initial,
+    state_model.Datum? initial,
   }) async {
     String? stateValue = initial?.name;
-    bool? statusValue = initial?.status == "true" ? true : false;
 
     bool isStateError = false;
     bool isCityError = false;
@@ -41,31 +40,13 @@ class AddEditStatePage {
                       },
                       stateValidator: (value) {
                         if (value == null || value.isEmpty) {
-                          return "Please select a state";
+                          return "Please select a states";
                         }
                         return null;
                       },
                     ),
 
                     const SizedBox(height: 16),
-
-                    // -------- STATUS SWITCH --------
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Status",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500),
-                        ),
-                        Switch(
-                          value: statusValue!,
-                          onChanged: (value) {
-                            statusValue = value;
-                          },
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),
@@ -89,7 +70,6 @@ class AddEditStatePage {
 
                   Navigator.pop(context, {
                     "name": stateValue,
-                    "status": statusValue,
                   });
                   isStateError = false;
                 },

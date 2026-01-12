@@ -1,47 +1,46 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
-import 'package:webapp/ui/common/shared/text_style_helpers.dart';
-import 'package:webapp/ui/views/plans/model/plans_model.dart';
-import 'package:webapp/widgets/common_button.dart';
+import 'package:webapp/ui/views/plans/model/plans_model.dart' as plan_model;
 import 'package:webapp/widgets/initial_textform.dart';
 import 'package:webapp/widgets/label_text.dart';
 
 class CommonPlanDialog {
   static Future<Map<String, dynamic>?> show(
     BuildContext context, {
-    PlanModel? initial,
+    plan_model.Datum? initial,
     bool isView = false,
+    bool isAdd = false,
   }) async {
-    String? planName = initial?.planName;
+    String? planName = initial?.name ?? '';
     String? conn = initial?.connections.toString();
     String? amt = initial?.amount.toString();
     String? badge = initial?.badge;
 
-    String category = initial?.category ?? '';
+    int categoryCode = initial?.category == "1"
+        ? 1
+        : initial?.category == "2"
+            ? 2
+            : initial?.category == "3"
+                ? 3
+                : 1; // default to TV Stars
 
     InputDecoration _decoration(String label) => InputDecoration(
           labelText: label,
-          fillColor: white,
+          fillColor: Colors.white,
           filled: true,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: disableColor, width: 1.5)),
-          enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: disableColor, width: 1.5)),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: appGreen400, width: 1.5),
-          ),
+              borderSide: const BorderSide(color: Colors.grey, width: 1.5)),
         );
 
     return showDialog<Map<String, dynamic>>(
       barrierDismissible: false,
       context: context,
       builder: (context) {
+        isAdd == true ? categoryCode = 1 : categoryCode;
         return AlertDialog(
           title: Text(
             isView
@@ -62,37 +61,20 @@ class CommonPlanDialog {
                 _field("Amount", amt, (v) => amt = v,
                     isView: isView, isNumber: true),
                 _field("Badge", badge, (v) => badge = v, isView: isView),
-                verticalSpacing8,
-                const Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    IconTextLabel(
-                      icon: null,
-                      text: 'Category',
-                      iconColor: Colors.black,
-                      textColor: Colors.black,
-                      iconSize: 16,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ],
-                ),
-                verticalSpacing8,
+                const SizedBox(height: 8),
                 IgnorePointer(
                   ignoring: isView,
-                  child: DropdownButtonFormField<String>(
-                    value: category.isEmpty ? null : category,
+                  child: DropdownButtonFormField<int>(
+                    value: categoryCode,
                     decoration: _decoration("Category"),
-                    items: const ["Influencers", "Movie Stars", "TV Stars"]
-                        .map(
-                          (category) => DropdownMenuItem<String>(
-                            value: category,
-                            child: Text(category),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (_) => null,
-                    validator: (v) => v == null ? "Select Category" : null,
+                    items: const [
+                      DropdownMenuItem(value: 1, child: Text("Influencers")),
+                      DropdownMenuItem(value: 2, child: Text("Movie Stars")),
+                      DropdownMenuItem(value: 3, child: Text("TV Stars")),
+                    ],
+                    onChanged: (v) => categoryCode = v ?? 1,
+                    validator: (v) =>
+                        v == null ? "Please select a category" : null,
                   ),
                 ),
               ],
@@ -100,28 +82,22 @@ class CommonPlanDialog {
           ),
           actions: [
             if (!isView)
-              CommonButton(
-                width: 200,
-                onTap: () {
-                  Navigator.pop(context, {
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(StackedService.navigatorKey!.currentContext!, {
                     'planName': planName,
                     'connections': int.tryParse(conn ?? "0") ?? 0,
                     'amount': int.tryParse(amt ?? "0") ?? 0,
                     'badge': badge ?? "",
+                    'category': categoryCode, // returns numeric code
                   });
                 },
-                text: "Save",
-                buttonColor: continueButton,
-                padding: defaultPadding10,
-                textStyle: fontFamilyMedium.size14.white,
+                child: Text(initial == null ? "Save" : "Update"),
               ),
-            CommonButton(
-              width: 200,
-              text: "close",
-              onTap: () => Navigator.pop(context),
-              buttonColor: red,
-              padding: defaultPadding10,
-              textStyle: fontFamilyMedium.size14.white,
+            TextButton(
+              onPressed: () =>
+                  Navigator.pop(StackedService.navigatorKey!.currentContext!),
+              child: const Text("Close"),
             ),
           ],
         );

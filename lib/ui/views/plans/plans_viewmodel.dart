@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
-import 'package:webapp/ui/views/plans/model/plans_model.dart';
+import 'package:webapp/app/app.locator.dart';
+import 'package:webapp/services/api_service.dart';
+import 'package:webapp/ui/views/plans/model/plans_model.dart' as plan_model;
 import 'package:webapp/ui/views/plans/widgets/common_plans_dialog.dart';
 import 'package:webapp/ui/views/plans/widgets/plans_table_source.dart';
 import 'package:webapp/widgets/common_button.dart';
@@ -11,8 +13,11 @@ class PlansViewModel extends BaseViewModel {
     loadPlans();
   }
 
-  List<PlanModel> plans = [];
+  List<plan_model.Datum> plans = [];
   late PlanTableSource tableSource;
+
+  final _dialogService = locator<DialogService>();
+  final _apiService = locator<ApiService>();
 
   // Form data
   String? planName;
@@ -23,6 +28,9 @@ class PlansViewModel extends BaseViewModel {
   String countryValue = "";
   String stateValue = "";
   String cityValue = "";
+
+  bool? _isLoading = false;
+  bool? get isLoading => _isLoading;
 
   void setPlanName(String v) {
     planName = v;
@@ -45,61 +53,72 @@ class PlansViewModel extends BaseViewModel {
   }
 
   // Initial load
-  void loadPlans() {
-    plans = [
-      PlanModel(
-          id: 1,
-          planName: "Basic",
-          connections: 1,
-          amount: 199,
-          badge: "Starter",
-          category: "Influencers"),
-      PlanModel(
-          id: 2,
-          planName: "Pro",
-          connections: 3,
-          amount: 499,
-          badge: "Popular",
-          category: "Tv Star"),
-      PlanModel(
-          id: 3,
-          planName: "star",
-          connections: 30,
-          amount: 4999,
-          badge: "celeberity",
-          category: "Movie Star"),
-    ];
-    _refreshTable();
+  Future<void> loadPlans() async {
+    setBusy(true);
+    try {
+      final res = await _apiService.getAllPlans();
+      plans = res.data ?? [];
+      // allStates = List.from(res); // 🔥 MASTER LIST
+      // filteredStates = List.from(res); // 🔥 INITIAL TABLE DATA
+    } catch (e) {
+      plans = [];
+    } finally {
+      setBusy(false);
+      _refreshTable(filtered: plans);
+    }
   }
 
   /// SEARCH
   void searchPlans(String query) {
     final filtered = plans.where((p) {
-      return p.planName.toLowerCase().contains(query.toLowerCase()) ||
-          p.badge.toLowerCase().contains(query.toLowerCase());
+      return p.name!.toLowerCase().contains(query.toLowerCase()) ||
+          p.badge!.toLowerCase().contains(query.toLowerCase());
     }).toList();
 
     _refreshTable(filtered: filtered);
   }
 
   // Add or update
-  void saveOrUpdate(PlanModel plan) {
-    final index = plans.indexWhere((p) => p.id == plan.id);
-    if (index >= 0) {
-      plans[index] = plan;
-    } else {
-      plans.add(plan);
+  Future<void> saveOrUpdate(plan) async {
+    _setLoading(true);
+    try {
+      final index = plans.indexWhere((p) => p.id == plan['id']);
+      if (index >= 0) {
+        await _apiService.updatePlan(plan);
+      } else {
+        await _apiService.addPlan(plan);
+      }
+    } catch (e) {
+      debugPrint('Save/Update failed: $e');
+    } finally {
+      plans = await _apiService.getAllPlans().then((value) => value.data ?? []);
+      _setLoading(false);
+      notifyListeners();
+      _refreshTable(filtered: plans);
     }
-    _refreshTable();
   }
 
-  void deletePlan(PlanModel plan) {
-    plans.remove(plan);
-    _refreshTable();
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
+  void deletePlan(plan_model.Datum plan) {
+    // plans.remove(plan);
+    _setLoading(true);
+    try {
+      _apiService.deletePlan(plan.id!);
+      plans.removeWhere((p) => p.id == plan.id);
+    } catch (e) {
+      debugPrint('Delete failed: $e');
+    } finally {
+      _setLoading(false);
+      _refreshTable();
+    }
   }
 
   // 🔹 Refresh table
-  void _refreshTable({List<PlanModel>? filtered}) {
+  void _refreshTable({List<plan_model.Datum>? filtered}) {
     final context = StackedService.navigatorKey!.currentContext!;
     tableSource = PlanTableSource(
       plans: filtered ?? plans,
@@ -112,57 +131,86 @@ class PlansViewModel extends BaseViewModel {
 
   // 🔥 Add Plan
   Future<void> addPlan(BuildContext context) async {
-    final result = await CommonPlanDialog.show(context);
+    final result = await CommonPlanDialog.show(context, isAdd: true);
     if (result != null) {
-      final newPlan = PlanModel(
-          id: DateTime.now().millisecondsSinceEpoch,
-          planName: result['planName'],
-          connections: result['connections'],
-          amount: result['amount'],
-          badge: result['badge'],
-          category: result['category']);
+      final newPlan = plan_model.Datum(
+        // id: DateTime.now().millisecondsSinceEpoch,
+        name: result['planName'],
+        connections: result['connections'],
+        amount: result['amount'],
+        badge: result['badge'],
+        category: result['category'] == 1
+            ? "Influencers"
+            : result['category'] == 2
+                ? "Movie Stars"
+                : "TV Stars",
+      );
       saveOrUpdate(newPlan);
     }
+    notifyListeners();
   }
 
-  // 🔥 Edit Plan
-  Future<void> editPlan(BuildContext context, PlanModel plan) async {
+  Future<void> editPlan(BuildContext context, plan_model.Datum plan) async {
     final result = await CommonPlanDialog.show(context, initial: plan);
     if (result != null) {
-      final updated = PlanModel(
-          id: plan.id,
-          planName: result['planName'],
-          connections: result['connections'],
-          amount: result['amount'],
-          badge: result['badge'],
-          category: result['category']);
+      final updated = {
+        "id": plan.id,
+        "name": result['planName'],
+        "connections": result['connections'],
+        "amount": result['amount'],
+        "badge": result['badge'],
+        "category": result['category'],
+      };
       saveOrUpdate(updated);
     }
   }
 
-  // 🔥 View Plan
-  Future<void> viewPlan(BuildContext context, PlanModel plan) async {
+  Future<void> viewPlan(BuildContext context, plan_model.Datum plan) async {
     await CommonPlanDialog.show(context, initial: plan, isView: true);
   }
 
   void applySort(bool specialFilter, String sortType) {
-    if (specialFilter) {
-      // implement custom filter
-    }
+    //   if (specialFilter) {
+    //     // implement custom filter
+    //   }
     if (sortType == "A-Z") {
-      plans.sort((a, b) => a.planName.compareTo(b.planName));
-    } else if (sortType == "clientAsc")
-      plans.sort((a, b) => a.id.compareTo(b.id));
+      plans.sort((a, b) => a.name!.compareTo(b.name!));
+    } else if (sortType == "clientAsc") {
+      plans.sort((a, b) => a.id!.compareTo(b.id!));
+    } else if (sortType == "older") {
+      plans.sort((a, b) {
+        DateTime aDate = a.createdAt != null
+            ? DateTime.parse(a.createdAt.toString())
+            : DateTime(1970);
+        DateTime bDate = b.createdAt != null
+            ? DateTime.parse(b.createdAt.toString())
+            : DateTime(1970);
+        return bDate.compareTo(aDate);
+      });
+    } else if (sortType == "newer") {
+      plans.sort((a, b) {
+        DateTime aDate = a.createdAt != null
+            ? DateTime.parse(a.createdAt.toString())
+            : DateTime(1970);
+        DateTime bDate = b.createdAt != null
+            ? DateTime.parse(b.createdAt.toString())
+            : DateTime(1970);
+        return aDate.compareTo(bDate);
+      });
+    } else {
+      // No sorting
+    }
+
     _refreshTable();
   }
 
   // 🔹 Confirm Delete
-  void confirmDelete(BuildContext context, PlanModel plan) {
+  void confirmDelete(BuildContext context, plan_model.Datum plan) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Confirm Delete"),
-        content: Text("Are you sure you want to delete ${plan.planName}?"),
+        content: Text("Are you sure you want to delete ${plan.name}?"),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),

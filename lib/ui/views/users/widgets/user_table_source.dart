@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
-import 'package:webapp/ui/views/users/model/users_model.dart';
 import 'package:webapp/widgets/common_button.dart';
-import 'common_user_dialog.dart'; // import your dialog
+import 'package:webapp/core/model/get_user_model.dart' as user_model;
 
 class UserTableSource extends DataTableSource {
-  final List<UserModel> originalList;
-  List<UserModel> filteredList;
+  final List<user_model.Datum> originalList;
+  List<user_model.Datum> filteredList;
   // final void Function(UserModel) onEdit;
   // final Function(UserModel) onDelete;
   final Function() onAdd;
 
   UserTableSource({
-    required List<UserModel> users,
+    required List<user_model.Datum> users,
     // required this.onEdit,
     // required this.onDelete,
     required this.onAdd,
@@ -25,9 +24,9 @@ class UserTableSource extends DataTableSource {
     query = query.toLowerCase();
 
     filteredList = originalList.where((user) {
-      final matchSearch = user.name.toLowerCase().contains(query) ||
-          user.email.toLowerCase().contains(query) ||
-          user.phone.contains(query);
+      final matchSearch = user.name!.toLowerCase().contains(query) ||
+          user.email!.toLowerCase().contains(query) ||
+          user.mobileNumber!.contains(query);
 
       final matchType = type == "All" || user.type == type;
 
@@ -75,12 +74,12 @@ class UserTableSource extends DataTableSource {
       ),
       cells: [
         DataCell(Text("${index + 1}")),
-        DataCell(Text(user.name)),
-        DataCell(Text(user.email)),
-        DataCell(Text(user.phone)),
-        DataCell(Text(user.type)),
+        DataCell(Text(user.name ?? "")),
+        DataCell(Text(user.email ?? "")),
+        DataCell(Text(user.mobileNumber ?? "")),
+        DataCell(Text(user.type ?? "")),
         DataCell(Text("${user.city}/${user.state}")),
-        DataCell(Text(user.plan)),
+        DataCell(Text(user.plan ?? "")),
         DataCell(Text("${user.connections}")),
         DataCell(CommonButton(
           text: 'ADD',

@@ -2,6 +2,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:webapp/app/app.locator.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:webapp/services/api_service.dart';
 // @stacked-import
 
 import 'test_helpers.mocks.dart';
@@ -12,14 +13,16 @@ import 'test_helpers.mocks.dart';
     MockSpec<NavigationService>(onMissingStub: OnMissingStub.returnDefault),
     MockSpec<BottomSheetService>(onMissingStub: OnMissingStub.returnDefault),
     MockSpec<DialogService>(onMissingStub: OnMissingStub.returnDefault),
-    // @stacked-mock-spec
+    MockSpec<ApiService>(onMissingStub: OnMissingStub.returnDefault),
+// @stacked-mock-spec
   ],
 )
 void registerServices() {
   getAndRegisterNavigationService();
   getAndRegisterBottomSheetService();
   getAndRegisterDialogService();
-  // @stacked-mock-register
+  getAndRegisterApiService();
+// @stacked-mock-register
 }
 
 MockNavigationService getAndRegisterNavigationService() {
@@ -76,6 +79,12 @@ MockDialogService getAndRegisterDialogService() {
   return service;
 }
 
+MockApiService getAndRegisterApiService() {
+  _removeRegistrationIfExists<ApiService>();
+  final service = MockApiService();
+  locator.registerSingleton<ApiService>(service);
+  return service;
+}
 // @stacked-mock-create
 
 void _removeRegistrationIfExists<T extends Object>() {

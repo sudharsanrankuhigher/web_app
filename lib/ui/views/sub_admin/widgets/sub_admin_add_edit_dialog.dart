@@ -234,7 +234,7 @@ class CommonSubAdminDialog {
                       },
                       stateValidator: (value) {
                         if (value == null || value.isEmpty) {
-                          return "Please select a state";
+                          return "Please select a states";
                         }
                         return null;
                       },

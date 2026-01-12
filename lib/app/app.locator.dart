@@ -6,11 +6,14 @@
 
 // ignore_for_file: public_member_api_docs, implementation_imports, depend_on_referenced_packages
 
+import 'package:shared_preferences/src/shared_preferences_legacy.dart';
 import 'package:stacked_services/src/bottom_sheet/bottom_sheet_service.dart';
 import 'package:stacked_services/src/dialog/dialog_service.dart';
 import 'package:stacked_services/src/navigation/navigation_service.dart';
 import 'package:stacked_shared/stacked_shared.dart';
 
+import '../services/api_service.dart';
+import '../services/user_authentication_service.dart';
 import '../ui/views/home/home_viewmodel.dart';
 
 final locator = StackedLocator.instance;
@@ -28,4 +31,9 @@ Future<void> setupLocator({
   locator.registerLazySingleton(() => DialogService());
   locator.registerLazySingleton(() => NavigationService());
   locator.registerLazySingleton(() => HomeViewModel());
+  final sharedPreferences = await SharedPreferences.getInstance();
+  locator.registerSingleton(sharedPreferences);
+
+  locator.registerLazySingleton(() => UserAuthenticationService());
+  locator.registerLazySingleton(() => ApiService.init());
 }

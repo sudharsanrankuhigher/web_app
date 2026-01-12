@@ -152,7 +152,8 @@ class HomeView extends StackedView<HomeViewModel> {
                     Row(
                       children: [
                         CachedNetworkImage(
-                          imageUrl: "https://example.com/profile.jpg",
+                          imageUrl: viewModel.profileImage ??
+                              "https://example.com/profile.jpg",
                           imageBuilder: (context, imageProvider) =>
                               CircleAvatar(
                             radius: 22,
@@ -171,8 +172,8 @@ class HomeView extends StackedView<HomeViewModel> {
                         ),
                         if (isExtended) ...[
                           const SizedBox(width: 10),
-                          const Text(
-                            "Sudharsan",
+                          Text(
+                            viewModel.name ?? "Admin Name",
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style: TextStyle(
@@ -183,8 +184,8 @@ class HomeView extends StackedView<HomeViewModel> {
                       ],
                     ),
                     if (isExtended)
-                      const Text(
-                        "Admin",
+                      Text(
+                        viewModel.role ?? "Administrator",
                         style: TextStyle(color: Colors.grey),
                       ),
                     verticalSpacing16,

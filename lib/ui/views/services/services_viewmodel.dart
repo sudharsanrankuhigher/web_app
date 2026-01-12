@@ -3,10 +3,13 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/core/navigation/navigation_mixin.dart';
+import 'package:webapp/services/api_service.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
-import 'package:webapp/ui/views/services/model/service_model.dart';
+import 'package:webapp/ui/views/services/model/service_model.dart'
+    as service_model;
 import 'package:webapp/ui/views/services/widgets/service_add_edit_dialog.dart';
 import 'package:webapp/ui/views/services/widgets/service_table_source.dart';
 import 'package:webapp/widgets/common_button.dart';
@@ -21,16 +24,20 @@ class ServicesViewModel extends BaseViewModel with NavigationMixin {
         imagePath = initialPath {
     loadServices();
   }
-  // ServicesViewModel() {
-  //   ServiceViewModel();
-  // }
-  List<ServiceModel> services = [];
+
+  List<service_model.Datum> services = [];
   late ServiceTableSource tableSource;
+
+  final _dialogService = locator<DialogService>();
+  final _apiService = locator<ApiService>();
 
   final TextEditingController nameController = TextEditingController();
   String? imagePath; // mobile
   Uint8List? imageBytes; // web
   String serviceName = '';
+
+  bool? _isLoading = false;
+  bool? get isLoading => _isLoading;
 
   void setServiceName(String value) {
     serviceName = value;
@@ -49,52 +56,68 @@ class ServicesViewModel extends BaseViewModel with NavigationMixin {
     notifyListeners();
   }
 
-  void loadServices() {
-    services = [
-      ServiceModel(
-        id: 1,
-        name: "Service 1",
-        image: "",
-        status: "active",
-        createdAt: "2025-12-01",
-        updatedAt: "2025-12-01",
-      ),
-      ServiceModel(
-        id: 2,
-        name: "Service 2",
-        image: "",
-        status: "inactive",
-        createdAt: "2025-11-01",
-        updatedAt: "2025-11-01",
-      ),
-      // Add more...
-    ];
-
+  // 🔹 Refresh table
+  void _refreshTable({List<service_model.Datum>? filtered}) {
+    final context = StackedService.navigatorKey!.currentContext!;
     tableSource = ServiceTableSource(
-      services: services,
-      onEdit: editService,
-      onDelete: confirmDelete,
+      services: filtered ?? services,
+      onEdit: (service) => editService(service),
+      onDelete: (service) => confirmDelete(service),
     );
-
     notifyListeners();
   }
 
-  void _updateTableSource() {
-    tableSource = ServiceTableSource(
-      services: services,
-      onEdit: editService,
-      onDelete: confirmDelete,
-    );
+  Future<void> loadServices() async {
+    setBusy(true);
+    try {
+      final res = await _apiService.getAllService();
+      services = res.data ?? [];
+      allService = List.from(services); // 🔥 MASTER LIST
+      filteredService = List.from(services); // 🔥 INITIAL TABLE DATA
+    } catch (e) {
+      services = [];
+    } finally {
+      setBusy(false);
+      _refreshTable(filtered: services);
+    }
+  }
+
+  Future<void> saveOrUpdate(service) async {
+    _setLoading(true);
+    try {
+      final index = services.indexWhere((p) => p.id == service['id']);
+
+      if (index >= 0) {
+        /// UPDATE
+        await _apiService.updateService(service);
+      } else {
+        /// ADD
+        await _apiService.addService(service);
+      }
+
+      /// 🔥 Always reload full list
+      final res = await _apiService.getAllService();
+      services = res.data ?? [];
+    } catch (e) {
+      debugPrint('Save/Update failed: $e');
+    } finally {
+      _setLoading(false);
+      _refreshTable();
+    }
+  }
+
+  void _setLoading(bool value) {
+    _isLoading = value;
     notifyListeners();
   }
 
   // ------------------ ADD SERVICE ------------------
-  void addService(ServiceModel service) {
-    services.add(service);
-    _updateTableSource();
+  void addService(service) {
+    saveOrUpdate(service);
+    _refreshTable();
   }
 
-  void editService(ServiceModel service) async {
+  void editService(service_model.Datum service) async {
     final result = await CommonServiceDialog.show(
       StackedService.navigatorKey!.currentContext!,
       existingName: service.name,
@@ -105,33 +128,49 @@ class ServicesViewModel extends BaseViewModel with NavigationMixin {
     if (result == null) return;
 
     // Create updated model
-    final updated = ServiceModel(
-      id: service.id,
-      name: result["serviceName"],
-      image: result["imagePath"] ?? service.image,
-      status: service.status,
-      createdAt: service.createdAt,
-      updatedAt: DateTime.now().toString(),
-    );
+    final updated = {
+      "id": service.id, // 🔥 REQUIRED
+      "serviceName": result["serviceName"],
+      "imagePath": result["imagePath"], // mobile
+      "imageBytes": result["imageBytes"], // web
+      if (result["imageBytes"] == null)
+        "existing_image": service.image, // keep existing
+    };
+    print("Updated Service Data: $updated");
+    saveOrUpdate(updated);
 
-    // 🚀 Call your UPDATE API here
-    // await updateServiceApi(updated);
-
-    // After API success → reload entire table
     loadServices();
   }
 
-  void deleteService(ServiceModel service) {
-    services.remove(service);
-    tableSource = ServiceTableSource(
-      services: services,
-      onEdit: editService,
-      onDelete: confirmDelete,
-    );
-    notifyListeners();
+  Future<void> deleteService(service_model.Datum service) async {
+    _setLoading(true);
+
+    try {
+      // wait for backend delete
+      await _apiService.deleteService(service.id!);
+
+      // remove locally if needed
+      services.removeWhere((s) => s.id == service.id);
+
+      // refresh table
+      tableSource = ServiceTableSource(
+        services: services,
+        onEdit: editService,
+        onDelete: confirmDelete,
+      );
+
+      _refreshTable();
+      notifyListeners();
+    } catch (e) {
+      // optional: show error
+      print("Delete error: $e");
+    } finally {
+      _setLoading(false);
+      Navigator.pop(StackedService.navigatorKey!.currentContext!);
+    }
   }
 
-  void confirmDelete(ServiceModel service) {
+  void confirmDelete(service_model.Datum service) {
     showDialog(
       context: StackedService.navigatorKey!.currentContext!,
       builder: (context) {
@@ -151,8 +190,8 @@ class ServicesViewModel extends BaseViewModel with NavigationMixin {
                 text: "Delete",
                 textStyle: fontFamilyMedium.size14.white,
                 onTap: () {
+                  // close dialog
                   deleteService(service);
-                  Navigator.pop(context); // close dialog
                 }),
           ],
         );
@@ -161,22 +200,52 @@ class ServicesViewModel extends BaseViewModel with NavigationMixin {
   }
 
   void applySort(bool specialFilter, String sortType) {
-    if (specialFilter) {
-      // whatever you want...
-    }
-
+    //   if (specialFilter) {
+    //     // implement custom filter
+    //   }
     if (sortType == "A-Z") {
-      services.sort((a, b) => a.name.compareTo(b.name));
-    }
-    // else if (sortType == "newer") {
-    //   influencers.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    // } else if (sortType == "older") {
-    //   influencers.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-    // }
-    else if (sortType == "clientAsc") {
-      services.sort((a, b) => a.id.compareTo(b.id));
+      services.sort((a, b) => a.name!.compareTo(b.name!));
+    } else if (sortType == "clientAsc") {
+      services.sort((a, b) => a.id!.compareTo(b.id!));
+    } else if (sortType == "older") {
+      services.sort((a, b) {
+        DateTime aDate = a.createdAt != null
+            ? DateTime.parse(a.createdAt.toString())
+            : DateTime(1970);
+        DateTime bDate = b.createdAt != null
+            ? DateTime.parse(b.createdAt.toString())
+            : DateTime(1970);
+        return bDate.compareTo(aDate);
+      });
+    } else if (sortType == "newer") {
+      services.sort((a, b) {
+        DateTime aDate = a.createdAt != null
+            ? DateTime.parse(a.createdAt.toString())
+            : DateTime(1970);
+        DateTime bDate = b.createdAt != null
+            ? DateTime.parse(b.createdAt.toString())
+            : DateTime(1970);
+        return aDate.compareTo(bDate);
+      });
+    } else {
+      // No sorting
     }
 
+    _refreshTable();
+  }
+
+  List<service_model.Datum> allService = [];
+  List<service_model.Datum> filteredService = [];
+
+  void applySearch(String query) {
+    final search = query.trim().toLowerCase();
+
+    filteredService = allService.where((item) {
+      final name = item.name?.toLowerCase() ?? '';
+      return search.isEmpty || name.contains(search);
+    }).toList();
+
+    _refreshTable(filtered: filteredService);
     notifyListeners();
   }
 }

@@ -1,19 +1,21 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:webapp/app/app.bottomsheets.dart';
 import 'package:webapp/app/app.dialogs.dart';
 import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/core/navigation/navigation_mixin.dart';
+import 'package:webapp/services/api_service.dart';
 import 'package:webapp/ui/common/app_strings.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
-import 'package:webapp/ui/views/dash_board/dash_board_view.dart';
-import 'package:webapp/ui/views/influencers/influencers_view.dart';
-import 'package:webapp/ui/views/plans/plans_view.dart';
-import 'package:webapp/ui/views/services/services_view.dart';
-import 'package:webapp/ui/views/users/users_view.dart';
 
 class HomeViewModel extends BaseViewModel with NavigationMixin {
+  HomeViewModel() {
+    getProfile();
+  }
+
   // void init(context) {
   //   WidgetsBinding.instance.addPostFrameCallback((_) {
   //   });
@@ -218,5 +220,28 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
 
   void logOut(BuildContext context) {
     context.pushReplacementNamed('login');
+  }
+
+  String? _name;
+  String? get name => _name;
+  String? _email;
+  String? get email => _email;
+  String? _profileImage;
+  String? get profileImage => _profileImage;
+  String? _role;
+  String? get role => _role;
+
+  Future<void> getProfile() async {
+    final res = await locator<ApiService>().getProfile();
+
+    if (res.status == 200) {
+      _name = res.data?.name;
+      _email = res.data?.email;
+      _profileImage = res.data?.profilePic;
+      res.data?.roleId;
+      log('Profile fetched successfully: ${res.data?.name}');
+    } else {
+      log('Failed to fetch profile: ${res.message}');
+    }
   }
 }

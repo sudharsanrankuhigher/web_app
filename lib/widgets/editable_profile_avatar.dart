@@ -1,8 +1,12 @@
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:webapp/widgets/image_picker.dart'; // your picker
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:webapp/app/app.locator.dart';
+import 'package:webapp/widgets/image_picker.dart';
+import 'package:webapp/widgets/web_image_loading.dart'; // your picker
 
 class EditableServiceImagePicker extends StatelessWidget {
   final String? imageUrl; // from API
@@ -67,16 +71,28 @@ class EditableServiceImagePicker extends StatelessWidget {
       );
     }
 
-    // 3. Network image
+    // 3️⃣ Network image
     if (imageUrl != null && imageUrl!.isNotEmpty) {
-      return CachedNetworkImage(
-        imageUrl: imageUrl!,
-        fit: BoxFit.cover,
-        placeholder: (_, __) => const Center(
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-        errorWidget: (_, __, ___) => const Icon(Icons.broken_image, size: 50),
-      );
+      return kIsWeb
+          // ? Image.network(
+          //     imageUrl!,
+          //     fit: BoxFit.cover,
+          //     errorBuilder: (_, __, ___) =>
+          //         const Icon(Icons.broken_image, size: 50),
+          //   )
+          ? WebImage(
+              imageUrl: imageUrl!,
+              width: 200,
+              height: 200,
+            )
+          : CachedNetworkImage(
+              imageUrl: Uri.encodeFull(imageUrl!),
+              fit: BoxFit.cover,
+              placeholder: (_, __) => const Center(
+                  child: CircularProgressIndicator(strokeWidth: 2)),
+              errorWidget: (_, __, ___) =>
+                  const Icon(Icons.broken_image, size: 50),
+            );
     }
 
     // 4. Default icon

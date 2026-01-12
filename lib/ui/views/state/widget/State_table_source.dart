@@ -1,17 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
-import 'package:webapp/ui/views/state/model/state_model.dart';
+import 'package:webapp/ui/views/state/model/state_model.dart' as state_model;
 
 class StateTableSource extends DataTableSource {
-  final List<StateModel> states;
-  final Function(StateModel) onEdit;
-  final Function(StateModel) onDelete;
+  final List<state_model.Datum> states;
+  final Function(state_model.Datum) onEdit;
+  final Function(state_model.Datum) onDelete;
 
   StateTableSource({
     required this.states,
     required this.onEdit,
     required this.onDelete,
   });
+
+  // ---------------------- SEARCH + FILTER ----------------------
+  void applySearch(String query, String type) {
+    query = query.toLowerCase();
+
+    states.where((state) {
+      final matchSearch = state.name!.toLowerCase().contains(query) ||
+          state.name!.toLowerCase().contains(query);
+
+      final matchType = type == "All" || state.name == type;
+
+      return matchSearch && matchType;
+    }).toList();
+
+    notifyListeners();
+  }
 
   @override
   DataRow? getRow(int index) {
@@ -21,7 +37,7 @@ class StateTableSource extends DataTableSource {
         cells: List.generate(
           3, // total columns
           (i) {
-            if (i == 2) {
+            if (i == 1) {
               // column index where message should show
               return const DataCell(
                 Center(
@@ -53,7 +69,7 @@ class StateTableSource extends DataTableSource {
         ),
         cells: [
           DataCell(Text("$sNo")),
-          DataCell(Text(plan.name)),
+          DataCell(Text(plan.name ?? "")),
           DataCell(Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -70,7 +86,6 @@ class StateTableSource extends DataTableSource {
                   onPressed: () => onDelete(plan)),
             ],
           )),
-          DataCell(Text(plan.status)),
         ]);
   }
 
