@@ -9,9 +9,18 @@ import 'package:webapp/core/model/get_user_model.dart';
 import 'package:webapp/core/model/login_model.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:webapp/ui/views/city/model/city_model.dart' as city_model;
+import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
+    as influencer_model;
+import 'package:webapp/ui/views/permissions/model/get_permission_model.dart';
 import 'package:webapp/ui/views/plans/model/plans_model.dart' as plan;
+import 'package:webapp/ui/views/roles/model/roles_model.dart' as roles_model;
 import 'package:webapp/ui/views/services/model/service_model.dart' as service;
 import 'package:webapp/ui/views/state/model/state_model.dart' as state_model;
+import 'package:webapp/ui/views/sub_admin/model/sub_admin_model.dart'
+    as sub_admin_model;
+
+import 'package:webapp/ui/views/add_company/model/company_model.dart'
+    as company_model;
 
 class ApiService {
   final Dio _dio;
@@ -21,7 +30,7 @@ class ApiService {
   static ApiService init() {
     final dio = Dio(
       BaseOptions(
-        baseUrl: 'http://172.20.25.55:8005/',
+        baseUrl: 'http://172.20.25.23:8005/',
         followRedirects: true,
         validateStatus: (status) => status != null && status < 500,
       ),
@@ -53,10 +62,15 @@ class ApiService {
     return ApiService._internal(dio);
   }
 
-  ///POST: /api/admin/login
   Future<LoginResponse> loginAdmin(LoginRequest loginRequest) async {
-    final response =
-        await _dio.post('api/admin/login', data: loginRequest.toJson());
+    final response = await _dio.post(
+      'api/admin/login',
+      data: loginRequest.toJson(),
+      options: Options(
+        validateStatus: (status) => status != null && status < 500,
+      ),
+    );
+
     return LoginResponse.fromJson(response.data);
   }
 
@@ -274,14 +288,115 @@ class ApiService {
     return response.data;
   }
 
-  Future<dynamic> updateInfluencer(FormData formData) async {
+  /// GET: /api/admin/get-all-plan
+  Future<influencer_model.InfluencerModel> getAllInfluencer() async {
+    final response = await _dio.get('api/admin/get-all-influencer');
+    return influencer_model.InfluencerModel.fromJson(response.data);
+  }
+
+  /////////////////// company api //////////////////////
+
+  /// POST: /api/admin/add-company
+  Future<void> addCompany(FormData formData) async {
     final response = await _dio.post(
-      'api/admin/edit-influencer',
+      'api/admin/add-company',
       data: formData,
       options: Options(
         contentType: 'multipart/form-data',
+        responseType: ResponseType.json, // ✅ important
       ),
     );
     return response.data;
+  }
+
+  Future<company_model.CompanyModel> getCompany() async {
+    final response = await _dio.get('api/admin/get-all-company');
+
+    // map JSON to CompanyModel
+    return company_model.CompanyModel.fromJson(response.data);
+  }
+
+  ////////////////// Role API ////////////////////
+  /// Get: /api/admin/get-all-role
+
+  Future<roles_model.RolesModel> getAllRole() async {
+    final response = await _dio.get('api/admin/get-all-role');
+    return roles_model.RolesModel.fromJson(response.data);
+  }
+
+  /// POST: /api/admin/add-role
+  Future<roles_model.RolesModel> addRole(role) async {
+    final response = await _dio.post(
+      'api/admin/add-role',
+      data: {
+        'name': role['name'], // ✅ map access
+      },
+    );
+
+    return roles_model.RolesModel.fromJson(response.data);
+  }
+
+  ///DELETE : /api/admin/delete-role/{id}
+  Future<roles_model.RolesModel> deleteRole(id) async {
+    final data = {'id': id};
+    final response = await _dio.delete('api/admin/delete-role', data: data);
+    return roles_model.RolesModel.fromJson(response.data);
+  }
+
+  ////////////// sub admin /////////////
+  /// GET: /api/admin/get-all-sub-admin
+  Future<List<sub_admin_model.Datum>> getAllSubAdmin() async {
+    final response = await _dio.get('api/admin/get-all-sub-admin');
+    final List<dynamic> data = response.data['data'] ?? [];
+    return data.map((json) => sub_admin_model.Datum.fromJson(json)).toList();
+  }
+
+  /// POST: /api/admin/add-sub-admin
+  Future<sub_admin_model.SubAdminModel> addSubAdmin(addSubAdminRequest) async {
+    final data = addSubAdminRequest;
+    log('Add Sub Admin Request Data: $data');
+    final response = await _dio.post(
+      'api/admin/add-sub-admin',
+      data: data,
+      options: Options(
+        contentType: 'multipart/form-data',
+        responseType: ResponseType.json, // ✅ important
+      ),
+    );
+    return sub_admin_model.SubAdminModel.fromJson(response.data);
+  }
+
+  ///DELETE : /api/admin/delete-role/{id}
+  Future<sub_admin_model.SubAdminModel> deleteSubAdmin(id) async {
+    final data = {'id': id};
+    final response = await _dio.delete('api/admin/delete-admin', data: data);
+    return sub_admin_model.SubAdminModel.fromJson(response.data);
+  }
+
+  /////////////////// Permissions ////////////////////
+  /// GET: /api/admin/add-permission
+
+  Future<void> addPermissions() async {
+    final response = await _dio.get(
+      'api/admin/permissions',
+      options: Options(
+        validateStatus: (status) => status != null && status < 500,
+      ),
+    );
+    return response.data;
+  }
+
+  Future<GetPermissionModel> getPermissions(id) async {
+    final request = {
+      "id": id,
+    };
+    final response = await _dio.get(
+      'api/admin/permissions',
+      data: request,
+      options: Options(
+        validateStatus: (status) => status != null && status < 500,
+      ),
+    );
+    return GetPermissionModel.fromJson(response.data);
   }
 }

@@ -11,6 +11,8 @@ class CommonRoleDialog {
   }) async {
     final formKey = GlobalKey<FormState>(); // ✅ Added formKey
 
+    String? name;
+
     return showDialog<Map<String, dynamic>>(
       barrierDismissible: false,
       context: context,
@@ -40,6 +42,10 @@ class CommonRoleDialog {
                           }
                           return null;
                         },
+                        onSaved: (value) {
+                          model.setname(value!);
+                          name = value;
+                        },
                       ),
                     ],
                   ),
@@ -58,7 +64,7 @@ class CommonRoleDialog {
                     if (!formKey.currentState!.validate()) return;
 
                     Navigator.pop(context, {
-                      "serviceName": model.name,
+                      "name": name ?? model.name,
                     });
                   },
                   child: Text(existingName == null ? "Save" : "Update"),

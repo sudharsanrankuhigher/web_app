@@ -57,7 +57,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      // onChanged: viewModel.searchUser,
+                      onChanged: (value) => viewModel.searchInfluencer(value),
                     ),
                   ),
                   Row(
@@ -91,7 +91,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                             initialCheckbox: false,
                             initialSort: "A-Z",
                             onApply: (isChecked, sortType) {
-                              // viewModel.applySort(isChecked, sortType);
+                              viewModel.applySort(isChecked, sortType);
                             },
                           );
                         },
@@ -116,7 +116,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
               ),
               verticalSpacing20,
               Expanded(
-                child: viewModel.subAdmins.isEmpty
+                child: viewModel.isBusy || viewModel.isLoading == true
                     ? const Center(child: CircularProgressIndicator())
                     : CommonPaginatedTable(
                         columns: const [
@@ -131,9 +131,9 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                           DataColumn(label: Text("Action")),
                           DataColumn(label: Text("Status")),
                         ],
-                        source: viewModel.tableSource,
-                        rowsperPage: viewModel.tableSource.rowCount < 10
-                            ? viewModel.tableSource.rowCount
+                        source: viewModel.tableSource!,
+                        rowsperPage: viewModel.tableSource!.rowCount < 10
+                            ? viewModel.tableSource!.rowCount
                             : 10,
                         minWidth: 1200,
                       ),

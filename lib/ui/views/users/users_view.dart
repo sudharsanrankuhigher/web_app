@@ -102,7 +102,7 @@ class UsersView extends StackedView<UsersViewModel> {
               ),
               verticalSpacing20,
               Expanded(
-                child: viewModel.users.isEmpty
+                child: viewModel.isBusy
                     ? const Center(child: CircularProgressIndicator())
                     : CommonPaginatedTable(
                         columns: const [

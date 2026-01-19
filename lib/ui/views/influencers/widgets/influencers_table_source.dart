@@ -1,32 +1,53 @@
 import 'package:flutter/material.dart';
-import 'package:webapp/ui/views/influencers/model/influencers_model.dart';
+import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
+    as influencer_model;
+import 'package:webapp/ui/views/services/model/service_model.dart'
+    as service_model;
 
 class InfluencerTableSource extends DataTableSource {
-  final List<InfluencerModel> influencers;
-  final Function(InfluencerModel, bool) onEdit;
-  final Function(InfluencerModel, bool)? onView;
+  final List<influencer_model.Datum> influencers;
+  final List<service_model.Datum>? service;
+
+  final Function(influencer_model.Datum, bool) onEdit;
+  final Function(influencer_model.Datum, bool)? onView;
   // final Function(InfluencerModel) onDelete;
-  final Function(InfluencerModel) onToggle;
+  final Function(influencer_model.Datum) onToggle;
 
   InfluencerTableSource({
     required this.influencers,
     required this.onEdit,
     // required this.onDelete,
     this.onView,
+    this.service,
     required this.onToggle,
   });
+
+  Map<int, String> get _serviceMap {
+    return {
+      for (final s in service ?? [])
+        if (s.id != null) s.id!: s.name ?? ""
+    };
+  }
+
+  String _getServiceNames(List<dynamic>? serviceIds) {
+    if (serviceIds == null || serviceIds.isEmpty) return "-";
+
+    return serviceIds.map((id) => _serviceMap[id] ?? "Unknown").join(", ");
+  }
 
   @override
   DataRow? getRow(int index) {
     /// -------------------------------
     /// CASE: NO DATA FOUND
     /// -------------------------------
+    ///
+    ///
     if (influencers.isEmpty) {
       return DataRow(
         cells: List.generate(
-          10, // total columns
+          12, // total columns
           (i) {
-            if (i == 4) {
+            if (i == 6) {
               // column index where message should show
               return const DataCell(
                 Center(
@@ -61,16 +82,19 @@ class InfluencerTableSource extends DataTableSource {
       cells: [
         DataCell(Text("${index + 1}")),
 
-        DataCell(Text(item.id.toString())),
-        DataCell(Text(item.name)),
-        DataCell(Text(item.phone)),
+        DataCell(Text(item.infId.toString())),
+        DataCell(Text(item.name!)),
+        DataCell(Text(item.phone!)),
         DataCell(Text("${item.city}/${item.state}")),
-        DataCell(Text(item.category)),
-        DataCell(Text(item.category)),
+        DataCell(
+          Text(_getServiceNames(item.service)),
+        ),
+        DataCell(
+            Text(item.service != null ? item.service!.length.toString() : "0")),
 
-        DataCell(Text(item.instagramFollowers ?? "")),
-        DataCell(Text(item.youtubeFollowers ?? "")),
-        DataCell(Text(item.facebookFollowers ?? "")),
+        DataCell(Text(item.instagramFollowers!.toString())),
+        DataCell(Text(item.youtubeFollowers.toString())),
+        DataCell(Text(item.facebookFollowers.toString())),
 
         /// ACTION BUTTONS
         DataCell(
@@ -101,7 +125,7 @@ class InfluencerTableSource extends DataTableSource {
           Transform.scale(
             scale: 0.7,
             child: Switch(
-              value: item.isActive,
+              value: item.status == 1 ? true : false,
               onChanged: (_) => onToggle(item),
             ),
           ),

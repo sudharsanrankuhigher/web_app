@@ -6,7 +6,8 @@ import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/city/widget/state_city_dropdown.dart';
-import 'package:webapp/ui/views/influencers/model/influencers_model.dart';
+import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
+    as influencer_model;
 import 'package:webapp/ui/views/influencers/widgets/icon_text_form_field.dart';
 import 'package:webapp/ui/views/services/model/service_model.dart'
     as service_model;
@@ -18,7 +19,7 @@ import 'package:webapp/widgets/profile_image.dart';
 import 'package:webapp/widgets/state_city_drop_down.dart';
 
 class InfluencerDialog extends StatefulWidget {
-  final InfluencerModel? influencer;
+  final influencer_model.Datum? influencer;
   final Function(dynamic) onSave;
   final bool? isView;
   final List<service_model.Datum>? service;
@@ -44,6 +45,9 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
   int? serviceId;
 
   bool? _isView = false;
+  bool formSubmitted = false;
+  bool _isStateError = false;
+  bool _isCityError = false;
 
   DateTime? dob;
   bool dobError = false;
@@ -82,29 +86,53 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
     nameController = TextEditingController(text: inf?.name ?? '');
     emailController = TextEditingController(text: inf?.email ?? '');
     phoneController = TextEditingController(text: inf?.phone ?? '');
-    dobController = TextEditingController(text: inf?.dob ?? '');
+    dobController = TextEditingController(text: inf?.dob.toString() ?? '');
     altPhoneController = TextEditingController(text: inf?.altPhone ?? '');
-    idController = TextEditingController(text: inf?.idNumber ?? '');
+    idController = TextEditingController(text: inf?.infId.toString() ?? '');
     stateController = TextEditingController(text: inf?.state ?? '');
-    passwordController = TextEditingController(text: inf?.password ?? '');
-    serviceController = TextEditingController(text: inf?.service ?? '');
+    passwordController = TextEditingController(text: '');
+    serviceController =
+        TextEditingController(text: inf?.service.toString() ?? '');
     cityController = TextEditingController(text: inf?.city ?? '');
-    instagramLinkController = TextEditingController(text: inf?.instagram ?? '');
+    instagramLinkController =
+        TextEditingController(text: inf?.instagramLink ?? '');
     instagramFollowersController =
-        TextEditingController(text: inf?.instagramFollowers ?? '');
-    instagramDescController =
-        TextEditingController(text: inf?.instagramDesc ?? '');
-    facebookLinkController = TextEditingController(text: inf?.facebook ?? '');
+        TextEditingController(text: inf?.instagramFollowers.toString() ?? '');
+    instagramDescController = facebookLinkController =
+        TextEditingController(text: inf?.facebookLink ?? '');
     facebookFollowersController =
-        TextEditingController(text: inf?.facebookFollowers ?? '');
-    youtubeLinkController = TextEditingController(text: inf?.youtube ?? '');
+        TextEditingController(text: inf?.facebookFollowers.toString() ?? '');
+    youtubeLinkController = TextEditingController(text: inf?.youtubeLink ?? '');
     youtubeFollowersController =
-        TextEditingController(text: inf?.youtubeFollowers ?? '');
-    bankAccountController = TextEditingController(text: inf?.bankAccount ?? '');
-    bankHolderController = TextEditingController(text: inf?.bankHolder ?? '');
-    ifscController = TextEditingController(text: inf?.ifsc ?? '');
-    upiController = TextEditingController(text: inf?.upi ?? '');
+        TextEditingController(text: inf?.youtubeFollowers.toString() ?? '');
+    bankAccountController = TextEditingController(text: inf?.accountNo ?? '');
+    bankHolderController =
+        TextEditingController(text: inf?.accountHolderName ?? '');
+    ifscController = TextEditingController(text: inf?.ifscCode ?? '');
+    upiController = TextEditingController(text: inf?.upiId ?? '');
     descriptionController = TextEditingController();
+
+    // selectedServices = inf?.service ?? [];
+    if (widget.influencer != null && widget.service != null) {
+      /// influencer.service contains IDs (example: [1, 3, 5])
+      final influencerServiceIds = widget.influencer!.service ?? [];
+
+      /// Build selected services list
+      selectedServices = widget.service!
+          .where((s) => influencerServiceIds.contains(s.id))
+          .map((s) => {
+                'id': s.id,
+                'name': s.name,
+              })
+          .toList();
+
+      /// Only IDs (for API save)
+      selectedService = selectedServices.map((e) => e['id']).toList();
+    }
+
+    dob = inf?.dob;
+    dobString = inf?.dob.toString();
+    dobError = false;
 
     _isView = widget.isView;
   }
@@ -205,6 +233,12 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                         icon: Icons.person,
                         label: "Name",
                         controller: nameController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a name';
+                          }
+                          return null;
+                        },
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -242,6 +276,15 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                         icon: Icons.phone,
                         label: "Phone",
                         controller: phoneController,
+                        keyBoardType: TextInputType.number,
+                        validator: (phone) {
+                          if (phoneController.text.isEmpty ||
+                              !RegExp(r'^\d{10}$')
+                                  .hasMatch(phoneController.text)) {
+                            return 'Please enter a valid 10-digit phone number';
+                          }
+                          return null;
+                        },
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -259,25 +302,28 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           fontWeight: FontWeight.w500,
                         ),
                         verticalSpacing10,
-                        DOBField(
-                          label: "Date of Birth",
-                          selectedDate: dob,
-                          isError: dobError,
-                          onDateSelected: (date) {
-                            setState(() {
-                              if (date != null) {
-                                dobString = "${date.year}"
-                                    "${date.month.toString().padLeft(2, '0')}-"
-                                    "${date.day.toString().padLeft(2, '0')}-";
-                                dob = date;
-                                dobError = false;
-                              } else {
-                                dobController.text = '';
-                                dobError = true;
-                                return;
-                              }
-                            });
-                          },
+                        IgnorePointer(
+                          ignoring: _isView == true ? true : false,
+                          child: DOBField(
+                            label: "Date of Birth",
+                            selectedDate: dob,
+                            isError: dobError,
+                            onDateSelected: (date) {
+                              setState(() {
+                                if (date != null) {
+                                  dobString = "${date.year}"
+                                      "${date.month.toString().padLeft(2, '0')}-"
+                                      "${date.day.toString().padLeft(2, '0')}-";
+                                  dob = date;
+                                  dobError = false;
+                                } else {
+                                  dobController.text = '';
+                                  dobError = true;
+                                  return;
+                                }
+                              });
+                            },
+                          ),
                         )
                       ],
                     )
@@ -308,6 +354,15 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                         icon: Icons.phone,
                         label: "Alternative Phone",
                         controller: altPhoneController,
+                        keyBoardType: TextInputType.number,
+                        validator: (phone) {
+                          if (altPhoneController.text.isEmpty ||
+                              !RegExp(r'^\d{10}$')
+                                  .hasMatch(altPhoneController.text)) {
+                            return 'Please enter a valid 10-digit phone number';
+                          }
+                          return null;
+                        },
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -342,15 +397,22 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                       fontWeight: FontWeight.w500,
                     ),
                     verticalSpacing10,
-                    StateCityDropdown(
-                      isVertical: true,
-                      showCity: true,
-                      onStateChanged: (value) {
-                        stateController.text = value ?? '';
-                      },
-                      onCityChanged: (value) {
-                        cityController.text = value ?? '';
-                      },
+                    IgnorePointer(
+                      ignoring: _isView == true ? true : false,
+                      child: StateCityDropdown(
+                        initialCity: widget.influencer?.city ?? '',
+                        initialState: widget.influencer?.state ?? '',
+                        isVertical: true,
+                        showCity: true,
+                        isCityError: _isCityError,
+                        isStateError: _isStateError,
+                        onStateChanged: (value) {
+                          stateController.text = value ?? '';
+                        },
+                        onCityChanged: (value) {
+                          cityController.text = value ?? '';
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -372,7 +434,9 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           fontWeight: FontWeight.w500,
                         ),
                         verticalSpacing10,
-                        DynamicMultiSearchDropdown(
+                        IgnorePointer(
+                          ignoring: _isView == true ? true : false,
+                          child: DynamicMultiSearchDropdown(
                             selectedItems: selectedServices,
                             items: widget.service!
                                 .map((e) => {
@@ -380,19 +444,25 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                                       'name': e.name,
                                     })
                                 .toList(),
-                            onChanged: (values) {
-                              setState(() {
-                                selectedServices = values;
-                                final ids = values.map((e) => e['id']).toList();
-                                print(ids);
-                              });
+                            onChanged: _isView == true
+                                ? (_) {} // 🔒 disable in view mode
+                                : (values) {
+                                    setState(() {
+                                      selectedServices = values;
+                                      selectedService =
+                                          values.map((e) => e['id']).toList();
+                                    });
 
-                              // Extract IDs
-                              final ids = values.map((e) => e['id']).toList();
-                              selectedService = ids;
-                              print(ids);
-                            },
-                            label: 'Service')
+                                    debugPrint(
+                                        "Selected IDs: $selectedService");
+                                  },
+                            label: 'Service',
+                            isError: selectedServices.isEmpty &&
+                                formSubmitted, // <-- add
+                            errorText:
+                                "Please select at least one service", // <-- add
+                          ),
+                        ),
                       ],
                     )
 
@@ -410,10 +480,14 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                     Expanded(
                       child: IconTextFormField(
                         validator: (value) {
-                          if (passwordController.text.isEmpty) {
-                            return 'Please enter Password';
+                          if (widget.influencer == null) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter Password';
+                            } else if (value.length < 8) {
+                              return 'Password must be at least 8 characters';
+                            }
                           }
-                          return null;
+                          return null; // no validation in edit/view
                         },
                         isView: _isView,
                         icon: Icons.lock,
@@ -454,6 +528,13 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           if (instagramLinkController.text.isEmpty) {
                             return 'Please enter Instagram Link';
                           }
+                          final uri = Uri.tryParse(val!.trim());
+                          if (uri == null ||
+                              !uri.hasScheme ||
+                              !uri.hasAuthority) {
+                            return 'Please enter a valid URL';
+                          }
+
                           return null;
                         },
                         isView: _isView,
@@ -491,6 +572,20 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                         icon: Icons.facebook,
                         label: "facebook Link",
                         controller: facebookLinkController,
+                        validator: (val) {
+                          if (facebookLinkController.text.isEmpty) {
+                            return 'Please enter Facebook Link';
+                          }
+
+                          final uri = Uri.tryParse(val!.trim());
+                          if (uri == null ||
+                              !uri.hasScheme ||
+                              !uri.hasAuthority) {
+                            return 'Please enter a valid URL';
+                          }
+
+                          return null;
+                        },
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -515,16 +610,24 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                   children: [
                     Expanded(
                       child: IconTextFormField(
-                        validator: (value) {
-                          if (youtubeLinkController.text.isEmpty) {
-                            return 'Please enter Youtube Link';
-                          }
-                          return null;
-                        },
                         isView: _isView,
                         icon: Icons.youtube_searched_for,
                         label: "youtube Link",
                         controller: youtubeLinkController,
+                        validator: (val) {
+                          if (val == null || val.trim().isEmpty) {
+                            return 'Please enter YouTube link';
+                          }
+
+                          final uri = Uri.tryParse(val.trim());
+                          if (uri == null ||
+                              !uri.hasScheme ||
+                              !uri.hasAuthority) {
+                            return 'Please enter a valid URL';
+                          }
+
+                          return null;
+                        },
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -640,6 +743,23 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           );
                           return;
                         }
+
+                        setState(() {
+                          dobError = dob == null;
+                          formSubmitted = true;
+                        });
+                        if (dobError) return;
+
+                        // 4️⃣ Check services
+                        if (selectedServices.isEmpty) return;
+
+                        final isStateError = stateController.text.isEmpty;
+                        final isCityError = cityController.text.isEmpty;
+                        setState(() {
+                          _isStateError = isStateError;
+                          _isCityError = isCityError;
+                        });
+                        if (isStateError || isCityError) return;
 
                         if (formKey.currentState!.validate()) {
                           final Map<String, dynamic> updated = {

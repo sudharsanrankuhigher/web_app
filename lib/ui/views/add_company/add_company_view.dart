@@ -59,12 +59,12 @@ class AddCompanyView extends StackedView<AddCompanyViewModel> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    // onChanged: viewModel.searchPlans,
+                    onChanged: viewModel.applySearch,
                   ),
                 ),
                 if (isExtended)
                   const SizedBox(
-                    width: 240,
+                    width: 290,
                   ),
                 // horizontalSpacing20,
                 // Filter Button
@@ -96,7 +96,7 @@ class AddCompanyView extends StackedView<AddCompanyViewModel> {
                         initialCheckbox: false,
                         initialSort: "A-Z",
                         onApply: (isChecked, sortType) {
-                          // viewModel.applySort(isChecked, sortType);
+                          viewModel.applySort(isChecked, sortType);
                         },
                       );
                     },
@@ -122,7 +122,7 @@ class AddCompanyView extends StackedView<AddCompanyViewModel> {
             ),
             verticalSpacing12,
             Expanded(
-                child: viewModel.companies.isEmpty
+                child: viewModel.isBusy || viewModel.isLoading == true
                     ? const Center(child: CircularProgressIndicator())
                     : CommonPaginatedTable(
                         columns: viewModel.companyColumn,

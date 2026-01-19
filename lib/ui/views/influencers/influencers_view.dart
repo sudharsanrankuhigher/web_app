@@ -178,7 +178,8 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
       InfluencersViewModel();
 
   @override
-  void onViewModelReady(InfluencersViewModel viewModel) {
-    viewModel.loadInfluencers();
+  void onViewModelReady(InfluencersViewModel viewModel) async {
+    await viewModel.getServices();
+    await viewModel.loadInfluencers();
   }
 }

@@ -140,6 +140,7 @@ class ServicesView extends StackedView<ServicesViewModel> {
                         columns: const [
                           DataColumn(label: Text("S.No")),
                           DataColumn(label: Text("Name")),
+                          DataColumn(label: Text("Image")),
                           DataColumn(
                               headingRowAlignment: MainAxisAlignment.center,
                               label: Text("Actions")),

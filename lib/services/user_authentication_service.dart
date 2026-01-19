@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:dio/dio.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -31,30 +32,34 @@ class UserAuthenticationService with NavigationMixin {
           'accessToken',
           res.response?.token ?? '',
         );
-        List<String>? accessList =
-            res.response?.access; // make sure this is List<String>?
+        List<String>? accessList = res.response?.access;
 
         if (accessList != null) {
           await _sharedPreference.setStringList('access', accessList);
         } else {
-          await _sharedPreference.remove('access'); // optional, remove if null
+          await _sharedPreference.remove('access');
         }
         goRouterKey.currentContext!.pushReplacementNamed('dashboard');
       } else {
-        // ✅ This will now run if response is like status: 303, message: "OTP not found"
-        _dialogService.showCustomDialog(
+        _dialogService.showDialog(
           title: 'Login Failed',
           description: res.message,
         );
       }
-    } catch (e, stack) {
-      log('Unexpected login error: $e');
-      log(stack.toString());
+    } on DioException catch (e) {
+      if (e.response != null && e.response?.data != null) {
+        final error = LoginResponse.fromJson(e.response!.data);
 
-      _dialogService.showDialog(
-        title: 'Unexpected Error',
-        description: 'Something went wrong. Please try again.',
-      );
+        _dialogService.showDialog(
+          title: 'Login Failed',
+          description: error.message ?? 'Invalid credentials',
+        );
+      } else {
+        _dialogService.showDialog(
+          title: 'Network Error',
+          description: 'Please check your internet connection',
+        );
+      }
     }
   }
 

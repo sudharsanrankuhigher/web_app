@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
-import 'package:webapp/ui/views/sub_admin/model/sub_admin_model.dart';
+import 'package:webapp/ui/views/sub_admin/model/sub_admin_model.dart'
+    as sub_admin_model;
 import 'package:webapp/widgets/profile_image.dart';
+import 'package:webapp/ui/views/roles/model/roles_model.dart' as roles_model;
 
 class SubAdminTableSource extends DataTableSource {
-  final List<SubAdminModel> data;
-  late List<SubAdminModel> filteredList;
+  final List<sub_admin_model.Datum> data;
+  final List<roles_model.Datum> roles;
+  late List<sub_admin_model.Datum> filteredList;
+  final Function(sub_admin_model.Datum) onToggle;
 
-  final void Function(SubAdminModel) onEdit;
-  final void Function(SubAdminModel) onDelete;
+  final void Function(sub_admin_model.Datum) onEdit;
+  final void Function(sub_admin_model.Datum) onDelete;
 
   SubAdminTableSource(
-    this.data,
-    this.onEdit,
-    this.onDelete,
-  ) {
+      this.data, this.onEdit, this.onDelete, this.roles, this.onToggle) {
     filteredList = List.from(data);
+    print('object$onToggle');
   }
 
   // ---------------------- SEARCH ----------------------
@@ -23,12 +26,52 @@ class SubAdminTableSource extends DataTableSource {
     query = query.toLowerCase().trim();
 
     filteredList = data.where((user) {
-      return user.name.toLowerCase().contains(query) ||
-          user.city.toLowerCase().contains(query) ||
-          user.state.toLowerCase().contains(query);
+      return user.name!.toLowerCase().contains(query) ||
+          user.city!.toLowerCase().contains(query) ||
+          user.state!.toLowerCase().contains(query);
     }).toList();
 
     notifyListeners();
+  }
+
+  String formatDate(String value) {
+    try {
+      final dateTime = DateTime.parse(value).toLocal();
+      return DateFormat('dd MMM yyyy').format(dateTime);
+    } catch (e) {
+      return '-';
+    }
+  }
+
+  String formatTimeToDotAMPM(String time) {
+    try {
+      final parts = time.split(':');
+      int hour = int.parse(parts[0]);
+      final minute = parts[1];
+
+      final isAM = hour < 12;
+      hour = hour % 12;
+      if (hour == 0) hour = 12;
+
+      return '$hour.$minute${isAM ? 'am' : 'pm'}';
+    } catch (e) {
+      return '-';
+    }
+  }
+
+  String getRoleName(int? roleId) {
+    if (roleId == null) return '-';
+
+    try {
+      final role = roles.firstWhere(
+        (r) => r.id == roleId,
+        orElse: () => roles_model.Datum(),
+      );
+
+      return role.name ?? '-';
+    } catch (e) {
+      return '-';
+    }
   }
 
   @override
@@ -56,34 +99,59 @@ class SubAdminTableSource extends DataTableSource {
     final row = filteredList[index];
 
     return DataRow(
-      color: WidgetStateProperty.resolveWith<Color?>(
-        (Set<WidgetState> states) {
-          if (index.isEven) return Colors.white;
-          return Colors.grey.shade100;
+      color: MaterialStateProperty.resolveWith<Color?>(
+        (Set<MaterialState> states) {
+          return index.isEven ? Colors.white : Colors.grey.shade100;
         },
       ),
       cells: [
+        // Index
         DataCell(Text("${index + 1}")),
-        DataCell(
 
-            // Text(row.imageUrl)
-            IgnorePointer(
-          ignoring: true,
-          child: Padding(
-            padding: defaultPadding4,
-            child: ProfileImageEdit(
-              imageUrl: row.idImageUrl,
-              radius: 30,
-              onImageSelected: (_, a) {},
+        // Profile Image
+        DataCell(
+          IgnorePointer(
+            ignoring: true,
+            child: Padding(
+              padding: defaultPadding4,
+              child: ProfileImageEdit(
+                imageUrl: row.profileImage ?? '', // handle null
+                radius: 30,
+                onImageSelected: (_, __) {},
+              ),
             ),
           ),
-        )),
-        DataCell(Text(row.name)),
-        DataCell(Text("${row.city}/${row.state}")),
-        DataCell(Text(row.loginTime.toString())),
-        DataCell(Text(row.logoutTime.toString())),
-        DataCell(Text(row.onlineAt.toString())),
-        DataCell(Text("${row.access}".toString().split(",").join(", "))),
+        ),
+
+        // Name
+        DataCell(Text(row.name ?? 'N/A')),
+
+        // City/State
+        DataCell(Text("${row.city ?? '-'} / ${row.state ?? '-'}")),
+
+        // Login Time
+        DataCell(
+          Text(row.loginTime != null
+              ? formatTimeToDotAMPM(row.loginTime.toString())
+              : '-'),
+        ),
+
+        // Logout Time
+        DataCell(
+          Text(row.logoutTime != null
+              ? formatTimeToDotAMPM(row.logoutTime.toString())
+              : '-'),
+        ),
+
+        // Online Status
+        DataCell(
+          Text(row.isOnline?.toString() == "1" ? "Online" : "Offline"),
+        ),
+
+        // Role Name
+        DataCell(Text(getRoleName(row.roleId ?? 0))), // default 0 if null
+
+        // Action Buttons
         DataCell(
           Row(
             children: [
@@ -98,7 +166,17 @@ class SubAdminTableSource extends DataTableSource {
             ],
           ),
         ),
-        DataCell(Text(row.isActive.toString())),
+
+        // Status Switch
+        DataCell(
+          Transform.scale(
+            scale: 0.7,
+            child: Switch(
+              value: row.status == 1,
+              onChanged: (_) => onToggle(row),
+            ),
+          ),
+        ),
       ],
     );
   }

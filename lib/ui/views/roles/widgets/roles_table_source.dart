@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:webapp/ui/views/roles/model/roles_model.dart';
+import 'package:webapp/ui/views/roles/model/roles_model.dart' as role_model;
 
 class RolesTableSource extends DataTableSource {
-  final List<RolesModel> roles;
-  final Function(RolesModel) onEdit;
-  final Function(RolesModel) onDelete;
+  final List<role_model.Datum> roles;
+  final Function(role_model.Datum) onEdit;
+  final Function(role_model.Datum) onDelete;
 
   RolesTableSource({
     required this.roles,
@@ -34,7 +34,7 @@ class RolesTableSource extends DataTableSource {
       cells: [
         DataCell(Text("${index + 1}")), // S.No
         DataCell(Text(role.id.toString())), // Name
-        DataCell(Text(role.name)), // Name
+        DataCell(Text(role.name!)), // Name
         DataCell(
           Row(
             // mainAxisSize: MainAxisSize.min,

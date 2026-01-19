@@ -1,83 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:flutter/material.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 
-class DynamicMultiSearchDropdown extends StatelessWidget {
+class DynamicSingleSearchDropdown extends StatelessWidget {
   final String label;
   final List<dynamic> items;
-  final List<dynamic> selectedItems;
+  final dynamic selectedItem;
   final String nameKey;
   final bool? isError;
   final String? errorText;
-  final void Function(List<dynamic>) onChanged;
+  final void Function(dynamic) onChanged;
 
-  const DynamicMultiSearchDropdown({
+  const DynamicSingleSearchDropdown({
     super.key,
     required this.label,
     required this.items,
-    required this.selectedItems,
+    required this.selectedItem,
     required this.onChanged,
     this.nameKey = "name",
     this.isError,
     this.errorText,
   });
 
+  String getLabel(dynamic item) {
+    if (item is String) return item;
+    if (item is Map && item.containsKey(nameKey)) {
+      return item[nameKey].toString();
+    }
+    return item.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DropdownSearch<dynamic>.multiSelection(
-      selectedItems: selectedItems,
-      compareFn: (a, b) => a['id'] == b['id'],
-      items: (String filter, LoadProps? props) {
+    return DropdownSearch<dynamic>(
+      selectedItem: selectedItem,
+
+      /// 🔹 Compare safely
+      compareFn: (a, b) => getLabel(a) == getLabel(b),
+
+      /// 🔹 Search filter
+      items: (filter, props) {
         if (filter.isEmpty) return items;
         return items
-            .where((e) => e[nameKey]
-                .toString()
-                .toLowerCase()
-                .contains(filter.toLowerCase()))
+            .where(
+                (e) => getLabel(e).toLowerCase().contains(filter.toLowerCase()))
             .toList();
       },
-      dropdownBuilder: (context, selectedItems) {
-        // if (selectedItems.isEmpty) {
-        //   return Text(
-        //     "Select $label",
-        //     style: fontFamilyMedium.size12.greyColor,
-        //   );
-        // }
-        return Wrap(
-          spacing: 6,
-          runSpacing: 4,
-          children: selectedItems
-              .map(
-                (e) => Chip(
-                  label: Text(
-                    e[nameKey],
-                    style: fontFamilyMedium.size11.black,
-                  ),
-                  visualDensity: VisualDensity.compact,
-                ),
-              )
-              .toList(),
+
+      /// 🔹 Selected value UI
+      dropdownBuilder: (context, selectedItem) {
+        if (selectedItem == null) {
+          return Text(
+            "Select $label",
+            style: fontFamilyMedium.size12.greyColor,
+          );
+        }
+        return Text(
+          getLabel(selectedItem),
+          style: fontFamilyMedium.size12.black,
         );
       },
-      popupProps: PopupPropsMultiSelection.menu(
+
+      /// 🔹 Popup UI
+      popupProps: PopupProps.menu(
         showSearchBox: true,
         itemBuilder: (context, item, isSelected, _) {
           return ListTile(
             dense: true,
             title: Text(
-              item[nameKey],
+              getLabel(item),
               style: fontFamilyMedium.size12.black,
             ),
             trailing: isSelected ? const Icon(Icons.check, size: 18) : null,
           );
         },
       ),
+
       decoratorProps: DropDownDecoratorProps(
         decoration: InputDecoration(
-          labelText: "Select $label",
-          labelStyle: fontFamilyMedium.size12.greyColor,
+          // labelText: "Select $label",
+          // labelStyle: fontFamilyMedium.size12.greyColor,
           fillColor: backgroundColor,
           filled: true,
           enabledBorder: OutlineInputBorder(
@@ -100,6 +103,7 @@ class DynamicMultiSearchDropdown extends StatelessWidget {
           ),
         ),
       ),
+
       onChanged: onChanged,
     );
   }

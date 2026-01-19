@@ -1,56 +1,103 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
-import 'package:webapp/ui/views/sub_admin/model/sub_admin_model.dart';
+import 'package:webapp/ui/views/roles/model/roles_model.dart' as roles_model;
+import 'package:webapp/ui/views/sub_admin/model/sub_admin_model.dart'
+    as sub_admin_model;
 import 'package:webapp/widgets/common_button.dart';
+import 'package:webapp/widgets/file_preview.dart';
+import 'package:webapp/widgets/image_picker.dart';
 import 'package:webapp/widgets/initial_textform.dart';
-import 'package:webapp/widgets/multi_select_form_field.dart';
 import 'package:webapp/widgets/profile_image.dart';
+import 'package:webapp/widgets/search_drop_down_widget.dart';
 import 'package:webapp/widgets/state_city_drop_down.dart';
 
 class CommonSubAdminDialog {
   static Future<Map<String, dynamic>?> show(
     BuildContext context, {
-    SubAdminModel? model,
+    sub_admin_model.Datum? model,
+    List<Map<String, dynamic>>? rolesModel,
+    List<roles_model.Datum>? roles,
   }) async {
     final formKey = GlobalKey<FormState>();
     final bool isEdit = model != null;
 
     String name = model?.name ?? '';
-    String phone = model?.phone ?? '';
+    String phone = model?.mobileNumber ?? '';
     String email = model?.email ?? '';
     String password = '';
 
     String gender = model?.gender ?? 'Male';
-    DateTime dob = model?.dob ?? DateTime(2000);
+    int? role;
+    DateTime dob = model?.dateOfBirth ?? DateTime(2000);
 
     String state = model?.state ?? '';
     String city = model?.city ?? '';
 
-    List<String> access = model?.access ?? [];
-    bool status = model?.isActive ?? true;
+    Map<String, dynamic>? selectedRole;
+    if (isEdit && model?.roleId != null && rolesModel != null) {
+      selectedRole = rolesModel.firstWhere(
+        (r) => r['id'] == model!.roleId,
+        orElse: () => {}, // return empty map if not found
+      );
+    }
 
-    String profileImage = model?.imageUrl ?? '';
-    String idImage = model?.idImageUrl ?? '';
+    String getRoleName(int? roleId) {
+      if (roleId == null) return '-';
+
+      try {
+        final role = roles!.firstWhere(
+          (r) => r.id == roleId,
+          orElse: () => roles_model.Datum(),
+        );
+
+        return role.name ?? '-';
+      } catch (e) {
+        return '-';
+      }
+    }
+
+    // List<String> access = model?.access ?? [];
+    bool status = model?.status == 1 ? true : true;
+
+    String profileImage = model?.profileImage ?? '';
+    String idImage = model?.docImg ?? '';
+    bool? isIdProofError = false;
+    bool? isprofileImageError = false;
 
     bool? isStateError = false;
     bool? isCityError = false;
 
-    final states = ["Tamil Nadu", "Kerala", "Karnataka"];
-    final cities = {
-      "Tamil Nadu": ["Chennai", "Coimbatore"],
-      "Kerala": ["Kochi", "Trivandrum"],
-      "Karnataka": ["Bangalore", "Mysore"],
-    };
+    bool? isRoleError = false;
 
     Uint8List? pickedBytes;
     String? pickedPath;
 
+    Uint8List? idProofBytes;
+    String? idProofPath = model?.docImg;
+    ;
+    bool isPdf = false;
+
+    Widget _uploadPlaceholder() {
+      return Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Icon(Icons.upload_file),
+            SizedBox(width: 8),
+            Text("Upload ID Proof"),
+          ],
+        ),
+      );
+    }
+
     InputDecoration _decoration(String label) => InputDecoration(
           labelText: label,
+          labelStyle: fontFamilyMedium.size13.greyColor,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           border: OutlineInputBorder(
@@ -79,23 +126,34 @@ class CommonSubAdminDialog {
                 child: Column(
                   children: [
                     /// ---------------- PROFILE IMAGE ----------------
-                    GestureDetector(
-                      onTap: () async {
-                        // TODO: image picker
-                      },
-                      child: Center(
-                        child: ProfileImageEdit(
-                          imageUrl: profileImage,
-                          imageBytes: pickedBytes,
-                          imagePath: pickedPath,
-                          onImageSelected: (bytes, path) {
-                            setState(() {
-                              pickedBytes = bytes;
-                              pickedPath = path;
-                            });
-                          },
+                    Column(
+                      children: [
+                        GestureDetector(
+                          onTap: () async {},
+                          child: Center(
+                            child: ProfileImageEdit(
+                              isView: isEdit == true ? true : false,
+                              imageUrl: profileImage,
+                              imageBytes: pickedBytes,
+                              imagePath: pickedPath,
+                              onImageSelected: (bytes, path) {
+                                setState(() {
+                                  pickedBytes = bytes;
+                                  pickedPath = path;
+                                });
+                              },
+                            ),
+                          ),
                         ),
-                      ),
+                        if (isprofileImageError == true)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 4),
+                            child: Text(
+                              "Please upload profile image",
+                              style: TextStyle(color: Colors.red, fontSize: 12),
+                            ),
+                          ),
+                      ],
                     ),
 
                     verticalSpacing16,
@@ -120,6 +178,11 @@ class CommonSubAdminDialog {
                       onChanged: (v) => phone = v ?? '',
                       validator: (v) =>
                           v == null || v.length < 10 ? "Invalid phone" : null,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(10),
+                      ],
+                      keyboardType: TextInputType.number,
                     ),
                     verticalSpacing12,
 
@@ -165,17 +228,17 @@ class CommonSubAdminDialog {
                     verticalSpacing16,
 
                     /// Gender
-                    DropdownButtonFormField<String>(
-                      value: gender,
-                      decoration: _decoration("Gender"),
-                      items: const [
-                        DropdownMenuItem(value: "Male", child: Text("Male")),
-                        DropdownMenuItem(
-                            value: "Female", child: Text("Female")),
-                        DropdownMenuItem(
-                            value: "Others", child: Text("Others")),
+                    DynamicSingleSearchDropdown(
+                      items: [
+                        "Male",
+                        "Female",
+                        "Others",
                       ],
-                      onChanged: (v) => gender = v!,
+                      selectedItem: gender,
+                      onChanged: (v) => gender = v,
+                      label: "Gender",
+                      isError: false,
+                      nameKey: "name",
                     ),
 
                     verticalSpacing10,
@@ -201,118 +264,113 @@ class CommonSubAdminDialog {
                     ),
 
                     verticalSpacing10,
-
-                    /// State
-                    // DropdownButtonFormField<String>(
-                    //   value: state.isEmpty ? null : state,
-                    //   decoration: _decoration("State"),
-                    //   items: states
-                    //       .map(
-                    //         (e) => DropdownMenuItem(value: e, child: Text(e)),
-                    //       )
-                    //       .toList(),
-                    //   onChanged: (v) {
-                    //     setState(() {
-                    //       state = v!;
-                    //       city = ''; // reset city when state changes
-                    //     });
-                    //   },
-                    //   validator: (v) => v == null ? "Select state" : null,
-                    // ),
-
                     StateCityDropdown(
                       showCity: true,
                       initialState: state.isEmpty ? null : state,
                       initialCity: city.isEmpty ? null : city,
                       isStateError: isStateError,
                       isCityError: isCityError,
-                      onStateChanged: (state) {
-                        model?.state = state;
+                      onStateChanged: (states) {
+                        model?.state = states;
+                        state = states;
                       },
-                      onCityChanged: (city) {
-                        model?.city = city!;
+                      onCityChanged: (citys) {
+                        model?.city = citys!;
+                        city = citys!;
                       },
                       stateValidator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Please select a states";
                         }
+                        isStateError = false;
+                        return null;
+                      },
+                      cityValidator: (val) {
+                        if (val == null || val.isEmpty) {
+                          return "Please select a city";
+                        }
+                        isCityError = false;
                         return null;
                       },
                     ),
-
-                    // verticalSpacing10,
-
-                    /// City
-                    // DropdownButtonFormField<String>(
-                    //   value: city.isEmpty ? null : city,
-                    //   decoration: _decoration("City"),
-                    //   items: state.isEmpty
-                    //       ? []
-                    //       : cities[state]!
-                    //           .map(
-                    //             (e) =>
-                    //                 DropdownMenuItem(value: e, child: Text(e)),
-                    //           )
-                    //           .toList(),
-                    //   onChanged: state.isEmpty
-                    //       ? null
-                    //       : (v) {
-                    //           setState(() {
-                    //             city = v!;
-                    //           });
-                    //         },
-                    //   validator: (v) => v == null ? "Select city" : null,
-                    // ),
-
                     verticalSpacing16,
 
                     /// ---------------- ID PROOF IMAGE ----------------
-                    GestureDetector(
-                      onTap: () async {
-                        // TODO: ID image picker
-                      },
-                      child: Container(
-                        height: 80,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey),
+                    Column(
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            final result =
+                                await UniversalImagePicker.pickImageOrPdf();
+                            if (result == null) return;
+
+                            setState(() {
+                              idProofBytes = result['bytes'] as Uint8List?;
+                              idProofPath = result['path'] as String?;
+                              if (idProofPath != null) {
+                                isPdf =
+                                    idProofPath!.toLowerCase().endsWith('.pdf');
+                              }
+                              print(idProofBytes);
+                              print(idProofPath);
+                              print(isPdf);
+                            });
+                          },
+                          child: Container(
+                              height: 80,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey),
+                                color: Colors.grey.shade100,
+                              ),
+                              child: idProofBytes == null && idProofPath == null
+                                  ? _uploadPlaceholder()
+                                  : FilePreview(
+                                      bytes: idProofBytes,
+                                      path: idProofPath,
+                                      isPdf: isPdf,
+                                      isEdit: false,
+                                      onRemove: () {
+                                        setState(() {
+                                          idProofBytes = null;
+                                          idProofPath = null;
+                                          isPdf = false;
+                                        });
+                                      },
+                                    )),
                         ),
-                        child: Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(Icons.upload_file),
-                              SizedBox(width: 8),
-                              Text("Upload ID Proof"),
-                            ],
+                        if (isIdProofError == true)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 4),
+                            child: Text(
+                              "Please upload ID proof",
+                              style: TextStyle(color: Colors.red, fontSize: 12),
+                            ),
                           ),
-                        ),
-                      ),
+                      ],
                     ),
 
                     verticalSpacing16,
 
                     /// Access
-                    MultiSelectFormField(
-                      hintText: "Access",
-                      items: const [
-                        "Payment",
-                        "Add Project",
-                        "Add Call",
-                        "Add Company",
-                      ],
-                      initialValue: access,
-                      onChanged: (v) => access = v,
-                      validator: (v) =>
-                          v == null || v.isEmpty ? "Select access" : null,
+                    DynamicSingleSearchDropdown(
+                      label: "Role",
+                      items: rolesModel ?? [],
+                      selectedItem: selectedRole,
+                      onChanged: (v) {
+                        role = v['id']; // update the roleId
+                        selectedRole = v; // update the selected map
+                      },
+                      isError: isRoleError,
+                      nameKey: "name",
                     ),
 
-                    SwitchListTile(
-                      title: const Text("Active"),
-                      value: status,
-                      onChanged: (v) => status = v,
-                    ),
+                    // SwitchListTile(
+                    //   title: const Text("Active"),
+                    //   value: status,
+                    //   onChanged: (v) => status = v,
+                    // ),
                   ],
                 ),
               ),
@@ -335,7 +393,22 @@ class CommonSubAdminDialog {
               text: isEdit ? "Update" : "Create",
               textStyle: fontFamilyBold.size14.white,
               onTap: () {
-                if (state == null || state.isEmpty) {
+                if (isEdit == false) {
+                  if (pickedBytes == null &&
+                      (pickedPath == null || pickedBytes!.isEmpty)) {
+                    setState(() {
+                      isprofileImageError = true;
+                    });
+                    return; // stop form submission
+                  } else {
+                    setState(() {
+                      isprofileImageError = false;
+                    });
+                  }
+                }
+
+                if (!formKey.currentState!.validate()) return;
+                if (state.isEmpty) {
                   setState(() {
                     isStateError = true;
                   });
@@ -345,7 +418,7 @@ class CommonSubAdminDialog {
                     isStateError = false;
                   });
                 }
-                if (city == null || city.isEmpty) {
+                if (city.isEmpty) {
                   setState(() {
                     isCityError = true;
                   });
@@ -355,20 +428,44 @@ class CommonSubAdminDialog {
                     isCityError = false;
                   });
                 }
-                if (!formKey.currentState!.validate()) return;
+
+                if (idProofBytes == null &&
+                    (idProofPath == null || idProofPath!.isEmpty)) {
+                  setState(() {
+                    isIdProofError = true;
+                  });
+                  return; // stop form submission
+                } else {
+                  setState(() {
+                    isIdProofError = false;
+                  });
+                }
+
+                if (selectedRole == null) {
+                  setState(() {
+                    isRoleError = true;
+                  });
+                  return;
+                } else {
+                  setState(() {
+                    isRoleError = false;
+                  });
+                }
 
                 Navigator.pop(StackedService.navigatorKey!.currentContext!, {
                   "name": name,
                   "phone": phone,
                   "email": email,
                   "password": password.isEmpty ? null : password,
-                  "gender": gender,
+                  "gender": gender.toLowerCase(),
                   "dob": dob,
                   "state": state,
                   "city": city,
-                  "access": access,
-                  "image": profileImage,
-                  "idImage": idImage,
+                  "roles": selectedRole!['id'],
+                  "image": pickedBytes,
+                  "existing_image": model?.profileImage,
+                  "existing_doc": model?.docImg,
+                  "idImage": idProofBytes,
                   "status": status,
                 });
                 state = '';

@@ -57,6 +57,8 @@ class RolesView extends StackedView<RolesViewModel> {
 
                       if (result != null) {
                         print('role Name: ${result['name']}');
+                        print(result);
+                        viewModel.addRole(result);
                         // You can save to API or database here
                       }
                     }),
@@ -64,7 +66,7 @@ class RolesView extends StackedView<RolesViewModel> {
             ),
             verticalSpacing12,
             Expanded(
-                child: viewModel.roles.isEmpty
+                child: viewModel.isBusy || viewModel.isLoading == true
                     ? const Center(child: CircularProgressIndicator())
                     : CommonPaginatedTable(
                         columns: const [

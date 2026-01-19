@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/widgets/initial_textform.dart';
 import 'package:webapp/widgets/label_text.dart';
@@ -15,6 +16,7 @@ class IconTextFormField extends StatelessWidget {
   final FontWeight? fontWeight;
   final bool? isView;
   final String? Function(String?)? validator;
+  final TextInputType? keyBoardType;
 
   const IconTextFormField({
     super.key,
@@ -29,6 +31,7 @@ class IconTextFormField extends StatelessWidget {
     this.iconSize,
     this.fontWeight,
     this.validator,
+    this.keyBoardType,
   });
 
   @override
@@ -52,6 +55,13 @@ class IconTextFormField extends StatelessWidget {
           radius: 10,
           controller: controller,
           hintText: hintText ?? label,
+          keyboardType: keyBoardType ?? TextInputType.text,
+          inputFormatters: keyBoardType == TextInputType.number
+              ? [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(10),
+                ]
+              : null,
         ),
       ],
     );

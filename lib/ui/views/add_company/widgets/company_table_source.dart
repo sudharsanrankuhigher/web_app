@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
-import 'package:webapp/ui/views/add_company/model/company_model.dart';
+import 'package:webapp/ui/views/add_company/model/company_model.dart'
+    as company_model;
 import 'package:webapp/widgets/profile_image.dart';
 
 class CompanyTableSource extends DataTableSource {
-  final List<CompanyModel> companies;
-  final Function(CompanyModel) onView;
+  final List<company_model.Datum> companies;
+  final Function(company_model.Datum) onView;
 
   CompanyTableSource({
     required this.companies,
@@ -18,9 +19,9 @@ class CompanyTableSource extends DataTableSource {
     if (companies.isEmpty) {
       return DataRow(
         cells: List.generate(
-          6, // total columns
+          10, // total columns
           (i) {
-            if (i == 3) {
+            if (i == 5) {
               // column index where message should show
               return const DataCell(
                 Center(
@@ -52,21 +53,23 @@ class CompanyTableSource extends DataTableSource {
         ),
         cells: [
           DataCell(Text("$sNo")),
-          DataCell(Padding(
-            padding: defaultPadding4,
-            child: IgnorePointer(
-              ignoring: true,
-              child: ProfileImageEdit(
-                imageUrl: company.companyImage,
-                radius: 30,
-                onImageSelected: (_, a) {},
+          DataCell(Center(
+            child: Padding(
+              padding: defaultPadding4,
+              child: IgnorePointer(
+                ignoring: true,
+                child: ProfileImageEdit(
+                  imageUrl: company.companyImage,
+                  radius: 30,
+                  onImageSelected: (_, a) {},
+                ),
               ),
             ),
           )),
           DataCell(Text("${company.companyName}")),
           DataCell(Text("${company.clientName}")),
           DataCell(Text("${company.phone}")),
-          DataCell(Text("${company.alterNativePhone}")),
+          DataCell(Text("${company.altPhoneNo}")),
           DataCell(Text("${company.city} / ${company.state}")),
           DataCell(Text("${company.gstNo}")),
           DataCell(Text("${company.projectCount}")),

@@ -166,7 +166,7 @@ class PlansView extends StackedView<PlansViewModel> {
             // ),
             verticalSpacing20,
             Expanded(
-              child: viewModel.plans.isEmpty || viewModel.isLoading == true
+              child: viewModel.isBusy || viewModel.isLoading == true
                   ? const Center(child: CircularProgressIndicator())
                   : CommonPaginatedTable(
                       columns: const [

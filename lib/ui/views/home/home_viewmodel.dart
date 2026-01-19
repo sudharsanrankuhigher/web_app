@@ -47,8 +47,8 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
     'Users',
     'Influencers',
     'Services',
-    'City',
-    'State',
+    // 'City',
+    // 'State',
     'Plans',
     'Requests',
     'Promotion Projects',
@@ -65,8 +65,8 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
     'assets/images/user.svg',
     'assets/images/influencer_dashboard.svg',
     'assets/images/service_dashboard.svg',
-    'assets/images/city.svg',
-    'assets/images/city.svg',
+    // 'assets/images/city.svg',
+    // 'assets/images/city.svg',
     'assets/images/plans_dashboard.svg',
     'assets/images/requests_dashboard.svg',
     'assets/images/promotes_proj_dashboard.svg',
@@ -119,47 +119,47 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
         context.pushReplacementNamed('services');
         _selectedIndex = 3;
         break;
+      // case 4:
+      //   context.pushReplacementNamed('city');
+      //   _selectedIndex = 4;
+      //   break;
+      // case 5:
+      //   context.pushReplacementNamed('state');
+      //   _selectedIndex = 5;
+      //   break;
       case 4:
-        context.pushReplacementNamed('city');
-        _selectedIndex = 4;
-        break;
-      case 5:
-        context.pushReplacementNamed('state');
-        _selectedIndex = 5;
-        break;
-      case 6:
         context.pushReplacementNamed('plans');
         _selectedIndex = 6;
         break;
-      case 7:
+      case 5:
         context.pushReplacementNamed('requests');
         _selectedIndex = 7;
         break;
-      case 8:
+      case 6:
         context.pushReplacementNamed('promotion-projects');
         _selectedIndex = 8;
         break;
-      case 9:
+      case 7:
         context.pushReplacementNamed('contact-support');
         _selectedIndex = 9;
         break;
-      case 10:
+      case 8:
         context.pushReplacementNamed('company');
         _selectedIndex = 10;
         break;
-      case 11:
+      case 9:
         context.pushReplacementNamed('sub-admin');
         _selectedIndex = 11;
         break;
-      case 12:
+      case 10:
         context.pushReplacementNamed('report');
         _selectedIndex = 12;
         break;
-      case 13:
+      case 11:
         context.pushReplacementNamed('roles');
         _selectedIndex = 13;
         break;
-      case 14:
+      case 12:
         context.pushReplacementNamed('permissions');
         _selectedIndex = 14;
         break;
@@ -180,38 +180,38 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
       case '/home/services':
         _selectedIndex = 3;
         break;
-      case '/home/city':
+      // case '/home/city':
+      //   _selectedIndex = 4;
+      //   break;
+      // case '/home/state':
+      //   _selectedIndex = 5;
+      //   break;
+      case '/home/plans':
         _selectedIndex = 4;
         break;
-      case '/home/state':
+      case '/home/requests':
         _selectedIndex = 5;
         break;
-      case '/home/plans':
+      case '/home/promotion-projects':
         _selectedIndex = 6;
         break;
-      case '/home/requests':
+      case '/home/contact-support':
         _selectedIndex = 7;
         break;
-      case '/home/promotion-projects':
+      case '/home/company':
         _selectedIndex = 8;
         break;
-      case '/home/contact-support':
+      case '/home/sub-admin':
         _selectedIndex = 9;
         break;
-      case '/home/company':
+      case '/home/report':
         _selectedIndex = 10;
         break;
-      case '/home/sub-admin':
+      case '/home/roles':
         _selectedIndex = 11;
         break;
-      case '/home/report':
-        _selectedIndex = 12;
-        break;
-      case '/home/roles':
-        _selectedIndex = 13;
-        break;
       case '/home/permissions':
-        _selectedIndex = 14;
+        _selectedIndex = 12;
         break;
       default:
         _selectedIndex = 0;

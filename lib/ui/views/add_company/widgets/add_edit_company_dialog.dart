@@ -1,7 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
-import 'package:webapp/ui/views/add_company/model/company_model.dart';
+import 'package:webapp/ui/views/add_company/model/company_model.dart'
+    as company_model;
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/initial_textform.dart';
 import 'package:webapp/widgets/profile_image.dart';
@@ -10,7 +14,8 @@ import 'package:webapp/widgets/state_city_drop_down.dart';
 class AddEditCompanyPage {
   static Future<Map<String, dynamic>?> show(
     BuildContext context, {
-    CompanyModel? initial,
+    company_model.Datum? initial,
+    vm,
   }) async {
     String? stateValue = initial?.state;
     String? cityValue = initial?.city;
@@ -20,6 +25,17 @@ class AddEditCompanyPage {
 
     bool isView = initial != null; // 👈 view mode if data exists
     bool isEdit = false;
+
+    Uint8List? pickedBytes;
+    String? pickedPath;
+
+    String? companyName;
+    String? clientName;
+    String? phone;
+    String? altPhone;
+
+    String? gstNo;
+    String? projectCount;
 
     final formKey = GlobalKey<FormState>();
 
@@ -74,10 +90,19 @@ class AddEditCompanyPage {
                       children: [
                         IgnorePointer(
                           ignoring: isReadOnly,
-                          child: ProfileImageEdit(
-                            imageUrl: initial?.companyImage,
-                            radius: 60,
-                            onImageSelected: (_, __) {},
+                          child: Center(
+                            child: ProfileImageEdit(
+                              isView: isEdit == true ? true : false,
+                              imageUrl: initial?.companyImage,
+                              imageBytes: pickedBytes,
+                              imagePath: pickedPath,
+                              onImageSelected: (bytes, path) {
+                                setDialogState(() {
+                                  pickedBytes = bytes;
+                                  pickedPath = path;
+                                });
+                              },
+                            ),
                           ),
                         ),
 
@@ -94,6 +119,11 @@ class AddEditCompanyPage {
                             validator: (value) => value == null || value.isEmpty
                                 ? 'Please enter company name'
                                 : null,
+                            onSaved: (value) {
+                              setDialogState(() {
+                                companyName = value;
+                              });
+                            },
                           ),
                         ),
 
@@ -110,6 +140,11 @@ class AddEditCompanyPage {
                             validator: (value) => value == null || value.isEmpty
                                 ? 'Please enter client name'
                                 : null,
+                            onSaved: (value) {
+                              setDialogState(() {
+                                clientName = value;
+                              });
+                            },
                           ),
                         ),
 
@@ -123,10 +158,19 @@ class AddEditCompanyPage {
                             fillColor: white,
                             hintText: 'Phone',
                             keyboardType: TextInputType.phone,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(10),
+                            ],
                             initialValue: initial?.phone,
                             validator: (value) => value == null || value.isEmpty
                                 ? 'Please enter phone number'
                                 : null,
+                            onSaved: (value) {
+                              setDialogState(() {
+                                phone = value;
+                              });
+                            },
                           ),
                         ),
 
@@ -140,10 +184,19 @@ class AddEditCompanyPage {
                             fillColor: white,
                             hintText: 'Alternative Phone',
                             keyboardType: TextInputType.phone,
-                            initialValue: initial?.alterNativePhone,
+                            initialValue: initial?.altPhoneNo,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(10),
+                            ],
                             validator: (value) => value == null || value.isEmpty
                                 ? 'Please enter alternative phone number'
                                 : null,
+                            onSaved: (value) {
+                              setDialogState(() {
+                                altPhone = value;
+                              });
+                            },
                           ),
                         ),
 
@@ -152,21 +205,24 @@ class AddEditCompanyPage {
                         // -------- STATE & CITY --------
                         buildField(
                           label: 'State & City',
-                          child: StateCityDropdown(
-                            showCity: true,
-                            initialState: stateValue,
-                            initialCity: cityValue,
-                            isStateError: isStateError,
-                            isCityError: isCityError,
-                            onStateChanged: (state) {
-                              setDialogState(() {
-                                stateValue = state;
-                                cityValue = null;
-                              });
-                            },
-                            onCityChanged: (city) {
-                              cityValue = city;
-                            },
+                          child: IgnorePointer(
+                            ignoring: isReadOnly,
+                            child: StateCityDropdown(
+                              showCity: true,
+                              initialState: stateValue,
+                              initialCity: cityValue,
+                              isStateError: isStateError,
+                              isCityError: isCityError,
+                              onStateChanged: (state) {
+                                setDialogState(() {
+                                  stateValue = state;
+                                  cityValue = null;
+                                });
+                              },
+                              onCityChanged: (city) {
+                                cityValue = city;
+                              },
+                            ),
                           ),
                         ),
 
@@ -183,6 +239,11 @@ class AddEditCompanyPage {
                             validator: (value) => value == null || value.isEmpty
                                 ? 'Please enter GST number'
                                 : null,
+                            onSaved: (value) {
+                              setDialogState(() {
+                                gstNo = value;
+                              });
+                            },
                           ),
                         ),
 
@@ -196,10 +257,19 @@ class AddEditCompanyPage {
                             fillColor: white,
                             hintText: 'Project Count',
                             keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(10),
+                            ],
                             initialValue: initial?.projectCount?.toString(),
                             validator: (value) => value == null || value.isEmpty
                                 ? 'Please enter project count'
                                 : null,
+                            onSaved: (value) {
+                              setDialogState(() {
+                                projectCount = value;
+                              });
+                            },
                           ),
                         ),
                       ],
@@ -219,7 +289,7 @@ class AddEditCompanyPage {
                     width: 200,
                     buttonColor: continueButton,
                     margin: EdgeInsets.zero,
-                    padding: defaultPadding4 - leftPadding4,
+                    padding: defaultPadding8 - leftPadding4,
                     borderRadius: 10,
                     text: (initial == null ? "Save" : "Update"),
                     textStyle: fontFamilySemiBold.size13.white,
@@ -237,10 +307,19 @@ class AddEditCompanyPage {
                         setDialogState(() => isCityError = true);
                         return;
                       }
-
+                      formKey.currentState!.save();
                       Navigator.pop(context, {
                         "state": stateValue,
                         "city": cityValue,
+                        "companyName": companyName,
+                        "clientName": clientName,
+                        "phone": phone,
+                        "altPhone": altPhone,
+                        "gstNo": gstNo,
+                        "projectCount": projectCount,
+                        "imageBytes": pickedBytes,
+                        if (pickedBytes == null)
+                          "existing_image": initial?.companyImage,
                       });
                     },
                   ),

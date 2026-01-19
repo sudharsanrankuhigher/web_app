@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/views/services/model/service_model.dart'
     as service_model;
+import 'package:webapp/widgets/profile_image.dart';
 
 class ServiceTableSource extends DataTableSource {
   final List<service_model.Datum> services;
@@ -35,17 +37,35 @@ class ServiceTableSource extends DataTableSource {
         DataCell(Text("${index + 1}")), // S.No
         DataCell(Text(service.name!)), // Name
         DataCell(
+
+            // Text(row.imageUrl)
+            IgnorePointer(
+          ignoring: true,
+          child: Padding(
+            padding: defaultPadding4,
+            child: ProfileImageEdit(
+              imageUrl: service.image,
+              radius: 30,
+              onImageSelected: (_, a) {},
+            ),
+          ),
+        )), // Name
+        DataCell(
           Row(
             // mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
-                icon: const Icon(Icons.edit, color: Colors.blue),
+                icon: const Icon(
+                  Icons.edit,
+                  size: 16,
+                  color: grey,
+                ),
                 onPressed: () => onEdit(service),
               ),
               IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
+                icon: const Icon(Icons.delete, size: 16, color: red),
                 onPressed: () => onDelete(service),
               ),
             ],

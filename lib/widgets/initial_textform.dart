@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 
@@ -22,6 +23,7 @@ class InitialTextForm extends StatelessWidget {
   final void Function()? onTapped;
   final TextInputType keyboardType;
   final TextStyle? textStyle;
+  final List<TextInputFormatter>? inputFormatters;
   final Key? keys;
 
   const InitialTextForm({
@@ -44,6 +46,7 @@ class InitialTextForm extends StatelessWidget {
     this.validator,
     this.readOnly = false,
     this.obscureText = false,
+    this.inputFormatters,
     this.keyboardType = TextInputType.text,
     this.textStyle,
   });
@@ -64,6 +67,7 @@ class InitialTextForm extends StatelessWidget {
         readOnly: readOnly,
         onChanged: onChanged,
         style: textStyle ?? fontFamilyRegular.size12,
+        inputFormatters: inputFormatters,
         decoration: InputDecoration(
           hintText: hintText ?? "Enter name",
           hintStyle: const TextStyle(color: Colors.grey),
