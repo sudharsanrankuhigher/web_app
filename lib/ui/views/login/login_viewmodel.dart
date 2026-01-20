@@ -33,21 +33,25 @@ class LoginViewModel extends BaseViewModel with NavigationMixin {
     _password = val ?? '';
   }
 
-  void validateAndSubmit() {
+  Future<void> validateAndSubmit() async {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
       final loginRequest = LoginRequest(
         emailId: _email,
         password: _password,
       );
-      login(loginRequest);
-      formKey.currentState!.reset();
+      final isSuccess = await login(loginRequest);
+
+      if (isSuccess) {
+        formKey.currentState!.reset(); // ✅ reset only on 200
+      }
     }
   }
 
-  Future<void> login(LoginRequest loginRequest) async {
+  Future<bool> login(LoginRequest loginRequest) async {
     setBusy(true);
-    await userAuthentication.loginApi(loginRequest);
+    final success = await userAuthentication.loginApi(loginRequest);
     setBusy(false);
+    return success;
   }
 }

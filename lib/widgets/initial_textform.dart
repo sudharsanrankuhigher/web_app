@@ -19,6 +19,7 @@ class InitialTextForm extends StatelessWidget {
   final Color? borderColor;
   final void Function(String?)? onSaved;
   final void Function(String?)? onChanged;
+  final void Function(String)? onFieldSubmitted;
   final Function(TapDownDetails)? onTap;
   final void Function()? onTapped;
   final TextInputType keyboardType;
@@ -49,6 +50,7 @@ class InitialTextForm extends StatelessWidget {
     this.inputFormatters,
     this.keyboardType = TextInputType.text,
     this.textStyle,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -60,6 +62,7 @@ class InitialTextForm extends StatelessWidget {
         maxLines: maxLines,
         initialValue: initialValue,
         onSaved: onSaved,
+        onFieldSubmitted: onFieldSubmitted,
         controller: controller,
         obscureText: obscureText,
         keyboardType: keyboardType,

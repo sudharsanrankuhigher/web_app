@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/city/widget/state_city_dropdown.dart';
@@ -150,7 +151,8 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _isView == true
+                _isView == true &&
+                        PermissionHelper.instance.canEdit('influencers')
                     ? Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [

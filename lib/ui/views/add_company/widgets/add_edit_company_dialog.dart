@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/add_company/model/company_model.dart'
@@ -60,7 +61,9 @@ class AddEditCompanyPage {
                   ),
                   Row(
                     children: [
-                      if (isView && !isEdit)
+                      if (isView &&
+                          !isEdit &&
+                          PermissionHelper.instance.canEdit('company'))
                         IconButton(
                           icon: const Icon(Icons.edit),
                           onPressed: () {
@@ -92,7 +95,12 @@ class AddEditCompanyPage {
                           ignoring: isReadOnly,
                           child: Center(
                             child: ProfileImageEdit(
-                              isView: isEdit == true ? true : false,
+                              isView: isEdit &&
+                                      PermissionHelper.instance
+                                              .canEdit('company') ==
+                                          true
+                                  ? true
+                                  : false,
                               imageUrl: initial?.companyImage,
                               imageBytes: pickedBytes,
                               imagePath: pickedPath,

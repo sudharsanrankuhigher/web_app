@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
+import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
     as influencer_model;
 import 'package:webapp/ui/views/services/model/service_model.dart'
@@ -122,11 +124,17 @@ class InfluencerTableSource extends DataTableSource {
 
         /// TOGGLE SWITCH
         DataCell(
-          Transform.scale(
-            scale: 0.7,
-            child: Switch(
-              value: item.status == 1 ? true : false,
-              onChanged: (_) => onToggle(item),
+          IgnorePointer(
+            ignoring: PermissionHelper.instance.canEdit('influencers') == true
+                ? false
+                : true,
+            child: Transform.scale(
+              scale: 0.7,
+              child: Switch(
+                activeColor: continueButton,
+                value: item.status == 1 ? true : false,
+                onChanged: (_) => onToggle(item),
+              ),
             ),
           ),
         ),

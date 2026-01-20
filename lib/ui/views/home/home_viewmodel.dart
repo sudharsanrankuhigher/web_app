@@ -10,6 +10,8 @@ import 'package:webapp/services/api_service.dart';
 import 'package:webapp/ui/common/app_strings.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 
 class HomeViewModel extends BaseViewModel with NavigationMixin {
   HomeViewModel() {
@@ -82,7 +84,7 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
   final List<String> bottomLabel = ['Profile', 'Logout'];
   final List<String> bottomIcons = ['assets/profile.png', 'assets/logout.png'];
 
-  void showDialog() {
+  void showDialogs() {
     _dialogService.showCustomDialog(
       variant: DialogType.infoAlert,
       title: 'Stacked Rocks!',
@@ -219,7 +221,112 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
   }
 
   void logOut(BuildContext context) {
-    context.pushReplacementNamed('login');
+    // context.pushReplacementNamed('login');
+    showLogoutConfirmation();
+  }
+
+  void showLogoutConfirmation() {
+    showDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.5,
+              minWidth: MediaQuery.of(context).size.width * 0.3,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 🔒 Icon
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.logout_rounded,
+                      color: Colors.red,
+                      size: 32,
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Title
+                  const Text(
+                    'Confirm Logout',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // Description
+                  const Text(
+                    'Are you sure you want to log out?\nYou will need to login again.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  Row(
+                    children: [
+                      // Cancel
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text('Cancel'),
+                        ),
+                      ),
+
+                      const SizedBox(width: 12),
+
+                      // Logout
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            context.pushReplacementNamed('login');
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: Text('Logout',style: fontFamilySemiBold.size14.white,),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   String? _name;

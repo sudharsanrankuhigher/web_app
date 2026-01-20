@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/app/router.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/core/model/login_model.dart';
 import 'package:webapp/core/navigation/navigation_mixin.dart';
 import 'package:webapp/services/api_service.dart';
@@ -22,29 +23,37 @@ class UserAuthenticationService with NavigationMixin {
       _loginResponse?.response!.token ??
       _sharedPreference.getString('accessToken').toString();
 
-  Future<void> loginApi(LoginRequest logInRequest) async {
+  Future<bool> loginApi(LoginRequest logInRequest) async {
     try {
       final res = await locator<ApiService>().loginAdmin(logInRequest);
 
       if (res.status == 200) {
         _loginResponse = res;
-        _sharedPreference.setString(
+
+        await _sharedPreference.setString(
           'accessToken',
           res.response?.token ?? '',
         );
+
         List<String>? accessList = res.response?.access;
 
         if (accessList != null) {
           await _sharedPreference.setStringList('access', accessList);
+          PermissionHelper.init(accessList.toSet());
         } else {
           await _sharedPreference.remove('access');
+          PermissionHelper.init({});
         }
+
         goRouterKey.currentContext!.pushReplacementNamed('dashboard');
+
+        return true; // ✅ SUCCESS
       } else {
         _dialogService.showDialog(
           title: 'Login Failed',
           description: res.message,
         );
+        return false;
       }
     } on DioException catch (e) {
       if (e.response != null && e.response?.data != null) {
@@ -60,6 +69,7 @@ class UserAuthenticationService with NavigationMixin {
           description: 'Please check your internet connection',
         );
       }
+      return false;
     }
   }
 

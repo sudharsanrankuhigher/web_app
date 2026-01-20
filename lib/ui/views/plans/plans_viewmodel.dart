@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/app.locator.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/services/api_service.dart';
 import 'package:webapp/ui/views/plans/model/plans_model.dart' as plan_model;
 import 'package:webapp/ui/views/plans/widgets/common_plans_dialog.dart';
@@ -122,9 +123,21 @@ class PlansViewModel extends BaseViewModel {
     final context = StackedService.navigatorKey!.currentContext!;
     tableSource = PlanTableSource(
       plans: filtered ?? plans,
-      onEdit: (plan) => editPlan(context, plan),
+      onEdit: (plan) => PermissionHelper.instance.canEdit('plans')
+          ? editPlan(context, plan)
+          : _dialogService.showDialog(
+              title: "Warning",
+              description:
+                  "Locked 🔒 – You need special permission to access this.",
+              buttonTitle: 'ok'),
       onView: (plan) => viewPlan(context, plan),
-      onDelete: (plan) => confirmDelete(context, plan),
+      onDelete: (plan) => PermissionHelper.instance.canDelete('plans')
+          ? confirmDelete(context, plan)
+          : _dialogService.showDialog(
+              title: "Warning",
+              description:
+                  "Locked 🔒 – You need special permission to access this.",
+              buttonTitle: 'ok'),
     );
     notifyListeners();
   }

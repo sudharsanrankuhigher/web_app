@@ -52,7 +52,9 @@ class CommonButton extends StatelessWidget {
           children: [
             if (icon != null) ...[
               icon!,
-              horizontalSpacing10,
+              text.isNotEmpty || textStyle != null
+                  ? horizontalSpacing10
+                  : Container(),
             ],
             if (text.isNotEmpty || textStyle != null)
               Text(

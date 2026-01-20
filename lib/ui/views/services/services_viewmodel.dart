@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/app.locator.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/core/navigation/navigation_mixin.dart';
 import 'package:webapp/services/api_service.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
@@ -61,8 +62,20 @@ class ServicesViewModel extends BaseViewModel with NavigationMixin {
     final context = StackedService.navigatorKey!.currentContext!;
     tableSource = ServiceTableSource(
       services: filtered ?? services,
-      onEdit: (service) => editService(service),
-      onDelete: (service) => confirmDelete(service),
+      onEdit: (service) => PermissionHelper.instance.canEdit('services')
+          ? editService(service)
+          : _dialogService.showDialog(
+              title: "Warning",
+              description:
+                  "Locked 🔒 – You need special permission to access this.",
+              buttonTitle: 'ok'),
+      onDelete: (service) => PermissionHelper.instance.canDelete('services')
+          ? confirmDelete(service)
+          : _dialogService.showDialog(
+              title: "Warning",
+              description:
+                  "Locked 🔒 – You need special permission to access this.",
+              buttonTitle: 'ok'),
     );
     notifyListeners();
   }

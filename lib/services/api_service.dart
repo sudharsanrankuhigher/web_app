@@ -376,9 +376,14 @@ class ApiService {
   /////////////////// Permissions ////////////////////
   /// GET: /api/admin/add-permission
 
-  Future<void> addPermissions() async {
-    final response = await _dio.get(
+  Future<void> addPermissions(id, request) async {
+    final req = {
+      "role_id": id,
+      "permissions": request,
+    };
+    final response = await _dio.post(
       'api/admin/permissions',
+      data: req,
       options: Options(
         validateStatus: (status) => status != null && status < 500,
       ),
@@ -388,11 +393,11 @@ class ApiService {
 
   Future<GetPermissionModel> getPermissions(id) async {
     final request = {
-      "id": id,
+      "role_id": id,
     };
     final response = await _dio.get(
-      'api/admin/permissions',
-      data: request,
+      'api/admin/get-permissions',
+      queryParameters: request,
       options: Options(
         validateStatus: (status) => status != null && status < 500,
       ),

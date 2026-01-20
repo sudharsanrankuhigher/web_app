@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:stacked_services/stacked_services.dart';
+import 'package:webapp/app/app.locator.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/views/sub_admin/model/sub_admin_model.dart'
     as sub_admin_model;
@@ -20,6 +23,8 @@ class SubAdminTableSource extends DataTableSource {
     filteredList = List.from(data);
     print('object$onToggle');
   }
+
+  final _dialogService = locator<DialogService>();
 
   // ---------------------- SEARCH ----------------------
   void applySearch(String query) {
@@ -157,11 +162,25 @@ class SubAdminTableSource extends DataTableSource {
             children: [
               IconButton(
                 icon: const Icon(Icons.edit, color: Colors.blue),
-                onPressed: () => onEdit(row),
+                onPressed: () => (PermissionHelper.instance
+                        .canEdit('sub_admin'))
+                    ? onEdit(row)
+                    : _dialogService.showDialog(
+                        title: "Warning",
+                        description:
+                            "Locked 🔒 – You need special permission to access this.",
+                        buttonTitle: 'ok'),
               ),
               IconButton(
                 icon: const Icon(Icons.delete, color: red),
-                onPressed: () => onDelete(row),
+                onPressed: () => (PermissionHelper.instance
+                        .canDelete('sub_admin'))
+                    ? onDelete(row)
+                    : _dialogService.showDialog(
+                        title: "Warning",
+                        description:
+                            "Locked 🔒 – You need special permission to access this.",
+                        buttonTitle: 'ok'),
               ),
             ],
           ),
@@ -173,7 +192,13 @@ class SubAdminTableSource extends DataTableSource {
             scale: 0.7,
             child: Switch(
               value: row.status == 1,
-              onChanged: (_) => onToggle(row),
+              onChanged: (_) => (PermissionHelper.instance.canEdit('sub_admin'))
+                  ? onToggle(row)
+                  : _dialogService.showDialog(
+                      title: "Warning",
+                      description:
+                          "Locked 🔒 – You need special permission to access this.",
+                      buttonTitle: 'ok'),
             ),
           ),
         ),

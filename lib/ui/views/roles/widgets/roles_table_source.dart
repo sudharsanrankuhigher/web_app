@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:stacked_services/stacked_services.dart';
+import 'package:webapp/app/app.locator.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/views/roles/model/roles_model.dart' as role_model;
 
 class RolesTableSource extends DataTableSource {
@@ -11,6 +14,8 @@ class RolesTableSource extends DataTableSource {
     required this.onEdit,
     required this.onDelete,
   });
+
+  final _dialogService = locator<DialogService>();
 
   @override
   DataRow? getRow(int index) {
@@ -43,11 +48,23 @@ class RolesTableSource extends DataTableSource {
             children: [
               IconButton(
                 icon: const Icon(Icons.edit, color: Colors.blue),
-                onPressed: () => onEdit(role),
+                onPressed: () => (PermissionHelper.instance.canEdit('role'))
+                    ? onEdit(role)
+                    : _dialogService.showDialog(
+                        title: "Warning",
+                        description:
+                            "Locked 🔒 – You need special permission to access this.",
+                        buttonTitle: 'ok'),
               ),
               IconButton(
                 icon: const Icon(Icons.delete, color: Colors.red),
-                onPressed: () => onDelete(role),
+                onPressed: () => PermissionHelper.instance.canDelete('role')
+                    ? onDelete(role)
+                    : _dialogService.showDialog(
+                        title: "Warning",
+                        description:
+                            "Locked 🔒 – You need special permission to access this.",
+                        buttonTitle: 'ok'),
               ),
             ],
           ),
