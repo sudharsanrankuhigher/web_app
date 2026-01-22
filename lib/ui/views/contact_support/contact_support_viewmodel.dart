@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 
 import 'package:stacked/stacked.dart';
-import 'package:webapp/ui/views/contact_support/model/client_model.dart';
+import 'package:stacked_services/stacked_services.dart';
+import 'package:webapp/app/app.locator.dart';
+import 'package:webapp/services/api_service.dart';
+import 'package:webapp/ui/views/contact_support/model/client_model.dart'
+    as client_model;
 import 'package:webapp/ui/views/contact_support/widget/contact_client_table_source.dart';
+import 'package:webapp/ui/views/contact_support/widget/show_note_dialog.dart';
 
 class ContactSupportViewModel extends BaseViewModel {
-  List<ClientModel> clients = [];
+  List<client_model.Datum> clients = [];
   late ClientTableSource tableSource;
 
   bool hasSelection = false;
@@ -19,41 +24,65 @@ class ContactSupportViewModel extends BaseViewModel {
     loadClients();
   }
 
-  /// Load client data
-  void loadClients() {
-    clients.clear();
-    clients.addAll([
-      ClientModel(
-        id: 1,
-        name: 'Arun',
-        city: 'Coimbatore',
-        state: 'Tamil Nadu',
-        phone: '9876543210',
-        contactNo: '0422-123456',
-        note: 'Regular client',
-      ),
-      ClientModel(
-        id: 2,
-        name: 'Bala',
-        city: 'Salem',
-        state: 'Tamil Nadu',
-        phone: '9876501234',
-        contactNo: '0427-987654',
-        note: 'New enquiry',
-      ),
-      ClientModel(
-        id: 3,
-        name: 'Karthik',
-        city: 'Chennai',
-        state: 'Tamil Nadu',
-        phone: '9123456789',
-        contactNo: '044-456789',
-        note: 'VIP client',
-      ),
-    ]);
+  final _dialogService = locator<DialogService>();
+  final _apiService = locator<ApiService>();
 
-    clearSelection();
-    _refreshTable();
+  bool? _isRequestLoading = false;
+  bool? get isRequestLoading => _isRequestLoading;
+
+  setLoading(value) {
+    _isRequestLoading = value;
+    notifyListeners();
+  }
+
+  /// Load client data
+  Future<void> loadClients() async {
+    setBusy(true);
+    setLoading(true);
+    try {
+      final response = await _apiService.getAllContactSupport();
+      clients = response.data ?? [];
+      tableSource = ClientTableSource(data: clients, vm: this);
+
+      // allCities = List.from(response); // 🔥 MASTER LIST
+      // filteredCities = List.from(response); // 🔥 INITIAL TABLE DATA
+    } catch (e) {
+      clients = [];
+    } finally {
+      setBusy(false);
+      _refreshTable();
+      setLoading(false);
+    }
+  }
+
+  Future<void> updateContactSupport({note, id, status}) async {
+    setLoading(true);
+    try {
+      final res = await _apiService.updateContactSupport({
+        "note": note,
+        "ticket_id": id,
+        "status": status,
+      });
+
+      if (res.status == 200) {
+        final data = await _dialogService.showDialog(
+          title: 'Success',
+          description: res.message ?? 'Contact support updated successfully',
+        );
+        if (data!.confirmed == true) {
+          loadClients();
+        }
+      } else {
+        _dialogService.showDialog(
+          title: 'Error',
+          description: res.message ?? 'Failed to update contact support',
+        );
+      }
+    } catch (e) {
+      _dialogService.showDialog(
+          title: 'Error', description: 'Something went wrong ');
+    }
+    setLoading(false);
   }
 
   /// Refresh table
@@ -70,7 +99,7 @@ class ContactSupportViewModel extends BaseViewModel {
 
     selectedIds
       ..clear()
-      ..addAll(value ? clients.map((e) => e.id) : []);
+      ..addAll(value ? clients.map((e) => e.id!) : []);
 
     hasSelection = value;
 
@@ -111,5 +140,40 @@ class ContactSupportViewModel extends BaseViewModel {
 
     hasSelection = selectedIds.isNotEmpty;
     notifyListeners();
+  }
+
+  Future<void> deleteSelected() async {
+    setLoading(true);
+    try {
+      final res = await _apiService.deleteContactSupport(selectedIds.toList());
+      if (res.status == 200) {
+        final data = await _dialogService.showDialog(
+          title: 'Success',
+          description: res.message ?? 'Client deleted successfully',
+        );
+        if (data!.confirmed == true) {
+          loadClients();
+        }
+      } else {
+        _dialogService.showDialog(
+          title: 'Error',
+          description: res.message ?? 'Failed to delete client',
+        );
+      }
+    } catch (e) {
+      _dialogService.showDialog(
+          title: 'Error', description: 'Something went wrong ');
+    } finally {
+      // loadClients();
+      setLoading(false);
+    }
+  }
+
+  void delete(BuildContext context) {
+    showBulkDeleteDialog(
+      context: context,
+      itemName: "clients",
+      onConfirm: () => deleteSelected(),
+    );
   }
 }

@@ -21,6 +21,8 @@ import 'package:webapp/ui/views/sub_admin/model/sub_admin_model.dart'
 
 import 'package:webapp/ui/views/add_company/model/company_model.dart'
     as company_model;
+import 'package:webapp/ui/views/contact_support/model/client_model.dart'
+    as client_model;
 
 class ApiService {
   final Dio _dio;
@@ -403,5 +405,45 @@ class ApiService {
       ),
     );
     return GetPermissionModel.fromJson(response.data);
+  }
+
+  ////////////////// contact support ////////////////////
+  ///
+  /// POST: /api/admin/add-contact-support
+  Future<client_model.ClientModel> getAllContactSupport() async {
+    final response = await _dio.get(
+      'api/admin/tickets',
+      options: Options(
+        validateStatus: (status) => status != null && status < 500,
+      ),
+    );
+    return client_model.ClientModel.fromJson(response.data);
+  }
+
+  /// POST: /api/admin/tickets/update
+  Future<client_model.ClientModel> updateContactSupport(request) async {
+    final response = await _dio.post(
+      'api/admin/tickets/update',
+      data: request,
+      options: Options(
+        validateStatus: (status) => status != null && status < 500,
+      ),
+    );
+    return client_model.ClientModel.fromJson(response.data);
+  }
+
+  /// Delete: /api/admin/tickets/delete
+  Future<client_model.ClientModel> deleteContactSupport(request) async {
+    final req = {
+      "ticket_id": request,
+    };
+    final response = await _dio.delete(
+      'api/admin/tickets/delete',
+      data: req,
+      options: Options(
+        validateStatus: (status) => status != null && status < 500,
+      ),
+    );
+    return client_model.ClientModel.fromJson(response.data);
   }
 }

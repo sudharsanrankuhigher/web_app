@@ -1,20 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:webapp/app/app.bottomsheets.dart';
-import 'package:webapp/app/app.dialogs.dart';
-import 'package:webapp/app/app.locator.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/router.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:webapp/init.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await setupLocator();
-  setupDialogUi();
-
-  setupBottomSheetUi();
-  setUrlStrategy(PathUrlStrategy()); // <-- removes the #
+  init();
   runApp(const MainApp());
 }
 

@@ -222,12 +222,14 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
 
   void logOut(BuildContext context) {
     // context.pushReplacementNamed('login');
-    showLogoutConfirmation();
+    showLogoutConfirmation(context);
   }
 
-  void showLogoutConfirmation() {
+  void showLogoutConfirmation(BuildContext context) {
+    final rootContext = context;
+
     showDialog(
-      context: StackedService.navigatorKey!.currentContext!,
+      context: rootContext,
       barrierDismissible: false,
       builder: (context) {
         return Dialog(
@@ -306,8 +308,10 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
+                            // context.pushReplacementNamed('login');
                             Navigator.pop(context);
-                            context.pushReplacementNamed('login');
+                            rootContext.pushReplacementNamed('login');
+                            // context.pushReplacementNamed('login');
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
@@ -315,7 +319,10 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: Text('Logout',style: fontFamilySemiBold.size14.white,),
+                          child: Text(
+                            'Logout',
+                            style: fontFamilySemiBold.size14.white,
+                          ),
                         ),
                       ),
                     ],

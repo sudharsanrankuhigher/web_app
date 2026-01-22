@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:stacked/stacked.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
@@ -46,159 +45,161 @@ class RequestsView extends StackedView<RequestsViewModel> {
                         style: fontFamilyBold.size26.black,
                       ),
                     ),
-                    Wrap(spacing: 12, runSpacing: 12, children: [
-                      CommonStatusChip(
-                        text: "Requested",
-                        imagePath: "assets/images/requested.svg",
-                        textStyle: viewModel.isSelected == 0
-                            ? fontFamilySemiBold.size14.white
-                            : fontFamilySemiBold.size14.black,
-                        bgColor:
-                            viewModel.isSelected == 0 ? appGreen400 : white,
-                        imageColor:
-                            viewModel.isSelected == 0 ? white : appSecond950,
-                        onTap: () {
-                          print("Requested chip tapped!");
-                          viewModel.setSelected(0);
-                        },
-                        margin: defaultPadding10,
-                      ),
-                      CommonStatusChip(
-                        text: "Pending",
-                        imagePath: "assets/images/pending.svg",
-                        textStyle: viewModel.isSelected == 1
-                            ? fontFamilySemiBold.size14.white
-                            : fontFamilySemiBold.size14.black,
-                        bgColor:
-                            viewModel.isSelected == 1 ? appGreen400 : white,
-                        imageColor: viewModel.isSelected == 1 ? white : null,
-                        onTap: () {
-                          print("Requested chip tapped!");
-                          viewModel.setSelected(1);
-                        },
-                        margin: defaultPadding10,
-                      ),
-                      CommonStatusChip(
-                        text: "Accepted",
-                        imagePath: "assets/images/accepted.svg",
-                        textStyle: viewModel.isSelected == 2
-                            ? fontFamilySemiBold.size14.white
-                            : fontFamilySemiBold.size14.black,
-                        bgColor:
-                            viewModel.isSelected == 2 ? appGreen400 : white,
-                        imageColor: viewModel.isSelected == 2 ? white : null,
-                        onTap: () {
-                          print("Requested chip tapped!");
-                          viewModel.setSelected(2);
-                        },
-                        margin: defaultPadding10,
-                      ),
-                      CommonStatusChip(
-                        text: "Completed Pending List",
-                        imagePath: "assets/images/complete-pending-list.svg",
-                        textStyle: viewModel.isSelected == 3
-                            ? fontFamilySemiBold.size14.white
-                            : fontFamilySemiBold.size14.black,
-                        bgColor:
-                            viewModel.isSelected == 3 ? appGreen400 : white,
-                        imageColor: viewModel.isSelected == 3 ? white : null,
-                        onTap: () {
-                          print("Requested chip tapped!");
-                          viewModel.setSelected(3);
-                        },
-                        margin: defaultPadding10,
-                      ),
-                      CommonStatusChip(
-                        text: "Completed",
-                        imagePath: "assets/images/complete-pending-list.svg",
-                        textStyle: viewModel.isSelected == 4
-                            ? fontFamilySemiBold.size14.white
-                            : fontFamilySemiBold.size14.black,
-                        bgColor:
-                            viewModel.isSelected == 4 ? appGreen400 : white,
-                        imageColor: viewModel.isSelected == 4 ? white : null,
-                        onTap: () {
-                          print("Requested chip tapped!");
-                          viewModel.setSelected(4);
-                        },
-                        margin: defaultPadding10,
-                      ),
-                      CommonStatusChip(
-                        text: "Cancelled",
-                        imagePath: "assets/images/cancelled.svg",
-                        textStyle: viewModel.isSelected == 5
-                            ? fontFamilySemiBold.size14.white
-                            : fontFamilySemiBold.size14.black,
-                        bgColor:
-                            viewModel.isSelected == 5 ? appGreen400 : white,
-                        imageColor: viewModel.isSelected == 5 ? white : null,
-                        onTap: () {
-                          print("Requested chip tapped!");
-                          viewModel.setSelected(5);
-                        },
-                        margin: defaultPadding10,
-                      ),
-                      CommonStatusChip(
-                        text: "Promote Verified",
-                        imagePath: "assets/images/verified.svg",
-                        textStyle: viewModel.isSelected == 6
-                            ? fontFamilySemiBold.size14.white
-                            : fontFamilySemiBold.size14.black,
-                        bgColor:
-                            viewModel.isSelected == 6 ? appGreen400 : white,
-                        imageColor: viewModel.isSelected == 6 ? white : null,
-                        onTap: () {
-                          print("Requested chip tapped!");
-                          viewModel.setSelected(6);
-                        },
-                        margin: defaultPadding10,
-                      ),
-                      CommonStatusChip(
-                        text: "Promote Pay",
-                        imagePath: "assets/images/pay.svg",
-                        textStyle: viewModel.isSelected == 7
-                            ? fontFamilySemiBold.size14.white
-                            : fontFamilySemiBold.size14.black,
-                        bgColor:
-                            viewModel.isSelected == 7 ? appGreen400 : white,
-                        imageColor: viewModel.isSelected == 7 ? white : null,
-                        onTap: () {
-                          print("Requested chip tapped!");
-                          viewModel.setSelected(7);
-                        },
-                        margin: defaultPadding10,
-                      ),
-                      CommonStatusChip(
-                        text: "Promote Commission",
-                        imagePath: "assets/images/comission.svg",
-                        textStyle: viewModel.isSelected == 8
-                            ? fontFamilySemiBold.size14.white
-                            : fontFamilySemiBold.size14.black,
-                        bgColor:
-                            viewModel.isSelected == 8 ? appGreen400 : white,
-                        imageColor: viewModel.isSelected == 8 ? white : null,
-                        onTap: () {
-                          print("Requested chip tapped!");
-                          viewModel.setSelected(8);
-                        },
-                        margin: defaultPadding10,
-                      ),
-                      CommonStatusChip(
-                        text: "Rejected",
-                        imagePath: "assets/images/rejected.svg",
-                        textStyle: viewModel.isSelected == 9
-                            ? fontFamilySemiBold.size14.white
-                            : fontFamilySemiBold.size14.black,
-                        bgColor:
-                            viewModel.isSelected == 9 ? appGreen400 : white,
-                        imageColor: viewModel.isSelected == 9 ? white : null,
-                        onTap: () {
-                          print("Requested chip tapped!");
-                          viewModel.setSelected(9);
-                        },
-                        margin: defaultPadding10,
-                      ),
-                    ]),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        /// 0 - Requested
+                        CommonStatusChip(
+                          text: "Requested",
+                          imagePath: "assets/images/requested.svg",
+                          textStyle: viewModel.isSelected == 0
+                              ? fontFamilySemiBold.size14.white
+                              : fontFamilySemiBold.size14.black,
+                          bgColor:
+                              viewModel.isSelected == 0 ? appGreen400 : white,
+                          imageColor:
+                              viewModel.isSelected == 0 ? white : appSecond950,
+                          onTap: () => viewModel.setSelected(0),
+                          margin: defaultPadding10,
+                        ),
+
+                        /// 1 - Waiting
+                        CommonStatusChip(
+                          text: "Waiting",
+                          imagePath: "assets/images/pending.svg",
+                          textStyle: viewModel.isSelected == 1
+                              ? fontFamilySemiBold.size14.white
+                              : fontFamilySemiBold.size14.black,
+                          bgColor:
+                              viewModel.isSelected == 1 ? appGreen400 : white,
+                          imageColor:
+                              viewModel.isSelected == 1 ? white : appSecond950,
+                          onTap: () => viewModel.setSelected(1),
+                          margin: defaultPadding10,
+                        ),
+
+                        /// 2 - Waiting Accept
+                        CommonStatusChip(
+                          text: "Waiting Accept",
+                          imagePath: "assets/images/accepted.svg",
+                          textStyle: viewModel.isSelected == 2
+                              ? fontFamilySemiBold.size14.white
+                              : fontFamilySemiBold.size14.black,
+                          bgColor:
+                              viewModel.isSelected == 2 ? appGreen400 : white,
+                          imageColor:
+                              viewModel.isSelected == 2 ? white : appSecond950,
+                          onTap: () => viewModel.setSelected(2),
+                          margin: defaultPadding10,
+                        ),
+
+                        /// 3 - Completed Pending
+                        CommonStatusChip(
+                          text: "Completed Pending",
+                          imagePath: "assets/images/complete-pending-list.svg",
+                          textStyle: viewModel.isSelected == 3
+                              ? fontFamilySemiBold.size14.white
+                              : fontFamilySemiBold.size14.black,
+                          bgColor:
+                              viewModel.isSelected == 3 ? appGreen400 : white,
+                          imageColor:
+                              viewModel.isSelected == 3 ? white : appSecond950,
+                          onTap: () => viewModel.setSelected(3),
+                          margin: defaultPadding10,
+                        ),
+
+                        /// 4 - Completed
+                        CommonStatusChip(
+                          text: "Completed",
+                          imagePath: "assets/images/complete-pending-list.svg",
+                          textStyle: viewModel.isSelected == 4
+                              ? fontFamilySemiBold.size14.white
+                              : fontFamilySemiBold.size14.black,
+                          bgColor:
+                              viewModel.isSelected == 4 ? appGreen400 : white,
+                          imageColor:
+                              viewModel.isSelected == 4 ? white : appSecond950,
+                          onTap: () => viewModel.setSelected(4),
+                          margin: defaultPadding10,
+                        ),
+
+                        /// 5 - Influencer Cancelled
+                        CommonStatusChip(
+                          text: "Influencer Cancelled",
+                          imagePath: "assets/images/cancelled.svg",
+                          textStyle: viewModel.isSelected == 5
+                              ? fontFamilySemiBold.size14.white
+                              : fontFamilySemiBold.size14.black,
+                          bgColor:
+                              viewModel.isSelected == 5 ? appGreen400 : white,
+                          imageColor:
+                              viewModel.isSelected == 5 ? white : appSecond950,
+                          onTap: () => viewModel.setSelected(5),
+                          margin: defaultPadding10,
+                        ),
+
+                        /// 6 - Rejected
+                        CommonStatusChip(
+                          text: "Rejected",
+                          imagePath: "assets/images/rejected.svg",
+                          textStyle: viewModel.isSelected == 6
+                              ? fontFamilySemiBold.size14.white
+                              : fontFamilySemiBold.size14.black,
+                          bgColor:
+                              viewModel.isSelected == 6 ? appGreen400 : white,
+                          imageColor:
+                              viewModel.isSelected == 6 ? white : appSecond950,
+                          onTap: () => viewModel.setSelected(6),
+                          margin: defaultPadding10,
+                        ),
+
+                        /// 7 - Promote Verified
+                        CommonStatusChip(
+                          text: "Promote Verified",
+                          imagePath: "assets/images/verified.svg",
+                          textStyle: viewModel.isSelected == 7
+                              ? fontFamilySemiBold.size14.white
+                              : fontFamilySemiBold.size14.black,
+                          bgColor:
+                              viewModel.isSelected == 7 ? appGreen400 : white,
+                          imageColor:
+                              viewModel.isSelected == 7 ? white : appSecond950,
+                          onTap: () => viewModel.setSelected(7),
+                          margin: defaultPadding10,
+                        ),
+
+                        /// 8 - Promote Pay
+                        CommonStatusChip(
+                          text: "Promote Pay",
+                          imagePath: "assets/images/pay.svg",
+                          textStyle: viewModel.isSelected == 8
+                              ? fontFamilySemiBold.size14.white
+                              : fontFamilySemiBold.size14.black,
+                          bgColor:
+                              viewModel.isSelected == 8 ? appGreen400 : white,
+                          imageColor:
+                              viewModel.isSelected == 8 ? white : appSecond950,
+                          onTap: () => viewModel.setSelected(8),
+                          margin: defaultPadding10,
+                        ),
+
+                        /// 9 - Promote Commission
+                        CommonStatusChip(
+                          text: "Promote Commission",
+                          imagePath: "assets/images/comission.svg",
+                          textStyle: viewModel.isSelected == 9
+                              ? fontFamilySemiBold.size14.white
+                              : fontFamilySemiBold.size14.black,
+                          bgColor:
+                              viewModel.isSelected == 9 ? appGreen400 : white,
+                          imageColor:
+                              viewModel.isSelected == 9 ? white : appSecond950,
+                          onTap: () => viewModel.setSelected(9),
+                          margin: defaultPadding10,
+                        ),
+                      ],
+                    ),
                     verticalSpacing20,
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

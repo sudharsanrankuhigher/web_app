@@ -58,6 +58,18 @@ class ContactSupportView extends StackedView<ContactSupportViewModel> {
                 horizontalSpacing10,
                 Row(
                   children: [
+                    if (viewModel.selectedIds.isNotEmpty)
+                      IconButton(
+                        onPressed: () {
+                          viewModel.selectedIds.isEmpty
+                              ? null
+                              : viewModel.delete(context);
+                        },
+                        icon: Icon(Icons.delete),
+                        iconSize: 35,
+                        color: red,
+                      ),
+                    horizontalSpacing10,
                     SizedBox(
                       width: isExtended ? 180 : null,
                       child: CommonButton(
@@ -98,7 +110,7 @@ class ContactSupportView extends StackedView<ContactSupportViewModel> {
             ),
             verticalSpacing20,
             Expanded(
-                child: viewModel.clients.isEmpty
+                child: viewModel.isBusy || viewModel.isRequestLoading == true
                     ? const Center(child: CircularProgressIndicator())
                     : CommonPaginatedTable(
                         enableCheckBox: true,
@@ -107,6 +119,7 @@ class ContactSupportView extends StackedView<ContactSupportViewModel> {
                           DataColumn(label: Text('Client Name')),
                           DataColumn(label: Text('City / State')),
                           DataColumn(label: Text('Phone')),
+                          DataColumn(label: Text('description')),
                           DataColumn(label: Text('Note')),
                           DataColumn(label: Text('Contact No')),
                           DataColumn(label: Text('Actions')),

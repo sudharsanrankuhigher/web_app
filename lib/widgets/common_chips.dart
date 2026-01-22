@@ -12,6 +12,8 @@ class CommonStatusChip extends StatelessWidget {
   final TextStyle? textStyle;
   final bool? isSelected;
   final Color? imageColor;
+  final double? imageheight;
+  final double? imagewidth;
 
   const CommonStatusChip({
     super.key,
@@ -23,6 +25,8 @@ class CommonStatusChip extends StatelessWidget {
     this.onTap,
     this.isSelected,
     this.imageColor,
+    this.imageheight,
+    this.imagewidth,
   });
 
   @override
@@ -47,8 +51,8 @@ class CommonStatusChip extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              height: 40,
-              width: 40,
+              height: imageheight ?? 40,
+              width: imagewidth ?? 40,
               child: SvgPicture.asset(
                 imagePath,
                 color: imageColor,

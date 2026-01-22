@@ -13,6 +13,7 @@ import 'package:webapp/widgets/image_picker.dart';
 import 'package:webapp/widgets/initial_textform.dart';
 import 'package:webapp/widgets/multi_select_form_field.dart';
 import 'package:webapp/widgets/state_city_drop_down.dart';
+import 'package:webapp/widgets/web_image_loading.dart';
 
 class ProjectDetailsDialog extends StatefulWidget {
   final ProjectModel model;
@@ -464,11 +465,11 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
 
     setState(() {
       // MOBILE
-      if (result['path'] != null) {
+      if (result['path'] != null && !kIsWeb) {
         images.add(result['path']);
       }
       // WEB
-      else if (result['bytes'] != null) {
+      else if (result['bytes'] != null && kIsWeb) {
         images.add(
           base64Encode(result['bytes']),
         );
@@ -489,31 +490,69 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
     );
   }
 
-  Widget buildImage(String pathOrData) {
+  Widget buildImage(
+    String pathOrData, {
+    double width = double.infinity,
+    double height = double.infinity,
+    BoxFit fit = BoxFit.cover,
+  }) {
+    bool isBase64(String value) {
+      final base64Regex = RegExp(r'^[A-Za-z0-9+/=]+$');
+      return base64Regex.hasMatch(value) && value.length % 4 == 0;
+    }
+
+    // ===================== WEB =====================
     if (kIsWeb) {
-      // On Web: treat it as base64 string
-      final bytes = base64Decode(pathOrData);
-      return Image.memory(
-        bytes,
-        fit: BoxFit.contain,
-        errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
-      );
-    } else {
-      // Mobile
+      // ✅ HTTP images → use HtmlElementView (WebImage)
       if (pathOrData.startsWith('http')) {
-        return Image.network(
-          pathOrData,
-          fit: BoxFit.contain,
-          errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
-        );
-      } else {
-        return Image.file(
-          File(pathOrData),
-          fit: BoxFit.contain,
-          errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
+        return WebImage(
+          imageUrl: pathOrData,
+          width: width,
+          height: height,
+          fit: fit,
         );
       }
+
+      // ✅ Base64 images
+      if (isBase64(pathOrData)) {
+        try {
+          return Image.memory(
+            base64Decode(pathOrData),
+            width: width,
+            height: height,
+            fit: fit,
+            errorBuilder: (_, __, ___) =>
+                const Icon(Icons.broken_image, color: Colors.red),
+          );
+        } catch (_) {
+          return const Icon(Icons.broken_image, color: Colors.red);
+        }
+      }
+
+      // ❌ Unsupported web format
+      return const Icon(Icons.image_not_supported, color: Colors.grey);
     }
+
+    // ===================== MOBILE =====================
+    if (pathOrData.startsWith('http')) {
+      return Image.network(
+        pathOrData,
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: (_, __, ___) =>
+            const Icon(Icons.broken_image, color: Colors.red),
+      );
+    }
+
+    return Image.file(
+      File(pathOrData),
+      width: width,
+      height: height,
+      fit: fit,
+      errorBuilder: (_, __, ___) =>
+          const Icon(Icons.broken_image, color: Colors.red),
+    );
   }
 
   void _save() {
