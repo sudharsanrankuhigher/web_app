@@ -24,6 +24,9 @@ import 'package:webapp/ui/views/add_company/model/company_model.dart'
 import 'package:webapp/ui/views/contact_support/model/client_model.dart'
     as client_model;
 
+import 'package:webapp/ui/views/requests/model/request_model.dart'
+    as request_model;
+
 class ApiService {
   final Dio _dio;
 
@@ -445,5 +448,18 @@ class ApiService {
       ),
     );
     return client_model.ClientModel.fromJson(response.data);
+  }
+
+  ///////////////////// client request ////////////////////////
+  ///POST: /api/admin/client/request
+
+  Future<request_model.ProjectRequestModel> getClientRequest(request) async {
+    final req = {"status": request};
+    final response = await _dio.post('api/admin/client/request',
+        data: req,
+        options: Options(
+          validateStatus: (status) => status != null && status < 500,
+        ));
+    return request_model.ProjectRequestModel.fromJson(response.data);
   }
 }

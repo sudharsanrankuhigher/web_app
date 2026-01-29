@@ -11,8 +11,7 @@ class ProjectModel {
   final String city;
   final String service;
 
-  final List<String> influencerImages;
-  List<String> influencers;
+  List<dynamic> influencers;
   final List<String> projectImages;
 
   final String note;
@@ -36,7 +35,6 @@ class ProjectModel {
     required this.state,
     required this.city,
     required this.service,
-    required this.influencerImages,
     required this.influencers,
     required this.projectImages,
     required this.note,
@@ -74,7 +72,6 @@ class ProjectModel {
       city: city,
       service: service,
       influencers: influencers ?? this.influencers,
-      influencerImages: influencerImages,
       projectImages: projectImages ?? this.projectImages,
       note: note ?? this.note,
       payment: payment ?? this.payment,
@@ -101,7 +98,6 @@ class ProjectModel {
       note: '',
       payment: 0,
       commission: 0,
-      influencerImages: [],
       projectImages: [],
       assignedDate: DateTime.now(),
       isCompleted: true,

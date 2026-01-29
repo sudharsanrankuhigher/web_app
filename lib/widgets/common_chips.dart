@@ -14,6 +14,7 @@ class CommonStatusChip extends StatelessWidget {
   final Color? imageColor;
   final double? imageheight;
   final double? imagewidth;
+  final EdgeInsetsGeometry? padding;
 
   const CommonStatusChip({
     super.key,
@@ -27,6 +28,7 @@ class CommonStatusChip extends StatelessWidget {
     this.imageColor,
     this.imageheight,
     this.imagewidth,
+    this.padding,
   });
 
   @override
@@ -35,7 +37,7 @@ class CommonStatusChip extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: margin,
-        padding: defaultPadding4 + rightPadding10,
+        padding: padding ?? defaultPadding4 + rightPadding10,
         decoration: BoxDecoration(
             color: bgColor,
             borderRadius: BorderRadius.circular(25),

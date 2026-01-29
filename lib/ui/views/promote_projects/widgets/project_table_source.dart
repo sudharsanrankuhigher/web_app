@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:stacked_services/stacked_services.dart';
-import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/views/promote_projects/model/promote_project_model.dart';
 import 'package:webapp/ui/views/promote_projects/promote_projects_viewmodel.dart';
 import 'package:webapp/widgets/over_lapping_avatar.dart';
@@ -49,21 +47,22 @@ class PromoteProjectsTableSource extends DataTableSource {
       DataCell(Text(item.projectCode)),
       DataCell(Text(item.clientName ?? '')),
       DataCell(Text(item.projectTitle)),
-      DataCell(Text(item.note)),
-      const DataCell(Text('5')),
       DataCell(
         OverlappingAvatars(
-          imageUrls: item.influencerImages,
+          imageUrls: item.influencers
+              .map<String>((e) => e['image'] as String)
+              .toList(),
           maxVisible: 2,
           size: 34,
         ),
       ),
-      const DataCell(Text('7/10')),
-      const DataCell(Text('Pending')),
-      DataCell(Text('₹${item.commission}')),
-      DataCell(Text(
-        '${item.assignedDate!.day}/${item.assignedDate!.month}/${item.assignedDate!.year}',
-      )),
+      const DataCell(Text('5')),
+      DataCell(Text(item.note)),
+      DataCell(Container(
+          alignment: Alignment.centerRight, child: Text('₹${item.payment}'))),
+      DataCell(Container(
+          alignment: Alignment.centerRight,
+          child: Text('₹${item.commission}'))),
       DataCell(Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -88,7 +87,9 @@ class PromoteProjectsTableSource extends DataTableSource {
       DataCell(Text(item.projectTitle)),
       DataCell(
         OverlappingAvatars(
-          imageUrls: item.influencerImages,
+          imageUrls: item.influencers
+              .map<String>((e) => e['image'] as String)
+              .toList(),
           maxVisible: 2,
           size: 34,
         ),
@@ -97,9 +98,6 @@ class PromoteProjectsTableSource extends DataTableSource {
       const DataCell(Text('10')),
       DataCell(Text('₹${item.payment}')),
       DataCell(Text('₹${item.commission}')),
-      DataCell(Text(
-        '${item.assignedDate!.day}/${item.assignedDate!.month}/${item.assignedDate!.year}',
-      )),
       const DataCell(Text('Paid')),
     ];
   }

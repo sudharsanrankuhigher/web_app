@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
+import 'package:stacked_services/stacked_services.dart';
+import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/core/enum/requested_status.dart';
 import 'package:webapp/core/navigation/navigation_mixin.dart';
-import 'package:webapp/ui/views/requests/model/request_model.dart';
+import 'package:webapp/services/api_service.dart';
+import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/views/requests/model/request_model.dart'
+    as request_model;
+import 'package:webapp/ui/views/requests/widgets/confirmation_dialog.dart';
 import 'package:webapp/ui/views/requests/widgets/request_table_source.dart';
 
 class RequestsViewModel extends BaseViewModel with NavigationMixin {
@@ -17,6 +23,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
   bool? _isRequest = false;
   bool? get isRequest => _isRequest;
 
+  int? request = 1;
   final List<RequestStatus> _tabs = [
     RequestStatus.requested,
     RequestStatus.waiting,
@@ -30,65 +37,66 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     RequestStatus.promoteCommission,
   ];
 
+  final _dialogService = locator<DialogService>();
+  final _apiService = locator<ApiService>();
+
   void setSelected(int index) {
     _isRequest = true;
     _isSelected = index;
 
-    final status = _tabs[index].value;
-    loadTable(status);
+    final selectedTab = _tabs[index];
+    loadTable(selectedTab);
 
     notifyListeners();
   }
 
   // Data list
-  List<ProjectRequestModel> requests = [];
+  List<request_model.Datum> requests = [];
 
-  late RequestTableSource tableSource;
+  RequestTableSource? tableSource;
 
-  Future<void> loadTable(String status) async {
+  // 1:Request, 2:Request-Waiting, 3:Waiting-Accept, 4:Completed-Pending, 5:Rework, 6:Completed, 7:inf-cancelled, 8:Admin-Rejected, 9:Promote-Verified, 10:Promote-Pay, 11:Promote-Commission,
+  Future<void> loadTable(RequestStatus tabStatus) async {
+    _isRequest = true;
+    print(tabStatus.value);
     setBusy(true);
-    _selectedString = status;
+    _selectedString = tabStatus.value;
 
     try {
-      await Future.delayed(const Duration(seconds: 1));
+      final res = await _apiService.getClientRequest(tabStatus.apiCode);
+      requests = res.data ?? [];
 
-      requests = [
-        ProjectRequestModel(
-          sNo: 1,
-          projectCode: "PR001",
-          clientName: "ABC Corp",
-          clientPhone: "9999999999",
-          influencerId: "INF001",
-          influencerName: "John Doe",
-          influencerPhone: "9898984562",
-          status: RequestStatus.requested.value,
-          requestedDate: "10-12-2025",
-          assignedDate: "11-12-2025",
-          completedDate: "12-12-2025",
-          influencerBankDetails: "Bank XYZ",
-          paymentAmount: "5000",
-          commissionAmount: "500",
-        ),
-        ProjectRequestModel(
-          sNo: 2,
-          projectCode: "PR002",
-          clientName: "ABC Corps",
-          clientPhone: "9999999999",
-          influencerId: "INF002",
-          influencerName: "John",
-          influencerPhone: "9898986532",
-          status: RequestStatus.waiting.value,
-          requestedDate: "10-12-2025",
-        ),
-      ];
+      final filteredData = requests.where((e) {
+        final apiStatus = e.status; // INT from backend
+        return tabStatus.backendCodes.contains(apiStatus);
+      }).toList();
 
       tableSource = RequestTableSource(
-          requests.where((e) => e.status == status).toList(), status, onReject);
+        filteredData,
+        tabStatus.value,
+        onReject,
+        onWaiting,
+        onProceed,
+        onPreparing,
+        onGoToPromoteVerified,
+        onRevoke,
+        onGotoPromotePay,
+      );
 
       _isRequest = false;
     } catch (e) {
       requests = [];
-      tableSource = RequestTableSource([], status, onReject);
+      tableSource = RequestTableSource(
+        [],
+        tabStatus.value,
+        onReject,
+        onWaiting,
+        onProceed,
+        onPreparing,
+        onGoToPromoteVerified,
+        onRevoke,
+        onGotoPromotePay,
+      );
       _isRequest = false;
     }
 
@@ -96,22 +104,34 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     notifyListeners();
   }
 
-  onReject(ProjectRequestModel model) {}
-
   List<DataColumn> getColumnsByStatus(String status) {
     switch (status) {
       // 1. Requested
       case "requested":
         return const [
-          DataColumn(label: Text("S.No")),
+          DataColumn(
+            label: SizedBox(
+              width: 40, // 👈 small width
+              child: Text("S.No"),
+            ),
+          ),
           DataColumn(label: Text("Project Code")),
           DataColumn(label: Text("Client")),
           DataColumn(label: Text("Client Phone")),
-          DataColumn(label: Text("Influencer ID")),
+          DataColumn(
+              label: Text("Inf_ID / Inf_No"),
+              headingRowAlignment: MainAxisAlignment.center),
           DataColumn(label: Text("Requested Date")),
           DataColumn(
-              label: Text("Action"),
-              headingRowAlignment: MainAxisAlignment.center),
+            headingRowAlignment: MainAxisAlignment.center,
+            label: SizedBox(
+              width: 260,
+              child: Text(
+                "Action",
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
         ];
 
       // 2. Waiting
@@ -121,7 +141,9 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Project Code")),
           DataColumn(label: Text("Client")),
           DataColumn(label: Text("Client Phone")),
-          DataColumn(label: Text("Influencer ID")),
+          DataColumn(
+              label: Text("Inf_ID / Inf_No"),
+              headingRowAlignment: MainAxisAlignment.center),
           DataColumn(label: Text("Requested Date")),
           DataColumn(
               label: Text("Action"),
@@ -134,11 +156,15 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("S.No")),
           DataColumn(label: Text("Project Code")),
           DataColumn(label: Text("Client")),
-          DataColumn(label: Text("Influencer")),
           DataColumn(label: Text("Client Phone")),
-          DataColumn(label: Text("Influencer Phone")),
+          DataColumn(label: Text("Influencer")),
+          DataColumn(label: Text("Inf_No")),
           DataColumn(label: Text("Requested Date")),
-          DataColumn(label: Text("Action")),
+          DataColumn(
+              label: Text(
+                "Action",
+              ),
+              headingRowAlignment: MainAxisAlignment.center),
         ];
 
       // 4. Complete Pending
@@ -147,10 +173,14 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("S.No")),
           DataColumn(label: Text("Project Code")),
           DataColumn(label: Text("Client")),
-          DataColumn(label: Text("Influencer")),
+          DataColumn(label: Text("Client phone")),
+          DataColumn(label: Text("Inf_Id / inf_phone")),
           DataColumn(label: Text("Requested Date")),
-          DataColumn(label: Text("View Link")),
-          DataColumn(label: Text("Action")),
+          DataColumn(label: Text("accepted Date")),
+          DataColumn(label: Text("link")),
+          DataColumn(
+              label: Text("Action"),
+              headingRowAlignment: MainAxisAlignment.center),
         ];
 
       // 5. Completed
@@ -159,10 +189,13 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("S.No")),
           DataColumn(label: Text("Project Code")),
           DataColumn(label: Text("Client")),
-          DataColumn(label: Text("Influencer")),
+          DataColumn(label: Text("Client phone")),
+          DataColumn(label: Text("Inf_Id / inf_phone")),
           DataColumn(label: Text("Requested Date")),
           DataColumn(label: Text("Completed Date")),
-          DataColumn(label: Text("Action")),
+          DataColumn(
+              label: Text("Action"),
+              headingRowAlignment: MainAxisAlignment.center),
         ];
 
       // 6. Influencer Cancelled
@@ -197,23 +230,27 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("S.No")),
           DataColumn(label: Text("CP Code")),
           DataColumn(label: Text("Client")),
-          DataColumn(label: Text("Influencer")),
           DataColumn(label: Text("Client Phone")),
-          DataColumn(label: Text("Influencer Phone")),
+          DataColumn(label: Text("Influencer")),
+          DataColumn(label: Text("Inf_Id / Inf_Phone")),
           DataColumn(label: Text("Assigned Date")),
-          DataColumn(label: Text("Action")),
+          DataColumn(label: Text("Completed Date")),
+          DataColumn(
+              label: Text("Action"),
+              headingRowAlignment: MainAxisAlignment.center),
         ];
 
       // 9. Promote Pay
       case "promote_pay":
         return const [
           DataColumn(label: Text("S.No")),
-          DataColumn(label: Text("CP Code")),
-          DataColumn(label: Text("Client")),
-          DataColumn(label: Text("Influencer")),
+          DataColumn(label: Text("Project Code")),
+          DataColumn(label: Text("Inf_name / Ind_ID")),
+          DataColumn(label: Text("Inf_phone")),
           DataColumn(label: Text("Completed Date")),
           DataColumn(label: Text("Bank Details")),
           DataColumn(label: Text("Payment Amount")),
+          DataColumn(label: Text("Commision Amount")),
           DataColumn(label: Text("Action")),
         ];
 
@@ -221,16 +258,104 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       case "promote_commission":
         return const [
           DataColumn(label: Text("S.No")),
-          DataColumn(label: Text("CP Code")),
-          DataColumn(label: Text("Client")),
-          DataColumn(label: Text("Influencer")),
-          DataColumn(label: Text("Completed Date")),
-          DataColumn(label: Text("Bank Details")),
+          DataColumn(label: Text("Project Code")),
+          DataColumn(label: Text("Inf_name / Ind_ID")),
+          DataColumn(label: Text("Inf_Phone")),
+          DataColumn(label: Text("Inf_Payment date")),
           DataColumn(label: Text("Commission Amount")),
+          DataColumn(label: Text("Action")),
         ];
 
       default:
         return [];
     }
+  }
+
+  /// functions
+  /// request & waiting
+  onReject(request_model.Datum model) {
+    showRejectConfirmationDialog(
+        context: StackedService.navigatorKey!.currentContext!,
+        itemName: "${model.projectId}",
+        onConfirm: () {});
+  }
+
+  //waiting
+  onWaiting(request_model.Datum model) {
+    showActionConfirmationDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      title: 'Move to Waiting',
+      confirmText: "Move",
+      message:
+          "Are you sure you want to move the ${model.projectId} to the waiting section?",
+      icon: Icons.hourglass_top,
+      confirmColor: Colors.green,
+      onConfirm: () => {},
+    );
+  }
+
+  //waiting accept
+  onProceed(request_model.Datum model) {
+    showAdminPaymentConfigDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      onSave: (data) {
+        debugPrint(data.toString());
+      },
+    );
+  }
+
+  //completed-pending
+  onPreparing(request_model.Datum model) async {
+    final result = await showStatusDialog(
+      StackedService.navigatorKey!.currentContext!,
+    );
+
+    if (result != null) {
+      print("Selected status: ${result['name']}");
+    }
+  }
+
+  onGoToPromoteVerified(request_model.Datum model) {
+    showActionConfirmationDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      title: 'Move to Promote Verified',
+      confirmText: "Move",
+      message:
+          "Are you sure you want to move the ${model.projectId} to the Promote Verified section?",
+      icon: Icons.hourglass_top,
+      confirmColor: Colors.green,
+      onConfirm: () => {},
+    );
+  }
+
+  onRevoke(request_model.Datum model) {
+    showActionConfirmationDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      title: 'Revoke',
+      confirmText: "Revoke",
+      message:
+          "Are you sure you want to Revoke the ${model.projectId} to the Influencer Cancelled section?",
+      icon: Icons.free_cancellation,
+      confirmColor: red,
+      onConfirm: () => {},
+    );
+  }
+
+  onGotoPromotePay(request_model.Datum model) {
+    showActionConfirmationDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      title: 'Promote Pay',
+      confirmText: "Go to Promote pay",
+      image: "assets/images/pay.svg",
+      message:
+          "Are you sure you move to Promote Pay the ${model.projectId} to the Promote verified section?",
+      icon: Icons.free_cancellation,
+      confirmColor: publisButtonColor,
+      onConfirm: () => {},
+    );
+  }
+
+  Future<void> onRefresh() async {
+    setSelected(_isSelected);
   }
 }

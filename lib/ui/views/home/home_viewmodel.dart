@@ -131,39 +131,39 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
       //   break;
       case 4:
         context.pushReplacementNamed('plans');
-        _selectedIndex = 6;
+        _selectedIndex = 4;
         break;
       case 5:
         context.pushReplacementNamed('requests');
-        _selectedIndex = 7;
+        _selectedIndex = 5;
         break;
       case 6:
         context.pushReplacementNamed('promotion-projects');
-        _selectedIndex = 8;
+        _selectedIndex = 6;
         break;
       case 7:
         context.pushReplacementNamed('contact-support');
-        _selectedIndex = 9;
+        _selectedIndex = 7;
         break;
       case 8:
         context.pushReplacementNamed('company');
-        _selectedIndex = 10;
+        _selectedIndex = 8;
         break;
       case 9:
         context.pushReplacementNamed('sub-admin');
-        _selectedIndex = 11;
+        _selectedIndex = 9;
         break;
       case 10:
         context.pushReplacementNamed('report');
-        _selectedIndex = 12;
+        _selectedIndex = 10;
         break;
       case 11:
         context.pushReplacementNamed('roles');
-        _selectedIndex = 13;
+        _selectedIndex = 11;
         break;
       case 12:
         context.pushReplacementNamed('permissions');
-        _selectedIndex = 14;
+        _selectedIndex = 12;
         break;
     }
   }

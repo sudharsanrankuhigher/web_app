@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:webapp/app/app.locator.dart' show locator;
 import 'package:webapp/core/navigation/navigation_mixin.dart';
+import 'package:webapp/services/api_service.dart';
 import 'package:webapp/ui/views/promote_projects/model/prmote_table_model.dart';
 import 'package:webapp/ui/views/promote_projects/model/promote_project_model.dart';
 import 'package:webapp/ui/views/promote_projects/widgets/add_edit_dialog.dart';
 import 'package:webapp/ui/views/promote_projects/widgets/project_table_source.dart';
 import 'package:webapp/ui/views/promote_projects/widgets/promote_status.dart';
 import 'package:webapp/ui/views/promote_projects/widgets/promote_table_source.dart';
+import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
+    as influencer_model;
+import 'package:webapp/ui/views/requests/widgets/confirmation_dialog.dart';
 
 class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
   PromoteProjectsViewModel() {
@@ -19,6 +24,11 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
 
   /// 🔹 Table source
   late PromoteProjectsTableSource tableSource;
+
+  final _dialogService = locator<DialogService>();
+  final _apiService = locator<ApiService>();
+
+  List<influencer_model.Datum> influencers = [];
 
   bool hasSelection = false;
   List<int> selectedIds = [];
@@ -47,10 +57,20 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     }
   }
 
+  Future<void> getInfluencers() async {
+    try {
+      final res = await runBusyFuture(_apiService.getAllInfluencer());
+      influencers = res.data ?? [];
+    } catch (e) {
+      influencers = [];
+    }
+  }
+
   /// 🔥 Initial load
   void init() {
     _isProjectVisible = false;
     plans = _dummyData();
+    getInfluencers();
 
     tableSource = PromoteProjectsTableSource(
       data: filteredPlans,
@@ -74,6 +94,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       context,
       model: newProject,
       isEdit: true,
+      influencers: influencers,
       onSave: (project) {
         addProject(project);
       },
@@ -81,22 +102,17 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
   }
 
   void editProject(BuildContext context, ProjectModel project) {
-    ProjectDetailsDialog.show(
-      context,
-      model: project,
-      isEdit: true,
-      onSave: (updatedProject) {
-        updateProject(updatedProject);
-      },
-    );
+    ProjectDetailsDialog.show(context, model: project, isEdit: true,
+        onSave: (updatedProject) {
+      updateProject(updatedProject);
+    }, influencers: influencers);
   }
 
   void viewProject(BuildContext context, ProjectModel project) {
-    ProjectDetailsDialog.show(
-      context,
-      model: project,
-      isEdit: false, // 👈 read-only
-    );
+    ProjectDetailsDialog.show(context,
+        model: project,
+        isEdit: false, // 👈 read-only
+        influencers: influencers);
   }
 
   /// 🔥 Toggle table
@@ -147,15 +163,25 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
         state: 'Tamil Nadu',
         city: 'Coimbatore',
         service: 'Instagram Promotion',
-        influencerImages: [
-          'https://i.pravatar.cc/150?img=${i + 1}',
-          'https://i.pravatar.cc/150?img=${i + 2}',
-          'https://i.pravatar.cc/150?img=${i + 3}',
-        ],
         influencers: [
-          'Influencer $i',
-          'Influencer $i',
-          'Influencer $i',
+          {
+            'id': 4,
+            'name': 'sudharsan D',
+            'image':
+                "http://172.20.25.23:8005/storage/influencer_image/1768215142_influencer.png"
+          },
+          {
+            'id': 5,
+            'name': "sudharsan",
+            'image':
+                'http://172.20.25.23:8005/storage/influencer_image/1768203188_influencer.png'
+          },
+          {
+            'id': 6,
+            'name': 'hema latha',
+            'image':
+                "http://172.20.25.23:8005/storage/influencer_image/1768214946_influencer.png"
+          }
         ],
         projectImages: [],
         note: 'Design work',
@@ -173,14 +199,21 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     DataColumn(label: Text("Project Code")),
     DataColumn(label: Text("Client Name")),
     DataColumn(label: Text("Project Title")),
-    DataColumn(label: Text("Note")),
+    DataColumn(label: Text("Inf_icons")),
     DataColumn(label: Text("Project Count")),
-    DataColumn(label: Text("Influencers")),
-    DataColumn(label: Text("In-Progress")),
-    DataColumn(label: Text("Payment")),
-    DataColumn(label: Text("Commission")),
-    DataColumn(label: Text("Assigned Date")),
-    DataColumn(label: Text("Actions")),
+    DataColumn(label: Text("Note")),
+    DataColumn(
+        label: Text("Total promote pay"),
+        tooltip: "Total promote pay",
+        headingRowAlignment: MainAxisAlignment.end),
+    DataColumn(
+        label: Text("Total Commission"),
+        tooltip: "Total Commission",
+        headingRowAlignment: MainAxisAlignment.end),
+    DataColumn(
+      label: Text("Actions"),
+      headingRowAlignment: MainAxisAlignment.center,
+    ),
   ];
 
   final completedColumns = const [
@@ -188,12 +221,11 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     DataColumn(label: Text("Project Code")),
     DataColumn(label: Text("Client Name")),
     DataColumn(label: Text("Project Title")),
-    DataColumn(label: Text("Influencers")),
+    DataColumn(label: Text("Inf_icons")),
     DataColumn(label: Text("Notes")),
     DataColumn(label: Text("Project Count")),
-    DataColumn(label: Text("Payment")),
-    DataColumn(label: Text("Commission")),
-    DataColumn(label: Text("Completed Date")),
+    DataColumn(label: Text("Total promotepay")),
+    DataColumn(label: Text("Total commission")),
     DataColumn(label: Text("Payment")),
   ];
 
@@ -261,7 +293,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           note: "First project",
           assignedDate: "11-12-2025",
           completedDate: "12-12-2025",
-          status: PromoteStatus.verified,
+          status: PromoteStatus.assigned,
           bankDetails: "Bank XYZ",
           amount: 5000,
           viewLink: "http://link1.com",
@@ -276,7 +308,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           note: "Second project",
           assignedDate: "11-12-2025",
           completedDate: "12-12-2025",
-          status: PromoteStatus.completed,
+          status: PromoteStatus.assigned,
           bankDetails: "Bank ABC",
           amount: 6000,
           viewLink: "http://link2.com",
@@ -289,7 +321,8 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           )
           .toList();
 
-      promoteTableSource = PromoteTableSource(data: tableData, status: status);
+      promoteTableSource = PromoteTableSource(
+          data: tableData, status: status, onPreparing: onPreparing);
     } catch (_) {
       tableData = [];
       promoteTableSource = PromoteTableSource(data: [], status: status);
@@ -306,13 +339,17 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           // Columns
           DataColumn(label: Text("S.No")),
           DataColumn(label: Text("Project Code")),
-          DataColumn(label: Text("Influencers")),
-          DataColumn(label: Text("Influencer Code")),
-          DataColumn(label: Text("Phone No")),
+          DataColumn(label: Text("Inf_name / Inf_ID")),
+          DataColumn(label: Text("Inf_Number")),
           DataColumn(label: Text("Note")),
+          DataColumn(label: Text("Link")),
           DataColumn(label: Text("Assigned Date")),
-          DataColumn(label: Text("Status")),
-          DataColumn(label: Text("Action")), // 9 columns
+          DataColumn(
+              label: Text("Status"),
+              headingRowAlignment: MainAxisAlignment.center),
+          DataColumn(
+              label: Text("Action"),
+              headingRowAlignment: MainAxisAlignment.center), // 9 columns
         ];
 
       case PromoteStatus.completed:
@@ -401,5 +438,16 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
 
     _isRequest = false;
     notifyListeners();
+  }
+
+  /// functions
+  ///
+  onPreparing(model) async {
+    final result = await showStatusDialog(
+      StackedService.navigatorKey!.currentContext!,
+    );
+    if (result != null) {
+      print("Selected status: ${result['projectCode']}");
+    }
   }
 }

@@ -38,6 +38,29 @@ class DynamicMultiSearchDropdown extends StatelessWidget {
                 .contains(filter.toLowerCase()))
             .toList();
       },
+      // dropdownBuilder: (context, selectedItems) {
+      //   // if (selectedItems.isEmpty) {
+      //   //   return Text(
+      //   //     "Select $label",
+      //   //     style: fontFamilyMedium.size12.greyColor,
+      //   //   );
+      //   // }
+      //   return Wrap(
+      //     spacing: 6,
+      //     runSpacing: 4,
+      //     children: selectedItems
+      //         .map(
+      //           (e) => Chip(
+      //             label: Text(
+      //               e[nameKey],
+      //               style: fontFamilyMedium.size11.black,
+      //             ),
+      //             visualDensity: VisualDensity.compact,
+      //           ),
+      //         )
+      //         .toList(),
+      //   );
+      // },
       dropdownBuilder: (context, selectedItems) {
         // if (selectedItems.isEmpty) {
         //   return Text(
@@ -45,22 +68,35 @@ class DynamicMultiSearchDropdown extends StatelessWidget {
         //     style: fontFamilyMedium.size12.greyColor,
         //   );
         // }
+
+        final visibleItems = selectedItems.take(2).toList();
+        final extraCount = selectedItems.length - visibleItems.length;
+
         return Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
           spacing: 6,
           runSpacing: 4,
-          children: selectedItems
-              .map(
-                (e) => Chip(
-                  label: Text(
-                    e[nameKey],
-                    style: fontFamilyMedium.size11.black,
-                  ),
-                  visualDensity: VisualDensity.compact,
+          children: [
+            ...visibleItems.map(
+              (e) => Chip(
+                label: Text(
+                  e[nameKey],
+                  style: fontFamilyMedium.size11.black,
                 ),
-              )
-              .toList(),
+                visualDensity: VisualDensity.compact,
+              ),
+            ),
+
+            /// +X more chip
+            if (extraCount > 0)
+              Text(
+                "+$extraCount more",
+                style: fontFamilyMedium.size11.black,
+              ),
+          ],
         );
       },
+
       popupProps: PopupPropsMultiSelection.menu(
         showSearchBox: true,
         itemBuilder: (context, item, isSelected, _) {

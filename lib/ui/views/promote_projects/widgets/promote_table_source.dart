@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/promote_projects/model/prmote_table_model.dart';
 import 'package:webapp/ui/views/promote_projects/widgets/promote_status.dart';
+import 'package:webapp/widgets/common_button.dart';
+import 'package:webapp/widgets/view_link.dart';
 
 class PromoteTableSource extends DataTableSource {
   final List<PromoteTableModel> data;
   final String status;
+  final void Function(PromoteTableModel)? onPreparing;
 
   PromoteTableSource({
     required this.data,
     required this.status,
+    this.onPreparing,
   });
 
   @override
@@ -48,18 +54,39 @@ class PromoteTableSource extends DataTableSource {
         return [
           DataCell(Text('${index + 1}')),
           DataCell(Text(item.projectCode)),
-          DataCell(Text(item.influencer)),
-          DataCell(Text(item.influencerId)),
+          DataCell(Text("${item.influencer} / ${item.influencerId}")),
           DataCell(Text(item.phone)),
           DataCell(Text(item.note)),
-          DataCell(Text(item.assignedDate)),
-          DataCell(Text(item.status)),
           DataCell(
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text("In Progress"),
+            ViewLink(
+              url: item.viewLink,
+              text: "ViewLink",
             ),
           ),
+          DataCell(Text(item.assignedDate)),
+          DataCell(Center(
+            child: InkWell(
+              onTap: onPreparing == null ? null : () => onPreparing!(item),
+              child: Container(
+                  padding: defaultPadding4 + rightPadding4 + leftPadding4,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(25),
+                    color: continueButton,
+                  ),
+                  child: Text(
+                    item.status,
+                    style: fontFamilyMedium.size13.white,
+                  )),
+            ),
+          )),
+          DataCell(CommonButton(
+            text: 'Reject',
+            onTap: () {},
+            buttonColor: red,
+            padding: defaultPadding4 + rightPadding4 + leftPadding4,
+            margin: defaultPadding10 + leftPadding8 + rightPadding8,
+            textStyle: fontFamilyMedium.size12.white,
+          )),
         ];
 
       case PromoteStatus.completed:
