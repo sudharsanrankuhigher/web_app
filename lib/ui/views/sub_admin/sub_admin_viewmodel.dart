@@ -46,14 +46,20 @@ class SubAdminViewModel extends BaseViewModel with NavigationMixin {
   }
 
   Future<void> getRoles() async {
-    final role = await runBusyFuture(_apiService.getAllRole());
-    roles = role.data ?? [];
-    roleDropdownItems = roles.map((e) {
-      return {
-        "id": e.id,
-        "name": e.name,
-      };
-    }).toList();
+    try {
+      final role = await runBusyFuture(_apiService.getAllRole());
+      roles = role.data ?? [];
+      roleDropdownItems = roles.map((e) {
+        return {
+          "id": e.id,
+          "name": e.name,
+        };
+      }).toList();
+    } catch (e) {
+      roles = [];
+    } finally {
+      setBusy(false);
+    }
     notifyListeners();
   }
 

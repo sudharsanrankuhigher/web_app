@@ -31,9 +31,16 @@ class InfluencersViewModel extends BaseViewModel {
   bool? get isLoading => _isLoading;
 
   String selectedCategory = "All";
+
   Future<void> getServices() async {
-    final res = await runBusyFuture(_apiService.getAllService());
-    services = res.data ?? [];
+    try {
+      final res = await runBusyFuture(_apiService.getAllService());
+      services = res.data ?? [];
+    } catch (e) {
+      services = [];
+    } finally {
+      setBusy(false);
+    }
   }
 
   void _setLoading(bool value) {
