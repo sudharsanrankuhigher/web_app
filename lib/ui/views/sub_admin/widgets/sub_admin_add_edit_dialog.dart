@@ -39,9 +39,9 @@ class CommonSubAdminDialog {
     String city = model?.city ?? '';
 
     Map<String, dynamic>? selectedRole;
-    if (isEdit && model?.roleId != null && rolesModel != null) {
+    if (isEdit && model.roleId != null && rolesModel != null) {
       selectedRole = rolesModel.firstWhere(
-        (r) => r['id'] == model!.roleId,
+        (r) => r['id'] == model.roleId,
         orElse: () => {}, // return empty map if not found
       );
     }

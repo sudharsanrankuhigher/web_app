@@ -8,6 +8,7 @@ import 'package:webapp/ui/views/add_company/model/company_model.dart'
     as company_model;
 import 'package:webapp/ui/views/add_company/widgets/add_edit_company_dialog.dart';
 import 'package:webapp/ui/views/add_company/widgets/company_table_source.dart';
+import 'package:webapp/ui/views/requests/widgets/confirmation_dialog.dart';
 import 'package:webapp/widgets/common_button.dart';
 
 class AddCompanyViewModel extends BaseViewModel {
@@ -80,12 +81,12 @@ class AddCompanyViewModel extends BaseViewModel {
     }
 
     tableSource = CompanyTableSource(
-      companies: companies,
-      onView: (company) => viewPlan(
-        StackedService.navigatorKey!.currentContext!,
-        company,
-      ),
-    );
+        companies: companies,
+        onView: (company) => viewPlan(
+              StackedService.navigatorKey!.currentContext!,
+              company,
+            ),
+        showBankDetails: showBankDetails);
 
     notifyListeners();
   }
@@ -116,12 +117,12 @@ class AddCompanyViewModel extends BaseViewModel {
 
   void _refreshTable({filtered}) {
     tableSource = CompanyTableSource(
-      companies: filtered ?? companies,
-      onView: (company) => viewPlan(
-        StackedService.navigatorKey!.currentContext!,
-        company,
-      ),
-    );
+        companies: filtered ?? companies,
+        onView: (company) => viewPlan(
+              StackedService.navigatorKey!.currentContext!,
+              company,
+            ),
+        showBankDetails: showBankDetails);
     notifyListeners();
   }
 
@@ -168,6 +169,29 @@ class AddCompanyViewModel extends BaseViewModel {
     } else if (existingImage != null) {
       // send existing image reference (backend expects this)
       addField("existing_image", existingImage);
+    }
+
+    if (result["bank_details"] is Map) {
+      final linkMap = Map<dynamic, dynamic>.from(result["bank_details"]);
+
+      linkMap.forEach((key, value) {
+        if (key != null && key.toString().trim().isNotEmpty) {
+          formData.fields.add(
+            MapEntry("bank_details[0][$key]", value.toString()),
+          );
+        }
+      });
+    }
+
+    // 🔎 PRINT FORM DATA
+    print("----- FORM DATA FIELDS -----");
+    for (var field in formData.fields) {
+      print("${field.key} : ${field.value}");
+    }
+
+    print("----- FORM DATA FILES -----");
+    for (var file in formData.files) {
+      print("${file.key} : ${file.value.filename}");
     }
 
     // ---------- Save / update ----------
@@ -218,6 +242,17 @@ class AddCompanyViewModel extends BaseViewModel {
     } else if (result['existing_image'] != null) {
       // send existing image reference
       addField("existing_image", result['existing_image']);
+    }
+    if (result["bank_details"] is Map) {
+      final linkMap = Map<dynamic, dynamic>.from(result["bank_details"]);
+
+      linkMap.forEach((key, value) {
+        if (key != null && key.toString().trim().isNotEmpty) {
+          formData.fields.add(
+            MapEntry("bank_details[0][$key]", value.toString()),
+          );
+        }
+      });
     }
 
     // ---------- Call saveOrUpdate ----------
@@ -306,5 +341,11 @@ class AddCompanyViewModel extends BaseViewModel {
 
     _refreshTable(filtered: filteredCompany);
     notifyListeners();
+  }
+
+  showBankDetails(model) {
+    showBankDetailsDialog(
+        context: StackedService.navigatorKey!.currentContext!,
+        bankDetails: model.bankDetails);
   }
 }

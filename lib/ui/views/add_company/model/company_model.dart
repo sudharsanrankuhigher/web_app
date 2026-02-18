@@ -46,27 +46,28 @@ class Datum {
   String? state;
   String? city;
   String? gstNo;
+  BankDetail? bankDetails;
   int? projectCount;
   String? companyImage;
   int? status;
   DateTime? createdAt;
   DateTime? updatedAt;
 
-  Datum({
-    this.id,
-    this.companyName,
-    this.clientName,
-    this.phone,
-    this.altPhoneNo,
-    this.state,
-    this.city,
-    this.gstNo,
-    this.projectCount,
-    this.companyImage,
-    this.status,
-    this.createdAt,
-    this.updatedAt,
-  });
+  Datum(
+      {this.id,
+      this.companyName,
+      this.clientName,
+      this.phone,
+      this.altPhoneNo,
+      this.state,
+      this.city,
+      this.gstNo,
+      this.projectCount,
+      this.companyImage,
+      this.status,
+      this.createdAt,
+      this.updatedAt,
+      this.bankDetails});
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         id: json["id"],
@@ -80,6 +81,7 @@ class Datum {
         projectCount: json["project_count"],
         companyImage: json["company_image"],
         status: json["status"],
+        bankDetails: _parseBankDetails(json["bank_details"]),
         createdAt: json["created_at"] == null
             ? null
             : DateTime.parse(json["created_at"]),
@@ -97,10 +99,52 @@ class Datum {
         "state": state,
         "city": city,
         "gst_no": gstNo,
+        "bank_details": bankDetails,
         "project_count": projectCount,
         "company_image": companyImage,
         "status": status,
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
       };
+
+  static BankDetail? _parseBankDetails(dynamic data) {
+    if (data == null) return null;
+
+    // Case 1: List
+    if (data is List && data.isNotEmpty) {
+      if (data.first is Map<String, dynamic>) {
+        return BankDetail.fromJson(data.first);
+      }
+    }
+
+    // Case 2: Direct Map
+    if (data is Map<String, dynamic>) {
+      return BankDetail.fromJson(data);
+    }
+
+    return null;
+  }
+}
+
+class BankDetail {
+  String? accountName;
+  String? accountNo;
+  String? ifscCode;
+  String? upi;
+
+  BankDetail({
+    this.accountName,
+    this.accountNo,
+    this.ifscCode,
+    this.upi,
+  });
+
+  factory BankDetail.fromJson(Map<String, dynamic> json) {
+    return BankDetail(
+      accountName: json['holder_name']?.toString(),
+      accountNo: json['account_no']?.toString(),
+      ifscCode: json['ifsc_code']?.toString(),
+      upi: json['upi_id']?.toString(),
+    );
+  }
 }

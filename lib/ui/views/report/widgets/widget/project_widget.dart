@@ -6,11 +6,13 @@ import 'package:webapp/widgets/pie_chart_widget.dart';
 class ProjectStatusWidget extends StatelessWidget {
   final int completed;
   final int pending;
+  final String? title;
 
   const ProjectStatusWidget({
     super.key,
     required this.completed,
     required this.pending,
+    this.title,
   });
 
   int get total => completed + pending;
@@ -37,7 +39,7 @@ class ProjectStatusWidget extends StatelessWidget {
         children: [
           /// 🔹 Title
           Text(
-            'Project Status',
+            title!,
             style: fontFamilySemiBold.size14.black,
           ),
 
@@ -78,14 +80,14 @@ class ProjectStatusWidget extends StatelessWidget {
                     const Divider(),
                     const SizedBox(height: 8),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        const Text(
-                          'Total Projects',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                        // const Text(
+                        //   'Total Projects',
+                        //   style: TextStyle(
+                        //     fontWeight: FontWeight.w500,
+                        //   ),
+                        // ),
                         Text(
                           '$total',
                           style: const TextStyle(
@@ -122,8 +124,8 @@ class ProjectStatusWidget extends StatelessWidget {
                 color: color,
               ),
             ),
-            const SizedBox(width: 8),
-            Text(label),
+            // const SizedBox(width: 8),
+            // Text(label),
           ],
         ),
         Text(

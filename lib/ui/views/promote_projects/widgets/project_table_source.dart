@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:webapp/ui/views/promote_projects/model/promote_project_model.dart';
+import 'package:webapp/core/helper/dialog_state.dart';
+import 'package:webapp/ui/views/promote_projects/model/promote_project_model.dart'
+    as project_model;
 import 'package:webapp/ui/views/promote_projects/promote_projects_viewmodel.dart';
 import 'package:webapp/widgets/over_lapping_avatar.dart';
 
 class PromoteProjectsTableSource extends DataTableSource {
-  List<ProjectModel> data;
-  final Function(ProjectModel) onView;
+  List<project_model.Message> data;
+  final Function(project_model.Message) onView;
   final PromoteProjectsViewModel vm;
 
   PromoteProjectsTableSource({
@@ -15,16 +17,33 @@ class PromoteProjectsTableSource extends DataTableSource {
   });
 
   /// 🔥 Update table data
-  void updateData(List<ProjectModel> newData) {
+  void updateData(List<project_model.Message> newData) {
     data = newData;
     notifyListeners();
   }
 
   @override
   DataRow? getRow(int index) {
-    if (index >= data.length) return null;
-
+    if (data.isEmpty) {
+      return DataRow.byIndex(
+        index: index,
+        cells: const [
+          DataCell.empty,
+          DataCell.empty,
+          DataCell.empty,
+          DataCell.empty,
+          DataCell(Text('No data available')),
+          DataCell.empty,
+          DataCell.empty,
+          DataCell.empty,
+          DataCell.empty,
+          DataCell.empty,
+        ],
+      );
+    }
     final item = data[index];
+
+    final pay = item.payment;
 
     return DataRow.byIndex(
       index: index,
@@ -32,37 +51,42 @@ class PromoteProjectsTableSource extends DataTableSource {
         (states) => index.isEven ? Colors.white : Colors.grey.shade100,
       ),
       onSelectChanged: (value) {
-        item.isSelected = value ?? false;
-        vm.notifySelectionChanged();
+        vm.onRowSelected(item.id!);
       },
       cells: vm.isInprogress
-          ? _inProgressCells(item, index)
-          : _completedCells(item, index),
+          ? _inProgressCells(item, pay, index)
+          : _completedCells(item, pay, index),
     );
   }
 
-  List<DataCell> _inProgressCells(ProjectModel item, int index) {
+  List<DataCell> _inProgressCells(project_model.Message item,
+      project_model.PaymentElement? pay, int index) {
     return [
       DataCell(Text('${index + 1}')),
-      DataCell(Text(item.projectCode)),
-      DataCell(Text(item.clientName ?? '')),
-      DataCell(Text(item.projectTitle)),
+      DataCell(Text(item.projectCode ?? '')),
+      DataCell(Text(item.companyName ?? '')),
+      DataCell(Text(item.projectName ?? '')),
       DataCell(
-        OverlappingAvatars(
-          imageUrls: item.influencers
-              .map<String>((e) => e['image'] as String)
-              .toList(),
-          maxVisible: 2,
-          size: 34,
-        ),
+        vm.isDialogOpen
+            ? Container(
+                padding: const EdgeInsets.all(4),
+              )
+            : OverlappingAvatars(
+                imageUrls: item.influencers!
+                    .map<String>((e) => e.image ?? '')
+                    .toList(),
+                maxVisible: 2,
+                size: 34,
+              ),
       ),
-      const DataCell(Text('5')),
-      DataCell(Text(item.note)),
-      DataCell(Container(
-          alignment: Alignment.centerRight, child: Text('₹${item.payment}'))),
+      DataCell(Text('${item.influencers?.length ?? 0}')),
+      DataCell(Text(item.description ?? '')),
       DataCell(Container(
           alignment: Alignment.centerRight,
-          child: Text('₹${item.commission}'))),
+          child: Text('₹${pay?.payment ?? 0}'))),
+      DataCell(Container(
+          alignment: Alignment.centerRight,
+          child: Text('₹${pay?.commission ?? 0}'))),
       DataCell(Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -79,31 +103,31 @@ class PromoteProjectsTableSource extends DataTableSource {
     ];
   }
 
-  List<DataCell> _completedCells(ProjectModel item, int index) {
+  List<DataCell> _completedCells(project_model.Message item,
+      project_model.PaymentElement? pay, int index) {
     return [
       DataCell(Text('${index + 1}')),
-      DataCell(Text(item.projectCode)),
-      DataCell(Text(item.clientName ?? '')),
-      DataCell(Text(item.projectTitle)),
+      DataCell(Text(item.projectCode ?? '')),
+      DataCell(Text(item.companyName ?? '')),
+      DataCell(Text(item.projectName ?? '')),
       DataCell(
         OverlappingAvatars(
-          imageUrls: item.influencers
-              .map<String>((e) => e['image'] as String)
-              .toList(),
+          imageUrls:
+              item.influencers!.map<String>((e) => e.image ?? '').toList(),
           maxVisible: 2,
           size: 34,
         ),
       ),
-      DataCell(Text(item.note)),
+      DataCell(Text(item.description ?? '')),
       const DataCell(Text('10')),
-      DataCell(Text('₹${item.payment}')),
-      DataCell(Text('₹${item.commission}')),
+      DataCell(Text('₹${pay?.payment ?? "0"}')),
+      DataCell(Text('₹${pay?.commission ?? "0"}')),
       const DataCell(Text('Paid')),
     ];
   }
 
   @override
-  int get rowCount => data.length;
+  int get rowCount => data.isEmpty ? 1 : data.length;
 
   @override
   bool get isRowCountApproximate => false;

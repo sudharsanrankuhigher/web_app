@@ -1,9 +1,14 @@
 import 'package:intl/intl.dart';
 
 class DateFormatter {
-  static String formatToDDMMMYYYY(String isoDate) {
+  static String formatToDDMMMYYYY(dynamic isoDate) {
+    if (isoDate == null) return '-';
+
+    final value = isoDate.toString().trim();
+    if (value.isEmpty || value.toLowerCase() == 'null') return '-';
+
     try {
-      final dateTime = DateTime.parse(isoDate).toLocal();
+      final dateTime = DateTime.parse(value).toLocal();
       return DateFormat('dd MMM yyyy').format(dateTime);
     } catch (e) {
       return '-';
@@ -43,5 +48,12 @@ class DateFormatter {
         }
       }
     }
+  }
+
+  String formatToYMD(String isoDate) {
+    final dateTime = DateTime.parse(isoDate);
+    return "${dateTime.year.toString().padLeft(4, '0')}-"
+        "${dateTime.month.toString().padLeft(2, '0')}-"
+        "${dateTime.day.toString().padLeft(2, '0')}";
   }
 }

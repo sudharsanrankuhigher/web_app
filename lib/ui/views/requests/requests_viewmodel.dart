@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/app.locator.dart';
@@ -10,6 +13,8 @@ import 'package:webapp/ui/views/requests/model/request_model.dart'
     as request_model;
 import 'package:webapp/ui/views/requests/widgets/confirmation_dialog.dart';
 import 'package:webapp/ui/views/requests/widgets/request_table_source.dart';
+import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
+    as influencer_model;
 
 class RequestsViewModel extends BaseViewModel with NavigationMixin {
   RequestsViewModel() {
@@ -23,6 +28,10 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
   bool? _isRequest = false;
   bool? get isRequest => _isRequest;
 
+  List<influencer_model.Datum> influencers = [];
+
+  List<int> assignedInfluencerIds = [];
+
   int? request = 1;
   final List<RequestStatus> _tabs = [
     RequestStatus.requested,
@@ -35,6 +44,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     RequestStatus.promoteVerified,
     RequestStatus.promotePay,
     RequestStatus.promoteCommission,
+    RequestStatus.clientPaymentVerified,
   ];
 
   final _dialogService = locator<DialogService>();
@@ -48,6 +58,15 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     loadTable(selectedTab);
 
     notifyListeners();
+  }
+
+  Future<void> getInfluencers() async {
+    try {
+      final res = await runBusyFuture(_apiService.getAllInfluencer());
+      influencers = res.data ?? [];
+    } catch (e) {
+      influencers = [];
+    }
   }
 
   // Data list
@@ -68,7 +87,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
 
       final filteredData = requests.where((e) {
         final apiStatus = e.status; // INT from backend
-        return tabStatus.backendCodes.contains(apiStatus);
+        return tabStatus.filterBackendCodes.contains(apiStatus);
       }).toList();
 
       tableSource = RequestTableSource(
@@ -81,6 +100,10 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         onGoToPromoteVerified,
         onRevoke,
         onGotoPromotePay,
+        onPaymentDialog,
+        onGotoPromoteCommission,
+        onClientPaymentVerified,
+        onReAssign,
       );
 
       _isRequest = false;
@@ -96,10 +119,15 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         onGoToPromoteVerified,
         onRevoke,
         onGotoPromotePay,
+        onPaymentDialog,
+        onGotoPromoteCommission,
+        onClientPaymentVerified,
+        onReAssign,
       );
+
       _isRequest = false;
     }
-
+    getInfluencers();
     setBusy(false);
     notifyListeners();
   }
@@ -222,6 +250,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Influencer Phone")),
           DataColumn(label: Text("Requested Date")),
           DataColumn(label: Text("Rejected Date")),
+          DataColumn(label: Text("Action")),
         ];
 
       // 8. Promote Verified
@@ -234,6 +263,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Influencer")),
           DataColumn(label: Text("Inf_Id / Inf_Phone")),
           DataColumn(label: Text("Assigned Date")),
+          DataColumn(label: Text("link")),
           DataColumn(label: Text("Completed Date")),
           DataColumn(
               label: Text("Action"),
@@ -263,12 +293,100 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Inf_Phone")),
           DataColumn(label: Text("Inf_Payment date")),
           DataColumn(label: Text("Commission Amount")),
-          DataColumn(label: Text("Action")),
+          DataColumn(
+              label: Text("Action"),
+              headingRowAlignment: MainAxisAlignment.center),
+        ];
+      case "client_payment_verified":
+        return const [
+          DataColumn(label: Text("S.No")),
+          DataColumn(label: Text("Project Code")),
+          DataColumn(label: Text("client_name")),
+          DataColumn(label: Text("client_Phone")),
+          DataColumn(label: Text("Payment amount")),
+          DataColumn(label: Text("Commission Amount")),
+          DataColumn(
+              label: Text("Action"),
+              headingRowAlignment: MainAxisAlignment.center),
         ];
 
       default:
         return [];
     }
+  }
+
+  Future<void> statusChange(data) async {
+    setBusy(true);
+    _isRequest = true;
+    final req = {
+      "id": data["id"],
+      "status": data["status"],
+    };
+
+    try {
+      final res = await _apiService.statusChange(req);
+      await onRefresh();
+    } catch (e) {
+      _isRequest = false;
+    } finally {}
+    setBusy(false);
+    _isRequest = false;
+    notifyListeners();
+  }
+
+  Future<void> waitingAccept(data) async {
+    setBusy(true);
+    _isRequest = true;
+    final req = {
+      "id": data["id"],
+      "status": data["status"],
+      "payment": data["data"]["payment"],
+      "verification": data["data"]["verification"],
+    };
+
+    try {
+      final res = await _apiService.waitingAccept(req);
+      await onRefresh();
+    } catch (e) {
+      _isRequest = false;
+    } finally {}
+    setBusy(false);
+    _isRequest = false;
+    notifyListeners();
+  }
+
+  Future<void> paymentStatusChange(data) async {
+    setBusy(true);
+    _isRequest = true;
+    final req = {
+      "id": data["id"],
+      "payment_date": data["payment_date"] ?? "",
+      "payment_status": data["payment_status"] == "Paid" ? 3 : 0
+    };
+
+    try {
+      final res = await _apiService.paymentStatusChange(req);
+      await onRefresh();
+    } catch (e) {
+      _isRequest = false;
+    } finally {}
+    setBusy(false);
+    _isRequest = false;
+    notifyListeners();
+  }
+
+  Future<void> assignInfluencer(data) async {
+    setBusy(true);
+    _isRequest = true;
+    try {
+      final res = await _apiService.clientReAssign(data);
+      await onRefresh();
+    } catch (e) {
+      _isRequest = false;
+    } finally {}
+    setBusy(false);
+    _isRequest = false;
+    notifyListeners();
   }
 
   /// functions
@@ -277,8 +395,16 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     showRejectConfirmationDialog(
         context: StackedService.navigatorKey!.currentContext!,
         itemName: "${model.projectId}",
-        onConfirm: () {});
+        onConfirm: () async {
+          final data = {
+            "id": model.id,
+            "status": 8,
+          };
+          await statusChange(data);
+        });
   }
+
+  //reAssign
 
   //waiting
   onWaiting(request_model.Datum model) {
@@ -290,7 +416,13 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           "Are you sure you want to move the ${model.projectId} to the waiting section?",
       icon: Icons.hourglass_top,
       confirmColor: Colors.green,
-      onConfirm: () => {},
+      onConfirm: () {
+        final data = {
+          "id": model.id,
+          "status": 2,
+        };
+        statusChange(data);
+      },
     );
   }
 
@@ -300,6 +432,9 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       context: StackedService.navigatorKey!.currentContext!,
       onSave: (data) {
         debugPrint(data.toString());
+        final datas = {"id": model.id, "status": 3, "data": data};
+        waitingAccept(datas);
+        print(datas);
       },
     );
   }
@@ -324,7 +459,13 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           "Are you sure you want to move the ${model.projectId} to the Promote Verified section?",
       icon: Icons.hourglass_top,
       confirmColor: Colors.green,
-      onConfirm: () => {},
+      onConfirm: () {
+        final data = {
+          "id": model.id,
+          "status": 12,
+        };
+        statusChange(data);
+      },
     );
   }
 
@@ -337,8 +478,33 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           "Are you sure you want to Revoke the ${model.projectId} to the Influencer Cancelled section?",
       icon: Icons.free_cancellation,
       confirmColor: red,
-      onConfirm: () => {},
+      onConfirm: () {
+        final data = {
+          "id": model.id,
+          "status": 4,
+        };
+        statusChange(data);
+      },
     );
+  }
+
+  onReAssign(request_model.Datum model) async {
+    final selected = await showReassignInfluencerDialog(
+        context: StackedService.navigatorKey!.currentContext!,
+        influencers: influencers,
+        currentInfluencerId: model.inf!.ids,
+        assignedInfluencerIds: assignedInfluencerIds);
+
+    if (selected != null) {
+      print("Selected Influencer ID: ${selected.id}");
+      final data = {
+        "client_project_id": model.id,
+        "inf_id": selected.id,
+        "status": 3
+      };
+      await assignInfluencer(data);
+      print(data);
+    }
   }
 
   onGotoPromotePay(request_model.Datum model) {
@@ -351,7 +517,78 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           "Are you sure you move to Promote Pay the ${model.projectId} to the Promote verified section?",
       icon: Icons.free_cancellation,
       confirmColor: publisButtonColor,
-      onConfirm: () => {},
+      onConfirm: () {
+        final data = {
+          "id": model.id,
+          "status": 10,
+        };
+        statusChange(data);
+      },
+    );
+  }
+
+  onGotoPromoteCommission(request_model.Datum model) {
+    showActionConfirmationDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      title: 'Promote Commission',
+      confirmText: "Go to Promote Commission",
+      image: "assets/images/pay.svg",
+      message:
+          "Are you sure you move to Promote Commission the ${model.projectId} to the Promote Pay section?",
+      icon: Icons.free_cancellation,
+      confirmColor: publisButtonColor,
+      onConfirm: () {
+        final data = {
+          "id": model.id,
+          "status": 11,
+        };
+        statusChange(data);
+      },
+    );
+  }
+
+  void onPaymentDialog(request_model.Datum model) {
+    showPaymentStatusDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      onConfirm: (result) {
+        if (result != null) {
+          final status = result['status'];
+          final paymentDate = result['paymentDate'];
+
+          print("Status Name : ${status['name']}");
+          print("Payment Date: $paymentDate");
+
+          final data = {
+            "id": model.id,
+            "payment_status": status['name'],
+            "payment_date":
+                DateFormat('yyyy-MM-dd').format(paymentDate ?? DateTime.now()),
+          };
+
+          // API call here 👇
+          paymentStatusChange(data);
+        }
+      },
+    );
+  }
+
+  onClientPaymentVerified(request_model.Datum model) {
+    showActionConfirmationDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      title: 'Client Payment Verified',
+      confirmText: "Client Payment Verified",
+      image: "assets/images/pay.svg",
+      message:
+          "Are you sure you want to mark the payment for ${model.projectId} as verified?",
+      icon: Icons.free_cancellation,
+      confirmColor: publisButtonColor,
+      onConfirm: () {
+        final data = {
+          "id": model.id,
+          "status": 9,
+        };
+        statusChange(data);
+      },
     );
   }
 
@@ -359,3 +596,15 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     setSelected(_isSelected);
   }
 }
+
+// 1:Request,
+//2:Request-Waiting,
+//3:Waiting-Accept,
+//4:Completed-Pending,
+//5:Rework,
+//6:Completed,
+//7:inf-cancelled,
+//8:Admin-Rejected,
+//9:Promote-Verified,
+//10:Promote-Pay,
+//11:Promote-Commission

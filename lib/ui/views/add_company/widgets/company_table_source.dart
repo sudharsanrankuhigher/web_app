@@ -7,10 +7,12 @@ import 'package:webapp/widgets/profile_image.dart';
 class CompanyTableSource extends DataTableSource {
   final List<company_model.Datum> companies;
   final Function(company_model.Datum) onView;
+  final Function(company_model.Datum)? showBankDetails;
 
   CompanyTableSource({
     required this.companies,
     required this.onView,
+    this.showBankDetails,
   });
 
   @override
@@ -60,7 +62,7 @@ class CompanyTableSource extends DataTableSource {
                 ignoring: true,
                 child: ProfileImageEdit(
                   imageUrl: company.companyImage,
-                  radius: 30,
+                  radius: 20,
                   onImageSelected: (_, a) {},
                 ),
               ),
@@ -72,7 +74,16 @@ class CompanyTableSource extends DataTableSource {
           DataCell(Text("${company.altPhoneNo}")),
           DataCell(Text("${company.city} / ${company.state}")),
           DataCell(Text("${company.gstNo}")),
-          DataCell(Text("${company.projectCount}")),
+          DataCell(
+            InkWell(
+              onTap: () => showBankDetails!(company),
+              child: Text(
+                company.bankDetails != null
+                    ? company.bankDetails!.upi?.toString() ?? ""
+                    : "",
+              ),
+            ),
+          ),
           DataCell(Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,

@@ -1,7 +1,9 @@
 import 'dart:html' as html;
 import 'dart:ui_web' as ui;
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:webapp/core/helper/dialog_state.dart';
 
 class WebImage extends StatelessWidget {
   final String imageUrl;
@@ -25,7 +27,9 @@ class WebImage extends StatelessWidget {
           ..style.width = '100%'
           ..style.height = '100%'
           ..style.objectFit = fit.name
-          ..style.border = 'none';
+          // ..style.borderRadius = '50%' // 👈 circular
+          ..style.border = 'none'
+          ..classes.add('web-image-two');
 
         return img;
       },
@@ -34,6 +38,13 @@ class WebImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // if (DialogState.isDialogOpen) {
+    //   return SizedBox(
+    //     width: width,
+    //     height: height,
+    //     child: const ColoredBox(color: Colors.transparent),
+    //   );
+    // }
     return SizedBox(
       width: width,
       height: height,

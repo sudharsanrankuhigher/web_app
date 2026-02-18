@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:flutter/material.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/widgets/web_image_loading.dart';
 
 class DynamicMultiSearchDropdown extends StatelessWidget {
   final String label;
@@ -77,15 +77,15 @@ class DynamicMultiSearchDropdown extends StatelessWidget {
           spacing: 6,
           runSpacing: 4,
           children: [
-            ...visibleItems.map(
-              (e) => Chip(
+            ...visibleItems.map((e) {
+              return Chip(
                 label: Text(
                   e[nameKey],
                   style: fontFamilyMedium.size11.black,
                 ),
                 visualDensity: VisualDensity.compact,
-              ),
-            ),
+              );
+            }),
 
             /// +X more chip
             if (extraCount > 0)
@@ -100,8 +100,25 @@ class DynamicMultiSearchDropdown extends StatelessWidget {
       popupProps: PopupPropsMultiSelection.menu(
         showSearchBox: true,
         itemBuilder: (context, item, isSelected, _) {
+          final image = item['image'];
+          final hasImage = image != null && image.isNotEmpty;
+
           return ListTile(
             dense: true,
+            leading: hasImage
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: WebImage(
+                      imageUrl: image,
+                      height: 36,
+                      width: 36,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : CircleAvatar(
+                    radius: 18,
+                    child: Text(item['name'][0].toUpperCase()),
+                  ),
             title: Text(
               item[nameKey],
               style: fontFamilyMedium.size12.black,

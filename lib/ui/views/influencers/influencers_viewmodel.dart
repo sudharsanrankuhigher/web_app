@@ -66,6 +66,7 @@ class InfluencersViewModel extends BaseViewModel {
       addField("inf_id", influencerData['inf_id']);
       addField("state", influencerData['state']);
       addField("password", influencerData['password']);
+      addField("gender", influencerData['gender']);
       // addField("service", influencerData['service']);
       final services = influencerData['service'];
 
@@ -78,6 +79,10 @@ class InfluencersViewModel extends BaseViewModel {
       }
 
       addField("city", influencerData['city']);
+      addField("category", influencerData['category']);
+      addField("instagram_name", influencerData['instagramName']);
+      addField("youtube_name", influencerData['youtubeName']);
+      addField("facebook_name", influencerData['facebookName']);
       addField("instagram_link", influencerData['instagram']);
       addField("instagram_followers", influencerData['instagramFollowers']);
       addField("facebook_link", influencerData['facebook']);
@@ -151,6 +156,7 @@ class InfluencersViewModel extends BaseViewModel {
       /// ---------------- TEXT FIELDS ----------------
       addField("id", influencerData['id']);
       addField("name", influencerData['name']);
+      addField("category", influencerData['category']);
       addField("email", influencerData['email']);
       addField("phone", influencerData['phone']);
       addField("alt_phone", influencerData['altPhone']); // ✅ FIXED
@@ -158,6 +164,7 @@ class InfluencersViewModel extends BaseViewModel {
       addField("inf_id", influencerData['inf_id']);
       addField("state", influencerData['state']);
       addField("city", influencerData['city']);
+      addField("gender", influencerData['gender']);
 
       /// ---------------- PASSWORD (ONLY IF GIVEN) ----------------
       if (influencerData['password'] != null &&
@@ -176,6 +183,9 @@ class InfluencersViewModel extends BaseViewModel {
       }
 
       /// ---------------- SOCIAL ----------------
+      addField("instagram_name", influencerData['instagramName']);
+      addField("youtube_name", influencerData['youtubeName']);
+      addField("facebook_name", influencerData['facebookName']);
       addField("instagram_link", influencerData['instagram']);
       addField("instagram_followers", influencerData['instagramFollowers']);
       addField("facebook_link", influencerData['facebook']);
@@ -324,6 +334,7 @@ class InfluencersViewModel extends BaseViewModel {
   void openEditDialog(influencer_model.Datum item, bool view) {
     showDialog(
       context: StackedService.navigatorKey!.currentContext!,
+      barrierDismissible: false,
       builder: (_) => Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 800, minWidth: 400),
@@ -409,6 +420,7 @@ class InfluencersViewModel extends BaseViewModel {
     add("inf_id", item.infId);
     add("state", item.state);
     add("city", item.city);
+    add("gender", item.gender);
 
     // ---------- SERVICES ----------
     if (item.service != null && item.service!.isNotEmpty) {
@@ -423,6 +435,9 @@ class InfluencersViewModel extends BaseViewModel {
     }
 
     // ---------- SOCIAL ----------
+    add("instagram_name", item.instagramName);
+    add("youtube_name", item.youtubeName);
+    add("facebook_name", item.facebookName);
     add("instagram_link", item.instagramLink);
     add("instagram_followers", item.instagramFollowers);
     add("facebook_link", item.facebookLink);
@@ -438,6 +453,7 @@ class InfluencersViewModel extends BaseViewModel {
 
     // ---------- EXTRA ----------
     add("description", item.description);
+    add("category", item.category);
 
     // ---------- IMAGE ----------
     add("existing_image", item.image);

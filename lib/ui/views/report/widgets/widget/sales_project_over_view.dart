@@ -17,7 +17,7 @@ class SalesProjectsOverviewWidget extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.barGroups,
-    this.maxY = 22000, // default max Y
+    this.maxY = 100, // default max Y
   });
 
   @override
@@ -85,7 +85,7 @@ class SalesProjectsOverviewWidget extends StatelessWidget {
                       showTitles: true,
                       interval: maxY / 4,
                       getTitlesWidget: (value, meta) => Text(
-                        value == 0 ? '0' : '${(value / 1000).toInt()}k',
+                        value == 0 ? '0' : '${(value / 1).toInt()}',
                         style: const TextStyle(fontSize: 10),
                       ),
                     ),
@@ -94,7 +94,13 @@ class SalesProjectsOverviewWidget extends StatelessWidget {
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
-                        final weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                        final weeks = [
+                          'influencer payment',
+                          'influencer commission',
+                          'client payment',
+                          'client commission'
+                        ];
+                        // final weeks = ['Week 1', 'Week2', 'Week 3', 'Week 4'];
                         return Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: Text(

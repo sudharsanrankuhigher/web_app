@@ -7,6 +7,7 @@ import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/add_company/model/company_model.dart'
     as company_model;
+import 'package:webapp/ui/views/influencers/widgets/icon_text_form_field.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/initial_textform.dart';
 import 'package:webapp/widgets/profile_image.dart';
@@ -37,6 +38,10 @@ class AddEditCompanyPage {
 
     String? gstNo;
     String? projectCount;
+    String? accountNo;
+    String? holderName;
+    String? ifscCode;
+    String? upiId;
 
     final formKey = GlobalKey<FormState>();
 
@@ -280,6 +285,102 @@ class AddEditCompanyPage {
                             },
                           ),
                         ),
+
+                        const Text("Bank Details",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        verticalSpacing16,
+
+                        buildField(
+                          label: 'Account number',
+                          child: InitialTextForm(
+                            radius: 12,
+                            readOnly: isReadOnly,
+                            fillColor: white,
+                            hintText: 'Account number',
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(20),
+                            ],
+                            initialValue: initial?.bankDetails != null &&
+                                    initial!.bankDetails != null
+                                ? initial.bankDetails!.accountNo?.toString()
+                                : null,
+                            validator: (value) => value == null || value.isEmpty
+                                ? 'Please enter Account number'
+                                : null,
+                            onSaved: (value) {
+                              setDialogState(() {
+                                accountNo = value;
+                              });
+                            },
+                          ),
+                        ),
+                        verticalSpacing10,
+                        buildField(
+                          label: 'Account Holder Name',
+                          child: InitialTextForm(
+                            radius: 12,
+                            readOnly: isReadOnly,
+                            fillColor: white,
+                            hintText: 'Account Holder Name',
+                            initialValue: initial?.bankDetails != null
+                                ? initial?.bankDetails!.accountName?.toString()
+                                : null,
+                            validator: (value) => value == null || value.isEmpty
+                                ? 'Please enter Account Holder Name'
+                                : null,
+                            onSaved: (value) {
+                              setDialogState(() {
+                                holderName = value;
+                              });
+                            },
+                          ),
+                        ),
+                        horizontalSpacing12,
+                        buildField(
+                          label: 'IFSC Code',
+                          child: InitialTextForm(
+                            radius: 12,
+                            readOnly: isReadOnly,
+                            fillColor: white,
+                            hintText: 'Enter IFSC code',
+                            initialValue: initial?.bankDetails != null
+                                ? initial!.bankDetails!.ifscCode?.toString()
+                                : null,
+                            validator: (value) => value == null || value.isEmpty
+                                ? 'Please enter IFSC code'
+                                : null,
+                            onSaved: (value) {
+                              setDialogState(() {
+                                ifscCode = value;
+                              });
+                            },
+                          ),
+                        ),
+                        verticalSpacing12,
+                        buildField(
+                          label: 'Upi id',
+                          child: InitialTextForm(
+                            radius: 12,
+                            readOnly: isReadOnly,
+                            fillColor: white,
+                            hintText: 'upi id',
+                            initialValue: initial?.bankDetails != null
+                                ? initial?.bankDetails!.upi?.toString()
+                                : null,
+                            // validator: (value) => value == null || value.isEmpty
+                            //     ? 'Please enter upi id'
+                            //     : null,
+                            onSaved: (value) {
+                              setDialogState(() {
+                                upiId = value;
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 12),
                       ],
                     ),
                   ),
@@ -328,6 +429,12 @@ class AddEditCompanyPage {
                         "imageBytes": pickedBytes,
                         if (pickedBytes == null)
                           "existing_image": initial?.companyImage,
+                        "bank_details": {
+                          "account_no": accountNo,
+                          "holder_name": holderName,
+                          "ifsc_code": ifscCode,
+                          if (upiId != null) "upi_id": upiId
+                        }
                       });
                     },
                   ),

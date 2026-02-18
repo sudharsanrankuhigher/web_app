@@ -16,6 +16,10 @@ class RequestTableSource extends DataTableSource {
   final void Function(request_model.Datum) onGoToPromoteVerified;
   final void Function(request_model.Datum) onRevoke;
   final void Function(request_model.Datum) onGotoPromotePay;
+  final void Function(request_model.Datum) onPaymentDialog;
+  final void Function(request_model.Datum) onGotoPromoteCommission;
+  final void Function(request_model.Datum) onClientPaymentVerified;
+  final void Function(request_model.Datum) onReAssign;
 
   final String status;
 
@@ -28,7 +32,11 @@ class RequestTableSource extends DataTableSource {
       this.onPreparing,
       this.onGoToPromoteVerified,
       this.onRevoke,
-      this.onGotoPromotePay);
+      this.onGotoPromotePay,
+      this.onPaymentDialog,
+      this.onGotoPromoteCommission,
+      this.onClientPaymentVerified,
+      this.onReAssign);
 
   @override
   DataRow? getRow(int index) {
@@ -179,26 +187,45 @@ class RequestTableSource extends DataTableSource {
           DataCell(Text(
               DateFormatter.formatToDDMMMYYYY(m.dates!.assignedAt.toString()) ??
                   "")),
+          // DataCell(
+          //   (m.promotion!.youtube != null)
+          //       ? ViewLink(
+          //           url: m.promotion!.youtube!.toString(),
+          //           text: "ViewLink",
+          //         )
+          //       : m.promotion!.instagram != null
+          //           ? ViewLink(
+          //               url: m.promotion!.instagram!.toString(),
+          //               text: "ViewLink",
+          //             )
+          //           : m.promotion!.facebook != null
+          //               ? ViewLink(
+          //                   url: m.promotion!.facebook!.toString(),
+          //                   text: "ViewLink",
+          //                 )
+          //               : Container(
+          //                   child: Text('-'),
+          //                 ),
+          // ),
           DataCell(
-            (m.promotion!.youtube != null)
-                ? ViewLink(
-                    url: m.promotion!.youtube!,
+            Builder(
+              builder: (_) {
+                final url = m.promotion?.youtube ??
+                    m.promotion?.instagram ??
+                    m.promotion?.facebook;
+
+                if (url != null && url.isNotEmpty) {
+                  return ViewLink(
+                    url: url,
                     text: "ViewLink",
-                  )
-                : m.promotion!.instagram != null
-                    ? ViewLink(
-                        url: m.promotion!.instagram!,
-                        text: "ViewLink",
-                      )
-                    : m.promotion!.facebook != null
-                        ? ViewLink(
-                            url: m.promotion!.facebook!,
-                            text: "ViewLink",
-                          )
-                        : Container(
-                            child: Text('-'),
-                          ),
+                  );
+                }
+
+                return const Text('-');
+              },
+            ),
           ),
+
           DataCell(Center(
             child: CommonStatusChip(
               onTap: () => onPreparing(m),
@@ -289,6 +316,13 @@ class RequestTableSource extends DataTableSource {
           DataCell(Text(
               DateFormatter.formatToDDMMMYYYY(m.dates!.cancelled.toString()) ??
                   "")),
+          DataCell(InkWell(
+            onTap: () => onReAssign(m),
+            child: Text(
+              "Re-Assign",
+              style: fontFamilySemiBold.size13.continueButton,
+            ),
+          )),
         ];
 
       case "promote_verified":
@@ -305,46 +339,43 @@ class RequestTableSource extends DataTableSource {
           DataCell(Text(
               DateFormatter.formatToDDMMMYYYY(m.dates!.completed.toString()) ??
                   "")),
-          DataCell(SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                if (m.promotion != null)
-                  (m.promotion!.youtube != null)
-                      ? ViewLink(
-                          url: m.promotion!.youtube!,
-                          text: "ViewLink",
-                        )
-                      : m.promotion!.instagram != null
-                          ? ViewLink(
-                              url: m.promotion!.instagram!,
-                              text: "ViewLink",
-                            )
-                          : m.promotion!.facebook != null
-                              ? ViewLink(
-                                  url: m.promotion!.facebook!,
-                                  text: "ViewLink",
-                                )
-                              : Container(),
-                horizontalSpacing4,
-                InkWell(
-                  onTap: () => onGotoPromotePay(m),
-                  child: Container(
-                    padding: defaultPadding4 + rightPadding4 + leftPadding4,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      color: greenShade1,
-                    ),
-                    child: Text(
-                      'Promote pay',
-                      style: fontFamilyMedium.size10.white,
-                    ),
-                  ),
-                ),
-              ],
+          DataCell(
+            Builder(
+              builder: (_) {
+                final url = m.promotion?.youtube ??
+                    m.promotion?.instagram ??
+                    m.promotion?.facebook;
+
+                if (url != null && url.isNotEmpty) {
+                  return ViewLink(
+                    url: url,
+                    text: "ViewLink",
+                  );
+                }
+
+                return const Text('-');
+              },
             ),
-          )),
+          ),
+          DataCell(Center(
+              child: m.status == 9
+                  ? InkWell(
+                      onTap: () => onGotoPromotePay(m),
+                      child: Container(
+                        padding: defaultPadding4 + rightPadding4 + leftPadding4,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(25),
+                          color: greenShade1,
+                        ),
+                        child: Text(
+                          'Promote pay',
+                          style: fontFamilyMedium.size10.white,
+                        ),
+                      ),
+                    )
+                  : Text("Pending client payment verification",
+                      textAlign: TextAlign.center,
+                      style: fontFamilySemiBold.size13.red))),
         ];
 
       case "promote_pay":
@@ -359,16 +390,35 @@ class RequestTableSource extends DataTableSource {
           DataCell(Text(m.payment!.bankDetails ?? "")),
           DataCell(Text("${m.payment!.amount ?? 0}")),
           DataCell(Text("${m.payment!.commission ?? 0}")),
-          DataCell(Row(
-            children: [
-              Text(
-                'Paid',
-                style: fontFamilySemiBold.size13.continueButton,
-              ),
-              horizontalSpacing4,
-              Text(" / ${m.dates!.completed.toString() ?? ""}"),
-            ],
-          )),
+          DataCell((m.payment!.status == '1')
+              ? InkWell(
+                  onTap: () => onPaymentDialog(m),
+                  child: Container(
+                    padding: defaultPadding4 + rightPadding4 + leftPadding4,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      color: pendingColorShade,
+                    ),
+                    child: Text(
+                      'Payment',
+                      style: fontFamilyMedium.size10.black,
+                    ),
+                  ),
+                )
+              : InkWell(
+                  onTap: () => onGotoPromoteCommission(m),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Paid',
+                        style: fontFamilySemiBold.size13.continueButton,
+                      ),
+                      horizontalSpacing4,
+                      Text(
+                          " / ${DateFormatter.formatToDDMMMYYYY(m.dates!.payment.toString())}"),
+                    ],
+                  ),
+                )),
         ];
 
       case "promote_commission":
@@ -378,10 +428,11 @@ class RequestTableSource extends DataTableSource {
           DataCell(Text("${m.inf!.name ?? ""} / ${m.inf!.infId ?? ""}")),
           DataCell(Text(m.inf!.phone ?? "")),
           DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(m.dates!.completed.toString()) ??
+              DateFormatter.formatToDDMMMYYYY(m.dates!.payment.toString()) ??
                   "")),
           DataCell(Text("${m.payment!.commission ?? 0}")),
           DataCell(Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 'Success',
@@ -389,8 +440,27 @@ class RequestTableSource extends DataTableSource {
               ),
               horizontalSpacing4,
               Text(
-                  " / ${DateFormatter.formatToDDMMMYYYY(m.dates!.completed.toString()) ?? ""}"),
+                  " / ${DateFormatter.formatToDDMMMYYYY(m.dates!.payment.toString()) ?? ""}"),
             ],
+          )),
+        ];
+      case "client_payment_verified":
+        return [
+          DataCell(Text('${index + 1}')),
+          DataCell(Text(m.projectId ?? "")),
+          DataCell(Text("${m.client!.name ?? ""} ")),
+          DataCell(Text(m.client!.mobileNumber ?? "")),
+          DataCell(Text(
+              m.payment!.amount != null ? m.payment!.amount.toString() : "")),
+          DataCell(Text("${m.payment!.commission ?? 0}")),
+          DataCell(InkWell(
+            onTap: () => onClientPaymentVerified(m),
+            child: Center(
+              child: Text(
+                'Check & Verify',
+                style: fontFamilySemiBold.size13.continueButton,
+              ),
+            ),
           )),
         ];
 

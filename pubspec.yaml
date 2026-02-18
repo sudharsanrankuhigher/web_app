@@ -59,4 +59,5 @@ flutter:
   assets:
     - assets/images/
     - assets/json/cities.json
+    - assets/json/data.json
 

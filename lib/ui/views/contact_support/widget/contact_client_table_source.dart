@@ -30,7 +30,7 @@ class ClientTableSource extends DataTableSource {
     if (data.isEmpty) {
       return DataRow(
         cells: List.generate(
-          7, // total columns
+          8, // total columns
           (i) {
             if (i == 3) {
               // column index where message should show

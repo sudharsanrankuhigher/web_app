@@ -8,11 +8,16 @@ import 'package:webapp/core/model/get_profile_model.dart';
 import 'package:webapp/core/model/get_user_model.dart';
 import 'package:webapp/core/model/login_model.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:webapp/ui/views/banner/model/all_banner_model.dart';
 import 'package:webapp/ui/views/city/model/city_model.dart' as city_model;
 import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
     as influencer_model;
+import 'package:webapp/ui/views/location_contact/models/location_contact_model.dart';
 import 'package:webapp/ui/views/permissions/model/get_permission_model.dart';
 import 'package:webapp/ui/views/plans/model/plans_model.dart' as plan;
+import 'package:webapp/ui/views/promote_projects/model/payment_split_model.dart';
+import 'package:webapp/ui/views/promote_projects/model/prmote_table_model.dart'
+    as sub_project_model;
 import 'package:webapp/ui/views/roles/model/roles_model.dart' as roles_model;
 import 'package:webapp/ui/views/services/model/service_model.dart' as service;
 import 'package:webapp/ui/views/state/model/state_model.dart' as state_model;
@@ -26,6 +31,8 @@ import 'package:webapp/ui/views/contact_support/model/client_model.dart'
 
 import 'package:webapp/ui/views/requests/model/request_model.dart'
     as request_model;
+import 'package:webapp/ui/views/promote_projects/model/promote_project_model.dart'
+    as project_model;
 
 class ApiService {
   final Dio _dio;
@@ -178,7 +185,11 @@ class ApiService {
   /// DELETE: /api/admin/delete-plan/{id}
   Future<plan.PlanModel> deletePlan(int id) async {
     final data = {'id': id};
-    final response = await _dio.delete('api/admin/delete-plan', data: data);
+    final response = await _dio.delete('api/admin/delete-plan',
+        data: data,
+        options: Options(
+          validateStatus: (status) => status != null && status < 501,
+        ));
     return plan.PlanModel.fromJson(response.data);
   }
 
@@ -458,8 +469,178 @@ class ApiService {
     final response = await _dio.post('api/admin/client/request',
         data: req,
         options: Options(
-          validateStatus: (status) => status != null && status < 500,
+          validateStatus: (status) => status != null && status < 501,
         ));
     return request_model.ProjectRequestModel.fromJson(response.data);
+  }
+
+  ///POST: /api/admin/client/status/change
+  Future<void> statusChange(request) async {
+    final response = await _dio.post('api/admin/status/change',
+        data: request,
+        options: Options(
+          validateStatus: (status) => status != null && status < 500,
+        ));
+    return response.data;
+  }
+
+  ///POST: /api/admin/client/status/change
+  Future<void> waitingAccept(request) async {
+    final response = await _dio.post('api/admin/waiting/accept',
+        data: request,
+        options: Options(
+          validateStatus: (status) => status != null && status < 500,
+        ));
+    return response.data;
+  }
+
+  ///POST: /api/admin/payment/status/change
+  Future<void> paymentStatusChange(request) async {
+    final response = await _dio.post('api/admin/payment/status/change',
+        data: request,
+        options: Options(
+          validateStatus: (status) => status != null && status < 500,
+        ));
+    return response.data;
+  }
+
+  ///POST: /api/admin/client/reassign
+  Future<request_model.ProjectRequestModel> clientReAssign(request) async {
+    final response = await _dio.post('api/admin/client/reassign',
+        data: request,
+        options: Options(
+          validateStatus: (status) => status != null && status < 501,
+        ));
+    return request_model.ProjectRequestModel.fromJson(response.data);
+  }
+
+  /////////////////////promote projects ////////////////////////
+  /// POST: /api/admin/promote/create
+  Future<dynamic> promoteProjectCreate(FormData formData) async {
+    final response = await _dio.post(
+      'api/admin/promote/create',
+      data: formData,
+      options: Options(
+        contentType: 'multipart/form-data',
+        validateStatus: (status) => status != null && status < 500,
+      ),
+    );
+    return response.data;
+  }
+
+  /// POST: /api/admin/promote/list
+  Future<project_model.ProjectModel> getAllPromoteProjects(request) async {
+    final response = await _dio.post('api/admin/promote/list', data: request);
+    return project_model.ProjectModel.fromJson(response.data);
+  }
+
+  ///POST: /api/admin/promote/project
+  Future<sub_project_model.PromoteTableModel> getSubProjects(request) async {
+    final response =
+        await _dio.post('api/admin/promote/project', data: request);
+    return sub_project_model.PromoteTableModel.fromJson(response.data);
+  }
+
+  ///POST: /api/admin/promote/status
+  Future<dynamic> changePromoteStatus(request) async {
+    final response = await _dio.post('api/admin/promote/status',
+        data: request,
+        options: Options(
+          validateStatus: (status) => status != null && status < 500,
+        ));
+    return response.data;
+  }
+
+  ///POST: /api/admin/payment/list
+  Future<PaymentSplitModel> getPaymentSplit(request) async {
+    final response = await _dio.post('api/admin/payment/list', data: request);
+    return PaymentSplitModel.fromJson(response.data);
+  }
+
+  ///POST: /api/admin/payment/update
+  Future<dynamic> updatePaymentSplit(request) async {
+    final response = await _dio.post('api/admin/payment/update',
+        data: request,
+        options: Options(
+          validateStatus: (status) => status != null && status < 500,
+        ));
+    return response.data;
+  }
+
+  ///POST: /api/admin/promote/reassign
+  Future<project_model.ProjectModel> reAssignInf(request) async {
+    final response = await _dio.post('api/admin/promote/reassign',
+        data: request,
+        options: Options(
+          validateStatus: (status) => status != null && status < 501,
+        ));
+    return project_model.ProjectModel.fromJson(response.data);
+  }
+
+  //////////////////// location contact ////////////////////
+  /// GET: /api/admin/contact/list
+  Future<LocationContactModel> getLocationContact() async {
+    final response = await _dio.get('api/admin/contact/list',
+        options: Options(
+          validateStatus: (status) => status != null && status < 500,
+        ));
+    return LocationContactModel.fromJson(response.data);
+  }
+
+  ///POST: /api/admin/contact/save
+  Future<LocationContactModel> createLocationContact(request) async {
+    final response = await _dio.post('api/admin/contact/save',
+        data: request,
+        options: Options(
+          validateStatus: (status) => status != null && status < 500,
+        ));
+    return LocationContactModel.fromJson(response.data);
+  }
+
+  ///DELETE: /api/admin/contact/delete
+  Future<LocationContactModel> deleteLocationContact(request) async {
+    final response = await _dio.delete('api/admin/contact/delete',
+        queryParameters: request,
+        options: Options(
+          validateStatus: (status) => status != null && status < 500,
+        ));
+    return LocationContactModel.fromJson(response.data);
+  }
+
+  //////////////////Banner/////////////////
+  ///Get: api/admin/banner/list
+  Future<AllBannerModel> getAllBanner() async {
+    final response = await _dio.get(
+      'api/admin/banner/list',
+      options: Options(
+        validateStatus: (status) => status != null && status < 500,
+        responseType: ResponseType.json,
+      ),
+    );
+    return AllBannerModel.fromJson(response.data);
+  }
+
+  ///POST: api/admin/banner/create
+  Future<AllBannerModel> createBanner(request) async {
+    final response = await _dio.post('api/admin/banner/create',
+        data: request,
+        options: Options(
+          contentType: 'multipart/form-data',
+          validateStatus: (status) => status != null && status < 501,
+        ));
+    return AllBannerModel.fromJson(response.data);
+  }
+
+  ///Delete: /api/admin/delete
+  Future<AllBannerModel> deleteBanner(id) async {
+    final request = {
+      "id": id,
+    };
+    final response = await _dio.delete('api/admin/banner/delete',
+        data: request,
+        options: Options(
+          validateStatus: (status) => status != null && status < 501,
+        ));
+    return AllBannerModel.fromJson(response.data);
   }
 }

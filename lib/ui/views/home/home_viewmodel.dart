@@ -52,9 +52,11 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
     // 'City',
     // 'State',
     'Plans',
-    'Requests',
+    "Banner",
+    'Client Requests',
     'Promotion Projects',
-    'Contact Support',
+    'Ticket Support',
+    "Contact",
     'Company',
     'Sub Admin',
     'Report',
@@ -68,10 +70,11 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
     'assets/images/influencer_dashboard.svg',
     'assets/images/service_dashboard.svg',
     // 'assets/images/city.svg',
-    // 'assets/images/city.svg',
     'assets/images/plans_dashboard.svg',
+    'assets/images/city.svg', // banner
     'assets/images/requests_dashboard.svg',
     'assets/images/promotes_proj_dashboard.svg',
+    'assets/images/support_dashboard.svg',
     'assets/images/support_dashboard.svg',
     'assets/images/support_dashboard.svg',
     'assets/images/sub-admin_dashboard.svg',
@@ -134,36 +137,43 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
         _selectedIndex = 4;
         break;
       case 5:
-        context.pushReplacementNamed('requests');
+        context.pushReplacementNamed('banner');
         _selectedIndex = 5;
         break;
       case 6:
-        context.pushReplacementNamed('promotion-projects');
+        context.pushReplacementNamed('requests');
         _selectedIndex = 6;
         break;
       case 7:
-        context.pushReplacementNamed('contact-support');
+        context.pushReplacementNamed('promotion-projects');
         _selectedIndex = 7;
         break;
       case 8:
-        context.pushReplacementNamed('company');
+        context.pushReplacementNamed('contact-support');
         _selectedIndex = 8;
-        break;
       case 9:
-        context.pushReplacementNamed('sub-admin');
+        context.pushReplacementNamed('contact');
         _selectedIndex = 9;
         break;
       case 10:
-        context.pushReplacementNamed('report');
+        context.pushReplacementNamed('company');
         _selectedIndex = 10;
         break;
       case 11:
-        context.pushReplacementNamed('roles');
+        context.pushReplacementNamed('sub-admin');
         _selectedIndex = 11;
         break;
       case 12:
-        context.pushReplacementNamed('permissions');
+        context.pushReplacementNamed('report');
         _selectedIndex = 12;
+        break;
+      case 13:
+        context.pushReplacementNamed('roles');
+        _selectedIndex = 13;
+        break;
+      case 14:
+        context.pushReplacementNamed('permissions');
+        _selectedIndex = 14;
         break;
     }
   }
@@ -191,29 +201,35 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
       case '/home/plans':
         _selectedIndex = 4;
         break;
-      case '/home/requests':
+      case '/home/banner':
         _selectedIndex = 5;
         break;
-      case '/home/promotion-projects':
+      case '/home/requests':
         _selectedIndex = 6;
         break;
-      case '/home/contact-support':
+      case '/home/promotion-projects':
         _selectedIndex = 7;
         break;
-      case '/home/company':
+      case '/home/ticket-support':
         _selectedIndex = 8;
         break;
-      case '/home/sub-admin':
+      case '/home/contact':
         _selectedIndex = 9;
         break;
-      case '/home/report':
+      case '/home/company':
         _selectedIndex = 10;
         break;
-      case '/home/roles':
+      case '/home/sub-admin':
         _selectedIndex = 11;
         break;
-      case '/home/permissions':
+      case '/home/report':
         _selectedIndex = 12;
+        break;
+      case '/home/roles':
+        _selectedIndex = 13;
+        break;
+      case '/home/permissions':
+        _selectedIndex = 14;
         break;
       default:
         _selectedIndex = 0;
@@ -346,7 +362,7 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
   String? get role => _role;
 
   Future<void> getProfile() async {
-    final res = await locator<ApiService>().getProfile();
+    final res = await runBusyFuture(locator<ApiService>().getProfile());
 
     if (res.status == 200) {
       _name = res.data?.name;

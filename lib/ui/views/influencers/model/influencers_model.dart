@@ -41,6 +41,7 @@ class InfluencerModel {
 
 class Datum {
   int? id;
+  int? category;
   String? name;
   String? image;
   String? email;
@@ -49,8 +50,12 @@ class Datum {
   DateTime? dob;
   String? infId;
   String? state;
+  String? gender;
   List<int>? service;
   String? city;
+  String? instagramName;
+  String? youtubeName;
+  String? facebookName;
   String? instagramLink;
   int? instagramFollowers;
   String? facebookLink;
@@ -76,9 +81,13 @@ class Datum {
     this.dob,
     this.infId,
     this.state,
+    this.gender,
     this.service,
     this.city,
     this.instagramLink,
+    this.youtubeName,
+    this.facebookName,
+    this.instagramName,
     this.instagramFollowers,
     this.facebookLink,
     this.facebookFollowers,
@@ -90,6 +99,7 @@ class Datum {
     this.upiId,
     this.description,
     this.status,
+    this.category,
     this.createdAt,
     this.updatedAt,
   });
@@ -97,6 +107,9 @@ class Datum {
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         id: json["id"],
         name: json["name"],
+        category: json["category"] == null
+            ? null
+            : int.tryParse(json["category"].toString()),
         image: json["image"],
         email: json["email"],
         phone: json["phone"],
@@ -108,12 +121,16 @@ class Datum {
             ? []
             : List<int>.from(json["service"]!.map((x) => x)),
         city: json["city"],
+        gender: json["gender"],
+        instagramName: json["instagram_name"],
+        youtubeName: json["youtube_name"],
+        facebookName: json["facebook_name"],
         instagramLink: json["instagram_link"],
-        instagramFollowers: json["instagram_followers"],
         facebookLink: json["facebook_link"],
-        facebookFollowers: json["facebook_followers"],
         youtubeLink: json["youtube_link"],
-        youtubeFollowers: json["youtube_followers"],
+        instagramFollowers: _parseInt(json["instagram_followers"]),
+        facebookFollowers: _parseInt(json["facebook_followers"]),
+        youtubeFollowers: _parseInt(json["youtube_followers"]),
         accountNo: json["account_no"],
         accountHolderName: json["account_holder_name"],
         ifscCode: json["ifsc_code"],
@@ -131,10 +148,12 @@ class Datum {
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
+        "category": category,
         "image": image,
         "email": email,
         "phone": phone,
         "alt_phone": altPhone,
+        "gender": gender,
         "dob":
             "${dob!.year.toString().padLeft(4, '0')}-${dob!.month.toString().padLeft(2, '0')}-${dob!.day.toString().padLeft(2, '0')}",
         "inf_id": infId,
@@ -142,6 +161,9 @@ class Datum {
         "service":
             service == null ? [] : List<dynamic>.from(service!.map((x) => x)),
         "city": city,
+        "instagram_name": instagramName,
+        "youtube_name": youtubeName,
+        "facebook_name": facebookName,
         "instagram_link": instagramLink,
         "instagram_followers": instagramFollowers,
         "facebook_link": facebookLink,
@@ -157,4 +179,14 @@ class Datum {
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
       };
+
+  static int _parseInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is String) {
+      if (value.trim().isEmpty) return 0;
+      return int.tryParse(value) ?? 0;
+    }
+    return 0;
+  }
 }

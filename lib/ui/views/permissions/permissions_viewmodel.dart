@@ -177,6 +177,18 @@ class PermissionsViewModel extends BaseViewModel {
       PermissionType.delete
     }),
     PermissionRow(name: 'report', allowed: {PermissionType.view}),
+    PermissionRow(name: 'banner', allowed: {
+      PermissionType.view,
+      PermissionType.edit,
+      PermissionType.delete,
+      PermissionType.add
+    }),
+    PermissionRow(name: 'location_contact', allowed: {
+      PermissionType.view,
+      PermissionType.edit,
+      PermissionType.delete,
+      PermissionType.add
+    }),
   ];
 
   void toggleSelectAll(bool value) {
@@ -245,6 +257,8 @@ class PermissionsViewModel extends BaseViewModel {
     SpecialPermissionRow(name: 'payment'),
     SpecialPermissionRow(name: 'add_call'),
     SpecialPermissionRow(name: 'add_project'),
+    SpecialPermissionRow(name: 'client_payment_approval'),
+    SpecialPermissionRow(name: 'company_payment_approval'),
   ];
 
   bool selectAllSpecial = false;

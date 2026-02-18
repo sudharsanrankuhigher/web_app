@@ -23,6 +23,7 @@ class ServiceTableSource extends DataTableSource {
           DataCell(Text("")),
           DataCell(Center(child: Text("No data found"))),
           DataCell(Text("")),
+          DataCell(Text("")),
         ],
       );
     }
@@ -45,7 +46,7 @@ class ServiceTableSource extends DataTableSource {
             padding: defaultPadding4,
             child: ProfileImageEdit(
               imageUrl: service.image,
-              radius: 30,
+              radius: 20,
               onImageSelected: (_, a) {},
             ),
           ),

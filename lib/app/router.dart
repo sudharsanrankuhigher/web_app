@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:webapp/ui/views/add_company/add_company_view.dart';
+import 'package:webapp/ui/views/banner/banner_view.dart';
 import 'package:webapp/ui/views/city/city_view.dart';
 import 'package:webapp/ui/views/contact_support/contact_support_view.dart';
 import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/ui/views/dash_board/dash_board_view.dart';
+import 'package:webapp/ui/views/location_contact/location_contact_view.dart';
 import 'package:webapp/ui/views/permissions/permissions_view.dart';
 import 'package:webapp/ui/views/promote_projects/promote_projects_view.dart';
 import 'package:webapp/ui/views/report/report_view.dart';
@@ -78,9 +80,14 @@ final GoRouter router = GoRouter(
           builder: (context, state) => PromoteProjectsView(),
         ),
         GoRoute(
-          path: '/home/contact-support',
+          path: '/home/ticket-support',
           name: 'contact-support',
           builder: (context, state) => ContactSupportView(),
+        ),
+        GoRoute(
+          path: '/home/contact',
+          name: 'contact',
+          builder: (context, state) => LocationContactView(),
         ),
         GoRoute(
           path: '/home/company',
@@ -106,6 +113,11 @@ final GoRouter router = GoRouter(
           path: '/home/permissions',
           name: 'permissions',
           builder: (context, state) => const PermissionsView(),
+        ),
+        GoRoute(
+          path: '/home/banner',
+          name: 'banner',
+          builder: (context, state) => const BannerView(),
         ),
       ],
     ),

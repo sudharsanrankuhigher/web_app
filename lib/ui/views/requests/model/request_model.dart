@@ -1,6 +1,6 @@
 // To parse this JSON data, do
 //
-//     final projectRequestModel = projectRequestModelFromJson(jsonString);
+// final projectRequestModel = projectRequestModelFromJson(jsonString);
 
 import 'dart:convert';
 
@@ -26,7 +26,9 @@ class ProjectRequestModel {
         success: json["success"],
         data: json["data"] == null
             ? []
-            : List<Datum>.from(json["data"]!.map((x) => Datum.fromJson(x))),
+            : List<Datum>.from(
+                json["data"].map((x) => Datum.fromJson(x)),
+              ),
         message: json["message"],
       );
 
@@ -72,18 +74,16 @@ class Datum {
         dates: json["dates"] == null ? null : Dates.fromJson(json["dates"]),
         payment:
             json["payment"] == null ? null : Payment.fromJson(json["payment"]),
-        promotion: json["promotion"] == null
-            ? null
-            : Promotion.fromJson(json["promotion"]),
+        promotion: _parsePromotion(json["promotion"]),
         status: json["status"] != null
             ? int.tryParse(json["status"].toString())
             : null,
         createdAt: json["created_at"] == null
             ? null
-            : DateTime.parse(json["created_at"]),
+            : DateTime.tryParse(json["created_at"]),
         updatedAt: json["updated_at"] == null
             ? null
-            : DateTime.parse(json["updated_at"]),
+            : DateTime.tryParse(json["updated_at"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -98,11 +98,31 @@ class Datum {
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
       };
+
+  /// Handles:
+  /// - null
+  /// - {}
+  /// - []
+  /// - [{}]
+  static Promotion? _parsePromotion(dynamic promoData) {
+    if (promoData == null) return null;
+
+    if (promoData is List) {
+      if (promoData.isEmpty) return null;
+      return Promotion.fromJson(Map<String, dynamic>.from(promoData.first));
+    }
+
+    if (promoData is Map<String, dynamic>) {
+      return Promotion.fromJson(promoData);
+    }
+
+    return null;
+  }
 }
 
 class Client {
-  dynamic name;
-  dynamic mobileNumber;
+  String? name;
+  String? mobileNumber;
 
   Client({
     this.name,
@@ -110,8 +130,8 @@ class Client {
   });
 
   factory Client.fromJson(Map<String, dynamic> json) => Client(
-        name: json["name"],
-        mobileNumber: json["mobile_number"],
+        name: json["name"]?.toString(),
+        mobileNumber: json["mobile_number"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -138,7 +158,7 @@ class Dates {
   factory Dates.fromJson(Map<String, dynamic> json) => Dates(
         requestedAt: json["requested_at"] == null
             ? null
-            : DateTime.parse(json["requested_at"]),
+            : DateTime.tryParse(json["requested_at"]),
         assignedAt: json["assigned_at"],
         completed: json["completed"],
         payment: json["payment"],
@@ -156,25 +176,24 @@ class Dates {
 
 class Inf {
   dynamic infId;
-  dynamic name;
-  dynamic phone;
+  String? name;
+  String? phone;
+  int? ids;
 
-  Inf({
-    this.infId,
-    this.name,
-    this.phone,
-  });
+  Inf({this.infId, this.name, this.phone, this.ids});
 
   factory Inf.fromJson(Map<String, dynamic> json) => Inf(
         infId: json["inf_id"],
-        name: json["name"],
-        phone: json["phone"],
+        name: json["name"]?.toString(),
+        phone: json["phone"]?.toString(),
+        ids: json["id"],
       );
 
   Map<String, dynamic> toJson() => {
         "inf_id": infId,
         "name": name,
         "phone": phone,
+        "id": ids,
       };
 }
 
@@ -195,28 +214,29 @@ class Payment {
 
   factory Payment.fromJson(Map<String, dynamic> json) => Payment(
         amount: json["amount"],
-        status: json["status"],
+        status: json["payment_status"]?.toString(),
         paidDate: json["paid_date"] == null
             ? null
-            : DateTime.parse(json["paid_date"]),
-        commission: json["commission"],
-        bankDetails: json["bank_details"],
+            : DateTime.tryParse(json["paid_date"]),
+        commission: json["commission"] == null
+            ? null
+            : int.tryParse(json["commission"].toString()),
+        bankDetails: json["bank_details"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {
         "amount": amount,
-        "status": status,
-        "paid_date":
-            "${paidDate!.year.toString().padLeft(4, '0')}-${paidDate!.month.toString().padLeft(2, '0')}-${paidDate!.day.toString().padLeft(2, '0')}",
+        "payment_status": status,
+        "paid_date": paidDate?.toIso8601String(),
         "commission": commission,
         "bank_details": bankDetails,
       };
 }
 
 class Promotion {
-  dynamic youtube;
-  dynamic facebook;
-  dynamic instagram;
+  String? youtube;
+  String? facebook;
+  String? instagram;
 
   Promotion({
     this.youtube,
@@ -225,9 +245,9 @@ class Promotion {
   });
 
   factory Promotion.fromJson(Map<String, dynamic> json) => Promotion(
-        youtube: json["youtube"],
-        facebook: json["facebook"],
-        instagram: json["instagram"],
+        youtube: json["youtube"]?.toString(),
+        facebook: json["facebook"]?.toString(),
+        instagram: json["instagram"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {

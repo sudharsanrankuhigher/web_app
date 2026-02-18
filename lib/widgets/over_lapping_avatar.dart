@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/widgets/web_image_loading.dart';
 
 class OverlappingAvatars extends StatelessWidget {
   final List<String> imageUrls;
@@ -27,12 +28,22 @@ class OverlappingAvatars extends StatelessWidget {
           for (int i = 0; i < visibleImages.length; i++)
             Positioned(
               left: i * (size * 0.6),
-              child: CircleAvatar(
-                radius: size / 2,
-                backgroundColor: Colors.white,
-                child: CircleAvatar(
-                  radius: (size / 2) - 2,
-                  backgroundImage: NetworkImage(visibleImages[i]),
+              child: Container(
+                width: size,
+                height: size,
+                padding: const EdgeInsets.all(0.8), // border thickness
+                decoration: BoxDecoration(
+                  color: Colors.black, // 👈 border color (change as needed)
+                  shape: BoxShape.circle,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(size / 2),
+                  child: WebImage(
+                    fit: BoxFit.cover,
+                    imageUrl: visibleImages[i],
+                    width: size - 4,
+                    height: size - 4,
+                  ),
                 ),
               ),
             ),
@@ -41,7 +52,7 @@ class OverlappingAvatars extends StatelessWidget {
               left: visibleImages.length * (size * 0.6),
               child: CircleAvatar(
                 radius: size / 2,
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.black87,
                 child: Text('+$remainingCount',
                     style: fontFamilySemiBold.size10.white),
               ),

@@ -62,18 +62,18 @@ class CommonFilterDialog extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                // Checkbox example if needed
-                Row(
-                  children: [
-                    Checkbox(
-                      value: checkStatus,
-                      onChanged: (v) => setState(() => checkStatus = v!),
-                    ),
-                    const Text("Special Filter"),
-                  ],
-                ),
+                // // Checkbox example if needed
+                // Row(
+                //   children: [
+                //     Checkbox(
+                //       value: checkStatus,
+                //       onChanged: (v) => setState(() => checkStatus = v!),
+                //     ),
+                //     const Text("Special Filter"),
+                //   ],
+                // ),
 
-                const SizedBox(height: 16),
+                // const SizedBox(height: 16),
 
                 // Action buttons
                 Row(

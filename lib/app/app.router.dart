@@ -5,30 +5,33 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:flutter/material.dart' as _i14;
+import 'package:flutter/material.dart' as _i16;
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart' as _i1;
-import 'package:stacked_services/stacked_services.dart' as _i21;
+import 'package:stacked_services/stacked_services.dart' as _i23;
 import 'package:webapp/ui/views/add_company/add_company_view.dart' as _i13;
+import 'package:webapp/ui/views/banner/banner_view.dart' as _i15;
 import 'package:webapp/ui/views/city/city_view.dart' as _i7;
 import 'package:webapp/ui/views/contact_support/contact_support_view.dart'
     as _i8;
-import 'package:webapp/ui/views/dash_board/dash_board_view.dart' as _i15;
+import 'package:webapp/ui/views/dash_board/dash_board_view.dart' as _i17;
 import 'package:webapp/ui/views/home/home_view.dart' as _i2;
-import 'package:webapp/ui/views/influencers/influencers_view.dart' as _i17;
+import 'package:webapp/ui/views/influencers/influencers_view.dart' as _i19;
+import 'package:webapp/ui/views/location_contact/location_contact_view.dart'
+    as _i14;
 import 'package:webapp/ui/views/login/login_view.dart' as _i4;
 import 'package:webapp/ui/views/permissions/permissions_view.dart' as _i11;
-import 'package:webapp/ui/views/plans/plans_view.dart' as _i19;
+import 'package:webapp/ui/views/plans/plans_view.dart' as _i21;
 import 'package:webapp/ui/views/promote_projects/promote_projects_view.dart'
     as _i9;
 import 'package:webapp/ui/views/report/report_view.dart' as _i10;
-import 'package:webapp/ui/views/requests/requests_view.dart' as _i20;
+import 'package:webapp/ui/views/requests/requests_view.dart' as _i22;
 import 'package:webapp/ui/views/roles/roles_view.dart' as _i12;
-import 'package:webapp/ui/views/services/services_view.dart' as _i18;
+import 'package:webapp/ui/views/services/services_view.dart' as _i20;
 import 'package:webapp/ui/views/startup/startup_view.dart' as _i3;
 import 'package:webapp/ui/views/state/state_view.dart' as _i6;
 import 'package:webapp/ui/views/sub_admin/sub_admin_view.dart' as _i5;
-import 'package:webapp/ui/views/users/users_view.dart' as _i16;
+import 'package:webapp/ui/views/users/users_view.dart' as _i18;
 
 class Routes {
   static const homeView = '/home';
@@ -55,6 +58,10 @@ class Routes {
 
   static const addCompanyView = '/add-company-view';
 
+  static const locationContactView = '/location-contact-view';
+
+  static const bannerView = '/banner-view';
+
   static const all = <String>{
     homeView,
     startupView,
@@ -68,6 +75,8 @@ class Routes {
     permissionsView,
     rolesView,
     addCompanyView,
+    locationContactView,
+    bannerView,
   };
 }
 
@@ -121,79 +130,99 @@ class StackedRouter extends _i1.RouterBase {
       Routes.addCompanyView,
       page: _i13.AddCompanyView,
     ),
+    _i1.RouteDef(
+      Routes.locationContactView,
+      page: _i14.LocationContactView,
+    ),
+    _i1.RouteDef(
+      Routes.bannerView,
+      page: _i15.BannerView,
+    ),
   ];
 
   final _pagesMap = <Type, _i1.StackedRouteFactory>{
     _i2.HomeView: (data) {
       final args = data.getArgs<HomeViewArguments>(nullOk: false);
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i16.MaterialPageRoute<dynamic>(
         builder: (context) => _i2.HomeView(key: args.key, child: args.child),
         settings: data,
       );
     },
     _i3.StartupView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i16.MaterialPageRoute<dynamic>(
         builder: (context) => const _i3.StartupView(),
         settings: data,
       );
     },
     _i4.LoginView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i16.MaterialPageRoute<dynamic>(
         builder: (context) => const _i4.LoginView(),
         settings: data,
       );
     },
     _i5.SubAdminView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i16.MaterialPageRoute<dynamic>(
         builder: (context) => const _i5.SubAdminView(),
         settings: data,
       );
     },
     _i6.StateView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i16.MaterialPageRoute<dynamic>(
         builder: (context) => const _i6.StateView(),
         settings: data,
       );
     },
     _i7.CityView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i16.MaterialPageRoute<dynamic>(
         builder: (context) => const _i7.CityView(),
         settings: data,
       );
     },
     _i8.ContactSupportView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i16.MaterialPageRoute<dynamic>(
         builder: (context) => const _i8.ContactSupportView(),
         settings: data,
       );
     },
     _i9.PromoteProjectsView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i16.MaterialPageRoute<dynamic>(
         builder: (context) => const _i9.PromoteProjectsView(),
         settings: data,
       );
     },
     _i10.ReportView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i16.MaterialPageRoute<dynamic>(
         builder: (context) => const _i10.ReportView(),
         settings: data,
       );
     },
     _i11.PermissionsView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i16.MaterialPageRoute<dynamic>(
         builder: (context) => const _i11.PermissionsView(),
         settings: data,
       );
     },
     _i12.RolesView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i16.MaterialPageRoute<dynamic>(
         builder: (context) => const _i12.RolesView(),
         settings: data,
       );
     },
     _i13.AddCompanyView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
+      return _i16.MaterialPageRoute<dynamic>(
         builder: (context) => const _i13.AddCompanyView(),
+        settings: data,
+      );
+    },
+    _i14.LocationContactView: (data) {
+      return _i16.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i14.LocationContactView(),
+        settings: data,
+      );
+    },
+    _i15.BannerView: (data) {
+      return _i16.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i15.BannerView(),
         settings: data,
       );
     },
@@ -212,9 +241,9 @@ class HomeViewArguments {
     required this.child,
   });
 
-  final _i14.Key? key;
+  final _i16.Key? key;
 
-  final _i14.Widget child;
+  final _i16.Widget child;
 
   @override
   String toString() {
@@ -260,64 +289,64 @@ class HomeViewRouter extends _i1.RouterBase {
   final _routes = <_i1.RouteDef>[
     _i1.RouteDef(
       HomeViewRoutes.dashBoardView,
-      page: _i15.DashBoardView,
+      page: _i17.DashBoardView,
     ),
     _i1.RouteDef(
       HomeViewRoutes.usersView,
-      page: _i16.UsersView,
+      page: _i18.UsersView,
     ),
     _i1.RouteDef(
       HomeViewRoutes.influencersView,
-      page: _i17.InfluencersView,
+      page: _i19.InfluencersView,
     ),
     _i1.RouteDef(
       HomeViewRoutes.servicesView,
-      page: _i18.ServicesView,
+      page: _i20.ServicesView,
     ),
     _i1.RouteDef(
       HomeViewRoutes.plansView,
-      page: _i19.PlansView,
+      page: _i21.PlansView,
     ),
     _i1.RouteDef(
       HomeViewRoutes.requestsView,
-      page: _i20.RequestsView,
+      page: _i22.RequestsView,
     ),
   ];
 
   final _pagesMap = <Type, _i1.StackedRouteFactory>{
-    _i15.DashBoardView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i15.DashBoardView(),
+    _i17.DashBoardView: (data) {
+      return _i16.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i17.DashBoardView(),
         settings: data,
       );
     },
-    _i16.UsersView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i16.UsersView(),
+    _i18.UsersView: (data) {
+      return _i16.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i18.UsersView(),
         settings: data,
       );
     },
-    _i17.InfluencersView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i17.InfluencersView(),
+    _i19.InfluencersView: (data) {
+      return _i16.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i19.InfluencersView(),
         settings: data,
       );
     },
-    _i18.ServicesView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i18.ServicesView(),
+    _i20.ServicesView: (data) {
+      return _i16.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i20.ServicesView(),
         settings: data,
       );
     },
-    _i19.PlansView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i19.PlansView(),
+    _i21.PlansView: (data) {
+      return _i16.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i21.PlansView(),
         settings: data,
       );
     },
-    _i20.RequestsView: (data) {
-      return _i14.MaterialPageRoute<dynamic>(
-        builder: (context) => const _i20.RequestsView(),
+    _i22.RequestsView: (data) {
+      return _i16.MaterialPageRoute<dynamic>(
+        builder: (context) => const _i22.RequestsView(),
         settings: data,
       );
     },
@@ -330,10 +359,10 @@ class HomeViewRouter extends _i1.RouterBase {
   Map<Type, _i1.StackedRouteFactory> get pagesMap => _pagesMap;
 }
 
-extension NavigatorStateExtension on _i21.NavigationService {
+extension NavigatorStateExtension on _i23.NavigationService {
   Future<dynamic> navigateToHomeView({
-    _i14.Key? key,
-    required _i14.Widget child,
+    _i16.Key? key,
+    required _i16.Widget child,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -502,6 +531,34 @@ extension NavigatorStateExtension on _i21.NavigationService {
         transition: transition);
   }
 
+  Future<dynamic> navigateToLocationContactView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return navigateTo<dynamic>(Routes.locationContactView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> navigateToBannerView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return navigateTo<dynamic>(Routes.bannerView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
   Future<dynamic> navigateToNestedDashBoardViewInHomeViewRouter([
     int? routerId,
     bool preventDuplicates = true,
@@ -587,8 +644,8 @@ extension NavigatorStateExtension on _i21.NavigationService {
   }
 
   Future<dynamic> replaceWithHomeView({
-    _i14.Key? key,
-    required _i14.Widget child,
+    _i16.Key? key,
+    required _i16.Widget child,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -751,6 +808,34 @@ extension NavigatorStateExtension on _i21.NavigationService {
         transition,
   ]) async {
     return replaceWith<dynamic>(Routes.addCompanyView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithLocationContactView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return replaceWith<dynamic>(Routes.locationContactView,
+        id: routerId,
+        preventDuplicates: preventDuplicates,
+        parameters: parameters,
+        transition: transition);
+  }
+
+  Future<dynamic> replaceWithBannerView([
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+        transition,
+  ]) async {
+    return replaceWith<dynamic>(Routes.bannerView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,

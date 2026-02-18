@@ -48,18 +48,38 @@ class SubAdminTableSource extends DataTableSource {
     }
   }
 
-  String formatTimeToDotAMPM(String time) {
+  String formatTimeToDotAMPM(String? time) {
+    if (time == null || time.trim().isEmpty) return '-';
+
     try {
-      final parts = time.split(':');
-      int hour = int.parse(parts[0]);
-      final minute = parts[1];
+      DateTime dateTime;
+
+      // Case 1: Full datetime
+      if (time.contains(' ')) {
+        dateTime = DateTime.parse(time);
+      }
+      // Case 2: HH:mm or HH:mm:ss
+      else if (time.contains(':')) {
+        final parts = time.split(':');
+        final hour = int.tryParse(parts[0]);
+        final minute = int.tryParse(parts[1]);
+
+        if (hour == null || minute == null) return '-';
+
+        dateTime = DateTime(0, 1, 1, hour, minute);
+      } else {
+        return '-';
+      }
+
+      int hour = dateTime.hour;
+      final minute = dateTime.minute.toString().padLeft(2, '0');
 
       final isAM = hour < 12;
       hour = hour % 12;
       if (hour == 0) hour = 12;
 
       return '$hour.$minute${isAM ? 'am' : 'pm'}';
-    } catch (e) {
+    } catch (_) {
       return '-';
     }
   }

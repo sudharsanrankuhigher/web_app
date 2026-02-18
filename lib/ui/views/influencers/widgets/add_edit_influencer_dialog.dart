@@ -17,7 +17,9 @@ import 'package:webapp/widgets/dob_field.dart';
 import 'package:webapp/widgets/drop_down_widget.dart';
 import 'package:webapp/widgets/label_text.dart';
 import 'package:webapp/widgets/profile_image.dart';
+import 'package:webapp/widgets/search_drop_down_widget.dart';
 import 'package:webapp/widgets/state_city_drop_down.dart';
+import 'package:webapp/core/helper/string_extensions.dart';
 
 class InfluencerDialog extends StatefulWidget {
   final influencer_model.Datum? influencer;
@@ -50,6 +52,20 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
   bool _isStateError = false;
   bool _isCityError = false;
 
+  dynamic selectedCategory;
+  bool isCategoryError = false;
+  bool isGenderError = false;
+
+  String? gender;
+  final List<String> genders = ['Male', 'Female', 'Other'];
+
+  final List<Map<String, dynamic>> categoryList = [
+    {'id': 1, 'name': 'Influencers'},
+    {'id': 2, 'name': 'Movie Stars'},
+    {'id': 3, 'name': 'TV Stars'},
+    {'id': 4, 'name': 'Sports Stars'},
+  ];
+
   DateTime? dob;
   bool dobError = false;
   List<dynamic> selectedServices = [];
@@ -78,11 +94,16 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
   late TextEditingController bankHolderController;
   late TextEditingController ifscController;
   late TextEditingController upiController;
+  late TextEditingController instagramNameController;
+  late TextEditingController youtubeNameController;
+  late TextEditingController facebookNameController;
 
   @override
   void initState() {
     super.initState();
     final inf = widget.influencer;
+
+    gender = inf?.gender?.capitalizeFirst() ?? "";
 
     nameController = TextEditingController(text: inf?.name ?? '');
     emailController = TextEditingController(text: inf?.email ?? '');
@@ -111,7 +132,29 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
         TextEditingController(text: inf?.accountHolderName ?? '');
     ifscController = TextEditingController(text: inf?.ifscCode ?? '');
     upiController = TextEditingController(text: inf?.upiId ?? '');
+    instagramNameController =
+        TextEditingController(text: inf?.instagramName ?? '');
+    youtubeNameController = TextEditingController(text: inf?.youtubeName ?? '');
+    facebookNameController =
+        TextEditingController(text: inf?.facebookName ?? '');
     descriptionController = TextEditingController();
+    isCategoryError = false;
+
+    // inf.category is int (from previous screen)
+    // selectedCategory = categoryList.firstWhere(
+    //   (e) => e['id'] == inf !.category,
+    //   orElse: () => categoryList.first,
+    // );
+    // Only try to find a category if inf exists and categoryList is not empty
+    if (inf != null && categoryList.isNotEmpty) {
+      selectedCategory = categoryList.firstWhere(
+        (e) =>
+            e['id'] == (inf.category ?? -1), // fallback -1 if category is null
+        orElse: () => categoryList.first, // safe fallback
+      );
+    } else {
+      selectedCategory = null; // no selection possible
+    }
 
     // selectedServices = inf?.service ?? [];
     if (widget.influencer != null && widget.service != null) {
@@ -151,39 +194,43 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _isView == true &&
-                        PermissionHelper.instance.canEdit('influencers')
-                    ? Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          CommonButton(
-                            padding: defaultPadding4,
-                            text: 'Edit',
-                            textStyle: fontFamilySemiBold.size12.black,
-                            buttonColor: redShade,
-                            width: 70,
-                            onTap: () {
-                              setState(() {
-                                _isView = false;
-                              });
-                            },
-                            icon: Icon(
-                              Icons.edit,
-                              size: 20,
-                            ),
-                          )
-                        ],
-                      )
-                    : InkWell(
-                        onTap: () {
-                          Navigator.pop(
-                              StackedService.navigatorKey!.currentContext!);
-                        },
-                        child: const SizedBox(
-                          height: 16,
-                          child: Icon(Icons.close),
-                        ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(
+                            StackedService.navigatorKey!.currentContext!);
+                      },
+                      child: const SizedBox(
+                        height: 16,
+                        child: Icon(Icons.close),
                       ),
+                    ),
+                    horizontalSpacing12,
+                    if (_isView == true &&
+                        PermissionHelper.instance.canEdit('influencers'))
+                      Center(
+                        child: CommonButton(
+                          padding: defaultPadding4,
+                          text: 'Edit',
+                          textStyle: fontFamilySemiBold.size12.black,
+                          buttonColor: redShade,
+                          width: 70,
+                          onTap: () {
+                            setState(() {
+                              _isView = false;
+                            });
+                          },
+                          icon: Icon(
+                            Icons.edit,
+                            size: 20,
+                          ),
+                        ),
+                      )
+                  ],
+                ),
 
                 Center(
                   child: Text(
@@ -444,6 +491,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                                 .map((e) => {
                                       'id': e.id,
                                       'name': e.name,
+                                      'image': e.image
                                     })
                                 .toList(),
                             onChanged: _isView == true
@@ -501,6 +549,58 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                 ),
 
                 const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildField(
+                        label: 'Category',
+                        child: IgnorePointer(
+                          ignoring: _isView == true ? true : false,
+                          child: SizedBox(
+                            width: 400,
+                            child: DynamicSingleSearchDropdown(
+                              label: "Category",
+                              items: categoryList,
+                              selectedItem: selectedCategory,
+                              isError: isCategoryError,
+                              errorText: "Please select a category",
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedCategory = value;
+                                  isCategoryError = false;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    horizontalSpacing10,
+                    Expanded(
+                      child: IgnorePointer(
+                        ignoring: _isView == true ? true : false,
+                        child: _buildField(
+                          label: 'Gender',
+                          child: DynamicSingleSearchDropdown(
+                            items: [
+                              "Male",
+                              "Female",
+                              "Others",
+                            ],
+                            selectedItem: gender,
+                            onChanged: (v) {
+                              gender = v;
+                            },
+                            label: "Gender",
+                            isError: isGenderError,
+                            nameKey: "name",
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
 
                 // -------------------------------
                 // SOCIAL MEDIA
@@ -521,43 +621,56 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                   ],
                 ),
                 verticalSpacing12,
-                // Instagram row
+
+                // ==============================
+                // INSTAGRAM ROW
+                // ==============================
                 Row(
                   children: [
                     Expanded(
                       child: IconTextFormField(
-                        validator: (val) {
-                          if (instagramLinkController.text.isEmpty) {
-                            return 'Please enter Instagram Link';
-                          }
-                          final uri = Uri.tryParse(val!.trim());
-                          if (uri == null ||
-                              !uri.hasScheme ||
-                              !uri.hasAuthority) {
-                            return 'Please enter a valid URL';
-                          }
-
-                          return null;
-                        },
+                        isView: _isView,
+                        icon: Icons.camera,
+                        label: "Instagram name",
+                        controller: instagramNameController,
+                        validator: (val) => null,
+                      ),
+                    ),
+                    horizontalSpacing10,
+                    Expanded(
+                      child: IconTextFormField(
                         isView: _isView,
                         icon: Icons.camera,
                         label: "Instagram Link",
                         controller: instagramLinkController,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: IconTextFormField(
                         validator: (val) {
-                          if (instagramFollowersController.text.isEmpty) {
-                            return 'Please enter Instagram Followers';
+                          if (val != null && val.trim().isNotEmpty) {
+                            final uri = Uri.tryParse(val.trim());
+                            if (uri == null ||
+                                !uri.hasScheme ||
+                                !uri.hasAuthority) {
+                              return 'Please enter a valid URL';
+                            }
                           }
                           return null;
                         },
+                      ),
+                    ),
+                    horizontalSpacing10,
+                    Expanded(
+                      child: IconTextFormField(
                         isView: _isView,
                         icon: Icons.camera,
                         label: "Instagram Followers",
                         controller: instagramFollowersController,
+                        validator: (val) {
+                          if (val != null && val.trim().isNotEmpty) {
+                            if (int.tryParse(val.trim()) == null) {
+                              return 'Enter valid number';
+                            }
+                          }
+                          return null;
+                        },
                       ),
                     ),
                   ],
@@ -565,86 +678,111 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
 
                 verticalSpacing8,
 
-                // FB + YT
+                // ==============================
+                // FACEBOOK ROW
+                // ==============================
                 Row(
                   children: [
                     Expanded(
                       child: IconTextFormField(
                         isView: _isView,
                         icon: Icons.facebook,
-                        label: "facebook Link",
+                        label: "Facebook name",
+                        controller: facebookNameController,
+                        validator: (val) => null,
+                      ),
+                    ),
+                    horizontalSpacing10,
+                    Expanded(
+                      child: IconTextFormField(
+                        isView: _isView,
+                        icon: Icons.facebook,
+                        label: "Facebook Link",
                         controller: facebookLinkController,
                         validator: (val) {
-                          if (facebookLinkController.text.isEmpty) {
-                            return 'Please enter Facebook Link';
+                          if (val != null && val.trim().isNotEmpty) {
+                            final uri = Uri.tryParse(val.trim());
+                            if (uri == null ||
+                                !uri.hasScheme ||
+                                !uri.hasAuthority) {
+                              return 'Please enter a valid URL';
+                            }
                           }
-
-                          final uri = Uri.tryParse(val!.trim());
-                          if (uri == null ||
-                              !uri.hasScheme ||
-                              !uri.hasAuthority) {
-                            return 'Please enter a valid URL';
-                          }
-
                           return null;
                         },
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    horizontalSpacing10,
                     Expanded(
                       child: IconTextFormField(
+                        isView: _isView,
+                        icon: Icons.facebook,
+                        label: "Facebook Followers",
+                        controller: facebookFollowersController,
                         validator: (val) {
-                          if (facebookFollowersController.text.isEmpty) {
-                            return 'Please enter Facebook Followers';
+                          if (val != null && val.trim().isNotEmpty) {
+                            if (int.tryParse(val.trim()) == null) {
+                              return 'Enter valid number';
+                            }
                           }
                           return null;
                         },
-                        isView: _isView,
-                        icon: Icons.facebook,
-                        label: "facebook Followers",
-                        controller: facebookFollowersController,
                       ),
                     ),
                   ],
                 ),
+
                 verticalSpacing8,
+
+                // ==============================
+                // YOUTUBE ROW
+                // ==============================
                 Row(
                   children: [
                     Expanded(
                       child: IconTextFormField(
                         isView: _isView,
                         icon: Icons.youtube_searched_for,
-                        label: "youtube Link",
+                        label: "YouTube name",
+                        controller: youtubeNameController,
+                        validator: (val) => null,
+                      ),
+                    ),
+                    horizontalSpacing10,
+                    Expanded(
+                      child: IconTextFormField(
+                        isView: _isView,
+                        icon: Icons.youtube_searched_for,
+                        label: "YouTube Link",
                         controller: youtubeLinkController,
                         validator: (val) {
-                          if (val == null || val.trim().isEmpty) {
-                            return 'Please enter YouTube link';
+                          if (val != null && val.trim().isNotEmpty) {
+                            final uri = Uri.tryParse(val.trim());
+                            if (uri == null ||
+                                !uri.hasScheme ||
+                                !uri.hasAuthority) {
+                              return 'Please enter a valid URL';
+                            }
                           }
-
-                          final uri = Uri.tryParse(val.trim());
-                          if (uri == null ||
-                              !uri.hasScheme ||
-                              !uri.hasAuthority) {
-                            return 'Please enter a valid URL';
-                          }
-
                           return null;
                         },
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    horizontalSpacing10,
                     Expanded(
                       child: IconTextFormField(
+                        isView: _isView,
+                        icon: Icons.video_label,
+                        label: "YouTube Followers",
+                        controller: youtubeFollowersController,
                         validator: (val) {
-                          if (youtubeFollowersController.text.isEmpty) {
-                            return 'Please enter Youtube Followers';
+                          if (val != null && val.trim().isNotEmpty) {
+                            if (int.tryParse(val.trim()) == null) {
+                              return 'Enter valid number';
+                            }
                           }
                           return null;
                         },
-                        isView: _isView,
-                        icon: Icons.video_label,
-                        label: "youtube Followers",
-                        controller: youtubeFollowersController,
                       ),
                     ),
                   ],
@@ -762,7 +900,67 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                           _isCityError = isCityError;
                         });
                         if (isStateError || isCityError) return;
+                        bool instagramStarted = instagramNameController.text
+                                .trim()
+                                .isNotEmpty ||
+                            instagramLinkController.text.trim().isNotEmpty ||
+                            instagramFollowersController.text.trim().isNotEmpty;
 
+                        bool instagramFull = instagramNameController.text
+                                .trim()
+                                .isNotEmpty &&
+                            instagramLinkController.text.trim().isNotEmpty &&
+                            instagramFollowersController.text.trim().isNotEmpty;
+
+                        // Facebook
+                        bool facebookStarted = facebookNameController.text
+                                .trim()
+                                .isNotEmpty ||
+                            facebookLinkController.text.trim().isNotEmpty ||
+                            facebookFollowersController.text.trim().isNotEmpty;
+
+                        bool facebookFull = facebookNameController.text
+                                .trim()
+                                .isNotEmpty &&
+                            facebookLinkController.text.trim().isNotEmpty &&
+                            facebookFollowersController.text.trim().isNotEmpty;
+
+                        // YouTube
+                        bool youtubeStarted = youtubeNameController.text
+                                .trim()
+                                .isNotEmpty ||
+                            youtubeLinkController.text.trim().isNotEmpty ||
+                            youtubeFollowersController.text.trim().isNotEmpty;
+
+                        bool youtubeFull = youtubeNameController.text
+                                .trim()
+                                .isNotEmpty &&
+                            youtubeLinkController.text.trim().isNotEmpty &&
+                            youtubeFollowersController.text.trim().isNotEmpty;
+
+                        // ❌ Partial row check
+                        if ((instagramStarted && !instagramFull) ||
+                            (facebookStarted && !facebookFull) ||
+                            (youtubeStarted && !youtubeFull)) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  "If you start filling a row, complete all fields."),
+                            ),
+                          );
+                          return;
+                        }
+
+                        // ❌ None filled
+                        if (!instagramFull && !facebookFull && !youtubeFull) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  "Please fill at least one social media row."),
+                            ),
+                          );
+                          return;
+                        }
                         if (formKey.currentState!.validate()) {
                           final Map<String, dynamic> updated = {
                             if (widget.influencer?.id != null)
@@ -777,12 +975,15 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                             "password": passwordController.text,
                             "service": selectedService,
                             "city": cityController.text,
+                            "instagramName": instagramNameController.text,
                             "instagram": instagramLinkController.text,
                             "instagramFollowers":
                                 instagramFollowersController.text,
+                            "facebookName": facebookNameController.text,
                             "facebook": facebookLinkController.text,
                             "facebookFollowers":
                                 facebookFollowersController.text,
+                            "youtubeName": youtubeNameController.text,
                             "youtube": youtubeLinkController.text,
                             "youtubeFollowers": youtubeFollowersController.text,
                             "bankAccount": bankAccountController.text,
@@ -790,6 +991,8 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                             "ifsc": ifscController.text,
                             "upi": upiController.text,
                             "description": descriptionController.text,
+                            "category": selectedCategory['id'],
+                            "gender": gender!.toLowerCase(),
                           };
 
                           // ✅ IMAGE DATA (WEB)
@@ -817,6 +1020,17 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildField({required String label, required Widget child}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+        const SizedBox(height: 4),
+        child,
+      ],
     );
   }
 }

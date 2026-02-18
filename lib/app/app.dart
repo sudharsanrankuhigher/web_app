@@ -24,6 +24,10 @@ import 'package:webapp/ui/views/permissions/permissions_view.dart';
 import 'package:webapp/ui/views/roles/roles_view.dart';
 import 'package:webapp/ui/views/add_company/add_company_view.dart';
 import 'package:webapp/services/api_service.dart';
+import 'package:webapp/ui/views/location_contact/location_contact_view.dart';
+import 'package:webapp/ui/views/location_contact/location_contact_view.dart';
+import 'package:webapp/ui/views/location_contact/location_contact_view.dart';
+import 'package:webapp/ui/views/banner/banner_view.dart';
 // @stacked-import
 
 @StackedApp(
@@ -58,6 +62,8 @@ import 'package:webapp/services/api_service.dart';
     MaterialRoute(page: PermissionsView),
     MaterialRoute(page: RolesView),
     MaterialRoute(page: AddCompanyView),
+    MaterialRoute(page: LocationContactView),
+    MaterialRoute(page: BannerView),
 // @stacked-route
   ],
   dependencies: [

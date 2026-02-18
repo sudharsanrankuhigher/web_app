@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/plans/model/plans_model.dart' as plan_model;
 import 'package:webapp/widgets/initial_textform.dart';
 import 'package:webapp/widgets/label_text.dart';
+import 'package:webapp/widgets/search_drop_down_widget.dart';
 
 class CommonPlanDialog {
   static Future<Map<String, dynamic>?> show(
@@ -15,16 +17,30 @@ class CommonPlanDialog {
     String? planName = initial?.name ?? '';
     String? conn = initial?.connections.toString();
     String? amt = initial?.amount.toString();
-    String? badge = initial?.badge;
+    String? badge = initial?.badge ?? '';
 
-    int categoryCode = initial?.category == "1"
-        ? 1
-        : initial?.category == "2"
-            ? 2
-            : initial?.category == "3"
-                ? 3
-                : 1; // default to TV Stars
+    /// ---------------- CATEGORY DROPDOWN DATA ----------------
+    dynamic selectedCategory;
+    bool isCategoryError = false;
 
+    final List<Map<String, dynamic>> categoryList = [
+      {'id': 1, 'name': 'Influencers'},
+      {'id': 2, 'name': 'Movie Stars'},
+      {'id': 3, 'name': 'TV Stars'},
+      {'id': 4, 'name': 'Sports Stars'},
+    ];
+
+    /// Preselect category (Edit / View)
+    if (initial?.category != null) {
+      selectedCategory = categoryList.firstWhere(
+        (e) => e['id'].toString() == initial!.category,
+        orElse: () => categoryList.first,
+      );
+    } else {
+      selectedCategory = categoryList.first; // default
+    }
+
+    /// ---------------- INPUT DECORATION ----------------
     InputDecoration _decoration(String label) => InputDecoration(
           labelText: label,
           fillColor: Colors.white,
@@ -32,79 +48,109 @@ class CommonPlanDialog {
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.grey, width: 1.5)),
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.grey, width: 1.5),
+          ),
         );
 
     return showDialog<Map<String, dynamic>>(
-      barrierDismissible: false,
       context: context,
+      barrierDismissible: false,
       builder: (context) {
-        isAdd == true ? categoryCode = 1 : categoryCode;
-        return AlertDialog(
-          title: Text(
-            isView
-                ? "View Plan"
-                : initial == null
-                    ? "Add Plan"
-                    : "Edit Plan",
-          ),
-          content: SizedBox(
-            width: 400,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _field("Plan Name", planName, (v) => planName = v,
-                    isView: isView),
-                _field("Connections", conn, (v) => conn = v,
-                    isView: isView, isNumber: true),
-                _field("Amount", amt, (v) => amt = v,
-                    isView: isView, isNumber: true),
-                _field("Badge", badge, (v) => badge = v, isView: isView),
-                const SizedBox(height: 8),
-                IgnorePointer(
-                  ignoring: isView,
-                  child: DropdownButtonFormField<int>(
-                    value: categoryCode,
-                    decoration: _decoration("Category"),
-                    items: const [
-                      DropdownMenuItem(value: 1, child: Text("Influencers")),
-                      DropdownMenuItem(value: 2, child: Text("Movie Stars")),
-                      DropdownMenuItem(value: 3, child: Text("TV Stars")),
-                    ],
-                    onChanged: (v) => categoryCode = v ?? 1,
-                    validator: (v) =>
-                        v == null ? "Please select a category" : null,
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(
+                isView
+                    ? "View Plan"
+                    : initial == null
+                        ? "Add Plan"
+                        : "Edit Plan",
+              ),
+              content: SizedBox(
+                width: 400,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _field("Plan Name", planName, (v) => planName = v,
+                        isView: isView),
+                    _field("Connections", conn, (v) => conn = v,
+                        isView: isView, isNumber: true),
+                    _field("Amount", amt, (v) => amt = v,
+                        isView: isView, isNumber: true),
+                    _field("Badge", badge, (v) => badge = v, isView: isView),
+
+                    const SizedBox(height: 8),
+
+                    /// ---------------- CATEGORY DROPDOWN ----------------
+                    IgnorePointer(
+                      ignoring: isView,
+                      child: SizedBox(
+                        width: 400,
+                        child: DynamicSingleSearchDropdown(
+                          label: "Category",
+                          items: categoryList,
+                          selectedItem: selectedCategory,
+                          isError: isCategoryError,
+                          errorText: "Please select a category",
+                          onChanged: (value) {
+                            setState(() {
+                              selectedCategory = value;
+                              isCategoryError = false;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              /// ---------------- ACTIONS ----------------
+              actions: [
+                if (!isView)
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(continueButton),
+                    ),
+                    onPressed: () {
+                      if (selectedCategory == null) {
+                        setState(() => isCategoryError = true);
+                        return;
+                      }
+
+                      Navigator.pop(
+                        StackedService.navigatorKey!.currentContext!,
+                        {
+                          'planName': planName,
+                          'connections': int.tryParse(conn ?? "0") ?? 0,
+                          'amount': int.tryParse(amt ?? "0") ?? initial!.amount,
+                          'badge': badge ?? "",
+                          'category': selectedCategory['id'], // ✅ numeric
+                        },
+                      );
+                    },
+                    child: Text(
+                      initial == null ? "Save" : "Update",
+                      style: fontFamilySemiBold.size13.white,
+                    ),
                   ),
+                TextButton(
+                  onPressed: () => Navigator.pop(
+                    StackedService.navigatorKey!.currentContext!,
+                  ),
+                  child: const Text("Close"),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            if (!isView)
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(StackedService.navigatorKey!.currentContext!, {
-                    'planName': planName,
-                    'connections': int.tryParse(conn ?? "0") ?? 0,
-                    'amount': int.tryParse(amt ?? "0") ?? 0,
-                    'badge': badge ?? "",
-                    'category': categoryCode, // returns numeric code
-                  });
-                },
-                child: Text(initial == null ? "Save" : "Update"),
-              ),
-            TextButton(
-              onPressed: () =>
-                  Navigator.pop(StackedService.navigatorKey!.currentContext!),
-              child: const Text("Close"),
-            ),
-          ],
+            );
+          },
         );
       },
     );
   }
 
+  /// ---------------- COMMON TEXT FIELD ----------------
   static Widget _field(
     String label,
     String? initial,
@@ -137,18 +183,6 @@ class CommonPlanDialog {
           ),
         ],
       ),
-      // child: TextFormField(
-      //   initialValue: initial,
-      //   readOnly: isView,
-      //   keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-      //   onChanged: onChanged,
-      //   decoration: InputDecoration(
-      //     labelText: label,
-      //     border: const OutlineInputBorder(
-      //       borderRadius: BorderRadius.all(Radius.circular(10)),
-      //     ),
-      //   ),
-      // ),
     );
   }
 }

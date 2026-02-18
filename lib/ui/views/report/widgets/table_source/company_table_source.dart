@@ -3,11 +3,11 @@ import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/report/model/report_model.dart';
 
-class ReportTableSource extends DataTableSource {
-  final List<ReportModel> data;
+class CompanyReportTableSource extends DataTableSource {
+  final List<CompanyWiseProjectCountReport> data;
   final String status;
 
-  ReportTableSource({
+  CompanyReportTableSource({
     required this.data,
     required this.status,
   });
@@ -18,17 +18,13 @@ class ReportTableSource extends DataTableSource {
       return const DataRow(
         cells: [
           DataCell(Text("")),
-          DataCell(Text("")),
-          DataCell(Text("")),
           DataCell(Center(child: Text("No data found"))),
-          DataCell(Text("")),
-          DataCell(Text("")),
           DataCell(Text("")),
         ],
       );
     }
 
-    final service = data[index];
+    final item = data[index];
 
     return DataRow(
       color: WidgetStateProperty.resolveWith<Color?>(
@@ -40,37 +36,11 @@ class ReportTableSource extends DataTableSource {
           style: fontFamilySemiBold.size13.black,
         )), // S.No
         DataCell(Text(
-          service.project,
+          item.companyName ?? '-',
           style: fontFamilySemiBold.size13.black,
         )), // Name
         DataCell(Text(
-          service.influencer,
-          style: fontFamilySemiBold.size13.black,
-        )),
-        DataCell(Text(
-          service.client,
-          style: fontFamilySemiBold.size13.black,
-        )),
-        DataCell(Text(
-          "\$ ${service.amount}",
-          style: fontFamilySemiBold.size13.black,
-        )),
-        DataCell(Container(
-          padding: defaultPadding4 + rightPadding4 + leftPadding4,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25),
-              color: service.status == 'in-progress'
-                  ? pendingColorShade
-                  : greenShade),
-          child: Text(
-            service.status,
-            style: service.status == 'in-progress'
-                ? fontFamilySemiBold.size13.pendingColor
-                : fontFamilySemiBold.size13.completedColor,
-          ),
-        )),
-        DataCell(Text(
-          service.date,
+          (item.projectCount ?? 0).toString(),
           style: fontFamilySemiBold.size13.black,
         )),
       ],

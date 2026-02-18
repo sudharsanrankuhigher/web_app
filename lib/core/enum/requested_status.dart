@@ -9,6 +9,7 @@ enum RequestStatus {
   promoteVerified,
   promotePay,
   promoteCommission,
+  clientPaymentVerified,
 }
 
 extension RequestStatusMapper on RequestStatus {
@@ -35,6 +36,10 @@ extension RequestStatusMapper on RequestStatus {
         return [10];
       case RequestStatus.promoteCommission:
         return [11];
+      case RequestStatus.clientPaymentVerified:
+        return [12];
+      default:
+        return [];
     }
   }
 
@@ -56,8 +61,31 @@ extension RequestStatusX on RequestStatus {
         return "promote_pay";
       case RequestStatus.promoteCommission:
         return "promote_commission";
+      case RequestStatus.clientPaymentVerified:
+        return "client_payment_verified";
       default:
         return name;
+    }
+  }
+}
+
+extension RequestStatusFilter on RequestStatus {
+  /// backend status codes used for TABLE FILTERING
+  List<int> get filterBackendCodes {
+    switch (this) {
+      case RequestStatus.completedPending:
+        // click 4 → show 4 & 5
+        return [4, 5];
+      case RequestStatus.promoteVerified:
+        // promote_verified tab shows client_payment_verified also
+        return [9, 12];
+
+      case RequestStatus.clientPaymentVerified:
+        // client_payment_verified shows ONLY itself
+        return [12];
+
+      default:
+        return backendCodes;
     }
   }
 }

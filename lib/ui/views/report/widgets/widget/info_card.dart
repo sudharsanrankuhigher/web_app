@@ -6,7 +6,7 @@ import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 class InfoSalesProjectCard extends StatelessWidget {
   final String title;
   final String count;
-  final String subtitle;
+  final String? subtitle;
   final String iconPath;
   final Color iconBgColor;
   final Color countColor;
@@ -15,7 +15,7 @@ class InfoSalesProjectCard extends StatelessWidget {
     super.key,
     required this.title,
     required this.count,
-    required this.subtitle,
+    this.subtitle,
     required this.iconPath,
     this.iconBgColor = const Color(0xffD5FFF6),
     this.countColor = const Color(0xff13A7E4),
@@ -50,6 +50,7 @@ class InfoSalesProjectCard extends StatelessWidget {
           ),
           horizontalSpacing10,
           Column(
+            mainAxisSize: MainAxisSize.min, // ADD THIS
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(

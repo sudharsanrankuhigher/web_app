@@ -13,6 +13,7 @@ class StateCityDropdown extends StatefulWidget {
   final String? initialCity;
   final Function(String) onStateChanged;
   final Function(String?)? onCityChanged;
+  final Function(String?)? onChangeId;
   final String? Function(dynamic?)? stateValidator;
   final String? Function(dynamic?)? cityValidator;
   final bool? isCityError;
@@ -30,6 +31,7 @@ class StateCityDropdown extends StatefulWidget {
     required this.onStateChanged,
     this.onCityChanged,
     this.cityValidator,
+    this.onChangeId,
     this.stateValidator,
     this.isCityError = false,
     this.isStateError = false,
@@ -47,6 +49,7 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
   List<String> states = [];
   String? selectedState;
   String? selectedCity;
+  String? selectedStateId;
 
   @override
   void initState() {
@@ -55,6 +58,7 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
       /// 🔥 External states provided
       states = widget.states!;
       cities = widget.cities ?? [];
+
       _setInitialValues();
     } else {
       /// 🔥 Fallback to asset JSON
@@ -82,6 +86,14 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
   List<String> getCitiesByState(String state) {
     if (cities.isEmpty) return [];
     return cities.where((c) => c.state == state).map((c) => c.name).toList();
+  }
+
+  CityModel? getCityByName(String name) {
+    try {
+      return cities.firstWhere((c) => c.name == name);
+    } catch (_) {
+      return null;
+    }
   }
 
   @override
@@ -164,7 +176,9 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                   validator: widget.cityValidator,
                   items: (String filter, LoadProps? props) {
                     if (selectedState == null) return [];
+
                     final allCities = getCitiesByState(selectedState!);
+
                     return allCities
                         .where((c) =>
                             filter.isEmpty ||
@@ -217,15 +231,20 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                     ),
                   ),
                   onChanged: (value) {
+                    if (value == null) return;
+
+                    final city = getCityByName(value);
+
                     setState(() {
                       selectedCity = value;
+                      selectedStateId = city?.id;
                     });
 
-                    if (widget.onCityChanged != null) {
-                      widget.onCityChanged!(value);
-                    }
+                    widget.onCityChanged?.call(value);
+                    widget.onChangeId?.call(city?.id);
+                    print(selectedStateId);
                   },
-                )
+                ),
               ]
             ],
           )
@@ -371,10 +390,13 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                     onChanged: (value) {
                       setState(() {
                         selectedCity = value;
+                        selectedStateId = getCityByName(value!)?.id;
+                        print(selectedStateId);
                       });
 
                       if (widget.onCityChanged != null) {
                         widget.onCityChanged!(value);
+                        widget.onChangeId?.call(selectedStateId);
                       }
                     },
                   ),

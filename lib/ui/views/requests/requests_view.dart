@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stacked/stacked.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/widgets/common_button.dart';
@@ -177,6 +178,23 @@ class RequestsView extends StackedView<RequestsViewModel> {
                             onTap: () => viewModel.setSelected(6),
                             margin: defaultPadding10,
                           ),
+                          if ((PermissionHelper.instance
+                              .has('client_payment_approval')))
+                            CommonStatusChip(
+                              text: "Client Payment verified",
+                              imagePath: "assets/images/verified.svg",
+                              textStyle: viewModel.isSelected == 10
+                                  ? fontFamilySemiBold.size14.white
+                                  : fontFamilySemiBold.size14.black,
+                              bgColor: viewModel.isSelected == 10
+                                  ? appGreen400
+                                  : white,
+                              imageColor: viewModel.isSelected == 10
+                                  ? white
+                                  : appSecond950,
+                              onTap: () => viewModel.setSelected(10),
+                              margin: defaultPadding10,
+                            ),
 
                           /// 7 - Promote Verified
                           CommonStatusChip(
