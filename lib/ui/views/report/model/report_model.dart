@@ -10,561 +10,388 @@ ReportModel reportModelFromJson(String str) =>
 String reportModelToJson(ReportModel data) => json.encode(data.toJson());
 
 class ReportModel {
-  bool? status;
-  String? month;
-  int? totalAmount;
   List<SubscriptionPlan>? subscriptionPlan;
-  List<InfluencerProfileHighlight>? influencersProfileHighlight;
-  // DashboardMonthlyCountSummary? dashboardMonthlyCountSummary;
-  DashboardTotal? dashboardTotal;
-  List<CompanyWiseProjectCountReport>? companyWiseProjectCountReport;
-  List<InfluencersProjectCount>? influencersProjectCount;
-  ClientProjectDetailedReport? clientProjectDetailedReport;
-  List<TotalMonthlyIncomeReport>? totalMonthlyIncomeReport;
-  int? grandTotal;
-  List<PromoteProjecte>? promoteProjectes;
+  List<InfBanner>? infBanner;
+  List<CompanyProject>? companyProject;
+  List<InfProject>? infProject;
+  ClientProjectDetails? clientProjectDetails;
+  MonthlyIncome? monthlyIncome;
+  String? grantTotal;
+  List<PromoteProject>? promoteProject;
 
   ReportModel({
-    this.status,
-    this.month,
-    this.totalAmount,
     this.subscriptionPlan,
-    this.influencersProfileHighlight,
-    // this.dashboardMonthlyCountSummary,
-    this.dashboardTotal,
-    this.companyWiseProjectCountReport,
-    this.influencersProjectCount,
-    this.clientProjectDetailedReport,
-    this.totalMonthlyIncomeReport,
-    this.grandTotal,
-    this.promoteProjectes,
+    this.infBanner,
+    this.companyProject,
+    this.infProject,
+    this.clientProjectDetails,
+    this.monthlyIncome,
+    this.grantTotal,
+    this.promoteProject,
   });
 
   factory ReportModel.fromJson(Map<String, dynamic> json) => ReportModel(
-        status: json["status"],
-        month: json["month"],
-        totalAmount: json["totalAmount"],
-        subscriptionPlan: json["Subscription_Plan"] == null
+        subscriptionPlan: json["subscription_plan"] == null
             ? []
-            : List<SubscriptionPlan>.from(json["Subscription_Plan"]!
+            : List<SubscriptionPlan>.from(json["subscription_plan"]!
                 .map((x) => SubscriptionPlan.fromJson(x))),
-        influencersProfileHighlight:
-            json["influencers_profile_highlight"] == null
-                ? []
-                : List<InfluencerProfileHighlight>.from(
-                    json["influencers_profile_highlight"]!
-                        .map((x) => InfluencerProfileHighlight.fromJson(x))),
-        // dashboardMonthlyCountSummary:
-        //     json["dashboard_monthly_count_summary"] == null
-        //         ? null
-        //         : DashboardMonthlyCountSummary.fromJson(
-        //             json["dashboard_monthly_count_summary"]),
-        dashboardTotal: json["dashboardTotal"] == null
+        infBanner: json["inf_banner"] == null
+            ? []
+            : List<InfBanner>.from(
+                json["inf_banner"]!.map((x) => InfBanner.fromJson(x))),
+        companyProject: json["company_project"] == null
+            ? []
+            : List<CompanyProject>.from(json["company_project"]!
+                .map((x) => CompanyProject.fromJson(x))),
+        infProject: json["inf_project"] == null
+            ? []
+            : List<InfProject>.from(
+                json["inf_project"]!.map((x) => InfProject.fromJson(x))),
+        clientProjectDetails: json["client_project_details"] == null
             ? null
-            : DashboardTotal.fromJson(json["dashboardTotal"]),
-        companyWiseProjectCountReport:
-            json["company_wise_project_count_report"] == null
-                ? []
-                : List<CompanyWiseProjectCountReport>.from(
-                    json["company_wise_project_count_report"]!
-                        .map((x) => CompanyWiseProjectCountReport.fromJson(x))),
-        influencersProjectCount: json["influencers_project_count"] == null
+            : ClientProjectDetails.fromJson(json["client_project_details"]),
+        monthlyIncome: json["monthly_income"] == null
+            ? null
+            : MonthlyIncome.fromJson(json["monthly_income"]),
+        grantTotal: json["grant_total"]?.toString(),
+        promoteProject: json["promote_project"] == null
             ? []
-            : List<InfluencersProjectCount>.from(
-                json["influencers_project_count"]!
-                    .map((x) => InfluencersProjectCount.fromJson(x))),
-        clientProjectDetailedReport:
-            json["client_project_detailed_report"] == null
-                ? null
-                : ClientProjectDetailedReport.fromJson(
-                    json["client_project_detailed_report"]),
-        totalMonthlyIncomeReport: json["total_monthly_income_report"] == null
-            ? []
-            : List<TotalMonthlyIncomeReport>.from(
-                json["total_monthly_income_report"]!
-                    .map((x) => TotalMonthlyIncomeReport.fromJson(x))),
-        grandTotal: json["grandTotal"],
-        promoteProjectes: json["promote_projectes"] == null
-            ? []
-            : List<PromoteProjecte>.from(json["promote_projectes"]!
-                .map((x) => PromoteProjecte.fromJson(x))),
+            : List<PromoteProject>.from(json["promote_project"]!
+                .map((x) => PromoteProject.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
-        "status": status,
-        "month": month,
-        "totalAmount": totalAmount,
-        "Subscription_Plan": subscriptionPlan == null
+        "subscription_plan": subscriptionPlan == null
             ? []
             : List<dynamic>.from(subscriptionPlan!.map((x) => x.toJson())),
-        "influencers_profile_highlight": influencersProfileHighlight == null
+        "inf_banner": infBanner == null
             ? []
-            : List<dynamic>.from(
-                influencersProfileHighlight!.map((x) => x.toJson())),
-        // "dashboard_monthly_count_summary":
-        //     dashboardMonthlyCountSummary?.toJson(),
-        "dashboardTotal": dashboardTotal?.toJson(),
-        "company_wise_project_count_report":
-            companyWiseProjectCountReport == null
-                ? []
-                : List<dynamic>.from(
-                    companyWiseProjectCountReport!.map((x) => x.toJson())),
-        "influencers_project_count": influencersProjectCount == null
+            : List<dynamic>.from(infBanner!.map((x) => x.toJson())),
+        "company_project": companyProject == null
             ? []
-            : List<dynamic>.from(
-                influencersProjectCount!.map((x) => x.toJson())),
-        "client_project_detailed_report": clientProjectDetailedReport?.toJson(),
-        "total_monthly_income_report": totalMonthlyIncomeReport == null
+            : List<dynamic>.from(companyProject!.map((x) => x.toJson())),
+        "inf_project": infProject == null
             ? []
-            : List<dynamic>.from(
-                totalMonthlyIncomeReport!.map((x) => x.toJson())),
-        "grandTotal": grandTotal,
-        "promote_projectes": promoteProjectes == null
+            : List<dynamic>.from(infProject!.map((x) => x.toJson())),
+        "client_project_details": clientProjectDetails?.toJson(),
+        "monthly_income": monthlyIncome?.toJson(),
+        "grant_total": grantTotal,
+        "promote_project": promoteProject == null
             ? []
-            : List<dynamic>.from(promoteProjectes!.map((x) => x.toJson())),
+            : List<dynamic>.from(promoteProject!.map((x) => x.toJson())),
       };
 }
 
-class ClientProjectDetailedReport {
-  bool? status;
-  Total? total;
+class ClientProjectDetails {
   List<Datum>? data;
+  Total? total;
 
-  ClientProjectDetailedReport({
-    this.status,
-    this.total,
+  ClientProjectDetails({
     this.data,
+    this.total,
   });
 
-  factory ClientProjectDetailedReport.fromJson(Map<String, dynamic> json) =>
-      ClientProjectDetailedReport(
-        status: json["status"],
-        total: json["total"] == null ? null : Total.fromJson(json["total"]),
+  factory ClientProjectDetails.fromJson(Map<String, dynamic> json) =>
+      ClientProjectDetails(
         data: json["data"] == null
             ? []
             : List<Datum>.from(json["data"]!.map((x) => Datum.fromJson(x))),
+        total: json["total"] == null ? null : Total.fromJson(json["total"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "status": status,
-        "total": total?.toJson(),
         "data": data == null
             ? []
             : List<dynamic>.from(data!.map((x) => x.toJson())),
+        "total": total?.toJson(),
       };
 }
 
 class Datum {
-  int? sno;
-  String? cpCode;
+  int? id;
   String? clientName;
-  String? clientMobile;
-  String? influencerId;
-  String? influencerName;
+  String? clientPhone;
+  String? infId;
+  String? infName;
   int? clientPayment;
-  int? clientCommission;
-  int? influencerPaid;
+  dynamic clientCommission;
+  dynamic infPayment;
 
   Datum({
-    this.sno,
-    this.cpCode,
+    this.id,
     this.clientName,
-    this.clientMobile,
-    this.influencerId,
-    this.influencerName,
+    this.clientPhone,
+    this.infId,
+    this.infName,
     this.clientPayment,
     this.clientCommission,
-    this.influencerPaid,
+    this.infPayment,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        sno: json["sno"],
-        cpCode: json["cpCode"],
-        clientName: json["clientName"],
-        clientMobile: json["clientMobile"],
-        influencerId: json["influencerId"],
-        influencerName: json["influencerName"],
-        clientPayment: json["clientPayment"],
-        clientCommission: json["clientCommission"],
-        influencerPaid: json["influencerPaid"],
+        id: json["id"],
+        clientName: json["client_name"],
+        clientPhone: json["client_phone"],
+        infId: json["inf_id"],
+        infName: json["inf_name"],
+        clientPayment: json["client_payment"],
+        clientCommission: json["client_commission"],
+        infPayment: json["inf_payment"],
       );
 
   Map<String, dynamic> toJson() => {
-        "sno": sno,
-        "cpCode": cpCode,
-        "clientName": clientName,
-        "clientMobile": clientMobile,
-        "influencerId": influencerId,
-        "influencerName": influencerName,
-        "clientPayment": clientPayment,
-        "clientCommission": clientCommission,
-        "influencerPaid": influencerPaid,
+        "id": id,
+        "client_name": clientName,
+        "client_phone": clientPhone,
+        "inf_id": infId,
+        "inf_name": infName,
+        "client_payment": clientPayment,
+        "client_commission": clientCommission,
+        "inf_payment": infPayment,
       };
 }
 
 class Total {
   int? clientPayment;
-  int? clientCommission;
-  int? influencerPaid;
+  int? infPayment;
+  int? commission;
 
   Total({
     this.clientPayment,
-    this.clientCommission,
-    this.influencerPaid,
+    this.infPayment,
+    this.commission,
   });
 
   factory Total.fromJson(Map<String, dynamic> json) => Total(
-        clientPayment: json["clientPayment"],
-        clientCommission: json["clientCommission"],
-        influencerPaid: json["influencerPaid"],
+        clientPayment: json["client_payment"],
+        infPayment: json["inf_payment"],
+        commission: json["commission"],
       );
 
   Map<String, dynamic> toJson() => {
-        "clientPayment": clientPayment,
-        "clientCommission": clientCommission,
-        "influencerPaid": influencerPaid,
+        "client_payment": clientPayment,
+        "inf_payment": infPayment,
+        "commission": commission,
       };
 }
 
-class CompanyWiseProjectCountReport {
-  int? sno;
-  String? companyId;
+class CompanyProject {
+  String? id;
   String? companyName;
-  int? projectCount;
+  int? companyCount;
 
-  CompanyWiseProjectCountReport({
-    this.sno,
-    this.companyId,
-    this.companyName,
-    this.projectCount,
-  });
-
-  factory CompanyWiseProjectCountReport.fromJson(Map<String, dynamic> json) =>
-      CompanyWiseProjectCountReport(
-        sno: json["sno"],
-        companyId: json["companyId"],
-        companyName: json["companyName"],
-        projectCount: json["projectCount"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "sno": sno,
-        "companyId": companyId,
-        "companyName": companyName,
-        "projectCount": projectCount,
-      };
-}
-
-class DashboardMonthlyCountSummary {
-  Summary? summary;
-
-  DashboardMonthlyCountSummary({
-    this.summary,
-  });
-
-  factory DashboardMonthlyCountSummary.fromJson(Map<String, dynamic> json) =>
-      DashboardMonthlyCountSummary(
-        summary:
-            json["summary"] == null ? null : Summary.fromJson(json["summary"]),
-      );
-
-  Map<String, dynamic> toJson() => {
-        "summary": summary?.toJson(),
-      };
-}
-
-class Summary {
-  int? clientProject;
-  int? promoteProject;
-  IncomingProfiles? incomingProfiles;
-  int? incomingClients;
-  int? incomingCompanies;
-
-  Summary({
-    this.clientProject,
-    this.promoteProject,
-    this.incomingProfiles,
-    this.incomingClients,
-    this.incomingCompanies,
-  });
-
-  factory Summary.fromJson(Map<String, dynamic> json) => Summary(
-        clientProject: json["clientProject"],
-        promoteProject: json["promoteProject"],
-        incomingProfiles: json["incomingProfiles"] == null
-            ? null
-            : IncomingProfiles.fromJson(json["incomingProfiles"]),
-        incomingClients: json["incomingClients"],
-        incomingCompanies: json["incomingCompanies"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "clientProject": clientProject,
-        "promoteProject": promoteProject,
-        "incomingProfiles": incomingProfiles?.toJson(),
-        "incomingClients": incomingClients,
-        "incomingCompanies": incomingCompanies,
-      };
-}
-
-class IncomingProfiles {
-  int? influencers;
-  int? movies;
-  int? tvStars;
-  int? sportsStars;
-
-  IncomingProfiles({
-    this.influencers,
-    this.movies,
-    this.tvStars,
-    this.sportsStars,
-  });
-
-  factory IncomingProfiles.fromJson(Map<String, dynamic> json) =>
-      IncomingProfiles(
-        influencers: json["influencers"],
-        movies: json["movies"],
-        tvStars: json["tvStars"],
-        sportsStars: json["sportsStars"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "influencers": influencers,
-        "movies": movies,
-        "tvStars": tvStars,
-        "sportsStars": sportsStars,
-      };
-}
-
-class DashboardTotal {
-  int? clients;
-  int? companies;
-  int? influencers;
-  int? movieStars;
-  int? tvStars;
-  int? sportsStars;
-
-  DashboardTotal({
-    this.clients,
-    this.companies,
-    this.influencers,
-    this.movieStars,
-    this.tvStars,
-    this.sportsStars,
-  });
-
-  factory DashboardTotal.fromJson(Map<String, dynamic> json) => DashboardTotal(
-        clients: json["clients"],
-        companies: json["companies"],
-        influencers: json["influencers"],
-        movieStars: json["movieStars"],
-        tvStars: json["tvStars"],
-        sportsStars: json["sportsStars"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "clients": clients,
-        "companies": companies,
-        "influencers": influencers,
-        "movieStars": movieStars,
-        "tvStars": tvStars,
-        "sportsStars": sportsStars,
-      };
-}
-
-class SubscriptionPlan {
-  int? sno;
-  String? clientId;
-  String? clientName;
-  String? mobile;
-  String? packageName;
-  String? paymentStatus;
-  int? amount;
-  DateTime? date;
-
-  SubscriptionPlan({
-    this.sno,
-    this.clientId,
-    this.clientName,
-    this.mobile,
-    this.packageName,
-    this.paymentStatus,
-    this.amount,
-    this.date,
-  });
-
-  factory SubscriptionPlan.fromJson(Map<String, dynamic> json) =>
-      SubscriptionPlan(
-        sno: json["sno"],
-        clientId: json["clientId"],
-        clientName: json["clientName"],
-        mobile: json["mobile"],
-        packageName: json["packageName"],
-        paymentStatus: json["paymentStatus"],
-        amount: json["amount"],
-        date: json["date"] == null ? null : DateTime.parse(json["date"]),
-      );
-
-  Map<String, dynamic> toJson() => {
-        "sno": sno,
-        "clientId": clientId,
-        "clientName": clientName,
-        "mobile": mobile,
-        "packageName": packageName,
-        "paymentStatus": paymentStatus,
-        "amount": amount,
-        "date": date?.toIso8601String(),
-      };
-}
-
-class InfluencerProfileHighlight {
-  int? sno;
-  String? influencerId;
-  String? influencerName;
-  String? mobile;
-  String? packageName;
-  String? paymentStatus;
-  int? amount;
-  DateTime? date;
-
-  InfluencerProfileHighlight({
-    this.sno,
-    this.influencerId,
-    this.influencerName,
-    this.mobile,
-    this.packageName,
-    this.paymentStatus,
-    this.amount,
-    this.date,
-  });
-
-  factory InfluencerProfileHighlight.fromJson(Map<String, dynamic> json) =>
-      InfluencerProfileHighlight(
-        sno: json["sno"],
-        influencerId: json["influencerId"],
-        influencerName: json["influencerName"],
-        mobile: json["mobile"],
-        packageName: json["packageName"],
-        paymentStatus: json["paymentStatus"],
-        amount: json["amount"],
-        date: json["date"] == null ? null : DateTime.parse(json["date"]),
-      );
-
-  Map<String, dynamic> toJson() => {
-        "sno": sno,
-        "influencerId": influencerId,
-        "influencerName": influencerName,
-        "mobile": mobile,
-        "packageName": packageName,
-        "paymentStatus": paymentStatus,
-        "amount": amount,
-        "date": date?.toIso8601String(),
-      };
-}
-
-class InfluencersProjectCount {
-  int? sno;
-  String? influencerId;
-  String? influencerName;
-  int? clientProject;
-  int? promoteProject;
-  int? totalProject;
-
-  InfluencersProjectCount({
-    this.sno,
-    this.influencerId,
-    this.influencerName,
-    this.clientProject,
-    this.promoteProject,
-    this.totalProject,
-  });
-
-  factory InfluencersProjectCount.fromJson(Map<String, dynamic> json) =>
-      InfluencersProjectCount(
-        sno: json["sno"],
-        influencerId: json["influencerId"],
-        influencerName: json["influencerName"],
-        clientProject: json["clientProject"],
-        promoteProject: json["promoteProject"],
-        totalProject: json["totalProject"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "sno": sno,
-        "influencerId": influencerId,
-        "influencerName": influencerName,
-        "clientProject": clientProject,
-        "promoteProject": promoteProject,
-        "totalProject": totalProject,
-      };
-}
-
-class PromoteProjecte {
-  int? id;
-  int? ppCode;
-  String? companyName;
-  int? infId;
-  String? infName1;
-  int? companyPayment;
-  int? companyCommission;
-  int? influencerPaid;
-
-  PromoteProjecte({
+  CompanyProject({
     this.id,
-    this.ppCode,
     this.companyName,
-    this.infId,
-    this.infName1,
-    this.companyPayment,
-    this.companyCommission,
-    this.influencerPaid,
+    this.companyCount,
   });
 
-  factory PromoteProjecte.fromJson(Map<String, dynamic> json) =>
-      PromoteProjecte(
+  factory CompanyProject.fromJson(Map<String, dynamic> json) => CompanyProject(
         id: json["id"],
-        ppCode: json["pp_code"],
         companyName: json["company_name"],
-        infId: json["inf_id"],
-        infName1: json["inf_name1"],
-        companyPayment: json["company_payment"],
-        companyCommission: json["company_commission"],
-        influencerPaid: json["influencer_paid"],
+        companyCount: json["company_count"],
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
-        "pp_code": ppCode,
         "company_name": companyName,
-        "inf_id": infId,
-        "inf_name1": infName1,
-        "company_payment": companyPayment,
-        "cpmmapany_commission": companyCommission,
-        "influencer_paid": influencerPaid,
+        "company_count": companyCount,
       };
 }
 
-class TotalMonthlyIncomeReport {
-  int? sno;
-  String? particular;
-  int? totalIncome;
+class InfBanner {
+  int? id;
+  String? infId;
+  String? name;
+  String? phone;
+  String? paymentStatus;
+  String? amount;
+  DateTime? createdAt;
 
-  TotalMonthlyIncomeReport({
-    this.sno,
-    this.particular,
-    this.totalIncome,
+  InfBanner({
+    this.id,
+    this.infId,
+    this.name,
+    this.phone,
+    this.paymentStatus,
+    this.amount,
+    this.createdAt,
   });
 
-  factory TotalMonthlyIncomeReport.fromJson(Map<String, dynamic> json) =>
-      TotalMonthlyIncomeReport(
-        sno: json["sno"],
-        particular: json["particular"],
-        totalIncome: json["totalIncome"],
+  factory InfBanner.fromJson(Map<String, dynamic> json) => InfBanner(
+        id: json["id"],
+        infId: json["inf_id"],
+        name: json["name"],
+        phone: json["phone"],
+        paymentStatus: json["payment_status"],
+        amount: json["amount"]?.toString(),
+        createdAt: json["created_at"] == null
+            ? null
+            : DateTime.parse(json["created_at"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "sno": sno,
-        "particular": particular,
-        "totalIncome": totalIncome,
+        "id": id,
+        "inf_id": infId,
+        "name": name,
+        "phone": phone,
+        "payment_status": paymentStatus,
+        "amount": amount,
+        "created_at": createdAt?.toIso8601String(),
+      };
+}
+
+class InfProject {
+  String? id;
+  String? infName;
+  int? clientProjectCount;
+  int? promoteProjectCount;
+  int? totalProjectCount;
+
+  InfProject({
+    this.id,
+    this.infName,
+    this.clientProjectCount,
+    this.promoteProjectCount,
+    this.totalProjectCount,
+  });
+
+  factory InfProject.fromJson(Map<String, dynamic> json) => InfProject(
+        id: json["id"],
+        infName: json["inf_name"],
+        clientProjectCount: json["client_project_count"],
+        promoteProjectCount: json["promote_project_count"],
+        totalProjectCount: json["total_project_count"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "inf_name": infName,
+        "client_project_count": clientProjectCount,
+        "promote_project_count": promoteProjectCount,
+        "total_project_count": totalProjectCount,
+      };
+}
+
+class MonthlyIncome {
+  String? subscription;
+  String? bannerAmount;
+  int? clientProjectCommission;
+  int? promoteProjectCommission;
+
+  MonthlyIncome({
+    this.subscription,
+    this.bannerAmount,
+    this.clientProjectCommission,
+    this.promoteProjectCommission,
+  });
+
+  factory MonthlyIncome.fromJson(Map<String, dynamic> json) => MonthlyIncome(
+        subscription: (json["subscription"] != null)
+            ? json["subscription"].toString()
+            : "0",
+        bannerAmount: (json["banner_amount"] != null)
+            ? json["banner_amount"].toString()
+            : "0",
+        clientProjectCommission: json["client_project_commission"],
+        promoteProjectCommission: json["promote_project_commission"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "subscription": subscription,
+        "banner_amount": bannerAmount,
+        "client_project_commission": clientProjectCommission,
+        "promote_project_commission": promoteProjectCommission,
+      };
+}
+
+class PromoteProject {
+  int? id;
+  String? projectCode;
+  String? companyName;
+  String? companyMobile;
+  int? infCount;
+  int? companyPayment;
+  int? companyCommission;
+  int? infPayment;
+
+  PromoteProject({
+    this.id,
+    this.projectCode,
+    this.companyName,
+    this.companyMobile,
+    this.infCount,
+    this.companyPayment,
+    this.companyCommission,
+    this.infPayment,
+  });
+
+  factory PromoteProject.fromJson(Map<String, dynamic> json) => PromoteProject(
+        id: json["id"],
+        projectCode: json["project_code"],
+        companyName: json["company_name"],
+        companyMobile: json["company_mobile"],
+        infCount: json["inf_count"],
+        companyPayment: json["company_payment"],
+        companyCommission: json["company_commission"],
+        infPayment: json["inf_payment"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "project_code": projectCode,
+        "company_name": companyName,
+        "company_mobile": companyMobile,
+        "inf_count": infCount,
+        "company_payment": companyPayment,
+        "company_commission": companyCommission,
+        "inf_payment": infPayment,
+      };
+}
+
+class SubscriptionPlan {
+  int? id;
+  int? clientId;
+  String? clientName;
+  String? clientMobileNumber;
+  String? packageName;
+  String? packageStatus;
+  String? amount;
+  DateTime? paymentDate;
+
+  SubscriptionPlan({
+    this.id,
+    this.clientId,
+    this.clientName,
+    this.clientMobileNumber,
+    this.packageName,
+    this.packageStatus,
+    this.amount,
+    this.paymentDate,
+  });
+
+  factory SubscriptionPlan.fromJson(Map<String, dynamic> json) =>
+      SubscriptionPlan(
+        id: json["id"],
+        clientId: json["client_id"],
+        clientName: json["client_name"],
+        clientMobileNumber: json["client_mobile_number"],
+        packageName: json["package_name"],
+        packageStatus: json["package_status"],
+        amount: json["amount"],
+        paymentDate: json["payment_date"] == null
+            ? null
+            : DateTime.parse(json["payment_date"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "client_id": clientId,
+        "client_name": clientName,
+        "client_mobile_number": clientMobileNumber,
+        "package_name": packageName,
+        "package_status": packageStatus,
+        "amount": amount,
+        "payment_date": paymentDate?.toIso8601String(),
       };
 }

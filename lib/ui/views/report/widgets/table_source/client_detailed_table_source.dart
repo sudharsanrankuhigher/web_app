@@ -35,13 +35,13 @@ class ClientDetailedTableSource extends DataTableSource {
           ),
           DataCell(
             Text(
-              total!.clientCommission!.toStringAsFixed(0),
+              total!.commission!.toStringAsFixed(0),
               style: fontFamilySemiBold.size13.black,
             ),
           ),
           DataCell(
             Text(
-              total!.influencerPaid!.toStringAsFixed(0),
+              total!.infPayment!.toStringAsFixed(0),
               style: fontFamilySemiBold.size13.black,
             ),
           ),
@@ -75,7 +75,7 @@ class ClientDetailedTableSource extends DataTableSource {
           style: fontFamilySemiBold.size13.black,
         )), // S.No
         DataCell(Text(
-          item.cpCode ?? '-',
+          item.id.toString() ?? '-',
           style: fontFamilySemiBold.size13.black,
         )), // Name
         DataCell(Text(
@@ -83,11 +83,11 @@ class ClientDetailedTableSource extends DataTableSource {
           style: fontFamilySemiBold.size13.black,
         )),
         DataCell(Text(
-          "${item.clientMobile ?? 0}",
+          "${item.clientPhone ?? 0}",
           style: fontFamilySemiBold.size13.black,
         )),
         DataCell(Text(
-          "${item.influencerId ?? 0} / ${item.influencerName ?? 0}",
+          "${item.infId ?? 0} / ${item.infName ?? 0}",
           style: fontFamilySemiBold.size13.black,
         )),
         DataCell(Text(
@@ -99,7 +99,7 @@ class ClientDetailedTableSource extends DataTableSource {
           style: fontFamilySemiBold.size13.black,
         )),
         DataCell(Text(
-          "${item.influencerPaid ?? 0}",
+          "${item.infPayment ?? 0}",
           style: fontFamilySemiBold.size13.black,
         )),
         // DataCell(Text(

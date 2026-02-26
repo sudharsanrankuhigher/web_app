@@ -137,9 +137,27 @@ class PlansView extends StackedView<PlansViewModel> {
                                                         ?.toString() ??
                                                     '0') ??
                                                 0,
-                                        "amount": (result['amount'] is int
-                                                ? result['amount']
-                                                : int.tryParse(result['amount']
+                                        "regular_price": (result[
+                                                    'regular_price'] is int
+                                                ? result['regular_price']
+                                                : int.tryParse(
+                                                        result['regular_price']
+                                                                ?.toString() ??
+                                                            '0') ??
+                                                    0)
+                                            .toString(),
+                                        "sale_price": (result['sale_price']
+                                                    is int
+                                                ? result['sale_price']
+                                                : int.tryParse(
+                                                        result['sale_price']
+                                                                ?.toString() ??
+                                                            '0') ??
+                                                    0)
+                                            .toString(),
+                                        "gst": (result['gst'] is int
+                                                ? result['gst']
+                                                : int.tryParse(result['gst']
                                                             ?.toString() ??
                                                         '0') ??
                                                     0)
@@ -185,7 +203,9 @@ class PlansView extends StackedView<PlansViewModel> {
                                     headingRowAlignment:
                                         MainAxisAlignment.start,
                                     label: Text("Connections")),
-                                DataColumn(label: Text("Amount")),
+                                DataColumn(label: Text("Regular Price")),
+                                DataColumn(label: Text("Sale Price")),
+                                DataColumn(label: Text("GST")),
                                 DataColumn(label: Text("Badge")),
                                 DataColumn(
                                     headingRowAlignment:

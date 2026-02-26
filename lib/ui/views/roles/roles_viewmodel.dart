@@ -110,7 +110,12 @@ class RolesViewModel extends BaseViewModel {
 
   Future<void> deleteService(role) async {
     try {
-      await _apiService.deleteRole(role.id);
+      final res = await _apiService.deleteRole(role.id);
+      _dialogService.showDialog(
+        title: 'Delete Role',
+        buttonTitle: 'ok',
+        description: res.message,
+      );
     } catch (e) {
       debugPrint('Delete failed: $e');
     } finally {

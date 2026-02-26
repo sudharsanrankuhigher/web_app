@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:ui';
 
-import 'package:fl_chart/fl_chart.dart';
+// import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:stacked/stacked.dart';
+import 'package:stacked_services/stacked_services.dart';
+import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/core/navigation/navigation_mixin.dart';
+import 'package:webapp/services/api_service.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/views/report/model/report_model.dart';
 import 'package:webapp/ui/views/report/widgets/table_source/client_detailed_table_source.dart';
@@ -21,13 +24,13 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
   // }
 
   List<SubscriptionPlan> reports = [];
-  List<InfluencerProfileHighlight> infHighLigtReprot = [];
-  List<CompanyWiseProjectCountReport> companyReport = [];
-  List<InfluencersProjectCount> influencerReport = [];
-  List<TotalMonthlyIncomeReport> totalMonthlyIncomeReport = [];
+  List<InfBanner> infHighLigtReprot = [];
+  List<CompanyProject> companyReport = [];
+  List<InfProject> influencerReport = [];
+  MonthlyIncome? totalMonthlyIncomeReport;
   List<Datum> clientProjectDetailedList = [];
   Total? clientProjectTotal;
-  List<PromoteProjecte>? promoteProjectes;
+  List<PromoteProject>? promoteProjectes;
 
   /// 🔹 Table source
   ReportTableSource? tableSource;
@@ -39,78 +42,35 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
 
   DateTime selectedMonth = DateTime.now();
 
-  @override
-  Future<void> initialise() async {
-    await loadReport();
-  }
+  List<Map<String, dynamic>> get monthlyReport {
+    if (totalMonthlyIncomeReport == null) return [];
 
-  final List<BarChartGroupData> weeklyBarGroups = [
-    BarChartGroupData(
-      x: 0,
-      barRods: [
-        BarChartRodData(
-            toY: 80,
-            color: const Color(0xff33CBA9),
-            width: 12,
-            borderRadius: BorderRadius.circular(4)),
-        BarChartRodData(
-            toY: 12,
-            color: pendingColor,
-            width: 12,
-            borderRadius: BorderRadius.circular(4)),
-      ],
-      barsSpace: 6,
-    ),
-    BarChartGroupData(
-      x: 1,
-      barRods: [
-        BarChartRodData(
-            toY: 14,
-            color: const Color(0xff33CBA9),
-            width: 12,
-            borderRadius: BorderRadius.circular(4)),
-        BarChartRodData(
-            toY: 9,
-            color: pendingColor,
-            width: 12,
-            borderRadius: BorderRadius.circular(4)),
-      ],
-      barsSpace: 6,
-    ),
-    BarChartGroupData(
-      x: 2,
-      barRods: [
-        BarChartRodData(
-            toY: 10,
-            color: const Color(0xff33CBA9),
-            width: 12,
-            borderRadius: BorderRadius.circular(4)),
-        BarChartRodData(
-            toY: 16,
-            color: pendingColor,
-            width: 12,
-            borderRadius: BorderRadius.circular(4)),
-      ],
-      barsSpace: 6,
-    ),
-    BarChartGroupData(
-      showingTooltipIndicators: [18, 13],
-      x: 3,
-      barRods: [
-        BarChartRodData(
-            toY: 18,
-            color: const Color(0xff33CBA9),
-            width: 12,
-            borderRadius: BorderRadius.circular(4)),
-        BarChartRodData(
-            toY: 13,
-            color: pendingColor,
-            width: 12,
-            borderRadius: BorderRadius.circular(4)),
-      ],
-      barsSpace: 6,
-    ),
-  ];
+    return [
+      {
+        "sno": 1,
+        "particular": "Subscription Plan",
+        "totalIncome": totalMonthlyIncomeReport?.subscription?.toString() ?? "0"
+      },
+      {
+        "sno": 2,
+        "particular": "Influencers Profile Highlight",
+        "totalIncome": totalMonthlyIncomeReport?.bannerAmount?.toString() ?? "0"
+      },
+      {
+        "sno": 3,
+        "particular": "Client Project Commission",
+        "totalIncome":
+            totalMonthlyIncomeReport?.clientProjectCommission?.toString() ?? "0"
+      },
+      {
+        "sno": 4,
+        "particular": "Promote Project Commission",
+        "totalIncome":
+            totalMonthlyIncomeReport?.promoteProjectCommission?.toString() ??
+                "0"
+      }
+    ];
+  }
 
   final clientProjectDetails = const [
     DataColumn(label: Text("S.No")),
@@ -127,7 +87,7 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
     DataColumn(label: Text("PP id")),
     DataColumn(label: Text("Company name")),
     DataColumn(label: Text("Company mobile no")),
-    DataColumn(label: Text("inf Id/ inf name")),
+    // DataColumn(label: Text("inf Id/ inf name")),
     DataColumn(label: Text("Company payment")),
     DataColumn(label: Text("Company commission")),
     DataColumn(label: Text("influencer paid")),
@@ -146,7 +106,7 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
     DataColumn(label: Text("S.No")),
     DataColumn(label: Text("Influencer Name")),
     DataColumn(label: Text("Inf mobile no")),
-    DataColumn(label: Text("Package name")),
+    // DataColumn(label: Text("Package name")),
     DataColumn(label: Text("payment status")),
     DataColumn(label: Text("Amount")),
     DataColumn(label: Text("Date")),
@@ -164,21 +124,34 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
     DataColumn(label: Text("total projects")),
   ];
 
-  Future<void> loadReport() async {
-    final String jsonString =
-        await rootBundle.loadString('assets/json/data.json');
+  ReportModel? reportModel;
 
-    final reportModel = reportModelFromJson(jsonString);
+  final _dialogService = locator<DialogService>();
+  final _apiService = locator<ApiService>();
+
+  Future<void> loadReport(requestDate) async {
+    String formattedMonth =
+        "${requestDate.month.toString().padLeft(2, '0')}-${requestDate.year}";
+    final request = {"month": formattedMonth};
+    // final String jsonString =
+    //     await rootBundle.loadString('assets/json/data.json');
+
+    // final reportModel = reportModelFromJson(jsonString);
+
+    final reportModel =
+        await runBusyFuture(_apiService.getReport(request).catchError((e) {
+      print(e);
+      return null;
+    }));
 
     reports = reportModel.subscriptionPlan ?? [];
-    infHighLigtReprot = reportModel.influencersProfileHighlight ?? [];
-    companyReport = reportModel.companyWiseProjectCountReport ?? [];
-    influencerReport = reportModel.influencersProjectCount ?? [];
-    totalMonthlyIncomeReport = reportModel.totalMonthlyIncomeReport ?? [];
-    clientProjectDetailedList =
-        reportModel.clientProjectDetailedReport?.data ?? [];
-    clientProjectTotal = reportModel.clientProjectDetailedReport?.total;
-    promoteProjectes = reportModel.promoteProjectes;
+    infHighLigtReprot = reportModel.infBanner ?? [];
+    companyReport = reportModel.companyProject ?? [];
+    influencerReport = reportModel.infProject ?? [];
+    totalMonthlyIncomeReport = reportModel.monthlyIncome!;
+    clientProjectDetailedList = reportModel.clientProjectDetails!.data ?? [];
+    clientProjectTotal = reportModel.clientProjectDetails!.total;
+    promoteProjectes = reportModel.promoteProject;
 
     tableSource = ReportTableSource(
       data: reports,

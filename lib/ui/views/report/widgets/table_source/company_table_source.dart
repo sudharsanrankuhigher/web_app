@@ -4,7 +4,7 @@ import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/report/model/report_model.dart';
 
 class CompanyReportTableSource extends DataTableSource {
-  final List<CompanyWiseProjectCountReport> data;
+  final List<CompanyProject> data;
   final String status;
 
   CompanyReportTableSource({
@@ -40,7 +40,7 @@ class CompanyReportTableSource extends DataTableSource {
           style: fontFamilySemiBold.size13.black,
         )), // Name
         DataCell(Text(
-          (item.projectCount ?? 0).toString(),
+          (item.companyCount ?? 0).toString(),
           style: fontFamilySemiBold.size13.black,
         )),
       ],

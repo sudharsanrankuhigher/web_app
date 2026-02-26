@@ -110,6 +110,7 @@ class PlansViewModel extends BaseViewModel {
     try {
       _apiService.deletePlan(plan.id!);
       plans.removeWhere((p) => p.id == plan.id);
+      loadPlans();
     } catch (e) {
       debugPrint('Delete failed: $e');
     } finally {

@@ -47,6 +47,8 @@ class ReportView extends StackedView<ReportViewModel> {
               selectedDate: viewModel.selectedMonth,
               onChanged: (viewDate) {
                 viewModel.selectedMonth = viewDate;
+                print(viewModel.selectedMonth.toString());
+                viewModel.loadReport(viewModel.selectedMonth);
                 viewModel.notifyListeners();
                 print(viewDate);
               },
@@ -54,23 +56,25 @@ class ReportView extends StackedView<ReportViewModel> {
           ),
         ],
       ),
-      body: Padding(
-        padding: defaultPadding12 - topPadding12,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              verticalSpacing12,
-              Text(
-                'Subscription Plans Report',
-                style: fontFamilySemiBold.size16.black,
-              ),
-              verticalSpacing12,
-              SizedBox(
-                height: rowCount < 10 ? (rowCount * 50) + 50 : 100,
-                child: viewModel.reports.isEmpty
-                    ? const Center(child: CircularProgressIndicator())
-                    : CommonPaginatedTable(
+      body: viewModel.isBusy
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: defaultPadding12 - topPadding12,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    verticalSpacing12,
+                    Text(
+                      'Subscription Plans Report',
+                      style: fontFamilySemiBold.size16.black,
+                    ),
+                    verticalSpacing12,
+                    SizedBox(
+                      height: viewModel.tableSource!.rowCount < 10
+                          ? (viewModel.tableSource!.rowCount * 50) + 50
+                          : 100,
+                      child: CommonPaginatedTable(
                         headingTextStyle: fontFamilySemiBold.size12.greyColor,
                         heddingRowColor: greenShade,
                         columns: viewModel.subscriptionPlans,
@@ -81,18 +85,23 @@ class ReportView extends StackedView<ReportViewModel> {
                         minWidth: 1000,
                         hidePaginator: true,
                       ),
-              ),
-              verticalSpacing20,
-              Text(
-                'Influencer HighLight Report',
-                style: fontFamilySemiBold.size16.black,
-              ),
-              verticalSpacing12,
-              SizedBox(
-                height: rowCount < 10 ? (rowCount * 50) + 50 : 100,
-                child: viewModel.reports.isEmpty
-                    ? const Center(child: CircularProgressIndicator())
-                    : CommonPaginatedTable(
+                    ),
+                    verticalSpacing20,
+                    Text(
+                      'Influencer HighLight Report',
+                      style: fontFamilySemiBold.size16.black,
+                    ),
+                    verticalSpacing12,
+                    SizedBox(
+                      height:
+                          viewModel.influencerHighlightTableSource!.rowCount <
+                                  10
+                              ? (viewModel.influencerHighlightTableSource!
+                                          .rowCount *
+                                      50) +
+                                  50
+                              : 100,
+                      child: CommonPaginatedTable(
                         headingTextStyle: fontFamilySemiBold.size12.greyColor,
                         heddingRowColor: pendingColorShade,
                         columns: viewModel.infHighlightColumn,
@@ -105,26 +114,31 @@ class ReportView extends StackedView<ReportViewModel> {
                         minWidth: 1000,
                         hidePaginator: true,
                       ),
-              ),
-              verticalSpacing20,
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Influencer Project Report",
-                        style: fontFamilySemiBold.size16.black,
-                      ),
-                      verticalSpacing10,
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.48,
-                        height: rowCount < 10 ? (rowCount * 50) + 50 : 100,
-                        child: viewModel.reports.isEmpty
-                            ? const Center(child: CircularProgressIndicator())
-                            : CommonPaginatedTable(
+                    ),
+                    verticalSpacing20,
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Influencer Project Report",
+                              style: fontFamilySemiBold.size16.black,
+                            ),
+                            verticalSpacing10,
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.48,
+                              height: viewModel.influencerReportTableSource!
+                                          .rowCount <
+                                      10
+                                  ? (viewModel.influencerReportTableSource!
+                                              .rowCount *
+                                          50) +
+                                      50
+                                  : 100,
+                              child: CommonPaginatedTable(
                                 headingTextStyle:
                                     fontFamilySemiBold.size12.greyColor,
                                 heddingRowColor: activeColorShade,
@@ -140,23 +154,28 @@ class ReportView extends StackedView<ReportViewModel> {
                                 minWidth: 500,
                                 hidePaginator: true,
                               ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Company Wise Project Report",
-                        style: fontFamilySemiBold.size16.black,
-                      ),
-                      verticalSpacing10,
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.33,
-                        height: rowCount < 10 ? (rowCount * 50) + 50 : 100,
-                        child: viewModel.reports.isEmpty
-                            ? const Center(child: CircularProgressIndicator())
-                            : CommonPaginatedTable(
+                            ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Company Wise Project Report",
+                              style: fontFamilySemiBold.size16.black,
+                            ),
+                            verticalSpacing10,
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.33,
+                              height:
+                                  viewModel.companyReportTableSource!.rowCount <
+                                          10
+                                      ? (viewModel.companyReportTableSource!
+                                                  .rowCount *
+                                              50) +
+                                          50
+                                      : 100,
+                              child: CommonPaginatedTable(
                                 headingTextStyle:
                                     fontFamilySemiBold.size12.greyColor,
                                 heddingRowColor: completedColorShade,
@@ -171,43 +190,45 @@ class ReportView extends StackedView<ReportViewModel> {
                                 minWidth: 500,
                                 hidePaginator: true,
                               ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    verticalSpacing20,
+                    Text('Total Monthly Income Report',
+                        style: fontFamilySemiBold.size16.black),
+                    verticalSpacing12,
+                    GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: isExtends ? 4 : 2,
+                        childAspectRatio: 3,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
                       ),
-                    ],
-                  ),
-                ],
-              ),
-              verticalSpacing20,
-              Text('Total Monthly Income Report',
-                  style: fontFamilySemiBold.size16.black),
-              verticalSpacing12,
-              GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: isExtends ? 4 : 2,
-                  childAspectRatio: 3,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                ),
-                shrinkWrap: true,
-                // physics: const NeverScrollableScrollPhysics(),
-                itemCount: viewModel.totalMonthlyIncomeReport.length,
-                itemBuilder: (context, index) => InfoSalesProjectCard(
-                  title: viewModel.totalMonthlyIncomeReport[index].particular ??
-                      '',
-                  count: viewModel.totalMonthlyIncomeReport[index].totalIncome
-                          .toString() ??
-                      '',
-                  iconPath: 'assets/images/arrow-down.svg',
-                ),
-              ),
-              verticalSpacing20,
-              Text('Client Project Detailed Report',
-                  style: fontFamilySemiBold.size16.black),
-              verticalSpacing12,
-              SizedBox(
-                height: rowCount < 10 ? (rowCount * 50) + 100 : 100,
-                child: viewModel.reports.isEmpty
-                    ? const Center(child: CircularProgressIndicator())
-                    : CommonPaginatedTable(
+                      shrinkWrap: true,
+                      // physics: const NeverScrollableScrollPhysics(),
+                      itemCount: viewModel.monthlyReport.length,
+                      itemBuilder: (context, index) => InfoSalesProjectCard(
+                        title:
+                            viewModel.monthlyReport[index]['particular'] ?? '',
+                        count: viewModel.monthlyReport[index]['totalIncome']
+                                .toString() ??
+                            '',
+                        iconPath: 'assets/images/arrow-down.svg',
+                      ),
+                    ),
+                    verticalSpacing20,
+                    Text('Client Project Detailed Report',
+                        style: fontFamilySemiBold.size16.black),
+                    verticalSpacing12,
+                    SizedBox(
+                      height: viewModel.clientDetailedTableSource!.rowCount < 10
+                          ? (viewModel.clientDetailedTableSource!.rowCount *
+                                  50) +
+                              100
+                          : 100,
+                      child: CommonPaginatedTable(
                         headingTextStyle: fontFamilySemiBold.size12.greyColor,
                         heddingRowColor: availableCampaignColor,
                         columns: viewModel.clientProjectDetails,
@@ -219,16 +240,19 @@ class ReportView extends StackedView<ReportViewModel> {
                         minWidth: 1100,
                         hidePaginator: true,
                       ),
-              ),
-              verticalSpacing20,
-              Text('Promote Projectes Detailed Report',
-                  style: fontFamilySemiBold.size16.black),
-              verticalSpacing12,
-              SizedBox(
-                height: rowCount < 10 ? (rowCount * 50) + 50 : 100,
-                child: viewModel.reports.isEmpty
-                    ? const Center(child: CircularProgressIndicator())
-                    : CommonPaginatedTable(
+                    ),
+                    verticalSpacing20,
+                    Text('Promote Projectes Detailed Report',
+                        style: fontFamilySemiBold.size16.black),
+                    verticalSpacing12,
+                    SizedBox(
+                      height: viewModel.companyDetailedTableSource!.rowCount <
+                              10
+                          ? (viewModel.companyDetailedTableSource!.rowCount *
+                                  50) +
+                              50
+                          : 100,
+                      child: CommonPaginatedTable(
                         headingTextStyle: fontFamilySemiBold.size12.greyColor,
                         heddingRowColor: publisButtonColor.withOpacity(0.5),
                         columns: viewModel.promoteProjectDetails,
@@ -240,11 +264,11 @@ class ReportView extends StackedView<ReportViewModel> {
                         minWidth: 1100,
                         hidePaginator: true,
                       ),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
@@ -256,6 +280,6 @@ class ReportView extends StackedView<ReportViewModel> {
 
   @override
   void onViewModelReady(ReportViewModel viewModel) async {
-    await viewModel.loadReport();
+    await viewModel.loadReport(viewModel.selectedMonth);
   }
 }

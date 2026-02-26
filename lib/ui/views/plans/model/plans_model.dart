@@ -41,6 +41,8 @@ class Datum {
   String? name;
   int? connections;
   String? amount;
+  String? saleAmount;
+  String? gst;
   String? badge;
   String? category;
   DateTime? createdAt;
@@ -55,13 +57,20 @@ class Datum {
     this.category,
     this.createdAt,
     this.updatedAt,
+    this.gst,
+    this.saleAmount,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         id: json["id"],
         name: json["name"],
         connections: json["connections"],
-        amount: json["amount"],
+        amount: json["regular_price"] == null
+            ? '0'
+            : json["regular_price"].toString(),
+        saleAmount:
+            json["sale_price"] == null ? '0' : json["sale_price"].toString(),
+        gst: json["gst"] == null ? '0' : json["gst"].toString(),
         badge: json["badge"],
         category: json["category"],
         createdAt: json["created_at"] == null
@@ -76,7 +85,9 @@ class Datum {
         "id": id,
         "name": name,
         "connections": connections,
-        "amount": amount,
+        "regular_price": amount,
+        "sale_price": saleAmount,
+        "gst": gst,
         "badge": badge,
         "category": category,
         "created_at": createdAt?.toIso8601String(),

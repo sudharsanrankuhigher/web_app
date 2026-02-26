@@ -6,7 +6,7 @@ import 'package:webapp/ui/views/promote_projects/widgets/add_edit_dialog.dart';
 import 'package:webapp/ui/views/report/model/report_model.dart';
 
 class CompanyDetailedTableSource extends DataTableSource {
-  final List<PromoteProjecte> data;
+  final List<PromoteProject> data;
   final String status;
 
   CompanyDetailedTableSource({required this.data, required this.status});
@@ -20,7 +20,7 @@ class CompanyDetailedTableSource extends DataTableSource {
           DataCell(Text("")),
           DataCell(Text("")),
           DataCell(Center(child: Text("No data found"))),
-          DataCell(Text("")),
+          // DataCell(Text("")),
           DataCell(Text("")),
           DataCell(Text("")),
           DataCell(Text("")),
@@ -40,7 +40,7 @@ class CompanyDetailedTableSource extends DataTableSource {
           style: fontFamilySemiBold.size13.black,
         )), // S.No
         DataCell(Text(
-          (item.ppCode ?? '-').toString(),
+          (item.projectCode ?? '-').toString(),
           style: fontFamilySemiBold.size13.black,
         )), // Name
         DataCell(Text(
@@ -51,10 +51,10 @@ class CompanyDetailedTableSource extends DataTableSource {
           "${item.companyName ?? 0}",
           style: fontFamilySemiBold.size13.black,
         )),
-        DataCell(Text(
-          "${item.infId ?? 0} / ${item.infName1 ?? 0}",
-          style: fontFamilySemiBold.size13.black,
-        )),
+        // DataCell(Text(
+        //   "${item.in ?? 0} / ${item.infName1 ?? 0}",
+        //   style: fontFamilySemiBold.size13.black,
+        // )),
         DataCell(Text(
           "${item.companyPayment ?? 0}",
           style: fontFamilySemiBold.size13.black,
@@ -64,7 +64,7 @@ class CompanyDetailedTableSource extends DataTableSource {
           style: fontFamilySemiBold.size13.black,
         )),
         DataCell(Text(
-          "${item.influencerPaid ?? 0}",
+          "${item.infPayment ?? 0}",
           style: fontFamilySemiBold.size13.black,
         )),
         // DataCell(Text(

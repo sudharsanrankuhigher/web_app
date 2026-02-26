@@ -50,14 +50,14 @@ class ProjectStatusWidget extends StatelessWidget {
             children: [
               /// 🔹 Pie Chart
               ///
-              SizedBox(
-                height: 120,
-                width: 120,
-                child: PieChartWidget(
-                  completed: completed,
-                  pending: pending,
-                ),
-              ),
+              // SizedBox(
+              //   height: 120,
+              //   width: 120,
+              //   child: PieChartWidget(
+              //     completed: completed,
+              //     pending: pending,
+              //   ),
+              // ),
 
               const SizedBox(width: 24),
 

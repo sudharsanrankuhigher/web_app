@@ -5,7 +5,7 @@ import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/report/model/report_model.dart';
 
 class InfluencerHighlightTableSource extends DataTableSource {
-  final List<InfluencerProfileHighlight> data;
+  final List<InfBanner> data;
   final String status;
 
   InfluencerHighlightTableSource({
@@ -20,7 +20,7 @@ class InfluencerHighlightTableSource extends DataTableSource {
         cells: [
           DataCell(Text("")),
           DataCell(Text("")),
-          DataCell(Text("")),
+          // DataCell(Text("")),
           DataCell(Center(child: Text("No data found"))),
           DataCell(Text("")),
           DataCell(Text("")),
@@ -41,17 +41,17 @@ class InfluencerHighlightTableSource extends DataTableSource {
           style: fontFamilySemiBold.size13.black,
         )), // S.No
         DataCell(Text(
-          item.influencerName ?? '-',
+          item.name ?? '-',
           style: fontFamilySemiBold.size13.black,
         )), // Name
         DataCell(Text(
-          item.mobile ?? '-',
+          item.phone ?? '-',
           style: fontFamilySemiBold.size13.black,
         )),
-        DataCell(Text(
-          "${item.packageName ?? 0}",
-          style: fontFamilySemiBold.size13.black,
-        )),
+        // DataCell(Text(
+        //   "${item. ?? 0}",
+        //   style: fontFamilySemiBold.size13.black,
+        // )),
         DataCell(Text(
           "${item.paymentStatus ?? 0}",
           style: fontFamilySemiBold.size13.black,
@@ -61,7 +61,7 @@ class InfluencerHighlightTableSource extends DataTableSource {
           style: fontFamilySemiBold.size13.black,
         )),
         DataCell(Text(
-          " ${DateFormatter.formatToDDMMMYYYY(item.date) ?? 0}",
+          " ${DateFormatter.formatToDDMMMYYYY(item.createdAt) ?? 0}",
           style: fontFamilySemiBold.size13.black,
         )),
       ],

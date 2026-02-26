@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
@@ -17,6 +18,8 @@ class CommonPlanDialog {
     String? planName = initial?.name ?? '';
     String? conn = initial?.connections.toString();
     String? amt = initial?.amount.toString();
+    String? saleAmt = initial?.saleAmount.toString();
+    String? gst = initial?.gst.toString();
     String? badge = initial?.badge ?? '';
 
     /// ---------------- CATEGORY DROPDOWN DATA ----------------
@@ -69,40 +72,61 @@ class CommonPlanDialog {
               ),
               content: SizedBox(
                 width: 400,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _field("Plan Name", planName, (v) => planName = v,
-                        isView: isView),
-                    _field("Connections", conn, (v) => conn = v,
-                        isView: isView, isNumber: true),
-                    _field("Amount", amt, (v) => amt = v,
-                        isView: isView, isNumber: true),
-                    _field("Badge", badge, (v) => badge = v, isView: isView),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _field("Plan Name", planName, (v) => planName = v,
+                          isView: isView),
+                      _field("Connections", conn, (v) => conn = v,
+                          isView: isView, isNumber: true),
+                      _field("Regular Amount", amt, (v) => amt = v,
+                          isView: isView, isNumber: true),
+                      _field("Sale Amount", saleAmt, (v) => saleAmt = v,
+                          isView: isView, isNumber: true),
+                      _field("Gst", gst, (v) => gst = v,
+                          suffix: Icon(Icons.percent),
+                          isView: isView,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            TextInputFormatter.withFunction(
+                                (oldValue, newValue) {
+                              if (newValue.text.isEmpty) return newValue;
 
-                    const SizedBox(height: 8),
+                              final intValue = int.tryParse(newValue.text);
+                              if (intValue != null && intValue <= 100) {
+                                return newValue;
+                              }
+                              return oldValue; // Prevent values > 100
+                            }),
+                          ],
+                          isNumber: true),
+                      _field("Badge", badge, (v) => badge = v, isView: isView),
 
-                    /// ---------------- CATEGORY DROPDOWN ----------------
-                    IgnorePointer(
-                      ignoring: isView,
-                      child: SizedBox(
-                        width: 400,
-                        child: DynamicSingleSearchDropdown(
-                          label: "Category",
-                          items: categoryList,
-                          selectedItem: selectedCategory,
-                          isError: isCategoryError,
-                          errorText: "Please select a category",
-                          onChanged: (value) {
-                            setState(() {
-                              selectedCategory = value;
-                              isCategoryError = false;
-                            });
-                          },
+                      const SizedBox(height: 8),
+
+                      /// ---------------- CATEGORY DROPDOWN ----------------
+                      IgnorePointer(
+                        ignoring: isView,
+                        child: SizedBox(
+                          width: 400,
+                          child: DynamicSingleSearchDropdown(
+                            label: "Category",
+                            items: categoryList,
+                            selectedItem: selectedCategory,
+                            isError: isCategoryError,
+                            errorText: "Please select a category",
+                            onChanged: (value) {
+                              setState(() {
+                                selectedCategory = value;
+                                isCategoryError = false;
+                              });
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
 
@@ -125,7 +149,11 @@ class CommonPlanDialog {
                         {
                           'planName': planName,
                           'connections': int.tryParse(conn ?? "0") ?? 0,
-                          'amount': int.tryParse(amt ?? "0") ?? initial!.amount,
+                          'regular_price':
+                              int.tryParse(amt ?? "0") ?? initial!.amount,
+                          'sale_price': int.tryParse(saleAmt ?? "0") ??
+                              initial!.saleAmount,
+                          'gst': int.tryParse(gst ?? "0") ?? initial!.gst,
                           'badge': badge ?? "",
                           'category': selectedCategory['id'], // ✅ numeric
                         },
@@ -157,6 +185,8 @@ class CommonPlanDialog {
     Function(String) onChanged, {
     bool isView = false,
     bool isNumber = false,
+    Widget? suffix,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -177,9 +207,11 @@ class CommonPlanDialog {
             readOnly: isView,
             radius: 10,
             hintText: label,
+            suffixIcon: suffix,
             initialValue: initial ?? '',
             onChanged: (val) => onChanged(val!),
             keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+            inputFormatters: inputFormatters,
           ),
         ],
       ),

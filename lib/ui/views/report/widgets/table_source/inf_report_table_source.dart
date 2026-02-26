@@ -4,7 +4,7 @@ import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/report/model/report_model.dart';
 
 class InfluencerReportTableSource extends DataTableSource {
-  final List<InfluencersProjectCount> data;
+  final List<InfProject> data;
   final String status;
 
   InfluencerReportTableSource({
@@ -38,19 +38,19 @@ class InfluencerReportTableSource extends DataTableSource {
           style: fontFamilySemiBold.size13.black,
         )), // S.No
         DataCell(Text(
-          item.influencerName ?? '-',
+          item.infName ?? '-',
           style: fontFamilySemiBold.size13.black,
         )), // Name
         DataCell(Text(
-          (item.promoteProject ?? 0).toString(),
+          (item.promoteProjectCount ?? 0).toString(),
           style: fontFamilySemiBold.size13.black,
         )),
         DataCell(Text(
-          "${item.clientProject ?? 0}",
+          "${item.clientProjectCount ?? 0}",
           style: fontFamilySemiBold.size13.black,
         )),
         DataCell(Text(
-          "${item.totalProject ?? 0}",
+          "${item.totalProjectCount ?? 0}",
           style: fontFamilySemiBold.size13.black,
         )),
       ],

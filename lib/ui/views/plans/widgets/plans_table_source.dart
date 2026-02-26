@@ -58,6 +58,8 @@ class PlanTableSource extends DataTableSource {
           DataCell(Text(plan.name!)),
           DataCell(Text("${plan.connections}")),
           DataCell(Text("₹${plan.amount}")),
+          DataCell(Text("₹${plan.saleAmount}")),
+          DataCell(Text("${plan.gst}")),
           DataCell(Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(

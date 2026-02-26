@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:webapp/core/helper/date_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
@@ -46,7 +45,7 @@ class ReportTableSource extends DataTableSource {
           style: fontFamilySemiBold.size13.black,
         )), // Name
         DataCell(Text(
-          item.mobile ?? '-',
+          item.clientMobileNumber ?? '-',
           style: fontFamilySemiBold.size13.black,
         )),
         DataCell(Text(
@@ -54,7 +53,7 @@ class ReportTableSource extends DataTableSource {
           style: fontFamilySemiBold.size13.black,
         )),
         DataCell(Text(
-          "${item.paymentStatus ?? 0}",
+          "${item.packageStatus ?? 0}",
           style: fontFamilySemiBold.size13.black,
         )),
         DataCell(Text(
@@ -62,7 +61,7 @@ class ReportTableSource extends DataTableSource {
           style: fontFamilySemiBold.size13.black,
         )),
         DataCell(Text(
-          "${DateFormatter.formatToDDMMMYYYY(item.date) ?? 0}",
+          "${DateFormatter.formatToDDMMMYYYY(item.paymentDate) ?? 0}",
           style: fontFamilySemiBold.size13.black,
         )),
       ],
