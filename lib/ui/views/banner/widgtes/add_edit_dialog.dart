@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/add_company/widgets/add_edit_company_dialog.dart';
@@ -124,15 +125,16 @@ class AddEditBannerDialog {
                   ),
                   Row(
                     children: [
-                      if (isView && !isEdit)
-                        IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () {
-                            setDialogState(() {
-                              isEdit = true;
-                            });
-                          },
-                        ),
+                      if (PermissionHelper.instance.canEdit('banner'))
+                        if (isView && !isEdit)
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              setDialogState(() {
+                                isEdit = true;
+                              });
+                            },
+                          ),
                       IconButton(
                         icon: const Icon(Icons.close),
                         onPressed: () => Navigator.pop(context),

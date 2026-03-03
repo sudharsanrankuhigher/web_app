@@ -25,11 +25,12 @@ import 'package:webapp/ui/views/roles/roles_view.dart';
 import 'package:webapp/ui/views/add_company/add_company_view.dart';
 import 'package:webapp/services/api_service.dart';
 import 'package:webapp/ui/views/location_contact/location_contact_view.dart';
-import 'package:webapp/ui/views/location_contact/location_contact_view.dart';
-import 'package:webapp/ui/views/location_contact/location_contact_view.dart';
-import 'package:webapp/ui/views/banner/banner_view.dart';
-// @stacked-import
 
+import 'package:webapp/ui/views/banner/banner_view.dart';
+
+// part 'app.router.dart'; // <<– add this line
+
+// @stacked-import
 @StackedApp(
   routes: [
     MaterialRoute(
@@ -44,15 +45,8 @@ import 'package:webapp/ui/views/banner/banner_view.dart';
         MaterialRoute(page: RequestsView, path: 'requests'),
       ],
     ),
-    // MaterialRoute(page: HomeView, path: '/home'),
     MaterialRoute(page: StartupView, path: "/startup"),
-    MaterialRoute(page: LoginView, path: "/login"),
-    // MaterialRoute(page: DashBoardView, path: "/dashBoard"),
-    // MaterialRoute(page: UsersView, path: "/users"),
-    // MaterialRoute(page: InfluencersView, path: "/influencers"),
-    // MaterialRoute(page: ServicesView, path: "/services"),
-    // MaterialRoute(page: PlansView, path: "/plans"),
-    // MaterialRoute(page: RequestsView, path: "/requests"),
+    MaterialRoute(page: LoginView, path: "/login", initial: true),
     MaterialRoute(page: SubAdminView),
     MaterialRoute(page: StateView),
     MaterialRoute(page: CityView),
@@ -70,12 +64,14 @@ import 'package:webapp/ui/views/banner/banner_view.dart';
     LazySingleton(classType: BottomSheetService),
     LazySingleton(classType: DialogService),
     LazySingleton(classType: NavigationService),
-    LazySingleton(classType: HomeViewModel),
+    // LazySingleton(classType: HomeViewModel),
     Presolve(
         classType: SharedPreferences,
         presolveUsing: SharedPreferences.getInstance),
     LazySingleton(classType: UserAuthenticationService),
     LazySingleton(classType: ApiService, resolveUsing: ApiService.init),
+    // LazySingleton(classType: ApiService),
+
 // @stacked-service
   ],
   bottomsheets: [

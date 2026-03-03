@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/views/location_contact/models/location_contact_model.dart'
     as contact;
@@ -64,23 +65,33 @@ class ContactTableSource extends DataTableSource {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(
-                  icon: const Icon(
-                    Icons.visibility,
-                    size: 16,
-                    color: Colors.blue,
-                  ),
-                  onPressed: () => onView(plan)),
-              IconButton(
-                  icon: const Icon(
-                    Icons.edit,
-                    size: 16,
-                    color: grey,
-                  ),
-                  onPressed: () => onEdit(plan)),
-              IconButton(
-                  icon: const Icon(Icons.delete, size: 16, color: red),
-                  onPressed: () => onDelete(plan)),
+              IgnorePointer(
+                ignoring: PermissionHelper.instance.canView('contact_support'),
+                child: IconButton(
+                    icon: const Icon(
+                      Icons.visibility,
+                      size: 16,
+                      color: Colors.blue,
+                    ),
+                    onPressed: () => onView(plan)),
+              ),
+              IgnorePointer(
+                ignoring: PermissionHelper.instance.canEdit('contact_support'),
+                child: IconButton(
+                    icon: const Icon(
+                      Icons.edit,
+                      size: 16,
+                      color: grey,
+                    ),
+                    onPressed: () => onEdit(plan)),
+              ),
+              IgnorePointer(
+                ignoring:
+                    PermissionHelper.instance.canDelete('contact_support'),
+                child: IconButton(
+                    icon: const Icon(Icons.delete, size: 16, color: red),
+                    onPressed: () => onDelete(plan)),
+              ),
             ],
           )),
         ]);

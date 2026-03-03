@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stacked/stacked.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/widgets/common_button.dart';
@@ -335,24 +336,26 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                 },
                                 margin: defaultPadding10,
                               ),
-                              CommonStatusChip(
-                                text: "Company Payment Verified",
-                                imagePath: "assets/images/verified.svg",
-                                textStyle: viewModel.isChipSelected == 8
-                                    ? fontFamilySemiBold.size14.white
-                                    : fontFamilySemiBold.size14.black,
-                                bgColor: viewModel.isChipSelected == 8
-                                    ? appGreen400
-                                    : white,
-                                imageColor: viewModel.isChipSelected == 8
-                                    ? white
-                                    : null,
-                                onTap: () {
-                                  print("company payment verified");
-                                  viewModel.setChipSelected(8);
-                                },
-                                margin: defaultPadding10,
-                              ),
+                              if (PermissionHelper.instance
+                                  .has('company_payment_approval'))
+                                CommonStatusChip(
+                                  text: "Company Payment Verified",
+                                  imagePath: "assets/images/verified.svg",
+                                  textStyle: viewModel.isChipSelected == 8
+                                      ? fontFamilySemiBold.size14.white
+                                      : fontFamilySemiBold.size14.black,
+                                  bgColor: viewModel.isChipSelected == 8
+                                      ? appGreen400
+                                      : white,
+                                  imageColor: viewModel.isChipSelected == 8
+                                      ? white
+                                      : null,
+                                  onTap: () {
+                                    print("company payment verified");
+                                    viewModel.setChipSelected(8);
+                                  },
+                                  margin: defaultPadding10,
+                                ),
                               CommonStatusChip(
                                 text: "Rejected",
                                 imagePath: "assets/images/rejected.svg",
@@ -390,7 +393,6 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                 },
                                 margin: defaultPadding10,
                               ),
-                              // if (viewModel.isInprogress == false)
                               CommonStatusChip(
                                 text: "Promote Pay",
                                 imagePath: "assets/images/pay.svg",

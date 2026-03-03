@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/contact_support/contact_support_viewmodel.dart';
@@ -85,47 +86,53 @@ class ClientTableSource extends DataTableSource {
         DataCell(Text(item.alternativeNo!)), // Contact No
         DataCell(
           (status == 'pending')
-              ? Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.check, color: Colors.green),
-                      onPressed: () {
-                        print('Approved ${item.id}');
-                        showNoteDialog(
-                          context: StackedService.navigatorKey!.currentContext!,
-                          title: "Add completed Note",
-                          noteString: 'Approved',
-                          onSubmit: (notes) {
-                            print("Submitted note: $notes");
-                            vm.updateContactSupport(
-                              id: item.id!,
-                              note: notes,
-                              status: "completed",
-                            );
-                          },
-                        );
-                      },
-                    ),
-                    IconButton(
-                        icon: const Icon(Icons.close, color: Colors.red),
+              ? IgnorePointer(
+                  ignoring: PermissionHelper.instance.has('contact_support')
+                      ? false
+                      : true,
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.check, color: Colors.green),
                         onPressed: () {
-                          print('Rejected ${item.id}');
+                          print('Approved ${item.id}');
                           showNoteDialog(
                             context:
                                 StackedService.navigatorKey!.currentContext!,
-                            noteString: 'Rejected',
-                            title: "Add Rejected Note",
-                            onSubmit: (note) {
-                              print("Submitted note: $note");
+                            title: "Add completed Note",
+                            noteString: 'Approved',
+                            onSubmit: (notes) {
+                              print("Submitted note: $notes");
                               vm.updateContactSupport(
-                                note: note,
                                 id: item.id!,
-                                status: "rejected",
+                                note: notes,
+                                status: "completed",
                               );
                             },
                           );
-                        }),
-                  ],
+                        },
+                      ),
+                      IconButton(
+                          icon: const Icon(Icons.close, color: Colors.red),
+                          onPressed: () {
+                            print('Rejected ${item.id}');
+                            showNoteDialog(
+                              context:
+                                  StackedService.navigatorKey!.currentContext!,
+                              noteString: 'Rejected',
+                              title: "Add Rejected Note",
+                              onSubmit: (note) {
+                                print("Submitted note: $note");
+                                vm.updateContactSupport(
+                                  note: note,
+                                  id: item.id!,
+                                  status: "rejected",
+                                );
+                              },
+                            );
+                          }),
+                    ],
+                  ),
                 )
               : (status == 'completed')
                   ? Container(

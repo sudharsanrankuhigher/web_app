@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/banner/model/all_banner_model.dart'
@@ -82,9 +83,14 @@ class BannerTableSource extends DataTableSource {
                   color: Colors.blue,
                 ),
                 onPressed: () => onView(item)),
-            IconButton(
-                icon: const Icon(Icons.delete, size: 16, color: red),
-                onPressed: () => onDelete(item, influencer.name ?? '')),
+            IgnorePointer(
+              ignoring: PermissionHelper.instance.canView('delete_banner')
+                  ? false
+                  : true,
+              child: IconButton(
+                  icon: const Icon(Icons.delete, size: 16, color: red),
+                  onPressed: () => onDelete(item, influencer.name ?? '')),
+            ),
           ],
         )),
       ],

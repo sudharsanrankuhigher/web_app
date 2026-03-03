@@ -28,7 +28,7 @@ class LocationContactView extends StackedView<LocationContactViewModel> {
 
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        body: PermissionHelper.instance.canView('plans')
+        body: PermissionHelper.instance.canView('location_contact')
             ? Container(
                 padding: defaultPadding20 - topPadding20,
                 child: Column(
@@ -148,7 +148,8 @@ class LocationContactView extends StackedView<LocationContactViewModel> {
                               ),
                             ),
                             horizontalSpacing10,
-                            if (PermissionHelper.instance.canAdd('plans'))
+                            if (PermissionHelper.instance
+                                .canAdd('location_contact'))
                               SizedBox(
                                 width: isExtended ? 180 : null,
                                 child: CommonButton(
