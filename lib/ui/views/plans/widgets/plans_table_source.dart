@@ -21,9 +21,9 @@ class PlanTableSource extends DataTableSource {
     if (plans.isEmpty) {
       return DataRow(
         cells: List.generate(
-          6, // total columns
+          8, // total columns
           (i) {
-            if (i == 3) {
+            if (i == 4) {
               // column index where message should show
               return const DataCell(
                 Center(

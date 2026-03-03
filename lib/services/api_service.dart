@@ -44,7 +44,8 @@ class ApiService {
   static ApiService init() {
     final dio = Dio(
       BaseOptions(
-        baseUrl: 'http://172.20.25.23:8005/',
+        baseUrl: 'https://admin.promoteapp.in/',
+        // baseUrl: 'http://172.20.25.23:8005/',
         followRedirects: true,
         validateStatus: (status) => status != null && status < 500,
       ),
@@ -85,7 +86,7 @@ class ApiService {
       ),
     );
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return LoginResponse.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -98,7 +99,7 @@ class ApiService {
   Future<GetAdminProfileResponse> getProfile() async {
     final response = await _dio.get('api/admin/profile');
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return GetAdminProfileResponse.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -111,7 +112,7 @@ class ApiService {
   Future<GetUsersResponse> getUsers() async {
     final response = await _dio.get('api/admin/get-users');
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return GetUsersResponse.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -127,7 +128,7 @@ class ApiService {
     final data = {'name': addStateRequest.name};
     final response = await _dio.post('api/admin/add-state', data: data);
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return state_model.StateModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -141,7 +142,7 @@ class ApiService {
     final response = await _dio.get('api/admin/get-all-state');
     final List<dynamic> data = response.data['data'] ?? [];
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return data.map((json) => state_model.Datum.fromJson(json)).toList();
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -155,7 +156,7 @@ class ApiService {
     final response = await _dio.post('api/admin/edit-state',
         data: updateStateRequest.toJson());
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return state_model.StateModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -169,7 +170,7 @@ class ApiService {
     final data = {'id': id};
     final response = await _dio.delete('api/admin/delete-state', data: data);
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return state_model.StateModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -185,7 +186,7 @@ class ApiService {
     final response = await _dio.get('api/admin/get-all-city');
     final List<dynamic> data = response.data['data'] ?? [];
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return data.map((json) => city_model.Datum.fromJson(json)).toList();
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -200,7 +201,7 @@ class ApiService {
     log('Add City Request Data: $data');
     final response = await _dio.post('api/admin/add-city', data: data);
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return city_model.CityShowModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -214,7 +215,7 @@ class ApiService {
     final response =
         await _dio.post('api/admin/edit-city', data: updateCityRequest);
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return city_model.CityShowModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -228,7 +229,7 @@ class ApiService {
     final data = {'id': id};
     final response = await _dio.delete('api/admin/delete-city', data: data);
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return city_model.CityShowModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -243,7 +244,7 @@ class ApiService {
   Future<plan.PlanModel> getAllPlans() async {
     final response = await _dio.get('api/admin/get-all-plan');
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return plan.PlanModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -258,7 +259,7 @@ class ApiService {
     log('Add Plan Request Data: $data');
     final response = await _dio.post('api/admin/add-plan', data: data);
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return plan.PlanModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -272,7 +273,7 @@ class ApiService {
     final response =
         await _dio.post('api/admin/edit-plan', data: updatePlanRequest);
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return plan.PlanModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -290,7 +291,7 @@ class ApiService {
           validateStatus: (status) => status != null && status < 501,
         ));
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return plan.PlanModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -305,7 +306,7 @@ class ApiService {
   Future<service.ServiceModel> getAllService() async {
     final response = await _dio.get('api/admin/get-all-service');
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return service.ServiceModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -345,7 +346,7 @@ class ApiService {
       ),
     );
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
       return service.ServiceModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -393,7 +394,8 @@ class ApiService {
       ),
     );
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return service.ServiceModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -407,7 +409,8 @@ class ApiService {
     final data = {'id': id};
     final response = await _dio.delete('api/admin/delete-service', data: data);
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return service.ServiceModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -422,7 +425,8 @@ class ApiService {
   Future<void> getInfluencers() async {
     final response = await _dio.get('api/admin/get-influencers');
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return response.data;
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -441,7 +445,8 @@ class ApiService {
       ),
     );
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return response.data;
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -454,7 +459,8 @@ class ApiService {
   Future<influencer_model.InfluencerModel> getAllInfluencer() async {
     final response = await _dio.get('api/admin/get-all-influencer');
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return influencer_model.InfluencerModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -476,7 +482,8 @@ class ApiService {
       ),
     );
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return response.data;
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -490,7 +497,8 @@ class ApiService {
 
     // map JSON to CompanyModel
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return company_model.CompanyModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -505,7 +513,8 @@ class ApiService {
   Future<roles_model.RolesModel> getAllRole() async {
     final response = await _dio.get('api/admin/get-all-role');
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return roles_model.RolesModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -523,7 +532,8 @@ class ApiService {
       },
     );
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return roles_model.RolesModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -537,7 +547,8 @@ class ApiService {
     final data = {'id': id};
     final response = await _dio.delete('api/admin/delete-role', data: data);
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return roles_model.RolesModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -552,7 +563,8 @@ class ApiService {
     final response = await _dio.get('api/admin/get-all-sub-admin');
     final List<dynamic> data = response.data['data'] ?? [];
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return data.map((json) => sub_admin_model.Datum.fromJson(json)).toList();
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -574,7 +586,8 @@ class ApiService {
       ),
     );
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return sub_admin_model.SubAdminModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -588,7 +601,8 @@ class ApiService {
     final data = {'id': id};
     final response = await _dio.delete('api/admin/delete-admin', data: data);
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return sub_admin_model.SubAdminModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -613,7 +627,8 @@ class ApiService {
       ),
     );
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return response.data;
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -634,7 +649,8 @@ class ApiService {
       ),
     );
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return GetPermissionModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -654,7 +670,8 @@ class ApiService {
       ),
     );
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return client_model.ClientModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -673,7 +690,8 @@ class ApiService {
       ),
     );
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return client_model.ClientModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -695,7 +713,8 @@ class ApiService {
       ),
     );
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return client_model.ClientModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -715,7 +734,8 @@ class ApiService {
           validateStatus: (status) => status != null && status < 501,
         ));
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return request_model.ProjectRequestModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -732,7 +752,8 @@ class ApiService {
           validateStatus: (status) => status != null && status < 500,
         ));
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return response.data;
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -749,7 +770,8 @@ class ApiService {
           validateStatus: (status) => status != null && status < 500,
         ));
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return response.data;
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -766,7 +788,8 @@ class ApiService {
           validateStatus: (status) => status != null && status < 500,
         ));
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return response.data;
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -783,7 +806,8 @@ class ApiService {
           validateStatus: (status) => status != null && status < 501,
         ));
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return request_model.ProjectRequestModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -804,7 +828,8 @@ class ApiService {
       ),
     );
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return response.data;
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -817,7 +842,8 @@ class ApiService {
   Future<project_model.ProjectModel> getAllPromoteProjects(request) async {
     final response = await _dio.post('api/admin/promote/list', data: request);
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return project_model.ProjectModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -831,7 +857,8 @@ class ApiService {
     final response =
         await _dio.post('api/admin/promote/project', data: request);
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return sub_project_model.PromoteTableModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -848,7 +875,8 @@ class ApiService {
           validateStatus: (status) => status != null && status < 500,
         ));
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return response.data;
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -871,7 +899,8 @@ class ApiService {
           validateStatus: (status) => status != null && status < 500,
         ));
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return response.data;
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -888,7 +917,8 @@ class ApiService {
           validateStatus: (status) => status != null && status < 501,
         ));
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return project_model.ProjectModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -921,7 +951,8 @@ class ApiService {
           validateStatus: (status) => status != null && status < 500,
         ));
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return LocationContactModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -938,7 +969,8 @@ class ApiService {
           validateStatus: (status) => status != null && status < 500,
         ));
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return LocationContactModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -958,7 +990,8 @@ class ApiService {
       ),
     );
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return AllBannerModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -976,7 +1009,8 @@ class ApiService {
           validateStatus: (status) => status != null && status < 501,
         ));
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return AllBannerModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -996,7 +1030,8 @@ class ApiService {
           validateStatus: (status) => status != null && status < 501,
         ));
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(msg: response.statusMessage.toString());
+      Fluttertoast.showToast(msg: response.data["message"].toString());
+
       return AllBannerModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
@@ -1014,7 +1049,8 @@ class ApiService {
   //         validateStatus: (status) => status != null && status < 501,
   //       ));
   //   if (response.statusCode == 200) {
-  //     Fluttertoast.showToast(msg: response.statusMessage.toString());
+  //           Fluttertoast.showToast(msg: response.data["message"].toString());
+
   //     return ReportModel.fromJson(response.data);
   //   } else {
   //     final message = response.data?['message'] ?? 'Server error';

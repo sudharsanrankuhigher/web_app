@@ -159,7 +159,7 @@ class LocationContactView extends StackedView<LocationContactViewModel> {
                                   textStyle: fontFamilyMedium.size14.white,
                                   margin: EdgeInsets.zero,
                                   borderRadius: 10,
-                                  text: isExtended ? "Add Plans" : "",
+                                  text: isExtended ? "Add Contact" : "",
                                   onTap: () async {
                                     viewModel.addContact(context);
                                   },
