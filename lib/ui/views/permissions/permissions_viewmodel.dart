@@ -249,7 +249,7 @@ class PermissionsViewModel extends BaseViewModel {
     print(
       'Row: $rowName | Permission: $permission | Value: $value',
     );
-    print('Row: ${permission}_${rowName} | Value: $value');
+    print('Row: ${permission}_$rowName | Value: $value');
     hasPermissionChanges();
   }
 

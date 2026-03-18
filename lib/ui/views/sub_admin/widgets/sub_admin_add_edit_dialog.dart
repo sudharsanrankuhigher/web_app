@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -79,14 +77,13 @@ class CommonSubAdminDialog {
 
     Uint8List? idProofBytes;
     String? idProofPath = model?.docImg;
-    ;
     bool isPdf = false;
 
-    Widget _uploadPlaceholder() {
-      return Center(
+    Widget uploadPlaceholder() {
+      return const Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             Icon(Icons.upload_file),
             SizedBox(width: 8),
             Text("Upload ID Proof"),
@@ -95,7 +92,7 @@ class CommonSubAdminDialog {
       );
     }
 
-    InputDecoration _decoration(String label) => InputDecoration(
+    InputDecoration decoration(String label) => InputDecoration(
           labelText: label,
           labelStyle: fontFamilyMedium.size13.greyColor,
           contentPadding:
@@ -229,7 +226,7 @@ class CommonSubAdminDialog {
 
                     /// Gender
                     DynamicSingleSearchDropdown(
-                      items: [
+                      items: const [
                         "Male",
                         "Female",
                         "Others",
@@ -255,7 +252,7 @@ class CommonSubAdminDialog {
                         if (picked != null) dob = picked;
                       },
                       child: InputDecorator(
-                        decoration: _decoration("Date of Birth").copyWith(
+                        decoration: decoration("Date of Birth").copyWith(
                             suffixIcon: const Icon(Icons.calendar_today)),
                         child: Text(
                           dob.toLocal().toString().split(' ')[0],
@@ -325,12 +322,13 @@ class CommonSubAdminDialog {
                                 color: Colors.grey.shade100,
                               ),
                               child: idProofBytes == null && idProofPath == null
-                                  ? _uploadPlaceholder()
+                                  ? uploadPlaceholder()
                                   : FilePreview(
                                       bytes: idProofBytes,
                                       path: idProofPath,
                                       isPdf: isPdf,
                                       isEdit: false,
+                                      imageUrl: model!.docImg,
                                       onRemove: () {
                                         setState(() {
                                           idProofBytes = null;

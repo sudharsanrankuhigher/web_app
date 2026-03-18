@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:webapp/core/helper/dialog_state.dart';
 import 'package:webapp/ui/views/promote_projects/model/promote_project_model.dart'
     as project_model;
 import 'package:webapp/ui/views/promote_projects/promote_projects_viewmodel.dart';
@@ -80,7 +79,11 @@ class PromoteProjectsTableSource extends DataTableSource {
               ),
       ),
       DataCell(Text('${item.influencers?.length ?? 0}')),
-      DataCell(Text(item.description ?? '')),
+      DataCell(
+        Tooltip(
+            message: item.description ?? '',
+            child: Text(item.description ?? '')),
+      ),
       DataCell(Container(
           alignment: Alignment.centerRight,
           child: Text('₹${pay?.payment ?? 0}'))),

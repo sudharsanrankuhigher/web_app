@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:webapp/core/helper/date_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
-import 'package:webapp/ui/views/promote_projects/widgets/add_edit_dialog.dart';
 import 'package:webapp/ui/views/report/model/report_model.dart';
 
 class CompanyDetailedTableSource extends DataTableSource {

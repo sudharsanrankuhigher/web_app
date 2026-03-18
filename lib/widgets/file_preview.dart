@@ -25,10 +25,11 @@ class FilePreview extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget preview;
 
-    if (isPdf) {
-      // PDF preview
-      preview = const Icon(Icons.picture_as_pdf, size: 40, color: Colors.red);
-    } else if (bytes != null) {
+    // if (isPdf) {
+    //   // PDF preview
+    //   preview = const Icon(Icons.picture_as_pdf, size: 40, color: Colors.red);
+    // } else
+    if (bytes != null) {
       // New image upload preview
       preview = ClipRRect(
         borderRadius: BorderRadius.circular(6),

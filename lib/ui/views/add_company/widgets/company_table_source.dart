@@ -21,7 +21,7 @@ class CompanyTableSource extends DataTableSource {
     if (companies.isEmpty) {
       return DataRow(
         cells: List.generate(
-          10, // total columns
+          11, // total columns
           (i) {
             if (i == 5) {
               // column index where message should show
@@ -74,6 +74,7 @@ class CompanyTableSource extends DataTableSource {
           DataCell(Text("${company.altPhoneNo}")),
           DataCell(Text("${company.city} / ${company.state}")),
           DataCell(Text("${company.gstNo}")),
+          DataCell(Text("${company.projectCount}")),
           DataCell(
             InkWell(
               onTap: () => showBankDetails!(company),

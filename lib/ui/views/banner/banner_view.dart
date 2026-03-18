@@ -21,10 +21,10 @@ class BannerView extends StackedView<BannerViewModel> {
     Widget? child,
   ) {
     final bool isExtended = MediaQuery.of(context).size.width > 1200;
-    final rowCount = viewModel.bannerTableSource?.rowCount ?? 0;
+    final rowCount = viewModel.bannerTableSource.rowCount ?? 0;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: PermissionHelper.instance.canView('banner')
           ? Container(
               padding: defaultPadding12 - topPadding12,
@@ -62,7 +62,9 @@ class BannerView extends StackedView<BannerViewModel> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          // onChanged: viewModel.applySearch,
+                          onChanged: (value) {
+                            viewModel.applySearch(value);
+                          },
                         ),
                       ),
                       Row(
@@ -97,7 +99,7 @@ class BannerView extends StackedView<BannerViewModel> {
                                   initialCheckbox: false,
                                   initialSort: "A-Z",
                                   onApply: (isChecked, sortType) {
-                                    // viewModel.applySort(isChecked, sortType);
+                                    viewModel.applySort(isChecked, sortType);
                                   },
                                 );
                               },
@@ -129,26 +131,27 @@ class BannerView extends StackedView<BannerViewModel> {
                   Expanded(
                     child: viewModel.isBusy || viewModel.isLoading == true
                         ? const Center(child: CircularProgressIndicator())
-                        : viewModel.bannerTableSource == null
-                            ? const Center(child: Text("No Data Found"))
-                            : CommonPaginatedTable(
-                                headingTextStyle:
-                                    fontFamilySemiBold.size12.greyColor,
-                                heddingRowColor: availableCampaignColor,
-                                columns: viewModel.bannerColumn,
-                                source: viewModel.bannerTableSource!,
-                                rowsperPage:
-                                    viewModel.bannerTableSource!.rowCount < 10
-                                        ? viewModel.bannerTableSource!.rowCount
-                                        : 10,
-                                minWidth: 1100,
-                                hidePaginator: false,
-                              ),
+                        : CommonPaginatedTable(
+                            key: ValueKey(
+                                viewModel.filteredService.length), // ✅ ADD THIS
+
+                            headingTextStyle:
+                                fontFamilySemiBold.size12.greyColor,
+                            heddingRowColor: availableCampaignColor,
+                            columns: viewModel.bannerColumn,
+                            source: viewModel.bannerTableSource,
+                            rowsperPage:
+                                viewModel.bannerTableSource.rowCount < 10
+                                    ? viewModel.bannerTableSource.rowCount
+                                    : 10,
+                            minWidth: 1100,
+                            hidePaginator: false,
+                          ),
                   )
                 ],
               ),
             )
-          : NoAccessWidget(),
+          : const NoAccessWidget(),
     );
   }
 

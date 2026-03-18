@@ -3,7 +3,6 @@ import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/views/location_contact/models/location_contact_model.dart'
     as contact;
-import 'package:webapp/ui/views/state/model/state_model.dart' as StateModel;
 
 class ContactTableSource extends DataTableSource {
   final List<contact.Datum> contacts;
@@ -24,7 +23,7 @@ class ContactTableSource extends DataTableSource {
     if (contacts.isEmpty) {
       return DataRow(
         cells: List.generate(
-          5, // total columns
+          4, // total columns
           (i) {
             if (i == 3) {
               // column index where message should show
@@ -59,7 +58,7 @@ class ContactTableSource extends DataTableSource {
         cells: [
           DataCell(Text("$sNo")),
           DataCell(Text(plan.state!)),
-          DataCell(Text("${plan.city}")),
+          // DataCell(Text("${plan.city}")),
           DataCell(Text("${plan.mobileNumber}")),
           DataCell(Row(
             crossAxisAlignment: CrossAxisAlignment.center,

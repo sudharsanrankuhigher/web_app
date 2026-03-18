@@ -7,6 +7,7 @@ import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
+import 'package:webapp/widgets/month_year_picker.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
 import 'users_viewmodel.dart';
 
@@ -22,6 +23,30 @@ class UsersView extends StackedView<UsersViewModel> {
     final bool isExtended = MediaQuery.of(context).size.width > 1000;
 
     return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        appBar: AppBar(
+          backgroundColor: white,
+          elevation: 0,
+          title: Text(
+            'User Management',
+            style: fontFamilyBold.size20.black,
+          ),
+          actions: [
+            Padding(
+              padding: defaultPadding12,
+              child: MonthYearPickerField(
+                selectedDate: viewModel.selectedMonth,
+                onChanged: (viewDate) {
+                  viewModel.selectedMonth = viewDate;
+                  print(viewModel.selectedMonth.toString());
+                  viewModel.loadUsers();
+                  viewModel.notifyListeners();
+                  print(viewDate);
+                },
+              ),
+            ),
+          ],
+        ),
         body: PermissionHelper.instance.canView('users')
             ? Padding(
                 padding: defaultPadding20 - topPadding20,
@@ -29,21 +54,21 @@ class UsersView extends StackedView<UsersViewModel> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: double.infinity,
-                        padding: defaultPadding16,
-                        decoration: const BoxDecoration(
-                          color: white,
-                          borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(12),
-                              bottomRight: Radius.circular(12)),
-                        ),
-                        child: Text(
-                          'User Management',
-                          style: fontFamilyBold.size26.black,
-                        ),
-                      ),
-                      verticalSpacing12,
+                      // Container(
+                      //   width: double.infinity,
+                      //   padding: defaultPadding16,
+                      //   decoration: const BoxDecoration(
+                      //     color: white,
+                      //     borderRadius: BorderRadius.only(
+                      //         bottomLeft: Radius.circular(12),
+                      //         bottomRight: Radius.circular(12)),
+                      //   ),
+                      //   child: Text(
+                      //     'User Management',
+                      //     style: fontFamilyBold.size26.black,
+                      //   ),
+                      // ),
+                      // verticalSpacing12,
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -117,7 +142,7 @@ class UsersView extends StackedView<UsersViewModel> {
                                   DataColumn(label: Text("City/State")),
                                   DataColumn(label: Text("Plan")),
                                   DataColumn(label: Text("Connections")),
-                                  DataColumn(label: Text("Actions")),
+                                  // DataColumn(label: Text("Actions")),
                                 ],
                                 source: viewModel.tableSource,
                                 rowsperPage: viewModel.tableSource.rowCount < 10
@@ -130,7 +155,7 @@ class UsersView extends StackedView<UsersViewModel> {
                   ),
                 ),
               )
-            : NoAccessWidget());
+            : const NoAccessWidget());
   }
 
   @override

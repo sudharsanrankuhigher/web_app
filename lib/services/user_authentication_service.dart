@@ -1,8 +1,7 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/app/router.dart';
@@ -11,7 +10,7 @@ import 'package:webapp/core/model/login_model.dart';
 import 'package:webapp/core/navigation/navigation_mixin.dart';
 import 'package:webapp/services/api_service.dart';
 
-class UserAuthenticationService with NavigationMixin {
+class UserAuthenticationService extends BaseViewModel with NavigationMixin {
   final _dialogService = locator<DialogService>();
   final _sharedPreference = locator<SharedPreferences>();
 

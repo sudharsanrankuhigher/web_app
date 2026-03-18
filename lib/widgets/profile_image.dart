@@ -56,9 +56,7 @@ class ProfileImageEdit extends StatelessWidget {
             backgroundColor: Colors.grey[200],
             child: kIsWeb
                 ? ClipRRect(
-                    borderRadius: radius != null
-                        ? BorderRadius.circular(radius)
-                        : BorderRadius.circular(60),
+                    borderRadius: BorderRadius.circular(radius),
                     child: WebImage(
                       imageUrl: imageUrl!,
                       width: 200,
@@ -77,8 +75,8 @@ class ProfileImageEdit extends StatelessWidget {
           ),
           if (isView == true)
             Positioned(
-              right: 0,
-              bottom: 0,
+              right: 10,
+              bottom: 10,
               child: GestureDetector(
                 onTap: () async {
                   final result = await UniversalImagePicker.pickImage();
@@ -92,12 +90,14 @@ class ProfileImageEdit extends StatelessWidget {
                   }
                 },
                 child: Container(
-                    decoration: BoxDecoration(
+                    padding: defaultPadding4,
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: grey,
                     ),
-                    child: Icon(
-                      Icons.add,
+                    child: const Icon(
+                      Icons.cloud_upload_outlined,
+                      size: 15,
                       color: white,
                     )),
               ),

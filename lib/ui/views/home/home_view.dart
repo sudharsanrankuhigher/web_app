@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:stacked/stacked.dart';
-import 'package:stacked_services/stacked_services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:webapp/ui/common/shared/styles.dart';
@@ -38,10 +37,21 @@ class HomeView extends StackedView<HomeViewModel> {
                   onTap: () => viewModel.onMenuTap(0, context),
                   child: Row(
                     children: [
-                      const CircleAvatar(
-                        backgroundColor: white,
-                        radius: 22,
-                        backgroundImage: AssetImage("assets/images/logo.png"),
+                      Container(
+                        color: white,
+                        child: CircleAvatar(
+                          backgroundColor: white,
+                          radius: 22,
+                          backgroundImage:
+                              const AssetImage("assets/images/logo.png"),
+                          child: SvgPicture.asset(
+                            "assets/images/logo.svg",
+                            color: Colors.black,
+                            height: 24,
+                            width: 24,
+                            package: null,
+                          ),
+                        ),
                       ),
                       if (isExtended) ...[
                         const SizedBox(width: 10),
@@ -151,23 +161,34 @@ class HomeView extends StackedView<HomeViewModel> {
                   children: [
                     Row(
                       children: [
-                        CachedNetworkImage(
-                          imageUrl: viewModel.profileImage ??
-                              "https://example.com/profile.jpg",
-                          imageBuilder: (context, imageProvider) =>
-                              CircleAvatar(
-                            radius: 22,
-                            backgroundImage: imageProvider,
-                          ),
-                          placeholder: (context, url) => const CircleAvatar(
-                            radius: 22,
-                            backgroundImage:
-                                AssetImage("assets/images/logo.png"),
-                          ),
-                          errorWidget: (context, url, error) =>
-                              const CircleAvatar(
-                            radius: 22,
-                            child: Icon(Icons.error),
+                        Container(
+                          color: white,
+                          child: CachedNetworkImage(
+                            imageUrl: viewModel.profileImage ??
+                                "https://tse4.mm.bing.net/th/id/OIP.K_MocKRlIvuJ7ryQAtlErwHaIS?w=559&h=626&rs=1&pid=ImgDetMain&o=7&rm=3",
+                            imageBuilder: (context, imageProvider) =>
+                                CircleAvatar(
+                              radius: 22,
+                              backgroundImage: imageProvider,
+                            ),
+                            placeholder: (context, url) => CircleAvatar(
+                              radius: 22,
+                              backgroundImage: const AssetImage(
+                                  "assets/images/logo.png",
+                                  package: null),
+                              child: SvgPicture.asset(
+                                "assets/images/logo.svg",
+                                color: Colors.black,
+                                height: 24,
+                                width: 24,
+                                package: null,
+                              ),
+                            ),
+                            errorWidget: (context, url, error) =>
+                                const CircleAvatar(
+                              radius: 22,
+                              child: Icon(Icons.error),
+                            ),
                           ),
                         ),
                         if (isExtended) ...[
@@ -176,7 +197,7 @@ class HomeView extends StackedView<HomeViewModel> {
                             viewModel.name ?? "Admin Name",
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 overflow: TextOverflow.ellipsis),
                           ),
@@ -186,7 +207,7 @@ class HomeView extends StackedView<HomeViewModel> {
                     if (isExtended)
                       Text(
                         viewModel.role ?? "Administrator",
-                        style: TextStyle(color: Colors.grey),
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     verticalSpacing16,
                     GestureDetector(

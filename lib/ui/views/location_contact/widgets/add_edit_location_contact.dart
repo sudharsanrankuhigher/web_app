@@ -74,7 +74,7 @@ class _AddressDialogState extends State<AddressDialog> {
         borderRadius: BorderRadius.circular(20),
       ),
       child: ConstrainedBox(
-        constraints: BoxConstraints(
+        constraints: const BoxConstraints(
           maxWidth: 500,
           minWidth: 400,
         ),

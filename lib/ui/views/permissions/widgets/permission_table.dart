@@ -28,7 +28,7 @@ Widget permissionTable(PermissionsViewModel vm) {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const Spacer(),
-            if (isExtended) Text('Select All Submenu Permissions'),
+            if (isExtended) const Text('Select All Submenu Permissions'),
             Checkbox(
               value: vm.selectAll,
               onChanged: (v) => vm.toggleSelectAll(v ?? false),

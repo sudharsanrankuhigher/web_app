@@ -3,7 +3,6 @@ import 'package:webapp/services/user_authentication_service.dart';
 import 'package:webapp/ui/bottom_sheets/notice/notice_sheet.dart';
 import 'package:webapp/ui/dialogs/info_alert/info_alert_dialog.dart';
 import 'package:webapp/ui/views/home/home_view.dart';
-import 'package:webapp/ui/views/home/home_viewmodel.dart';
 import 'package:webapp/ui/views/startup/startup_view.dart';
 import 'package:stacked/stacked_annotations.dart';
 import 'package:stacked_services/stacked_services.dart';

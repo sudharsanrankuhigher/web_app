@@ -22,7 +22,7 @@ class PermissionsView extends StackedView<PermissionsViewModel> {
   ) {
     return PermissionHelper.instance.canView('permissions')
         ? Scaffold(
-            backgroundColor: Theme.of(context).colorScheme.background,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             body: PermissionHelper.instance.canView('permissions')
                 ? viewModel.isBusy
                     ? const Center(child: CircularProgressIndicator())
@@ -51,7 +51,7 @@ class PermissionsView extends StackedView<PermissionsViewModel> {
                                 padding: leftPadding8,
                                 width: 300,
                                 child: DropdownButtonFormField<int>(
-                                  value: viewModel.selectedRoleId,
+                                  initialValue: viewModel.selectedRoleId,
                                   decoration: decoration("Roles"),
                                   items: viewModel.roles
                                       .map(
@@ -119,7 +119,7 @@ class PermissionsView extends StackedView<PermissionsViewModel> {
                           ),
                         ),
                       )
-                : NoAccessWidget(),
+                : const NoAccessWidget(),
             bottomNavigationBar: (viewModel.selectedRoleId == null ||
                     viewModel.hasPermissions == false ||
                     (viewModel.isPermissionsLoading == true))
@@ -172,7 +172,7 @@ class PermissionsView extends StackedView<PermissionsViewModel> {
                       ],
                     ),
                   ))
-        : NoAccessWidget();
+        : const NoAccessWidget();
   }
 
   @override

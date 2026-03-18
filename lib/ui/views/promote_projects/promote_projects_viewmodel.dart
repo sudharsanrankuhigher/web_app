@@ -141,7 +141,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     setProjectLoading(true);
     final data = {
       if (request['id'] != null) "id": request['id'],
-      "project_code": request["projectCode"],
+      // "project_code": request["projectCode"],
       "project_name": request["projectTitle"],
       "company_id": request["companyId"],
       "service_ids": request["selectedServiceIds"],
@@ -171,7 +171,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       }
 
       addField("id", data["id"]);
-      addField("project_code", data["project_code"]);
+      // addField("project_code", data["project_code"]);
       addField("project_name", data["project_name"]);
       addField("company_id", data["company_id"]);
       addField("state", data["state"]);
@@ -272,10 +272,14 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       }
 
       print("FIELDS:");
-      formData.fields.forEach((e) => print("${e.key} = ${e.value}"));
+      for (var e in formData.fields) {
+        print("${e.key} = ${e.value}");
+      }
 
       print("FILES:");
-      formData.files.forEach((e) => print("${e.key} = ${e.value}"));
+      for (var e in formData.files) {
+        print("${e.key} = ${e.value}");
+      }
 
       await _apiService.promoteProjectCreate(formData);
 
@@ -312,7 +316,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       },
     );
 
-    runBusyFuture(loadProjects());
+    loadProjects();
     getInfluencers();
     getServices();
     loadCompanies();
@@ -324,7 +328,8 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     final request = {"status": _isInprogress ? "0" : "1"};
 
     try {
-      final res = await _apiService.getAllPromoteProjects(request);
+      final res =
+          await runBusyFuture(_apiService.getAllPromoteProjects(request));
 
       plans = res.message ?? [];
 
@@ -563,16 +568,18 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       _projectCode = allData.projectCode;
 
       promoteTableSource = PromoteTableSource(
-          data: tableData,
-          status: status,
-          onReject: onReject,
-          onVerify: onVerify,
-          onGotoPromoteVerified: onGotoPromoteVerified,
-          onGotoPromotePay: onGotoPromotePay,
-          onGotoPromoteCommission: onGotoPromoteCommission,
-          showBankDetails: showBankDetails,
-          onReAssign: onReAssign,
-          onRevoke: onRevoke);
+        data: tableData,
+        status: status,
+        onReject: onReject,
+        onVerify: onVerify,
+        onGotoPromoteVerified: onGotoPromoteVerified,
+        onGotoPromotePay: onGotoPromotePay,
+        onGotoPromoteCommission: onGotoPromoteCommission,
+        showBankDetails: showBankDetails,
+        onReAssign: onReAssign,
+        onRevoke: onRevoke,
+        onCompanyPaymentVerified: onCompanyPaymentVerified,
+      );
     } catch (_) {
       tableData = [];
       promoteTableSource = PromoteTableSource(data: [], status: status);
@@ -706,6 +713,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Completed Date")),
           DataColumn(label: Text("Bank Details")),
           DataColumn(label: Text("Commission")),
+          DataColumn(label: Text("Action")),
         ];
       case PromoteStatus.rejected:
         return const [
@@ -887,9 +895,15 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
   onReject(model) async {
     await showRejectConfirmationDialog(
       context: StackedService.navigatorKey!.currentContext!,
-      itemName: model.projectCode,
+      itemName: model.subId.toString(),
       promotionProject: "Promotion Project",
-      onConfirm: () {},
+      onConfirm: () {
+        final data = {
+          "promote_project_id": model.subId,
+          "status": 4,
+        };
+        changeStatus(data);
+      },
     );
   }
 
@@ -921,13 +935,13 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       title: 'Move to Promote Verified',
       confirmText: "Move",
       message:
-          "Are you sure you want to move the ${model.subId} to the promote verified section?",
+          "Are you sure you want to move the ${model.subId} to the Company payment verified section?",
       icon: Icons.hourglass_top,
       confirmColor: Colors.green,
       onConfirm: () async {
         await changeStatus({
           "promote_project_id": model.subId,
-          "status": 6,
+          "status": 9,
         });
       },
     );
@@ -946,6 +960,24 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
         await changeStatus({
           "promote_project_id": model.subId,
           "status": 7,
+        });
+      },
+    );
+  }
+
+  onCompanyPaymentVerified(model) {
+    showActionConfirmationDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      title: 'Company Payment Verified to Promote verified',
+      confirmText: "Move",
+      message:
+          "Are you sure you want to move the ${model.subId} to the company payment verified section?",
+      icon: Icons.hourglass_top,
+      confirmColor: greenShade1,
+      onConfirm: () async {
+        await changeStatus({
+          "promote_project_id": model.subId,
+          "status": 6,
         });
       },
     );
@@ -1095,6 +1127,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           "status": 2,
         };
         changeStatus(data);
+        getPaymentList();
       },
     );
   }

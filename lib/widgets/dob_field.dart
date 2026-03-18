@@ -8,6 +8,8 @@ class DOBField extends StatelessWidget {
   final bool isError;
   final String? errorText;
   final void Function(DateTime) onDateSelected;
+  final DateTime? fistDate;
+  final DateTime? lastdate;
 
   const DOBField({
     super.key,
@@ -16,6 +18,8 @@ class DOBField extends StatelessWidget {
     this.selectedDate,
     this.isError = false,
     this.errorText,
+    this.fistDate,
+    this.lastdate,
   });
 
   @override
@@ -63,8 +67,8 @@ class DOBField extends StatelessWidget {
         final picked = await showDatePicker(
           context: context,
           initialDate: selectedDate ?? DateTime(2000),
-          firstDate: DateTime(1900),
-          lastDate: DateTime.now(),
+          firstDate: fistDate ?? DateTime(1900),
+          lastDate: lastdate ?? DateTime.now(),
           builder: (context, child) {
             return Theme(
               data: Theme.of(context).copyWith(

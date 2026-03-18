@@ -20,6 +20,7 @@ class RequestTableSource extends DataTableSource {
   final void Function(request_model.Datum) onGotoPromoteCommission;
   final void Function(request_model.Datum) onClientPaymentVerified;
   final void Function(request_model.Datum) onReAssign;
+  final void Function(request_model.Datum) infReject;
 
   final String status;
 
@@ -36,7 +37,8 @@ class RequestTableSource extends DataTableSource {
       this.onPaymentDialog,
       this.onGotoPromoteCommission,
       this.onClientPaymentVerified,
-      this.onReAssign);
+      this.onReAssign,
+      this.infReject);
 
   @override
   DataRow? getRow(int index) {
@@ -172,6 +174,19 @@ class RequestTableSource extends DataTableSource {
               ),
             ),
           ),
+          DataCell(
+            CommonStatusChip(
+              onTap: () => infReject(m),
+              imageheight: 20,
+              imagewidth: 20,
+              margin: zeroPadding,
+              text: 'Reject',
+              imagePath: 'assets/images/rejected.svg',
+              bgColor: red,
+              imageColor: white,
+              textStyle: fontFamilySemiBold.size10.white,
+            ),
+          ),
         ];
 
       case "completed_pending":
@@ -210,29 +225,76 @@ class RequestTableSource extends DataTableSource {
           DataCell(
             Builder(
               builder: (_) {
-                final url = m.promotion?.youtube ??
-                    m.promotion?.instagram ??
-                    m.promotion?.facebook;
+                final links = <Widget>[];
 
-                if (url != null && url.isNotEmpty) {
-                  return ViewLink(
-                    url: url,
-                    text: "ViewLink",
+                if (m.promotion?.youtube != null &&
+                    m.promotion!.youtube!.isNotEmpty) {
+                  links.add(
+                    ViewLink(
+                      url: m.promotion!.youtube!,
+                      text: "YouTube",
+                    ),
                   );
                 }
 
-                return const Text('-');
+                if (m.promotion?.instagram != null &&
+                    m.promotion!.instagram!.isNotEmpty) {
+                  links.add(
+                    ViewLink(
+                      url: m.promotion!.instagram!,
+                      text: "Instagram",
+                    ),
+                  );
+                }
+
+                if (m.promotion?.facebook != null &&
+                    m.promotion!.facebook!.isNotEmpty) {
+                  links.add(
+                    ViewLink(
+                      url: m.promotion!.facebook!,
+                      text: "Facebook",
+                    ),
+                  );
+                }
+
+                if (links.isEmpty) {
+                  return const Text('-');
+                }
+
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: links,
+                );
               },
             ),
           ),
 
           DataCell(Center(
             child: CommonStatusChip(
-              onTap: () => onPreparing(m),
+              onTap: () => m.status == 5
+                  ? null
+                  : (m.promotion?.youtube != null &&
+                              m.promotion!.youtube!.isNotEmpty) ||
+                          (m.promotion?.instagram != null &&
+                              m.promotion!.instagram!.isNotEmpty) ||
+                          (m.promotion?.facebook != null &&
+                              m.promotion!.facebook!.isNotEmpty)
+                      ? onPreparing(m)
+                      : null,
               imageheight: 20,
               imagewidth: 20,
               margin: zeroPadding,
-              text: 'Preparing',
+              text: m.status == 5
+                  ? "Rework"
+                  : (m.promotion?.youtube != null &&
+                              m.promotion!.youtube!.isNotEmpty) ||
+                          (m.promotion?.instagram != null &&
+                              m.promotion!.instagram!.isNotEmpty) ||
+                          (m.promotion?.facebook != null &&
+                              m.promotion!.facebook!.isNotEmpty)
+                      ? 'Inf- complete'
+                      : 'Preparing',
               imagePath: 'assets/images/pending.svg',
               bgColor: pending,
               imageColor: white,

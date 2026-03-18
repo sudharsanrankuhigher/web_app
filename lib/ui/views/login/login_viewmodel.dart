@@ -25,6 +25,14 @@ class LoginViewModel extends BaseViewModel with NavigationMixin {
   String get email => _email;
   String get password => _password;
 
+  bool _obscurePassword = true;
+  bool get obscurePassword => _obscurePassword;
+
+  void togglePasswordVisibility() {
+    _obscurePassword = !_obscurePassword;
+    notifyListeners();
+  }
+
   void saveEmail(String? val) {
     _email = val ?? '';
   }
@@ -50,8 +58,15 @@ class LoginViewModel extends BaseViewModel with NavigationMixin {
 
   Future<bool> login(LoginRequest loginRequest) async {
     setBusy(true);
-    final success = await userAuthentication.loginApi(loginRequest);
-    setBusy(false);
-    return success;
+
+    try {
+      final success = await userAuthentication.loginApi(loginRequest);
+      return success;
+    } catch (e) {
+      debugPrint("Login Error: $e");
+      return false;
+    } finally {
+      setBusy(false); // ✅ ALWAYS runs
+    }
   }
 }

@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stacked/stacked.dart';
@@ -237,7 +235,8 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                   onTap: () => viewModel.splitAmount(context),
                                   child: RichText(
                                       text: TextSpan(children: [
-                                    WidgetSpan(child: Icon(Icons.splitscreen)),
+                                    const WidgetSpan(
+                                        child: Icon(Icons.splitscreen)),
                                     WidgetSpan(
                                         child: Center(
                                       child: Container(
@@ -471,9 +470,8 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                           SizedBox(
                             height: MediaQuery.of(context).size.height * 0.75,
                             width: double.infinity,
-                            child: (viewModel.isRequest == true ||
-                                    viewModel.tableSource == null)
-                                ? Center(
+                            child: (viewModel.isRequest == true)
+                                ? const Center(
                                     child: CircularProgressIndicator(),
                                   )
                                 : CommonPaginatedTable(

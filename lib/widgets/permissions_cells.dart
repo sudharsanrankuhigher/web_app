@@ -7,7 +7,7 @@ class HeaderCell extends StatelessWidget {
   final int flex;
   final TextAlign? align;
 
-  const HeaderCell(this.text, this.align, {this.flex = 1});
+  const HeaderCell(this.text, this.align, {super.key, this.flex = 1});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class HeaderCell extends StatelessWidget {
       flex: flex,
       child: Text(
         text,
-        style: TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold),
         textAlign: align ?? TextAlign.center,
       ),
     );
@@ -26,7 +26,7 @@ class TextCell extends StatelessWidget {
   final String text;
   final int flex;
 
-  const TextCell(this.text, {this.flex = 1});
+  const TextCell(this.text, {super.key, this.flex = 1});
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +49,7 @@ class CheckCell extends StatelessWidget {
   final bool enabled;
 
   const CheckCell({
+    super.key,
     required this.value,
     required this.onChanged,
     required this.enabled,

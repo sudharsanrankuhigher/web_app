@@ -43,6 +43,10 @@ class Datum {
   String? image;
   int? infId;
   String? amount;
+  DateTime? startDate;
+  DateTime? endDate;
+  DateTime? createdAt;
+  DateTime? updatedAt;
 
   Datum({
     this.id,
@@ -50,6 +54,10 @@ class Datum {
     this.image,
     this.infId,
     this.amount,
+    this.createdAt,
+    this.updatedAt,
+    this.startDate,
+    this.endDate,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -58,6 +66,14 @@ class Datum {
         image: json["image"],
         infId: json["inf_id"],
         amount: json["amount"],
+        startDate: json["start_date"] == null
+            ? null
+            : DateTime.tryParse(json["start_date"].toString()),
+        endDate: json["end_date"] == null
+            ? null
+            : DateTime.tryParse(json["end_date"].toString()),
+        createdAt: DateTime.parse(json["created_at"]),
+        updatedAt: DateTime.parse(json["updated_at"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -66,5 +82,9 @@ class Datum {
         "image": image,
         "inf_id": infId,
         "amount": amount,
+        "start_date": startDate?.toIso8601String(),
+        "end_date": endDate?.toIso8601String(),
+        "created_at": createdAt?.toIso8601String(),
+        "updated_at": updatedAt?.toIso8601String(),
       };
 }

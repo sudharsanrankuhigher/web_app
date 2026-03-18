@@ -7,7 +7,6 @@ import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
-import 'package:webapp/widgets/state_city_drop_down.dart';
 
 import 'contact_support_viewmodel.dart';
 
@@ -68,7 +67,7 @@ class ContactSupportView extends StackedView<ContactSupportViewModel> {
                                       ? null
                                       : viewModel.delete(context);
                                 },
-                                icon: Icon(Icons.delete),
+                                icon: const Icon(Icons.delete),
                                 iconSize: 35,
                                 color: red,
                               ),
@@ -125,7 +124,7 @@ class ContactSupportView extends StackedView<ContactSupportViewModel> {
                                   DataColumn(label: Text('Phone')),
                                   DataColumn(label: Text('description')),
                                   DataColumn(label: Text('Note')),
-                                  DataColumn(label: Text('Contact No')),
+                                  // DataColumn(label: Text('Contact No')),
                                   DataColumn(label: Text('Actions')),
                                 ],
                                 rowsperPage: viewModel.tableSource.rowCount < 10
@@ -137,7 +136,7 @@ class ContactSupportView extends StackedView<ContactSupportViewModel> {
                   ],
                 ),
               )
-            : NoAccessWidget());
+            : const NoAccessWidget());
   }
 
   @override

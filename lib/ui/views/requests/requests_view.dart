@@ -261,7 +261,7 @@ class RequestsView extends StackedView<RequestsViewModel> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              // onChanged: viewModel.searchServices,
+                              onChanged: viewModel.searchRequests,
                             ),
                           ),
                           SizedBox(
@@ -288,7 +288,7 @@ class RequestsView extends StackedView<RequestsViewModel> {
                                   initialCheckbox: false,
                                   initialSort: "A-Z",
                                   onApply: (isChecked, sortType) {
-                                    // viewModel.applySort(isChecked, sortType);
+                                    viewModel.applySort(isChecked, sortType);
                                   },
                                 );
                               },

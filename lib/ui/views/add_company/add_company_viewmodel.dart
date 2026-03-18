@@ -19,7 +19,7 @@ class AddCompanyViewModel extends BaseViewModel {
   List<company_model.Datum> companies = [];
   late CompanyTableSource tableSource;
 
-  final _dialogService = locator<DialogService>();
+  // final _dialogService = locator<DialogService>();
   final _apiService = locator<ApiService>();
 
   String? _cityValue;
@@ -49,6 +49,7 @@ class AddCompanyViewModel extends BaseViewModel {
     DataColumn(label: Text("city/state")),
     DataColumn(label: Text("GST no")),
     DataColumn(label: Text("project count")),
+    DataColumn(label: Text("Bank Account")),
     DataColumn(
         label: Text("Action"), headingRowAlignment: MainAxisAlignment.center),
   ];
@@ -152,7 +153,7 @@ class AddCompanyViewModel extends BaseViewModel {
     addField("alt_phone_no", result['altPhone']);
     addField("city", result['city']);
     addField("state", result['state']);
-    addField("project_count", result['projectCount']);
+    // addField("project_count", result['projectCount']);
 
     // ---------- Add image ----------
     final bytes = result['imageBytes'];

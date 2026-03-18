@@ -37,7 +37,7 @@ Future<void> showRejectConfirmationDialog({
                 borderRadius: BorderRadius.circular(18),
               ),
               child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 500, minWidth: 300),
+                constraints: const BoxConstraints(maxWidth: 500, minWidth: 300),
                 child: Padding(
                   padding: const EdgeInsets.all(24),
                   child: Column(
@@ -72,7 +72,7 @@ Future<void> showRejectConfirmationDialog({
 
                       // Message
                       Text(
-                          "Are you sure you want to reject the $itemName from ${(promotionProject == null ? "Client request" : promotionProject)}?",
+                          "Are you sure you want to reject the $itemName from ${(promotionProject ?? "Client request")}?",
                           textAlign: TextAlign.center,
                           style: fontFamilyMedium.size14.grey),
 
@@ -176,7 +176,7 @@ Future<void> showActionConfirmationDialog({
                           color: confirmColor.withOpacity(0.12),
                           shape: BoxShape.circle,
                         ),
-                        child: (image != null && image!.isNotEmpty)
+                        child: (image != null && image.isNotEmpty)
                             ? SvgPicture.asset(image)
                             : Icon(icon, size: 36, color: confirmColor),
                       ),
@@ -250,7 +250,7 @@ Future<void> showActionConfirmationDialog({
 }
 
 void showBankDetailsDialog({
-  required dynamic? bankDetails,
+  required dynamic bankDetails,
   required BuildContext context,
 }) {
   showDialog(
@@ -473,7 +473,7 @@ Future<void> showAdminPaymentConfigDialog({
                           ElevatedButton(
                             style: ButtonStyle(
                               backgroundColor:
-                                  MaterialStateProperty.all(Colors.blue),
+                                  WidgetStateProperty.all(Colors.blue),
                             ),
                             onPressed: () {
                               final isFormValid =
@@ -606,7 +606,7 @@ Future<dynamic> showStatusDialog(BuildContext context) {
               ),
               ElevatedButton(
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(continueButton),
+                  backgroundColor: WidgetStateProperty.all(continueButton),
                 ),
                 onPressed: () {
                   if (selectedStatus == null) {
@@ -697,8 +697,9 @@ Future<influencer_model.Datum?> showReassignInfluencerDialog({
                             child: (currentInfluencer.image != null &&
                                     currentInfluencer.image!.isNotEmpty)
                                 ? ClipRRect(
-                                    borderRadius: BorderRadiusGeometry.all(
-                                        Radius.circular(25)),
+                                    borderRadius:
+                                        const BorderRadiusGeometry.all(
+                                            Radius.circular(25)),
                                     child: WebImage(
                                         imageUrl: currentInfluencer.image!))
                                 : (currentInfluencer.image == null ||
@@ -759,7 +760,7 @@ Future<influencer_model.Datum?> showReassignInfluencerDialog({
                                           inf.image!.isNotEmpty)
                                       ? ClipRRect(
                                           borderRadius:
-                                              BorderRadiusGeometry.all(
+                                              const BorderRadiusGeometry.all(
                                                   Radius.circular(25)),
                                           child: WebImage(imageUrl: inf.image!))
                                       : (inf.image == null ||
@@ -806,7 +807,7 @@ Future<influencer_model.Datum?> showReassignInfluencerDialog({
               ),
               ElevatedButton(
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(continueButton),
+                  backgroundColor: WidgetStateProperty.all(continueButton),
                 ),
                 onPressed: () {
                   if (selectedInfluencer == null) {
@@ -978,9 +979,9 @@ Future<void> showPaymentStatusDialog({
                                 child: ElevatedButton(
                                   style: ButtonStyle(
                                     foregroundColor:
-                                        MaterialStateProperty.all(Colors.white),
-                                    backgroundColor: MaterialStateProperty.all(
-                                        continueButton),
+                                        WidgetStateProperty.all(Colors.white),
+                                    backgroundColor:
+                                        WidgetStateProperty.all(continueButton),
                                   ),
                                   onPressed: () {
                                     if (selectedStatus == null) {

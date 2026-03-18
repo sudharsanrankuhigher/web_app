@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'dart:html' as html;
 import 'package:image_picker/image_picker.dart';
-import 'dart:typed_data';
 
 class UniversalImagePicker {
   static Future<Map<String, dynamic>?> pickImage() async {

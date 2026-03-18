@@ -14,12 +14,13 @@ class SubAdminTableSource extends DataTableSource {
   final List<roles_model.Datum> roles;
   late List<sub_admin_model.Datum> filteredList;
   final Function(sub_admin_model.Datum) onToggle;
+  final Function(String) viewDoc;
 
   final void Function(sub_admin_model.Datum) onEdit;
   final void Function(sub_admin_model.Datum) onDelete;
 
-  SubAdminTableSource(
-      this.data, this.onEdit, this.onDelete, this.roles, this.onToggle) {
+  SubAdminTableSource(this.data, this.onEdit, this.onDelete, this.roles,
+      this.onToggle, this.viewDoc) {
     filteredList = List.from(data);
     print('object$onToggle');
   }
@@ -111,6 +112,7 @@ class SubAdminTableSource extends DataTableSource {
           DataCell(Text("")),
           DataCell(Text("")),
           DataCell(Text("")),
+          DataCell(Text("")),
           DataCell(Text("No data found")),
           DataCell(Text("")),
           DataCell(Text("")),
@@ -124,8 +126,8 @@ class SubAdminTableSource extends DataTableSource {
     final row = filteredList[index];
 
     return DataRow(
-      color: MaterialStateProperty.resolveWith<Color?>(
-        (Set<MaterialState> states) {
+      color: WidgetStateProperty.resolveWith<Color?>(
+        (Set<WidgetState> states) {
           return index.isEven ? Colors.white : Colors.grey.shade100;
         },
       ),
@@ -205,6 +207,15 @@ class SubAdminTableSource extends DataTableSource {
             ],
           ),
         ),
+
+        DataCell(IconButton(
+          icon: const Icon(
+            Icons.visibility,
+            color: Colors.blue,
+            size: 18,
+          ),
+          onPressed: () => viewDoc(row.docImg ?? ''),
+        )),
 
         // Status Switch
         DataCell(

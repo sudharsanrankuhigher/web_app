@@ -13,6 +13,7 @@ import 'package:webapp/ui/views/sub_admin/widgets/sub_admin_add_edit_dialog.dart
 import 'package:webapp/ui/views/sub_admin/widgets/sub_admin_table_source.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/ui/views/roles/model/roles_model.dart' as roles_model;
+import 'package:webapp/widgets/web_image_loading.dart';
 
 class SubAdminViewModel extends BaseViewModel with NavigationMixin {
   SubAdminTableSource? tableSource; // ✅ nullable
@@ -243,7 +244,8 @@ class SubAdminViewModel extends BaseViewModel with NavigationMixin {
         onEdit,
         confirmDelete,
         roles,
-        toggleInfluencerStatus);
+        toggleInfluencerStatus,
+        viewDoc);
     notifyListeners();
   }
 
@@ -403,14 +405,49 @@ class SubAdminViewModel extends BaseViewModel with NavigationMixin {
           inf.state!.toLowerCase().contains(query);
     }).toList();
 
-    tableSource = SubAdminTableSource(
-      filtered,
-      onEdit,
-      confirmDelete,
-      roles,
-      toggleInfluencerStatus,
-    );
+    tableSource = SubAdminTableSource(filtered, onEdit, confirmDelete, roles,
+        toggleInfluencerStatus, viewDoc);
 
     notifyListeners();
+  }
+
+  void viewDoc(String imageUrl) {
+    showDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      barrierDismissible: true,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.black,
+          insetPadding: const EdgeInsets.all(20),
+          child: Stack(
+            children: [
+              /// 🔥 IMAGE (your WebImageTwo)
+              SizedBox(
+                width: 400,
+                height: 400,
+                child: WebImage(
+                  imageUrl: imageUrl,
+                  fit: BoxFit.contain,
+                ),
+              ),
+
+              /// ❌ CLOSE BUTTON
+              Positioned(
+                top: 10,
+                right: 10,
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: const Icon(
+                    Icons.close,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

@@ -56,7 +56,13 @@ class LoginView extends StackedView<LoginViewModel> {
                               textAlign: TextAlign.center,
                               text: TextSpan(children: [
                                 WidgetSpan(
-                                    child: Image.asset(
+                                    child:
+                                        // SvgPicture.asset(
+                                        //   'assets/images/logo.svg',
+                                        //   package: null,
+                                        //   height: 35,
+                                        // ),
+                                        Image.asset(
                                   'assets/images/logo.png',
                                   height: 35,
                                 )),
@@ -123,6 +129,16 @@ class LoginView extends StackedView<LoginViewModel> {
                                 }
                                 return null;
                               },
+                              obscureText: viewModel.obscurePassword,
+                              suffixIcon: InkWell(
+                                onTap: viewModel.togglePasswordVisibility,
+                                child: Icon(
+                                  viewModel.obscurePassword
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                  color: disableColor,
+                                ),
+                              ),
                               preffixIcon: const Icon(Icons.lock_outline,
                                   color: disableColor),
                               hintText: 'Enter password',

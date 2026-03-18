@@ -123,20 +123,24 @@ class Datum {
 class Client {
   String? name;
   String? mobileNumber;
+  int? id;
 
   Client({
     this.name,
     this.mobileNumber,
+    this.id,
   });
 
   factory Client.fromJson(Map<String, dynamic> json) => Client(
         name: json["name"]?.toString(),
         mobileNumber: json["mobile_number"]?.toString(),
+        id: json["id"],
       );
 
   Map<String, dynamic> toJson() => {
         "name": name,
         "mobile_number": mobileNumber,
+        "id": id,
       };
 }
 
@@ -213,7 +217,7 @@ class Payment {
   });
 
   factory Payment.fromJson(Map<String, dynamic> json) => Payment(
-        amount: json["amount"],
+        amount: _parseInt(json["payment"]),
         status: json["payment_status"]?.toString(),
         paidDate: json["paid_date"] == null
             ? null
@@ -225,12 +229,25 @@ class Payment {
       );
 
   Map<String, dynamic> toJson() => {
-        "amount": amount,
+        "payment": amount,
         "payment_status": status,
         "paid_date": paidDate?.toIso8601String(),
         "commission": commission,
         "bank_details": bankDetails,
       };
+}
+
+int? _parseInt(dynamic value) {
+  if (value == null) return null;
+
+  if (value is int) return value;
+
+  if (value is String) {
+    if (value.trim().isEmpty) return null;
+    return int.tryParse(value);
+  }
+
+  return null;
 }
 
 class Promotion {

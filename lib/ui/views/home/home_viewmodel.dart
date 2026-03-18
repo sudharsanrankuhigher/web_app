@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webapp/app/app.bottomsheets.dart';
 import 'package:webapp/app/app.dialogs.dart';
 import 'package:webapp/app/app.locator.dart';
@@ -25,6 +26,7 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
 
   final _dialogService = locator<DialogService>();
   final _bottomSheetService = locator<BottomSheetService>();
+  final _sharedPreferences = locator<SharedPreferences>();
 
   int _counter = 0;
   int get selectedIndex => _selectedIndex;
@@ -32,6 +34,10 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
 
   final GlobalKey<NavigatorState> rightPanelNavigatorKey =
       GlobalKey<NavigatorState>();
+
+  Future<void> clearUserData() async {
+    await _sharedPreferences.clear();
+  }
 
   void incrementCounter() {
     _counter++;
@@ -65,22 +71,22 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
   ];
 
   final List<String> railIcon = [
-    'assets/images/dash_board.svg',
-    'assets/images/user.svg',
-    'assets/images/influencer_dashboard.svg',
-    'assets/images/service_dashboard.svg',
+    'assets/images/dash_board.svg', // dashboard
+    'assets/images/user.svg', //  users
+    'assets/images/influencer_dashboard.svg', // influencers
+    'assets/images/service_dashboard.svg', // services
     // 'assets/images/city.svg',
-    'assets/images/plans_dashboard.svg',
-    'assets/images/city.svg', // banner
-    'assets/images/requests_dashboard.svg',
-    'assets/images/promotes_proj_dashboard.svg',
-    'assets/images/support_dashboard.svg',
-    'assets/images/support_dashboard.svg',
-    'assets/images/support_dashboard.svg',
-    'assets/images/sub-admin_dashboard.svg',
-    'assets/images/sub-admin_dashboard.svg',
-    'assets/images/sub-admin_dashboard.svg',
-    'assets/images/sub-admin_dashboard.svg',
+    'assets/images/plans_dashboard.svg', // plans
+    'assets/images/banner.svg', // banner
+    'assets/images/requests_dashboard.svg', // client requests
+    'assets/images/promotes_proj_dashboard.svg', // promotion projects
+    'assets/images/ticket_support.svg', // ticket support
+    'assets/images/support_dashboard.svg', // location contact
+    'assets/images/company.svg', // company
+    'assets/images/sub-admin_dashboard.svg', // sub admin
+    'assets/images/report.svg', // reports
+    'assets/images/roles.svg', // roles
+    'assets/images/permission.svg', // permissions
   ];
 
   // ─── Bottom Labels ───
@@ -323,11 +329,11 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
                       // Logout
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: () {
-                            // context.pushReplacementNamed('login');
-                            Navigator.pop(context);
-                            rootContext.pushReplacementNamed('login');
-                            // context.pushReplacementNamed('login');
+                          onPressed: () async {
+                            await clearUserData(); // 🧹 clear storage
+                            Navigator.pop(context); // ❌ close dialog
+                            rootContext
+                                .pushReplacementNamed('login'); // 🔁 redirect
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,

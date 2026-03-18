@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
@@ -7,7 +5,6 @@ import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/add_company/model/company_model.dart'
     as company_model;
-import 'package:webapp/ui/views/influencers/widgets/icon_text_form_field.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/initial_textform.dart';
 import 'package:webapp/widgets/profile_image.dart';
@@ -176,9 +173,19 @@ class AddEditCompanyPage {
                               LengthLimitingTextInputFormatter(10),
                             ],
                             initialValue: initial?.phone,
-                            validator: (value) => value == null || value.isEmpty
-                                ? 'Please enter phone number'
-                                : null,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter  phone number';
+                              }
+
+                              RegExp phoneRegex = RegExp(r'^[6-9]\d{9}$');
+
+                              if (!phoneRegex.hasMatch(value)) {
+                                return 'Enter valid 10 digit phone number';
+                              }
+
+                              return null;
+                            },
                             onSaved: (value) {
                               setDialogState(() {
                                 phone = value;
@@ -202,9 +209,19 @@ class AddEditCompanyPage {
                               FilteringTextInputFormatter.digitsOnly,
                               LengthLimitingTextInputFormatter(10),
                             ],
-                            validator: (value) => value == null || value.isEmpty
-                                ? 'Please enter alternative phone number'
-                                : null,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter alternative phone number';
+                              }
+
+                              RegExp phoneRegex = RegExp(r'^[6-9]\d{9}$');
+
+                              if (!phoneRegex.hasMatch(value)) {
+                                return 'Enter valid 10 digit phone number';
+                              }
+
+                              return null;
+                            },
                             onSaved: (value) {
                               setDialogState(() {
                                 altPhone = value;
@@ -262,29 +279,29 @@ class AddEditCompanyPage {
 
                         verticalSpacing10,
 
-                        buildField(
-                          label: 'Project Count',
-                          child: InitialTextForm(
-                            radius: 12,
-                            readOnly: isReadOnly,
-                            fillColor: white,
-                            hintText: 'Project Count',
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                              LengthLimitingTextInputFormatter(10),
-                            ],
-                            initialValue: initial?.projectCount?.toString(),
-                            validator: (value) => value == null || value.isEmpty
-                                ? 'Please enter project count'
-                                : null,
-                            onSaved: (value) {
-                              setDialogState(() {
-                                projectCount = value;
-                              });
-                            },
-                          ),
-                        ),
+                        // buildField(
+                        //   label: 'Project Count',
+                        //   child: InitialTextForm(
+                        //     radius: 12,
+                        //     readOnly: isReadOnly,
+                        //     fillColor: white,
+                        //     hintText: 'Project Count',
+                        //     keyboardType: TextInputType.number,
+                        //     inputFormatters: [
+                        //       FilteringTextInputFormatter.digitsOnly,
+                        //       LengthLimitingTextInputFormatter(10),
+                        //     ],
+                        //     initialValue: initial?.projectCount?.toString(),
+                        //     validator: (value) => value == null || value.isEmpty
+                        //         ? 'Please enter project count'
+                        //         : null,
+                        //     onSaved: (value) {
+                        //       setDialogState(() {
+                        //         projectCount = value;
+                        //       });
+                        //     },
+                        //   ),
+                        // ),
 
                         const Text("Bank Details",
                             style: TextStyle(fontWeight: FontWeight.bold)),
@@ -325,9 +342,8 @@ class AddEditCompanyPage {
                             readOnly: isReadOnly,
                             fillColor: white,
                             hintText: 'Account Holder Name',
-                            initialValue: initial?.bankDetails != null
-                                ? initial?.bankDetails!.accountName?.toString()
-                                : null,
+                            initialValue:
+                                initial?.bankDetails?.accountName?.toString(),
                             validator: (value) => value == null || value.isEmpty
                                 ? 'Please enter Account Holder Name'
                                 : null,
@@ -367,9 +383,7 @@ class AddEditCompanyPage {
                             readOnly: isReadOnly,
                             fillColor: white,
                             hintText: 'upi id',
-                            initialValue: initial?.bankDetails != null
-                                ? initial?.bankDetails!.upi?.toString()
-                                : null,
+                            initialValue: initial?.bankDetails?.upi?.toString(),
                             // validator: (value) => value == null || value.isEmpty
                             //     ? 'Please enter upi id'
                             //     : null,
@@ -425,7 +439,7 @@ class AddEditCompanyPage {
                         "phone": phone,
                         "altPhone": altPhone,
                         "gstNo": gstNo,
-                        "projectCount": projectCount,
+                        // "projectCount": projectCount,
                         "imageBytes": pickedBytes,
                         if (pickedBytes == null)
                           "existing_image": initial?.companyImage,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:webapp/ui/views/roles/roles_viewmodel.dart';
-import 'package:webapp/ui/views/services/services_viewmodel.dart';
 import 'package:webapp/widgets/initial_textform.dart';
 
 class CommonRoleDialog {

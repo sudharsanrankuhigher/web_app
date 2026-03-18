@@ -32,7 +32,7 @@ class OverlappingAvatars extends StatelessWidget {
                 width: size,
                 height: size,
                 padding: const EdgeInsets.all(0.8), // border thickness
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.black, // 👈 border color (change as needed)
                   shape: BoxShape.circle,
                 ),

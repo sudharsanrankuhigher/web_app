@@ -59,7 +59,8 @@ class Datum {
   dynamic rejectedAt;
   Payment? payment;
   String? status;
-  dynamic link;
+  int? reworkStatus;
+  Link? link;
 
   Datum({
     this.id,
@@ -81,6 +82,7 @@ class Datum {
     this.rejectedAt,
     this.payment,
     this.status,
+    this.reworkStatus,
     this.link,
   });
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -93,7 +95,7 @@ class Datum {
         note: json["note"] ?? "-",
         rejectNotes: json["reject_notes"],
         amount: json["amount"]?.toString(),
-        commisionAmount: json["commision_amount"]?.toString(),
+        commisionAmount: json["commission"]?.toString(),
         paymentNotes: json["payment_notes"]?.toString(),
         createdAt: parseDate(json["created_at"]),
         completedAt: parseDate(json["completed_at"]),
@@ -104,7 +106,8 @@ class Datum {
         payment:
             json["payment"] == null ? null : Payment.fromJson(json["payment"]),
         status: json["status"],
-        link: json["link"] == null ? null : Link.fromJson(json["link"]),
+        reworkStatus: json["rework_status"],
+        link: _parseLink(json["link"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -126,8 +129,26 @@ class Datum {
         "rejected_at": rejectedAt,
         "payment": payment?.toJson(),
         "status": status,
+        "rework_status": reworkStatus,
         "link": link?.toJson(),
       };
+
+  static Link? _parseLink(dynamic linkData) {
+    if (linkData == null) return null;
+
+    // If API returns List
+    if (linkData is List) {
+      if (linkData.isEmpty) return null;
+      return Link.fromJson(Map<String, dynamic>.from(linkData.first));
+    }
+
+    // If API returns Map
+    if (linkData is Map<String, dynamic>) {
+      return Link.fromJson(Map<String, dynamic>.from(linkData));
+    }
+
+    return null;
+  }
 }
 
 class Link {
@@ -142,9 +163,9 @@ class Link {
   });
 
   factory Link.fromJson(Map<String, dynamic> json) => Link(
-        youtube: json["youtube"],
-        instagram: json["instagram"],
-        facebook: json["facebook"],
+        youtube: json["youtube"]?.toString(),
+        instagram: json["instagram"]?.toString(),
+        facebook: json["facebook"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {

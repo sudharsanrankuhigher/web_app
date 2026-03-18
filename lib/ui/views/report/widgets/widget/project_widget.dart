@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
-import 'package:webapp/widgets/pie_chart_widget.dart';
 
 class ProjectStatusWidget extends StatelessWidget {
   final int completed;

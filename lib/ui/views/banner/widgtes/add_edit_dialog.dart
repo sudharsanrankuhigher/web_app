@@ -8,9 +8,10 @@ import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/add_company/widgets/add_edit_company_dialog.dart';
 import 'package:webapp/ui/views/promote_projects/widgets/image_items.dart';
-import 'package:webapp/widgets/drop_down_widget.dart';
+import 'package:webapp/widgets/dob_field.dart';
 import 'package:webapp/widgets/image_picker.dart';
 import 'package:webapp/widgets/initial_textform.dart';
+import 'package:webapp/widgets/label_text.dart';
 import 'package:webapp/widgets/search_drop_down_widget.dart';
 import 'package:webapp/widgets/web_image_two.dart';
 import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
@@ -29,6 +30,13 @@ class AddEditBannerDialog {
 
     String? title;
     String? amount;
+
+    DateTime? startDate;
+    String? startDateString;
+    bool? startDateError = false;
+    DateTime? endDate;
+    String? endDateString;
+    bool? endDateError = false;
 
     final formKey = GlobalKey<FormState>();
 
@@ -87,7 +95,7 @@ class AddEditBannerDialog {
           builder: (context, setDialogState) {
             final bool isReadOnly = isView && !isEdit;
 
-            Future<void> _pickImage() async {
+            Future<void> pickImage() async {
               final result = await UniversalImagePicker.pickImage();
               if (result == null) return;
 
@@ -223,6 +231,74 @@ class AddEditBannerDialog {
 
                         verticalSpacing20,
 
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const IconTextLabel(
+                              icon: Icons.calendar_month,
+                              text: "Start Date",
+                              iconColor: Colors.black,
+                              textColor: Colors.black,
+                              iconSize: 16,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            verticalSpacing10,
+                            DOBField(
+                              label: "Start Date",
+                              selectedDate: startDate ?? DateTime.now(),
+                              isError: startDateError ?? false,
+                              fistDate: DateTime.now(),
+                              lastdate: DateTime(2100),
+                              onDateSelected: (date) {
+                                setDialogState(() {
+                                  startDateString = "${date.year}"
+                                      "${date.month.toString().padLeft(2, '0')}-"
+                                      "${date.day.toString().padLeft(2, '0')}-";
+                                  startDate = date;
+                                  print(startDate);
+                                  startDateError = false;
+                                });
+                              },
+                            )
+                          ],
+                        ),
+                        verticalSpacing16,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const IconTextLabel(
+                              icon: Icons.calendar_month,
+                              text: "End Date",
+                              iconColor: Colors.black,
+                              textColor: Colors.black,
+                              iconSize: 16,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            verticalSpacing10,
+                            DOBField(
+                              label: "End Date",
+                              fistDate:
+                                  DateTime.now().add(const Duration(days: 20)),
+                              lastdate: DateTime(2100),
+                              selectedDate: endDate ??
+                                  DateTime.now().add(const Duration(days: 20)),
+                              isError: endDateError ?? false,
+                              onDateSelected: (date) {
+                                setDialogState(() {
+                                  endDateString = "${date.year}"
+                                      "${date.month.toString().padLeft(2, '0')}-"
+                                      "${date.day.toString().padLeft(2, '0')}-";
+                                  endDate = date;
+                                  endDateError = false;
+                                });
+                              },
+                            )
+                          ],
+                        ),
+                        verticalSpacing16,
+
                         /// IMAGE PREVIEW
                         if (imageItem != null)
                           ClipRRect(
@@ -251,11 +327,11 @@ class AddEditBannerDialog {
                         /// UPLOAD BUTTON
                         if (!isReadOnly)
                           ElevatedButton.icon(
-                            style: ButtonStyle(
+                            style: const ButtonStyle(
                                 backgroundColor:
                                     WidgetStatePropertyAll(continueButton)),
-                            onPressed: _pickImage,
-                            icon: Icon(
+                            onPressed: pickImage,
+                            icon: const Icon(
                               Icons.image,
                               color: white,
                             ),
@@ -278,7 +354,7 @@ class AddEditBannerDialog {
                 ),
                 if (!isReadOnly)
                   ElevatedButton(
-                    style: ButtonStyle(
+                    style: const ButtonStyle(
                       backgroundColor: WidgetStatePropertyAll(continueButton),
                     ),
                     onPressed: () {
@@ -301,7 +377,9 @@ class AddEditBannerDialog {
                         "inf_id": selectedInfluencerIds.isNotEmpty
                             ? selectedInfluencerIds.first
                             : null,
-                        if (initial != null) "id": initial.id
+                        if (initial != null) "id": initial.id,
+                        "start_date": startDate,
+                        "end_date": endDate,
                       });
                     },
                     child: Text(

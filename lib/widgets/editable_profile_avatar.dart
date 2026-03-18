@@ -1,10 +1,7 @@
 import 'dart:io';
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/widgets/image_picker.dart';
 import 'package:webapp/widgets/web_image_loading.dart'; // your picker
 

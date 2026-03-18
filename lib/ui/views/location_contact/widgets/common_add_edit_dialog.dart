@@ -91,7 +91,7 @@ class _AddressDialogState extends State<AddressDialog> {
         borderRadius: BorderRadius.circular(20),
       ),
       child: ConstrainedBox(
-        constraints: BoxConstraints(
+        constraints: const BoxConstraints(
           maxWidth: 500,
           minWidth: 400,
         ),
@@ -110,7 +110,7 @@ class _AddressDialogState extends State<AddressDialog> {
                       : widget.isEdit == true
                           ? "Edit Address"
                           : "Add Address",
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -202,7 +202,7 @@ class _AddressDialogState extends State<AddressDialog> {
                         child: ElevatedButton(
                           style: ButtonStyle(
                               backgroundColor:
-                                  MaterialStateProperty.all(continueButton)),
+                                  WidgetStateProperty.all(continueButton)),
                           onPressed: _onSave,
                           child: Text(
                             widget.isEdit == true ? "Update" : "Save",

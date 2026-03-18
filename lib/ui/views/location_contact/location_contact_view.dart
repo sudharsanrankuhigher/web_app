@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stacked/stacked.dart';
-import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
-import 'package:webapp/ui/views/plans/widgets/common_plans_dialog.dart';
 import 'package:webapp/widgets/common_button.dart';
-import 'package:webapp/widgets/common_chips.dart';
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
@@ -97,7 +93,7 @@ class LocationContactView extends StackedView<LocationContactViewModel> {
                                       style: fontFamilyRegular.size11.red,
                                     ),
                                   ),
-                                  WidgetSpan(
+                                  const WidgetSpan(
                                       child: Center(
                                           child: Icon(
                                     Icons.close,
@@ -193,10 +189,10 @@ class LocationContactView extends StackedView<LocationContactViewModel> {
                               columns: const [
                                 DataColumn(label: Text("S.No")),
                                 DataColumn(label: Text("state")),
-                                DataColumn(
-                                    headingRowAlignment:
-                                        MainAxisAlignment.start,
-                                    label: Text("city")),
+                                // DataColumn(
+                                //     headingRowAlignment:
+                                //         MainAxisAlignment.start,
+                                //     label: Text("city")),
                                 DataColumn(label: Text("phone")),
                                 DataColumn(
                                     headingRowAlignment:
@@ -213,7 +209,7 @@ class LocationContactView extends StackedView<LocationContactViewModel> {
                   ],
                 ),
               )
-            : NoAccessWidget());
+            : const NoAccessWidget());
   }
 
   @override

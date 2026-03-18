@@ -6,7 +6,6 @@ import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
-import 'package:webapp/widgets/state_city_drop_down.dart';
 
 import 'state_viewmodel.dart';
 

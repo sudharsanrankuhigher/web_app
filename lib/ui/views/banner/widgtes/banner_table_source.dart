@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:webapp/core/helper/date_helper.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
@@ -29,7 +30,9 @@ class BannerTableSource extends DataTableSource {
         cells: [
           DataCell(Text("")),
           DataCell(Text("")),
+          DataCell(Text("")),
           DataCell(Center(child: Text("No data found"))),
+          DataCell(Text("")),
           DataCell(Text("")),
           DataCell(Text("")),
           DataCell(Text("")),
@@ -70,6 +73,14 @@ class BannerTableSource extends DataTableSource {
         )),
         DataCell(Text(
           (item.priority ?? '-').toString(),
+          style: fontFamilySemiBold.size13.black,
+        )),
+        DataCell(Text(
+          DateFormatter.formatToDDMMMYYYY(item.startDate) ?? '-',
+          style: fontFamilySemiBold.size13.black,
+        )),
+        DataCell(Text(
+          DateFormatter.formatToDDMMMYYYY(item.endDate) ?? '-',
           style: fontFamilySemiBold.size13.black,
         )),
         DataCell(Row(

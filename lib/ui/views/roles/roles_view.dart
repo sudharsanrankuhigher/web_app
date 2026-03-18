@@ -21,7 +21,7 @@ class RolesView extends StackedView<RolesViewModel> {
     Widget? child,
   ) {
     return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: PermissionHelper.instance.canView('role')
             ? Padding(
                 padding: defaultPadding12 - topPadding12,
@@ -92,7 +92,7 @@ class RolesView extends StackedView<RolesViewModel> {
                   ],
                 ),
               )
-            : NoAccessWidget());
+            : const NoAccessWidget());
   }
 
   @override

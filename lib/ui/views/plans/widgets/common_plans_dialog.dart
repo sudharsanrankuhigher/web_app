@@ -44,7 +44,7 @@ class CommonPlanDialog {
     }
 
     /// ---------------- INPUT DECORATION ----------------
-    InputDecoration _decoration(String label) => InputDecoration(
+    InputDecoration decoration(String label) => InputDecoration(
           labelText: label,
           fillColor: Colors.white,
           filled: true,
@@ -85,7 +85,7 @@ class CommonPlanDialog {
                       _field("Sale Amount", saleAmt, (v) => saleAmt = v,
                           isView: isView, isNumber: true),
                       _field("Gst", gst, (v) => gst = v,
-                          suffix: Icon(Icons.percent),
+                          suffix: const Icon(Icons.percent),
                           isView: isView,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
@@ -135,8 +135,7 @@ class CommonPlanDialog {
                 if (!isView)
                   ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(continueButton),
+                      backgroundColor: WidgetStateProperty.all(continueButton),
                     ),
                     onPressed: () {
                       if (selectedCategory == null) {

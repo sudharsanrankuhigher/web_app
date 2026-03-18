@@ -17,8 +17,8 @@ class StateCityDropdownWidget extends StatefulWidget {
   final bool isCityError;
   final Function(int stateId) onStateChanged;
   final Function(String? cityId)? onCityChanged;
-  final String? Function(dynamic?)? stateValidator;
-  final String? Function(dynamic?)? cityValidator;
+  final String? Function(dynamic)? stateValidator;
+  final String? Function(dynamic)? cityValidator;
   final bool? isVertical;
 
   const StateCityDropdownWidget({
@@ -85,7 +85,7 @@ class _StateCityDropdownWidgetState extends State<StateCityDropdownWidget> {
       // If not found by ID or you want to select by city name
       if (selectedCity == null && widget.initialCityName != null) {
         selectedCity = allCities.firstWhereOrNull((c) =>
-            c.name!.toLowerCase().trim() ==
+            c.name.toLowerCase().trim() ==
             widget.initialCityName!.toLowerCase().trim());
       }
 

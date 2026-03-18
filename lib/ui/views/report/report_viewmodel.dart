@@ -1,12 +1,17 @@
-import 'dart:convert';
-import 'dart:ui';
-
 // import 'package:fl_chart/fl_chart.dart';
+import 'dart:convert';
+
+import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/app.locator.dart';
+import 'package:webapp/core/enum/report_enum.dart';
+import 'package:webapp/core/helper/date_helper.dart';
 import 'package:webapp/core/navigation/navigation_mixin.dart';
 import 'package:webapp/services/api_service.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
@@ -17,6 +22,7 @@ import 'package:webapp/ui/views/report/widgets/table_source/company_table_source
 import 'package:webapp/ui/views/report/widgets/table_source/inf_highlight_table_source.dart';
 import 'package:webapp/ui/views/report/widgets/table_source/inf_report_table_source.dart';
 import 'package:webapp/ui/views/report/widgets/table_source/subscription_report_table_source.dart';
+import 'dart:html' as html; // 🔥 required for web download
 
 class ReportViewModel extends BaseViewModel with NavigationMixin {
   // ReportViewModel() {
@@ -41,6 +47,23 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
   CompanyDetailedTableSource? companyDetailedTableSource;
 
   DateTime selectedMonth = DateTime.now();
+
+  List<String> get reportsItem =>
+      ReportType.values.map((e) => e.title).toList();
+
+  ReportType? _selectedReportType = ReportType.subscription;
+  ReportType? get selectedReportType => _selectedReportType;
+
+  void selectedReport(String? value) {
+    _selectedReportType = ReportType.values.firstWhere(
+      (e) => e.title == value,
+      orElse: () => ReportType.subscription,
+    );
+    print(value);
+    print(_selectedReportType);
+
+    notifyListeners();
+  }
 
   List<Map<String, dynamic>> get monthlyReport {
     if (totalMonthlyIncomeReport == null) return [];
@@ -185,5 +208,260 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
     );
 
     notifyListeners();
+  }
+
+  // pdf and xl
+  List<String> getHeaders(List<DataColumn> columns) {
+    return columns.map((col) {
+      final textWidget = col.label as Text;
+      return textWidget.data ?? "";
+    }).toList();
+  }
+
+  List<DataColumn> getSelectedColumns() {
+    switch (_selectedReportType) {
+      case ReportType.subscription:
+        return subscriptionPlans;
+
+      case ReportType.clientDetailed:
+        return clientProjectDetails;
+
+      case ReportType.promoteDetailed:
+        return promoteProjectDetails;
+
+      case ReportType.influencerHighlight:
+        return infHighlightColumn;
+
+      case ReportType.companyReport:
+        return companyProjectReport;
+
+      case ReportType.influencerReport:
+        return influencerProjectReport;
+
+      default:
+        return [];
+    }
+  }
+
+  List<List<dynamic>> getSelectedRows() {
+    switch (_selectedReportType) {
+      case ReportType.subscription:
+        return reports.asMap().entries.map((e) {
+          final i = e.key;
+          final item = e.value;
+          return [
+            i + 1,
+            item.clientName ?? "-",
+            item.clientMobileNumber ?? "-",
+            item.packageName ?? "-",
+            item.packageStatus ?? "-",
+            item.amount ?? 0,
+            item.paymentDate != null
+                ? DateFormatter.formatToDDMMMYYYY(item.paymentDate)
+                : "-"
+          ];
+        }).toList();
+
+      case ReportType.clientDetailed:
+        return clientProjectDetailedList.asMap().entries.map((e) {
+          final i = e.key;
+          final item = e.value;
+
+          return [
+            i + 1,
+            item.id ?? "-",
+            item.clientName ?? "-",
+            item.clientPhone ?? "-",
+            (_safeText("${item.infId ?? ''} / ${item.infName ?? ''}")),
+            _toDouble(item.clientPayment),
+            _toDouble(item.clientCommission),
+            _toDouble(item.infPayment),
+          ];
+        }).toList();
+
+      case ReportType.promoteDetailed:
+        return promoteProjectes!.asMap().entries.map((e) {
+          final i = e.key;
+          final item = e.value;
+          return [
+            i + 1,
+            item.id ?? "-",
+            item.companyName ?? "-",
+            item.companyMobile ?? "-",
+            item.companyPayment ?? 0,
+            item.companyCommission ?? 0,
+            item.infPayment ?? 0,
+          ];
+        }).toList();
+
+      case ReportType.influencerHighlight:
+        return infHighLigtReprot.asMap().entries.map((e) {
+          final i = e.key;
+          final item = e.value;
+          return [
+            i + 1,
+            item.name ?? "-",
+            item.phone ?? "-",
+            item.paymentStatus ?? "-",
+            item.amount ?? 0,
+            item.createdAt != null
+                ? DateFormatter.formatToDDMMMYYYY(item.createdAt)
+                : "-"
+          ];
+        }).toList();
+
+      case ReportType.companyReport:
+        return companyReport.asMap().entries.map((e) {
+          final i = e.key;
+          final item = e.value;
+          return [
+            i + 1,
+            item.companyName ?? "-",
+            item.companyCount ?? 0,
+          ];
+        }).toList();
+
+      case ReportType.influencerReport:
+        return influencerReport.asMap().entries.map((e) {
+          final i = e.key;
+          final item = e.value;
+          return [
+            i + 1,
+            item.infName ?? "-",
+            item.promoteProjectCount ?? 0,
+            item.clientProjectCount ?? 0,
+            item.totalProjectCount ?? 0,
+          ];
+        }).toList();
+
+      default:
+        return [];
+    }
+  }
+
+  String _safeText(String value, {int max = 20}) {
+    if (value.length <= max) return value;
+    return value.substring(0, max);
+  }
+
+  double _toDouble(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value.toDouble();
+    if (value is double) return value;
+    if (value is String) return double.tryParse(value) ?? 0;
+    return 0;
+  }
+
+  List<CellValue?> toCellValues(List<dynamic> row) {
+    return row.map((e) {
+      if (e == null) return TextCellValue("");
+
+      if (e is int) return IntCellValue(e);
+      if (e is double) return DoubleCellValue(e);
+
+      return TextCellValue(e.toString());
+    }).toList();
+  }
+
+  void exportCsv() {
+    final headers = getHeaders(getSelectedColumns());
+    final rows = getSelectedRows();
+
+    if (rows.isEmpty) {
+      Fluttertoast.showToast(
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          webBgColor: "linear-gradient(to right, #000000, #000000)",
+          webPosition: "center",
+          webShowClose: true,
+          textColor: white,
+          msg: "export Data Empty ❌");
+      print("No data to export");
+      return;
+    }
+
+    /// 🔥 Convert to CSV string
+    String csv = '';
+
+    // Header
+    csv += headers.join(",") + "\n";
+
+    // Rows
+    for (var row in rows) {
+      csv += row.map((e) => '"${e ?? ""}"').join(",") + "\n";
+    }
+
+    final bytes = utf8.encode(csv);
+
+    final blob = html.Blob([bytes]);
+    final url = html.Url.createObjectUrlFromBlob(blob);
+
+    html.AnchorElement(href: url)
+      ..setAttribute("download", "${_selectedReportType?.title}.csv")
+      ..click();
+
+    html.Url.revokeObjectUrl(url);
+  }
+
+  Future<void> exportPdfWeb() async {
+    final pdf = pw.Document();
+
+    final font = await rootBundle.load("assets/fonts/Roboto-Regular.ttf");
+    final ttf = pw.Font.ttf(font);
+
+    final headers = getHeaders(getSelectedColumns());
+    final data = getSelectedRows();
+
+    if (data.isEmpty) {
+      // Fluttertoast.showToast(msg: "PDF Data Empty ❌");
+      Fluttertoast.showToast(
+          timeInSecForIosWeb: 2,
+          gravity: ToastGravity.TOP,
+          webBgColor: "linear-gradient(to right, #000000, #000000)",
+          webPosition: "center",
+          webShowClose: true,
+          textColor: white,
+          msg: "PDF Data Empty ❌");
+      print("PDF Data Empty ❌");
+      return;
+    }
+
+    pdf.addPage(
+      pw.Page(
+        build: (context) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text(
+              _selectedReportType?.title ?? "",
+              style: pw.TextStyle(font: ttf, fontSize: 18),
+            ),
+            pw.SizedBox(height: 10),
+            pw.Expanded(
+              child: pw.Table.fromTextArray(
+                headers: headers,
+                data: data.map((row) {
+                  return row.map((e) => e?.toString() ?? "").toList();
+                }).toList(),
+                headerStyle: pw.TextStyle(font: ttf),
+                cellStyle: pw.TextStyle(font: ttf),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final bytes = await pdf.save();
+
+    final blob = html.Blob([bytes], 'application/pdf');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+
+    html.window.open(url, "_blank");
+
+    html.AnchorElement(href: url)
+      ..setAttribute("download", "${_selectedReportType?.title}.pdf")
+      ..click();
+
+    html.Url.revokeObjectUrl(url);
   }
 }

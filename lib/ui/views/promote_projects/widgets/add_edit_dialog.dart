@@ -245,7 +245,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
           .toList();
 
       filteredInfluencers = List.from(allInfluencers);
-      print("test filteredInfluencers: ${filteredInfluencers}");
+      print("test filteredInfluencers: $filteredInfluencers");
     }
 
     if (widget.model.service != null && widget.service != null) {
@@ -353,7 +353,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                         ),
                         Row(
                           children: [
-                            if (isView)
+                            if (isView && widget.model.isEditable == 0)
                               IconButton(
                                 icon: const Icon(Icons.edit),
                                 onPressed: () {
@@ -532,54 +532,49 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                     ),
 
                                     /// Project Code & Company
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: _buildField(
-                                            label: 'Project Code',
-                                            child: InitialTextForm(
-                                              radius: 10,
-                                              controller: codeCtrl,
-                                              hintText: 'Project Code',
-                                              readOnly: isView,
-                                              validator: (value) {
-                                                if (value == null ||
-                                                    value.isEmpty) {
-                                                  return 'Project Code is required';
-                                                }
-                                                return null;
-                                              },
-                                            ),
-                                          ),
+                                    ///   Expanded(
+                                    //   child: _buildField(
+                                    //     label: 'Project Code',
+                                    //     child: InitialTextForm(
+                                    //       radius: 10,
+                                    //       controller: codeCtrl,
+                                    //       hintText: 'Project Code',
+                                    //       readOnly: isView,
+                                    //       validator: (value) {
+                                    //         if (value == null ||
+                                    //             value.isEmpty) {
+                                    //           return 'Project Code is required';
+                                    //         }
+                                    //         return null;
+                                    //       },
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    // horizontalSpacing12,
+                                    IgnorePointer(
+                                      ignoring: isView,
+                                      child: _buildField(
+                                        label: 'Company Name',
+                                        child: DynamicSingleSearchDropdown(
+                                          label: "Company",
+                                          items: widget.companies!
+                                              .map((c) => {
+                                                    'id': c.id,
+                                                    'name': c.companyName,
+                                                  })
+                                              .toList(),
+                                          selectedItem: selectedCompany,
+                                          onChanged: (v) {
+                                            setState(() {
+                                              selectedCompany = v;
+                                              companyId = v['id'];
+                                              isCompanyError = false;
+                                            });
+                                          },
+                                          isError: isCompanyError,
+                                          nameKey: "name",
                                         ),
-                                        horizontalSpacing12,
-                                        Expanded(
-                                            child: IgnorePointer(
-                                          ignoring: isView,
-                                          child: _buildField(
-                                            label: 'Company Name',
-                                            child: DynamicSingleSearchDropdown(
-                                              label: "Company",
-                                              items: widget.companies!
-                                                  .map((c) => {
-                                                        'id': c.id,
-                                                        'name': c.companyName,
-                                                      })
-                                                  .toList(),
-                                              selectedItem: selectedCompany,
-                                              onChanged: (v) {
-                                                setState(() {
-                                                  selectedCompany = v;
-                                                  companyId = v['id'];
-                                                  isCompanyError = false;
-                                                });
-                                              },
-                                              isError: isCompanyError,
-                                              nameKey: "name",
-                                            ),
-                                          ),
-                                        )),
-                                      ],
+                                      ),
                                     ),
                                     verticalSpacing12,
                                     Row(
@@ -745,7 +740,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                               label: 'Gender',
                                               child:
                                                   DynamicSingleSearchDropdown(
-                                                items: [
+                                                items: const [
                                                   "Male",
                                                   "Female",
                                                   "Others",
@@ -767,11 +762,12 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                               child: Builder(
                                                 builder: (context) {
                                                   // 🔹 Debug: check the data before passing to dropdown
-                                                  (widget.influencers ?? [])
-                                                      .forEach((e) {
+                                                  for (var e
+                                                      in (widget.influencers ??
+                                                          [])) {
                                                     debugPrint(
                                                         "id=${e.id}, name=${e.name}, image=${e.image}");
-                                                  });
+                                                  }
 
                                                   return DynamicMultiSearchDropdown(
                                                     label: 'Influencers',
@@ -798,11 +794,14 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                                         .where((e) {
                                                           if (state
                                                                   .isNotEmpty &&
-                                                              e.state != state)
+                                                              e.state !=
+                                                                  state) {
                                                             return false;
+                                                          }
                                                           if (city.isNotEmpty &&
-                                                              e.city != city)
+                                                              e.city != city) {
                                                             return false;
+                                                          }
 
                                                           if (selectedService
                                                               .isNotEmpty) {
@@ -1213,7 +1212,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
 
     final updated = {
       if (widget.model.id != null) "id": widget.model.id,
-      "projectCode": codeCtrl.text,
+      // "projectCode": codeCtrl.text,
       "projectTitle": titleCtrl.text,
       "gender": gender,
       "state": state,

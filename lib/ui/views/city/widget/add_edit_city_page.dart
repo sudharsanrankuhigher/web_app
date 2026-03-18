@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
-import 'package:webapp/core/model/cities_model.dart';
 import 'package:webapp/ui/views/city/model/city_model.dart' as city_model;
 import 'package:webapp/ui/views/city/widget/state_city_dropdown.dart';
 import 'package:webapp/ui/views/state/model/state_model.dart' as state_model;

@@ -1,16 +1,14 @@
-import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/influencers/widgets/add_edit_influencer_dialog.dart';
+import 'package:webapp/ui/views/influencers/widgets/inf_filter.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_data_table.dart';
-import 'package:webapp/widgets/common_dialog.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
 
 import 'influencers_viewmodel.dart';
@@ -55,21 +53,64 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                       // crossAxisAlignment: WrapCrossAlignment.start,
                       // alignment: WrapAlignment.start,
                       children: [
-                        SizedBox(
-                          height: 47.h,
-                          width: isExtended ? 500 : 500.w,
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: "Search name, phone, city...",
-                              hintStyle: fontFamilyRegular.size12.grey,
-                              prefixIcon: const Icon(Icons.search),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
+                        Row(
+                          children: [
+                            SizedBox(
+                              height: 47.h,
+                              width: isExtended ? 500 : 500.w,
+                              child: TextField(
+                                controller: viewModel.searchController,
+                                decoration: InputDecoration(
+                                  hintText: "Search name, phone, city...",
+                                  hintStyle: fontFamilyRegular.size12.grey,
+                                  prefixIcon: const Icon(Icons.search),
+
+                                  /// 🔥 CLEAR BUTTON
+                                  suffixIcon: viewModel
+                                          .searchController.text.isNotEmpty
+                                      ? GestureDetector(
+                                          onTap: () {
+                                            viewModel.searchController.clear();
+                                            viewModel.searchInfluencer(
+                                                ""); // reset search
+                                          },
+                                          child: const Icon(Icons.close),
+                                        )
+                                      : null,
+
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                onChanged: (value) {
+                                  viewModel.searchInfluencer(value);
+
+                                  /// 🔥 refresh UI to show/hide clear icon
+                                  viewModel.notifyListeners();
+                                },
                               ),
                             ),
-                            // onChanged: viewModel.searchInfluencer,
-                            onChanged: viewModel.searchInfluencer,
-                          ),
+                            if (viewModel.currentSearch.isNotEmpty ||
+                                viewModel.currentSort.isNotEmpty)
+                              Row(
+                                children: [
+                                  horizontalSpacing4,
+                                  Text("clear filter",
+                                      style: fontFamilyRegular.size12.red),
+                                  const SizedBox(width: 4),
+                                  GestureDetector(
+                                    onTap: () {
+                                      viewModel.clearFilter();
+                                    },
+                                    child: const Icon(
+                                      Icons.close,
+                                      size: 18,
+                                      color: red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                          ],
                         ),
                         Row(
                           children: [
@@ -98,12 +139,26 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                                   ),
                                 ),
                                 onTap: () {
-                                  CommonFilterDialog.show(
+                                  // CommonFilterDialog.show(
+                                  //   context,
+                                  //   initialCheckbox: false,
+                                  //   initialSort: "A-Z",
+                                  //   onApply: (isChecked, sortType) {
+                                  //     viewModel.applySort(isChecked, sortType);
+                                  //   },
+                                  // );
+                                  InfFilter.show(
                                     context,
-                                    initialCheckbox: false,
-                                    initialSort: "A-Z",
-                                    onApply: (isChecked, sortType) {
-                                      viewModel.applySort(isChecked, sortType);
+                                    categoryList: viewModel.categoryList,
+                                    services: viewModel.services,
+                                    onApply: (check, sort) {
+                                      viewModel.applySort(check, sort);
+                                    },
+                                    onFilter: (categoryId, serviceId) {
+                                      viewModel.applyFilter(
+                                        categoryId: categoryId,
+                                        serviceId: serviceId,
+                                      );
                                     },
                                   );
                                 },
@@ -179,7 +234,7 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                   ],
                 ),
               )
-            : NoAccessWidget());
+            : const NoAccessWidget());
   }
 
   @override

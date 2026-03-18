@@ -1,12 +1,9 @@
-import 'dart:developer';
-import 'dart:typed_data';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
-import 'package:webapp/ui/views/city/widget/state_city_dropdown.dart';
 import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
     as influencer_model;
 import 'package:webapp/ui/views/influencers/widgets/icon_text_form_field.dart';
@@ -15,6 +12,7 @@ import 'package:webapp/ui/views/services/model/service_model.dart'
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/dob_field.dart';
 import 'package:webapp/widgets/drop_down_widget.dart';
+import 'package:webapp/widgets/image_picker.dart';
 import 'package:webapp/widgets/label_text.dart';
 import 'package:webapp/widgets/profile_image.dart';
 import 'package:webapp/widgets/search_drop_down_widget.dart';
@@ -223,7 +221,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                               _isView = false;
                             });
                           },
-                          icon: Icon(
+                          icon: const Icon(
                             Icons.edit,
                             size: 20,
                           ),
@@ -251,16 +249,57 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                 IgnorePointer(
                   ignoring: _isView == true ? true : false,
                   child: Center(
-                    child: ProfileImageEdit(
-                      imageUrl: widget.influencer?.image,
-                      imageBytes: pickedBytes,
-                      imagePath: pickedPath,
-                      onImageSelected: (bytes, path) {
-                        setState(() {
-                          pickedBytes = bytes;
-                          pickedPath = path;
-                        });
-                      },
+                    child: Stack(
+                      children: [
+                        ProfileImageEdit(
+                          imageUrl: widget.influencer?.image,
+                          imageBytes: pickedBytes,
+                          imagePath: pickedPath,
+                          onImageSelected: (bytes, path) {
+                            setState(() {
+                              pickedBytes = bytes;
+                              pickedPath = path;
+                            });
+                          },
+                        ),
+                        if (_isView == false)
+                          Positioned(
+                            bottom: 10,
+                            right: 10,
+                            child: InkWell(
+                              onTap: () async {
+                                final result =
+                                    await UniversalImagePicker.pickImage();
+
+                                if (result != null) {
+                                  if (kIsWeb && result['bytes'] != null) {
+                                    setState(() {
+                                      pickedBytes = result['bytes'];
+                                      pickedPath = null;
+                                    });
+                                  } else {
+                                    setState(() {
+                                      pickedBytes = null;
+                                      pickedPath = result['path'];
+                                    });
+                                  }
+                                }
+                              },
+                              child: Container(
+                                padding: defaultPadding4,
+                                decoration: const BoxDecoration(
+                                  color: Colors.black54,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.cloud_upload_outlined,
+                                  color: Colors.white,
+                                  size: 15,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ),
@@ -341,7 +380,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                         child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        IconTextLabel(
+                        const IconTextLabel(
                           icon: Icons.calendar_month,
                           text: "DOB",
                           iconColor: Colors.black,
@@ -359,17 +398,11 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                             isError: dobError,
                             onDateSelected: (date) {
                               setState(() {
-                                if (date != null) {
-                                  dobString = "${date.year}"
-                                      "${date.month.toString().padLeft(2, '0')}-"
-                                      "${date.day.toString().padLeft(2, '0')}-";
-                                  dob = date;
-                                  dobError = false;
-                                } else {
-                                  dobController.text = '';
-                                  dobError = true;
-                                  return;
-                                }
+                                dobString = "${date.year}"
+                                    "${date.month.toString().padLeft(2, '0')}-"
+                                    "${date.day.toString().padLeft(2, '0')}-";
+                                dob = date;
+                                dobError = false;
                               });
                             },
                           ),
@@ -414,21 +447,21 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                         },
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: IconTextFormField(
-                        validator: (id) {
-                          if (idController.text.isEmpty) {
-                            return 'Please enter ID Number';
-                          }
-                          return null;
-                        },
-                        isView: widget.isView,
-                        icon: Icons.perm_identity,
-                        label: "ID Number",
-                        controller: idController,
-                      ),
-                    ),
+                    // const SizedBox(width: 12),
+                    // Expanded(
+                    //   child: IconTextFormField(
+                    //     validator: (id) {
+                    //       if (idController.text.isEmpty) {
+                    //         return 'Please enter ID Number';
+                    //       }
+                    //       return null;
+                    //     },
+                    //     isView: widget.isView,
+                    //     icon: Icons.perm_identity,
+                    //     label: "ID Number",
+                    //     controller: idController,
+                    //   ),
+                    // ),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -436,7 +469,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    IconTextLabel(
+                    const IconTextLabel(
                       icon: Icons.location_on,
                       text: "State / City",
                       iconColor: Colors.black,
@@ -473,7 +506,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                         child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        IconTextLabel(
+                        const IconTextLabel(
                           icon: Icons.design_services,
                           text: "Service",
                           iconColor: Colors.black,
@@ -582,7 +615,7 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                         child: _buildField(
                           label: 'Gender',
                           child: DynamicSingleSearchDropdown(
-                            items: [
+                            items: const [
                               "Male",
                               "Female",
                               "Others",

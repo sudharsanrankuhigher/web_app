@@ -69,21 +69,26 @@ class Datum {
     this.plan,
     this.connections,
   });
-
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        id: json["id"],
-        name: json["name"],
-        email: json["email"],
+        id: json["id"] is int
+            ? json["id"]
+            : int.tryParse(json["id"]?.toString() ?? ""),
+        name: json["name"]?.toString(),
+        email: json["email"]?.toString(),
         emailVerifiedAt: json["email_verified_at"],
         createdAt: json["created_at"],
         updatedAt: json["updated_at"],
-        mobileNumber: json["mobile_number"],
-        type: json["type"],
-        dob: json["dob"] == null ? null : DateTime.parse(json["dob"]),
-        state: json["state"] == null ? "" : json["state"],
-        city: json["city"] == null ? "" : json["city"],
-        plan: json["plan"],
-        connections: json["connections"],
+        mobileNumber: json["mobile_number"]?.toString(),
+        type: json["type"]?.toString(),
+        dob: json["dob"] == null
+            ? null
+            : DateTime.tryParse(json["dob"].toString()),
+        state: json["state"]?.toString() ?? "",
+        city: json["city"]?.toString() ?? "",
+        plan: json["plan"]?.toString(),
+        connections: json["connections"] is int
+            ? json["connections"]
+            : int.tryParse(json["connections"]?.toString() ?? ""),
       );
 
   Map<String, dynamic> toJson() => {

@@ -50,6 +50,7 @@ class Message {
   List<int>? service;
   String? gender;
   LinkElement? link;
+  int? isEditable;
 
   Message(
       {this.id,
@@ -67,6 +68,7 @@ class Message {
       this.image,
       this.service,
       this.gender,
+      this.isEditable,
       this.link});
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
@@ -107,6 +109,7 @@ class Message {
 
         gender: json["gender"],
         link: _parseLink(json["link"]),
+        isEditable: json["is_editable"] ?? 0,
       );
 
   Map<String, dynamic> toJson() => {
@@ -130,6 +133,7 @@ class Message {
         "service": service ?? [],
         "gender": gender,
         "link": link == null ? [] : [link!.toJson()],
+        "is_editable": isEditable,
       };
 
   /// ✅ Handles object OR list OR null

@@ -158,7 +158,7 @@ class ServicesView extends StackedView<ServicesViewModel> {
                 ],
               ),
             )
-          : NoAccessWidget(),
+          : const NoAccessWidget(),
     );
   }
 

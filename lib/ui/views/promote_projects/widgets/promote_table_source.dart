@@ -19,19 +19,20 @@ class PromoteTableSource extends DataTableSource {
   final void Function(promote_table_model.Datum)? showBankDetails;
   final void Function(promote_table_model.Datum)? onReAssign;
   final void Function(promote_table_model.Datum)? onRevoke;
+  final void Function(promote_table_model.Datum)? onCompanyPaymentVerified;
 
-  PromoteTableSource({
-    required this.data,
-    required this.status,
-    this.onVerify,
-    this.onReject,
-    this.onGotoPromoteVerified,
-    this.onGotoPromotePay,
-    this.onGotoPromoteCommission,
-    this.showBankDetails,
-    this.onReAssign,
-    this.onRevoke,
-  });
+  PromoteTableSource(
+      {required this.data,
+      required this.status,
+      this.onVerify,
+      this.onReject,
+      this.onGotoPromoteVerified,
+      this.onGotoPromotePay,
+      this.onGotoPromoteCommission,
+      this.showBankDetails,
+      this.onReAssign,
+      this.onRevoke,
+      this.onCompanyPaymentVerified});
 
   @override
   DataRow? getRow(int index) {
@@ -129,32 +130,47 @@ class PromoteTableSource extends DataTableSource {
           DataCell(Text(item.amount.toString() ?? "")),
           DataCell(Text(DateFormatter.formatToDDMMMYYYY(item.createdAt))),
           DataCell(
-            (item.link != null && item.link?.instagram != null)
-                ? Center(
-                    child: ViewLink(
-                      url: item.link!.instagram.toString(),
-                      text: "ViewLink",
+            Center(
+              child: Column(
+                // mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (item.link?.instagram != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: ViewLink(
+                        url: item.link!.instagram.toString(),
+                        text: "Instagram",
+                      ),
                     ),
-                  )
-                : (item.link != null && item.link?.facebook != null)
-                    ? Center(
-                        child: ViewLink(
-                          url: item.link!.facebook.toString(),
-                          text: "ViewLink",
-                        ),
-                      )
-                    : (item.link != null && item.link?.youtube != null)
-                        ? Center(
-                            child: ViewLink(
-                              url: item.link!.youtube.toString(),
-                              text: "ViewLink",
-                            ),
-                          )
-                        : Center(child: const SizedBox.shrink()),
+                  if (item.link?.youtube != null) ...{
+                    verticalSpacing4,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: ViewLink(
+                        url: item.link!.youtube.toString(),
+                        text: "YouTube",
+                      ),
+                    ),
+                  },
+                  if (item.link?.facebook != null) ...{
+                    verticalSpacing4,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: ViewLink(
+                        url: item.link!.facebook.toString(),
+                        text: "Facebook",
+                      ),
+                    ),
+                  },
+                ],
+              ),
+            ),
           ),
           DataCell(CommonButton(
-            text: 'Verify',
-            onTap: () => onVerify?.call(item),
+            text: item.reworkStatus == 0 ? 'Verify' : 'Rework',
+            onTap: () => item.reworkStatus == 0 ? onVerify?.call(item) : null,
             buttonColor: greenShade1,
             padding: defaultPadding4 + rightPadding4 + leftPadding4,
             margin: defaultPadding10 + leftPadding8 + rightPadding8,
@@ -176,15 +192,18 @@ class PromoteTableSource extends DataTableSource {
                   "")),
           DataCell(
             Center(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: greenShade1,
-                  padding: defaultPadding4 + rightPadding4 + leftPadding4,
-                ),
-                onPressed: () => onGotoPromoteVerified?.call(item),
-                child: Text(
-                  "Promote Verify",
-                  style: fontFamilySemiBold.size12.white,
+              child: Container(
+                margin: defaultPadding4 + leftPadding8 + rightPadding8,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: greenShade1,
+                    padding: defaultPadding4 + rightPadding4 + leftPadding4,
+                  ),
+                  onPressed: () => onGotoPromoteVerified?.call(item),
+                  child: Text(
+                    "Promote Verify",
+                    style: fontFamilySemiBold.size12.white,
+                  ),
                 ),
               ),
             ),
@@ -195,26 +214,47 @@ class PromoteTableSource extends DataTableSource {
         return [
           DataCell(Text('${index + 1}')),
           DataCell(Text(item.subId.toString() ?? "")),
-          DataCell(Text("${item.influencerName ?? ""}")),
+          DataCell(Text(item.influencerName ?? "")),
           DataCell(Text(item.influencerId.toString() ?? "")),
           DataCell(Text(item.influencerPhone ?? "")),
           DataCell(
-            (item.link != null && item.link?.instagram != null)
-                ? ViewLink(
-                    url: item.link!.instagram.toString(),
-                    text: "ViewLink",
-                  )
-                : (item.link != null && item.link?.facebook != null)
-                    ? ViewLink(
+            Center(
+              child: Column(
+                // mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (item.link?.instagram != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: ViewLink(
+                        url: item.link!.instagram.toString(),
+                        text: "Instagram",
+                      ),
+                    ),
+                  if (item.link?.youtube != null) ...{
+                    verticalSpacing4,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: ViewLink(
+                        url: item.link!.youtube.toString(),
+                        text: "YouTube",
+                      ),
+                    ),
+                  },
+                  if (item.link?.facebook != null) ...{
+                    verticalSpacing4,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: ViewLink(
                         url: item.link!.facebook.toString(),
-                        text: "ViewLink",
-                      )
-                    : (item.link != null && item.link?.youtube != null)
-                        ? ViewLink(
-                            url: item.link!.youtube.toString(),
-                            text: "ViewLink",
-                          )
-                        : const SizedBox.shrink(),
+                        text: "Facebook",
+                      ),
+                    ),
+                  },
+                ],
+              ),
+            ),
           ),
           DataCell(Text(item.amount.toString())),
           DataCell(Text((item.createdAt != null)
@@ -225,15 +265,24 @@ class PromoteTableSource extends DataTableSource {
               : "")),
           DataCell(
             Center(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: greenShade1,
-                  padding: defaultPadding4 + rightPadding4 + leftPadding4,
-                ),
-                onPressed: () => onGotoPromotePay?.call(item),
-                child: Text(
-                  "Promote pay",
-                  style: fontFamilySemiBold.size12.white,
+              child: Container(
+                margin: defaultPadding4 + leftPadding8 + rightPadding8,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: greenShade1,
+                    padding: defaultPadding4 + rightPadding4 + leftPadding4,
+                  ),
+                  onPressed: () =>
+                      item.status == "6" ? onGotoPromotePay?.call(item) : null,
+                  child: Center(
+                    child: Text(
+                      textAlign: TextAlign.center,
+                      item.status == "6"
+                          ? "Promote pay"
+                          : "Waiting to payment verified",
+                      style: fontFamilySemiBold.size12.white,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -247,8 +296,12 @@ class PromoteTableSource extends DataTableSource {
           DataCell(Text(item.influencerName ?? "")),
           DataCell(Text(item.influencerId.toString() ?? "")),
           DataCell(Text(item.influencerPhone ?? "")),
-          DataCell(Text(item.createdAt.toString() ?? "")),
-          DataCell(Text(item.completedAt.toString() ?? "")),
+          DataCell(Text(
+              DateFormatter.formatToDDMMMYYYY(item.createdAt.toString()) ??
+                  "")),
+          DataCell(Text(
+              DateFormatter.formatToDDMMMYYYY(item.infCompleted.toString()) ??
+                  "")),
           DataCell(InkWell(
               onTap: () => showBankDetails?.call(item),
               child: Text(item.payment!.upi.toString() ?? ""))),
@@ -301,6 +354,21 @@ class PromoteTableSource extends DataTableSource {
               onTap: () => showBankDetails?.call(item),
               child: Text(item.payment!.upi.toString() ?? ""))),
           DataCell(Text(item.amount.toString())),
+          DataCell(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: pendingColor,
+                padding: defaultPadding4 + rightPadding4 + leftPadding4,
+              ),
+              onPressed: () => onCompanyPaymentVerified?.call(item),
+              child: Center(
+                  child: Text(
+                "Company Payment Verified",
+                style: fontFamilySemiBold.size12.white,
+                textAlign: TextAlign.center,
+              )),
+            ),
+          ),
         ];
       case PromoteStatus.rejected:
         return [
@@ -330,7 +398,7 @@ class PromoteTableSource extends DataTableSource {
                   style: fontFamilySemiBold.size11.red,
                 ),
               ),
-              Text('&'),
+              const Text('&'),
               InkWell(
                 onTap: () => onReAssign!(item),
                 child: Text(
@@ -366,7 +434,7 @@ class PromoteTableSource extends DataTableSource {
       case PromoteStatus.promoteCommission:
         return 9;
       case PromoteStatus.companyPaymentVerified:
-        return 9;
+        return 10;
       default:
         return 0;
     }

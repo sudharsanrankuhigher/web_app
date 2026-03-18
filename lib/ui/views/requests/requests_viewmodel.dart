@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
@@ -74,6 +72,8 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
 
   RequestTableSource? tableSource;
 
+  List<request_model.Datum> filteredData = [];
+
   // 1:Request, 2:Request-Waiting, 3:Waiting-Accept, 4:Completed-Pending, 5:Rework, 6:Completed, 7:inf-cancelled, 8:Admin-Rejected, 9:Promote-Verified, 10:Promote-Pay, 11:Promote-Commission,
   Future<void> loadTable(RequestStatus tabStatus) async {
     _isRequest = true;
@@ -90,46 +90,110 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         return tabStatus.filterBackendCodes.contains(apiStatus);
       }).toList();
 
+      requests = filteredData;
       tableSource = RequestTableSource(
-        filteredData,
-        tabStatus.value,
-        onReject,
-        onWaiting,
-        onProceed,
-        onPreparing,
-        onGoToPromoteVerified,
-        onRevoke,
-        onGotoPromotePay,
-        onPaymentDialog,
-        onGotoPromoteCommission,
-        onClientPaymentVerified,
-        onReAssign,
-      );
+          filteredData,
+          tabStatus.value,
+          onReject,
+          onWaiting,
+          onProceed,
+          onPreparing,
+          onGoToPromoteVerified,
+          onRevoke,
+          onGotoPromotePay,
+          onPaymentDialog,
+          onGotoPromoteCommission,
+          onClientPaymentVerified,
+          onReAssign,
+          infReject);
 
       _isRequest = false;
     } catch (e) {
       requests = [];
-      tableSource = RequestTableSource(
-        [],
-        tabStatus.value,
-        onReject,
-        onWaiting,
-        onProceed,
-        onPreparing,
-        onGoToPromoteVerified,
-        onRevoke,
-        onGotoPromotePay,
-        onPaymentDialog,
-        onGotoPromoteCommission,
-        onClientPaymentVerified,
-        onReAssign,
-      );
+      tableSource = RequestTableSource([],
+          tabStatus.value,
+          onReject,
+          onWaiting,
+          onProceed,
+          onPreparing,
+          onGoToPromoteVerified,
+          onRevoke,
+          onGotoPromotePay,
+          onPaymentDialog,
+          onGotoPromoteCommission,
+          onClientPaymentVerified,
+          onReAssign,
+          infReject);
 
       _isRequest = false;
     }
     getInfluencers();
     setBusy(false);
     notifyListeners();
+  }
+
+  void searchRequests(String value) {
+    if (value.isEmpty) {
+      filteredData = List.from(requests);
+    } else {
+      filteredData = requests.where((e) {
+        final service = (e.client ?? "").toString().toLowerCase();
+        final client = (e.inf?.name ?? "").toLowerCase();
+        final search = value.toLowerCase();
+
+        return service.contains(search) || client.contains(search);
+      }).toList();
+    }
+
+    tableSource = RequestTableSource(
+        filteredData,
+        _selectedString!,
+        onReject,
+        onWaiting,
+        onProceed,
+        onPreparing,
+        onGoToPromoteVerified,
+        onRevoke,
+        onGotoPromotePay,
+        onPaymentDialog,
+        onGotoPromoteCommission,
+        onClientPaymentVerified,
+        onReAssign,
+        infReject);
+    notifyListeners();
+  }
+
+  void applySort(bool specialFilter, String sortType) {
+    if (sortType == "A-Z") {
+      filteredData.sort((a, b) =>
+          (a.client ?? "").toString().compareTo(b.client.toString() ?? ""));
+    } else if (sortType == "clientAsc") {
+      filteredData.sort((a, b) => (a.id ?? 0).compareTo(b.id ?? 0));
+    } else if (sortType == "older") {
+      filteredData.sort((a, b) {
+        DateTime aDate = a.createdAt != null
+            ? DateTime.parse(a.createdAt!.toString())
+            : DateTime(1970);
+
+        DateTime bDate = b.createdAt != null
+            ? DateTime.parse(b.createdAt!.toString())
+            : DateTime(1970);
+
+        return aDate.compareTo(bDate);
+      });
+    } else if (sortType == "newer") {
+      filteredData.sort((a, b) {
+        DateTime aDate = a.createdAt != null
+            ? DateTime.parse(a.createdAt!.toString())
+            : DateTime(1970);
+
+        DateTime bDate = b.createdAt != null
+            ? DateTime.parse(b.createdAt!.toString())
+            : DateTime(1970);
+
+        return bDate.compareTo(aDate);
+      });
+    }
   }
 
   List<DataColumn> getColumnsByStatus(String status) {
@@ -193,6 +257,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
                 "Action",
               ),
               headingRowAlignment: MainAxisAlignment.center),
+          DataColumn(label: Text("Inf Reject")),
         ];
 
       // 4. Complete Pending
@@ -321,6 +386,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     final req = {
       "id": data["id"],
       "status": data["status"],
+      "client_id": data["client_id"],
     };
 
     try {
@@ -399,6 +465,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           final data = {
             "id": model.id,
             "status": 8,
+            "client_id": model.client!.id,
           };
           await statusChange(data);
         });
@@ -420,6 +487,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         final data = {
           "id": model.id,
           "status": 2,
+          "client_id": model.client!.id,
         };
         statusChange(data);
       },
@@ -447,7 +515,33 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
 
     if (result != null) {
       print("Selected status: ${result['name']}");
+      final data = {
+        "id": model.id,
+        "status": result['name'] == "Completed" ? 6 : 5,
+        "client_id": model.client!.id,
+      };
+      statusChange(data);
     }
+  }
+
+  infReject(request_model.Datum model) {
+    showActionConfirmationDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      title: 'Influencer Reject',
+      confirmText: "Reject",
+      message:
+          "Are you sure the influencer wants to reject the ${model.projectId}?",
+      icon: Icons.cancel,
+      confirmColor: Colors.red,
+      onConfirm: () {
+        final data = {
+          "id": model.id,
+          "status": 7,
+          "client_id": model.client!.id,
+        };
+        statusChange(data);
+      },
+    );
   }
 
   onGoToPromoteVerified(request_model.Datum model) {
@@ -463,6 +557,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         final data = {
           "id": model.id,
           "status": 12,
+          "client_id": model.client!.id,
         };
         statusChange(data);
       },
@@ -482,6 +577,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         final data = {
           "id": model.id,
           "status": 4,
+          "client_id": model.client!.id,
         };
         statusChange(data);
       },
@@ -521,6 +617,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         final data = {
           "id": model.id,
           "status": 10,
+          "client_id": model.client!.id,
         };
         statusChange(data);
       },
@@ -541,6 +638,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         final data = {
           "id": model.id,
           "status": 11,
+          "client_id": model.client!.id,
         };
         statusChange(data);
       },
@@ -551,23 +649,21 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     showPaymentStatusDialog(
       context: StackedService.navigatorKey!.currentContext!,
       onConfirm: (result) {
-        if (result != null) {
-          final status = result['status'];
-          final paymentDate = result['paymentDate'];
+        final status = result['status'];
+        final paymentDate = result['paymentDate'];
 
-          print("Status Name : ${status['name']}");
-          print("Payment Date: $paymentDate");
+        print("Status Name : ${status['name']}");
+        print("Payment Date: $paymentDate");
 
-          final data = {
-            "id": model.id,
-            "payment_status": status['name'],
-            "payment_date":
-                DateFormat('yyyy-MM-dd').format(paymentDate ?? DateTime.now()),
-          };
+        final data = {
+          "id": model.id,
+          "payment_status": status['name'],
+          "payment_date":
+              DateFormat('yyyy-MM-dd').format(paymentDate ?? DateTime.now()),
+        };
 
-          // API call here 👇
-          paymentStatusChange(data);
-        }
+        // API call here 👇
+        paymentStatusChange(data);
       },
     );
   }
@@ -586,7 +682,9 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         final data = {
           "id": model.id,
           "status": 9,
+          "client_id": model.client!.id,
         };
+        print("data client id $data");
         statusChange(data);
       },
     );

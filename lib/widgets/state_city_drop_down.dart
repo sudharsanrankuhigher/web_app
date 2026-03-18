@@ -14,8 +14,8 @@ class StateCityDropdown extends StatefulWidget {
   final Function(String) onStateChanged;
   final Function(String?)? onCityChanged;
   final Function(String?)? onChangeId;
-  final String? Function(dynamic?)? stateValidator;
-  final String? Function(dynamic?)? cityValidator;
+  final String? Function(dynamic)? stateValidator;
+  final String? Function(dynamic)? cityValidator;
   final bool? isCityError;
   final bool? isStateError;
   final bool? isVertical;

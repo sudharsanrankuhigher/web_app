@@ -23,7 +23,7 @@ class AddCompanyView extends StackedView<AddCompanyViewModel> {
     final bool isExtended = MediaQuery.of(context).size.width > 1200;
 
     return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: PermissionHelper.instance.canView('company')
             ? Padding(
                 padding: defaultPadding12 - topPadding12,
@@ -140,7 +140,7 @@ class AddCompanyView extends StackedView<AddCompanyViewModel> {
                   ],
                 ),
               )
-            : NoAccessWidget());
+            : const NoAccessWidget());
   }
 
   @override

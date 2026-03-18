@@ -27,6 +27,15 @@ class InfluencersViewModel extends BaseViewModel {
   final _dialogService = locator<DialogService>();
   final _apiService = locator<ApiService>();
 
+  final List<Map<String, dynamic>> categoryList = [
+    {'id': 1, 'name': 'Influencers'},
+    {'id': 2, 'name': 'Movie Stars'},
+    {'id': 3, 'name': 'TV Stars'},
+    {'id': 4, 'name': 'Sports Stars'},
+  ];
+
+  TextEditingController searchController = TextEditingController();
+
   bool? _isLoading = false;
   bool? get isLoading => _isLoading;
 
@@ -70,7 +79,7 @@ class InfluencersViewModel extends BaseViewModel {
       addField("phone", influencerData['phone']);
       addField("dob", influencerData['dob']);
       addField("alt_phone", influencerData['altPhone']);
-      addField("inf_id", influencerData['inf_id']);
+      // addField("inf_id", influencerData['inf_id']);
       addField("state", influencerData['state']);
       addField("password", influencerData['password']);
       addField("gender", influencerData['gender']);
@@ -168,7 +177,7 @@ class InfluencersViewModel extends BaseViewModel {
       addField("phone", influencerData['phone']);
       addField("alt_phone", influencerData['altPhone']); // ✅ FIXED
       addField("dob", influencerData['dob']);
-      addField("inf_id", influencerData['inf_id']);
+      // addField("inf_id", influencerData['inf_id']);
       addField("state", influencerData['state']);
       addField("city", influencerData['city']);
       addField("gender", influencerData['gender']);
@@ -252,6 +261,10 @@ class InfluencersViewModel extends BaseViewModel {
     }
   }
 
+  List<influencer_model.Datum> filteredInfluencers =
+      []; // after filter (service/category)
+  List<influencer_model.Datum> displayInfluencers = []; // after search + sort
+
   Future<void> loadInfluencers() async {
     setBusy(true);
     _setLoading(true);
@@ -259,11 +272,13 @@ class InfluencersViewModel extends BaseViewModel {
     try {
       final res = await _apiService.getAllInfluencer();
       influencers = res.data ?? [];
+      filteredInfluencers = List.from(influencers);
+      displayInfluencers = List.from(influencers);
     } catch (e) {
       influencers = [];
     } finally {
       setBusy(false);
-      _refreshTable(filtered: influencers);
+      _refreshTable(filtered: displayInfluencers);
       _setLoading(false);
     }
 
@@ -291,23 +306,27 @@ class InfluencersViewModel extends BaseViewModel {
 
   /// SEARCH
   // ================== SEARCH / FILTER ==================
+  // void searchInfluencer(String query) {
+  //   query = query.toLowerCase();
+
+  //   final filtered = influencers.where((inf) {
+  //     return inf.name!.toLowerCase().contains(query) ||
+  //         inf.phone!.contains(query) ||
+  //         inf.city!.toLowerCase().contains(query);
+  //   }).toList();
+
+  //   tableSource = InfluencerTableSource(
+  //     influencers: filtered,
+  //     onEdit: openEditDialog,
+  //     onView: openEditDialog,
+  //     onToggle: (_) => toggleInfluencerStatus(_),
+  //   );
+
+  //   notifyListeners();
+  // }
   void searchInfluencer(String query) {
-    query = query.toLowerCase();
-
-    final filtered = influencers.where((inf) {
-      return inf.name!.toLowerCase().contains(query) ||
-          inf.phone!.contains(query) ||
-          inf.city!.toLowerCase().contains(query);
-    }).toList();
-
-    tableSource = InfluencerTableSource(
-      influencers: filtered,
-      onEdit: openEditDialog,
-      onView: openEditDialog,
-      onToggle: (_) => toggleInfluencerStatus(_),
-    );
-
-    notifyListeners();
+    currentSearch = query.toLowerCase();
+    applySearchAndSort();
   }
 
   void applyCategory(String cat) {
@@ -424,7 +443,7 @@ class InfluencersViewModel extends BaseViewModel {
       add("dob", item.dob!.toIso8601String().split('T').first);
     }
 
-    add("inf_id", item.infId);
+    // add("inf_id", item.infId);
     add("state", item.state);
     add("city", item.city);
     add("gender", item.gender);
@@ -491,38 +510,98 @@ class InfluencersViewModel extends BaseViewModel {
     }
   }
 
+  // void applySort(bool specialFilter, String sortType) {
+  //   //   if (specialFilter) {
+  //   //     // implement custom filter
+  //   //   }
+  //   if (sortType == "A-Z") {
+  //     influencers.sort((a, b) => a.name!.compareTo(b.name!));
+  //   } else if (sortType == "clientAsc") {
+  //     influencers.sort((a, b) => a.id!.compareTo(b.id!));
+  //   } else if (sortType == "older") {
+  //     influencers.sort((a, b) {
+  //       DateTime aDate = a.createdAt != null
+  //           ? DateTime.parse(a.createdAt.toString())
+  //           : DateTime(1970);
+  //       DateTime bDate = b.createdAt != null
+  //           ? DateTime.parse(b.createdAt.toString())
+  //           : DateTime(1970);
+  //       return bDate.compareTo(aDate);
+  //     });
+  //   } else if (sortType == "newer") {
+  //     influencers.sort((a, b) {
+  //       DateTime aDate = a.createdAt != null
+  //           ? DateTime.parse(a.createdAt.toString())
+  //           : DateTime(1970);
+  //       DateTime bDate = b.createdAt != null
+  //           ? DateTime.parse(b.createdAt.toString())
+  //           : DateTime(1970);
+  //       return aDate.compareTo(bDate);
+  //     });
+  //   } else {
+  //     // No sorting
+  //   }
+
+  //   _refreshTable();
+  // }
+
   void applySort(bool specialFilter, String sortType) {
-    //   if (specialFilter) {
-    //     // implement custom filter
-    //   }
-    if (sortType == "A-Z") {
-      influencers.sort((a, b) => a.name!.compareTo(b.name!));
-    } else if (sortType == "clientAsc") {
-      influencers.sort((a, b) => a.id!.compareTo(b.id!));
-    } else if (sortType == "older") {
-      influencers.sort((a, b) {
-        DateTime aDate = a.createdAt != null
-            ? DateTime.parse(a.createdAt.toString())
-            : DateTime(1970);
-        DateTime bDate = b.createdAt != null
-            ? DateTime.parse(b.createdAt.toString())
-            : DateTime(1970);
-        return bDate.compareTo(aDate);
-      });
-    } else if (sortType == "newer") {
-      influencers.sort((a, b) {
-        DateTime aDate = a.createdAt != null
-            ? DateTime.parse(a.createdAt.toString())
-            : DateTime(1970);
-        DateTime bDate = b.createdAt != null
-            ? DateTime.parse(b.createdAt.toString())
-            : DateTime(1970);
-        return aDate.compareTo(bDate);
-      });
-    } else {
-      // No sorting
+    currentSort = sortType;
+    applySearchAndSort();
+  }
+
+  void applyFilter({
+    int? categoryId,
+    int? serviceId,
+  }) {
+    filteredInfluencers = influencers.where((inf) {
+      final matchCategory = categoryId == null || inf.category == categoryId;
+
+      final matchService = serviceId == null ||
+          (inf.service != null && inf.service!.contains(serviceId));
+
+      return matchCategory && matchService;
+    }).toList();
+
+    // after filter → apply search + sort again
+    applySearchAndSort();
+  }
+
+  String currentSearch = "";
+  String currentSort = "A-Z";
+
+  void applySearchAndSort() {
+    List<influencer_model.Datum> temp = List.from(filteredInfluencers);
+
+    /// SEARCH
+    if (currentSearch.isNotEmpty) {
+      temp = temp.where((inf) {
+        return (inf.name ?? '').toLowerCase().contains(currentSearch) ||
+            (inf.phone ?? '').contains(currentSearch) ||
+            (inf.city ?? '').toLowerCase().contains(currentSearch);
+      }).toList();
     }
 
-    _refreshTable();
+    /// SORT
+    if (currentSort == "A-Z") {
+      temp.sort((a, b) => (a.name ?? '').compareTo(b.name ?? ''));
+    } else if (currentSort == "older") {
+      temp.sort((a, b) => (b.createdAt ?? DateTime(1970))
+          .compareTo(a.createdAt ?? DateTime(1970)));
+    } else if (currentSort == "newer") {
+      temp.sort((a, b) => (a.createdAt ?? DateTime(1970))
+          .compareTo(b.createdAt ?? DateTime(1970)));
+    }
+
+    displayInfluencers = temp;
+
+    _refreshTable(filtered: displayInfluencers);
+  }
+
+  void clearFilter() {
+    filteredInfluencers = List.from(influencers);
+    currentSearch = "";
+    currentSort = "";
+    applySearchAndSort();
   }
 }

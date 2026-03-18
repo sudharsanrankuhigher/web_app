@@ -37,6 +37,21 @@ class InfluencerTableSource extends DataTableSource {
     return serviceIds.map((id) => _serviceMap[id] ?? "Unknown").join(", ");
   }
 
+  String getCategoryName(int? categoryId) {
+    switch (categoryId) {
+      case 1:
+        return "Influencers";
+      case 2:
+        return "Movie Stars";
+      case 3:
+        return "TV Stars";
+      case 4:
+        return "Sports Stars";
+      default:
+        return "Unknown";
+    }
+  }
+
   @override
   DataRow? getRow(int index) {
     /// -------------------------------
@@ -91,8 +106,7 @@ class InfluencerTableSource extends DataTableSource {
         DataCell(
           Text(_getServiceNames(item.service)),
         ),
-        DataCell(
-            Text(item.service != null ? item.service!.length.toString() : "0")),
+        DataCell(Text(getCategoryName(item.category))),
 
         DataCell(Text(item.instagramFollowers!.toString())),
         DataCell(Text(item.youtubeFollowers.toString())),
@@ -131,7 +145,7 @@ class InfluencerTableSource extends DataTableSource {
             child: Transform.scale(
               scale: 0.7,
               child: Switch(
-                activeColor: continueButton,
+                activeThumbColor: continueButton,
                 value: item.status == 1 ? true : false,
                 onChanged: (_) => onToggle(item),
               ),

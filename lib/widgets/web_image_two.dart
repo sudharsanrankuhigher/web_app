@@ -3,7 +3,6 @@ import 'dart:ui_web' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:webapp/core/helper/dialog_state.dart';
 
 class WebImageTwo extends StatelessWidget {
   final String imageUrl;

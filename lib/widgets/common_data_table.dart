@@ -43,7 +43,7 @@ class CommonPaginatedTable extends StatelessWidget {
       headingRowColor: WidgetStateProperty.all(appGreen400),
       headingRowDecoration: BoxDecoration(
         color: heddingRowColor ?? appGreen400,
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(12),
           topRight: Radius.circular(12),
         ),

@@ -9,7 +9,7 @@ Future<void> showNoteDialog({
   String hintText = "Enter your note...",
   required Function(String) onSubmit,
 }) async {
-  final TextEditingController _noteController = TextEditingController();
+  final TextEditingController noteController = TextEditingController();
 
   await showDialog(
     context: context,
@@ -42,7 +42,7 @@ Future<void> showNoteDialog({
 
                 // 📝 Note TextField
                 TextField(
-                  controller: _noteController,
+                  controller: noteController,
                   maxLines: 4,
                   decoration: InputDecoration(
                     hintText: hintText,
@@ -82,7 +82,7 @@ Future<void> showNoteDialog({
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          final note = _noteController.text.trim();
+                          final note = noteController.text.trim();
                           if (note.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -148,7 +148,7 @@ Future<void> showBulkDeleteDialog({
                 borderRadius: BorderRadius.circular(18),
               ),
               child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 500, minWidth: 300),
+                constraints: const BoxConstraints(maxWidth: 500, minWidth: 300),
                 child: Padding(
                   padding: const EdgeInsets.all(24),
                   child: Column(

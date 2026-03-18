@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/ui/views/add_company/add_company_view.dart';
 import 'package:webapp/ui/views/banner/banner_view.dart';
 import 'package:webapp/ui/views/city/city_view.dart';
@@ -26,6 +28,30 @@ final goRouterKey = GlobalKey<NavigatorState>();
 final GoRouter router = GoRouter(
   navigatorKey: goRouterKey,
   initialLocation: '/startup',
+  redirect: (context, state) {
+    final prefs = locator<SharedPreferences>();
+    final token = prefs.getString('accessToken');
+
+    final loggedIn = token != null && token.isNotEmpty;
+    final location = state.uri.toString();
+
+    // 🚫 If not logged in and trying to access protected route
+    if (!loggedIn && location.startsWith('/home')) {
+      return '/login';
+    }
+
+    // ✅ If logged in and trying to open login
+    if (loggedIn && location == '/login') {
+      return '/home/dashboard';
+    }
+
+    // Handle startup route
+    if (location == '/startup') {
+      return loggedIn ? '/home/dashboard' : '/login';
+    }
+
+    return null;
+  },
   routes: [
     ShellRoute(
       builder: (context, state, child) {
@@ -68,31 +94,31 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/home/city',
           name: 'city',
-          builder: (context, state) => CityView(),
+          builder: (context, state) => const CityView(),
         ),
         GoRoute(
             path: '/home/state',
             name: 'state',
-            builder: (context, state) => StateView()),
+            builder: (context, state) => const StateView()),
         GoRoute(
           path: '/home/promotion-projects',
           name: 'promotion-projects',
-          builder: (context, state) => PromoteProjectsView(),
+          builder: (context, state) => const PromoteProjectsView(),
         ),
         GoRoute(
           path: '/home/ticket-support',
           name: 'contact-support',
-          builder: (context, state) => ContactSupportView(),
+          builder: (context, state) => const ContactSupportView(),
         ),
         GoRoute(
           path: '/home/contact',
           name: 'contact',
-          builder: (context, state) => LocationContactView(),
+          builder: (context, state) => const LocationContactView(),
         ),
         GoRoute(
           path: '/home/company',
           name: 'company',
-          builder: (context, state) => AddCompanyView(),
+          builder: (context, state) => const AddCompanyView(),
         ),
         GoRoute(
           path: '/home/sub-admin',

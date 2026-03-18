@@ -44,19 +44,28 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
   }
 
   final bannerColumn = [
-    DataColumn(label: Text("S.No")),
-    DataColumn(label: Text("Image")),
-    DataColumn(label: Text("Influencer")),
-    DataColumn(label: Text("Amount")),
-    DataColumn(label: Text("Priority")),
-    DataColumn(
+    const DataColumn(label: Text("S.No")),
+    const DataColumn(label: Text("Image")),
+    const DataColumn(label: Text("Influencer")),
+    const DataColumn(label: Text("Amount")),
+    const DataColumn(label: Text("Priority")),
+    const DataColumn(label: Text("Start Date")),
+    const DataColumn(label: Text("End Date")),
+    const DataColumn(
         label: Text('Action'), headingRowAlignment: MainAxisAlignment.center)
   ];
+
+  Map<int, String> influencerNameMap = {};
 
   Future<void> getInfluencers() async {
     try {
       final res = await runBusyFuture(_apiService.getAllInfluencer());
       influencers = res.data ?? [];
+      // Create ID → Name map
+      influencerNameMap = {
+        for (var inf in influencers)
+          if (inf.id != null) inf.id!: inf.name ?? ''
+      };
       await getBanner();
     } catch (e) {
       influencers = [];
@@ -69,6 +78,9 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
     try {
       final res = await runBusyFuture(_apiService.getAllBanner());
       bannerList = res.data ?? [];
+
+      allService = List.from(bannerList); // store original
+      filteredService = List.from(bannerList);
     } catch (e) {
       bannerList = [];
     } finally {
@@ -83,8 +95,9 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
       FormData formData = FormData();
 
       // 🔹 Normal fields
-      if (data["id"] != null)
+      if (data["id"] != null) {
         formData.fields.add(MapEntry("id", data['id'].toString()));
+      }
 
       formData.fields.add(MapEntry("inf_id", data['inf_id'].toString()));
       if (data["inf_id"] != null) {
@@ -102,6 +115,9 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
         }
       }
       formData.fields.add(MapEntry("amount", data['amount'].toString()));
+      formData.fields
+          .add(MapEntry("start_date", data['start_date'].toString()));
+      formData.fields.add(MapEntry("end_date", data['end_date'].toString()));
 
       if (data['priority'] != null) {
         formData.fields.add(MapEntry("priority", data['priority'].toString()));
@@ -198,7 +214,7 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Confirm Delete"),
-        content: Text("Are you sure you want to delete ${name}?"),
+        content: Text("Are you sure you want to delete $name?"),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
@@ -222,7 +238,7 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
 
   refreshBanner() {
     bannerTableSource = BannerTableSource(
-      data: bannerList,
+      data: filteredService,
       status: "requested",
       influencers: influencers,
       onView: (item) async => await viewBanner(item),
@@ -243,29 +259,27 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
       influencers.sort((a, b) => a.name!.compareTo(b.name!));
     } else if (sortType == "clientAsc") {
       bannerList.sort((a, b) => a.id!.compareTo(b.id!));
-    }
-    //  else if (sortType == "older") {
-    //   bannerList.sort((a, b) {
-    //     DateTime aDate = a.createdAt != null
-    //         ? DateTime.parse(a.createdAt.toString())
-    //         : DateTime(1970);
-    //     DateTime bDate = b.createdAt != null
-    //         ? DateTime.parse(b.createdAt.toString())
-    //         : DateTime(1970);
-    //     return bDate.compareTo(aDate);
-    //   });
-    // } else if (sortType == "newer") {
-    //   bannerList.sort((a, b) {
-    //     DateTime aDate = a.createdAt != null
-    //         ? DateTime.parse(a.createdAt.toString())
-    //         : DateTime(1970);
-    //     DateTime bDate = b.createdAt != null
-    //         ? DateTime.parse(b.createdAt.toString())
-    //         : DateTime(1970);
-    //     return aDate.compareTo(bDate);
-    //   });
-    // }
-    else {
+    } else if (sortType == "older") {
+      bannerList.sort((a, b) {
+        DateTime aDate = a.createdAt != null
+            ? DateTime.parse(a.createdAt.toString())
+            : DateTime(1970);
+        DateTime bDate = b.createdAt != null
+            ? DateTime.parse(b.createdAt.toString())
+            : DateTime(1970);
+        return bDate.compareTo(aDate);
+      });
+    } else if (sortType == "newer") {
+      bannerList.sort((a, b) {
+        DateTime aDate = a.createdAt != null
+            ? DateTime.parse(a.createdAt.toString())
+            : DateTime(1970);
+        DateTime bDate = b.createdAt != null
+            ? DateTime.parse(b.createdAt.toString())
+            : DateTime(1970);
+        return aDate.compareTo(bDate);
+      });
+    } else {
       // No sorting
     }
 
@@ -279,11 +293,17 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
     final search = query.trim().toLowerCase();
 
     filteredService = allService.where((item) {
-      final name = item.amount?.toLowerCase() ?? '';
-      return search.isEmpty || name.contains(search);
+      final influencerName = influencerNameMap[item.infId] ?? '';
+
+      final amount = item.amount?.toLowerCase() ?? '';
+      final priority = item.priority?.toString() ?? '';
+
+      return search.isEmpty ||
+          influencerName.toLowerCase().contains(search) ||
+          amount.contains(search) ||
+          priority.contains(search);
     }).toList();
 
-    refreshBanner();
-    notifyListeners();
+    refreshBanner(); // ✅ important
   }
 }

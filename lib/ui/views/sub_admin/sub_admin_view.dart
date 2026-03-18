@@ -137,6 +137,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                   DataColumn(label: Text("Online At")),
                                   DataColumn(label: Text("Access")),
                                   DataColumn(label: Text("Action")),
+                                  DataColumn(label: Text("View Id")),
                                   DataColumn(label: Text("Status")),
                                 ],
                                 source: viewModel.tableSource!,
@@ -151,7 +152,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                   ),
                 ),
               )
-            : NoAccessWidget());
+            : const NoAccessWidget());
   }
 
   @override

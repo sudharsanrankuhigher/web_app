@@ -60,15 +60,22 @@ class PlanTableSource extends DataTableSource {
           DataCell(Text("₹${plan.amount}")),
           DataCell(Text("₹${plan.saleAmount}")),
           DataCell(Text("${plan.gst}")),
-          DataCell(Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8), color: Colors.blue),
-            child: Text(
-              plan.badge!,
-              style: const TextStyle(color: Colors.white),
-            ),
-          )),
+          plan.badge != null
+              ? DataCell(
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.blue,
+                    ),
+                    child: Text(
+                      plan.badge!,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                )
+              : const DataCell(SizedBox()),
           DataCell(Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,

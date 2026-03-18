@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:webapp/ui/common/shared/styles.dart';
-import 'package:webapp/ui/common/shared/text_style_helpers.dart';
-import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/core/model/get_user_model.dart' as user_model;
 
 class UserTableSource extends DataTableSource {
@@ -42,7 +39,7 @@ class UserTableSource extends DataTableSource {
     if (filteredList.isEmpty) {
       return DataRow(
         cells: List.generate(
-          9,
+          8,
           (i) {
             if (i == 4) {
               return const DataCell(
@@ -81,33 +78,33 @@ class UserTableSource extends DataTableSource {
         DataCell(Text("${user.city}/${user.state}")),
         DataCell(Text(user.plan ?? "")),
         DataCell(Text("${user.connections}")),
-        DataCell(CommonButton(
-          text: 'ADD',
-          textStyle: fontFamilyBold.size12.white,
-          buttonColor: continueButton,
-          width: 85,
-          padding: zeroPadding,
-          margin: zeroPadding,
-          icon: Icon(
-            Icons.add,
-            color: white,
-          ),
-          onTap: () => onAdd(),
-          height: 30,
-        )
-            // Row(
-            //   children: [
-            //     IconButton(
-            //       icon: const Icon(Icons.edit, color: Colors.blue),
-            //       onPressed: () => onEdit(user),
-            //     ),
-            //     IconButton(
-            //       icon: const Icon(Icons.delete, color: red),
-            //       onPressed: () => onDelete(user),
-            //     ),
-            //   ],
-            // ),
-            ),
+        // DataCell(CommonButton(
+        //   text: 'ADD',
+        //   textStyle: fontFamilyBold.size12.white,
+        //   buttonColor: continueButton,
+        //   width: 85,
+        //   padding: zeroPadding,
+        //   margin: zeroPadding,
+        //   icon: const Icon(
+        //     Icons.add,
+        //     color: white,
+        //   ),
+        //   onTap: () => onAdd(),
+        //   height: 30,
+        // )
+        // Row(
+        //   children: [
+        //     IconButton(
+        //       icon: const Icon(Icons.edit, color: Colors.blue),
+        //       onPressed: () => onEdit(user),
+        //     ),
+        //     IconButton(
+        //       icon: const Icon(Icons.delete, color: red),
+        //       onPressed: () => onDelete(user),
+        //     ),
+        //   ],
+        // ),
+        // ),
       ],
     );
   }

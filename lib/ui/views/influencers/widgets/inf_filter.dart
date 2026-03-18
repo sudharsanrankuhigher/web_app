@@ -1,22 +1,32 @@
 import 'package:flutter/material.dart';
 
-/// Reusable dialog for sorting/filter
-class CommonFilterDialog extends StatelessWidget {
+class InfFilter extends StatelessWidget {
   final bool initialCheckbox;
   final String initialSort;
-  final void Function(bool checkbox, String sort) onApply;
 
-  const CommonFilterDialog({
+  final List<Map<String, dynamic>> categoryList;
+  final List<dynamic> services; // your service model
+
+  final void Function(bool checkbox, String sort) onApply;
+  final void Function(int? categoryId, int? serviceId)? onFilter;
+
+  const InfFilter({
     Key? key,
     this.initialCheckbox = false,
     this.initialSort = "A-Z",
     required this.onApply,
+    required this.categoryList,
+    required this.services,
+    this.onFilter,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     bool checkStatus = initialCheckbox;
     String selectedSort = initialSort;
+
+    int? selectedCategory;
+    int? selectedService;
 
     return Dialog(
       constraints: const BoxConstraints(maxWidth: 400),
@@ -34,9 +44,46 @@ class CommonFilterDialog extends StatelessWidget {
                   "Filters & Sorting",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
+
                 const SizedBox(height: 12),
 
-                // Sort options
+                /// ✅ CATEGORY DROPDOWN
+                const Text("Category",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 6),
+                DropdownButtonFormField<int>(
+                  initialValue: selectedCategory,
+                  hint: const Text("Select Category"),
+                  items: categoryList.map((cat) {
+                    return DropdownMenuItem<int>(
+                      value: cat['id'],
+                      child: Text(cat['name']),
+                    );
+                  }).toList(),
+                  onChanged: (val) => setState(() => selectedCategory = val),
+                ),
+
+                const SizedBox(height: 12),
+
+                /// ✅ SERVICE DROPDOWN
+                const Text("Service",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 6),
+                DropdownButtonFormField<int>(
+                  initialValue: selectedService,
+                  hint: const Text("Select Service"),
+                  items: services.map<DropdownMenuItem<int>>((srv) {
+                    return DropdownMenuItem<int>(
+                      value: srv.id,
+                      child: Text(srv.name ?? ''),
+                    );
+                  }).toList(),
+                  onChanged: (val) => setState(() => selectedService = val),
+                ),
+
+                const SizedBox(height: 16),
+
+                /// ✅ SORT
                 const Text("Sort By",
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 RadioListTile(
@@ -54,28 +101,10 @@ class CommonFilterDialog extends StatelessWidget {
                     groupValue: selectedSort,
                     title: const Text("Older First"),
                     onChanged: (v) => setState(() => selectedSort = v!)),
-                // RadioListTile(
-                //     value: "clientAsc",
-                //     groupValue: selectedSort,
-                //     title: const Text("Client ID (Asc → Desc)"),
-                //     onChanged: (v) => setState(() => selectedSort = v!)),
 
                 const SizedBox(height: 16),
 
-                // // Checkbox example if needed
-                // Row(
-                //   children: [
-                //     Checkbox(
-                //       value: checkStatus,
-                //       onChanged: (v) => setState(() => checkStatus = v!),
-                //     ),
-                //     const Text("Special Filter"),
-                //   ],
-                // ),
-
-                // const SizedBox(height: 16),
-
-                // Action buttons
+                /// ✅ BUTTONS
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -85,8 +114,14 @@ class CommonFilterDialog extends StatelessWidget {
                     const SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () {
-                        onApply(checkStatus, selectedSort); // return result
-                        Navigator.pop(context); // close dialog
+                        onApply(checkStatus, selectedSort);
+
+                        /// 🔥 send filter values
+                        if (onFilter != null) {
+                          onFilter!(selectedCategory, selectedService);
+                        }
+
+                        Navigator.pop(context);
                       },
                       child: const Text("Apply"),
                     ),
@@ -100,24 +135,30 @@ class CommonFilterDialog extends StatelessWidget {
     );
   }
 
-  /// Helper function to show the dialog
+  /// ✅ SHOW FUNCTION UPDATED
   static Future<void> show(
     BuildContext context, {
     bool initialCheckbox = false,
     String initialSort = "A-Z",
+    required List<Map<String, dynamic>> categoryList,
+    required List<dynamic> services,
     required void Function(bool checkbox, String sort) onApply,
+    void Function(int? categoryId, int? serviceId)? onFilter,
   }) async {
     await showGeneralDialog(
       context: context,
       barrierDismissible: false,
       barrierLabel: "Filter",
-      barrierColor: Colors.black.withOpacity(0.3), // semi-transparent overlay
+      barrierColor: Colors.black.withOpacity(0.3),
       pageBuilder: (_, __, ___) {
         return Center(
-          child: CommonFilterDialog(
+          child: InfFilter(
             initialCheckbox: initialCheckbox,
             initialSort: initialSort,
             onApply: onApply,
+            categoryList: categoryList,
+            services: services,
+            onFilter: onFilter,
           ),
         );
       },

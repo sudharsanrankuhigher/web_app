@@ -14,9 +14,9 @@ Future<void> init() async {
 }
 
 Future<void> initPermissions() async {
-  final _sharedPreference = locator<SharedPreferences>();
+  final sharedPreference = locator<SharedPreferences>();
 
-  final accessList = _sharedPreference.getStringList('access') ?? [];
+  final accessList = sharedPreference.getStringList('access') ?? [];
 
   PermissionHelper.init(accessList.toSet());
   print('initcompleted: $accessList');

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
+import 'package:webapp/core/helper/string_extensions.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/contact_support/contact_support_viewmodel.dart';
@@ -31,7 +32,7 @@ class ClientTableSource extends DataTableSource {
     if (data.isEmpty) {
       return DataRow(
         cells: List.generate(
-          8, // total columns
+          7, // total columns
           (i) {
             if (i == 3) {
               // column index where message should show
@@ -83,81 +84,78 @@ class ClientTableSource extends DataTableSource {
         DataCell(Text(item.mobile!)), // Phone
         DataCell(Text(item.description!)), // Phone
         DataCell(Text(item.note!)), // Note
-        DataCell(Text(item.alternativeNo!)), // Contact No
-        DataCell(
-          (status == 'pending')
-              ? IgnorePointer(
-                  ignoring: PermissionHelper.instance.has('contact_support')
-                      ? false
-                      : true,
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.check, color: Colors.green),
+        // DataCell(Text(item.alternativeNo!)), // Contact No
+        DataCell((status == 'pending')
+            ? IgnorePointer(
+                ignoring: PermissionHelper.instance.has('contact_support')
+                    ? false
+                    : true,
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.check, color: Colors.green),
+                      onPressed: () {
+                        print('Approved ${item.id}');
+                        showNoteDialog(
+                          context: StackedService.navigatorKey!.currentContext!,
+                          title: "Add completed Note",
+                          noteString: 'Approved',
+                          onSubmit: (notes) {
+                            print("Submitted note: $notes");
+                            vm.updateContactSupport(
+                              id: item.id!,
+                              note: notes,
+                              status: "completed",
+                            );
+                          },
+                        );
+                      },
+                    ),
+                    IconButton(
+                        icon: const Icon(Icons.close, color: Colors.red),
                         onPressed: () {
-                          print('Approved ${item.id}');
+                          print('Rejected ${item.id}');
                           showNoteDialog(
                             context:
                                 StackedService.navigatorKey!.currentContext!,
-                            title: "Add completed Note",
-                            noteString: 'Approved',
-                            onSubmit: (notes) {
-                              print("Submitted note: $notes");
+                            noteString: 'Rejected',
+                            title: "Add Rejected Note",
+                            onSubmit: (note) {
+                              print("Submitted note: $note");
                               vm.updateContactSupport(
+                                note: note,
                                 id: item.id!,
-                                note: notes,
-                                status: "completed",
+                                status: "rejected",
                               );
                             },
                           );
-                        },
-                      ),
-                      IconButton(
-                          icon: const Icon(Icons.close, color: Colors.red),
-                          onPressed: () {
-                            print('Rejected ${item.id}');
-                            showNoteDialog(
-                              context:
-                                  StackedService.navigatorKey!.currentContext!,
-                              noteString: 'Rejected',
-                              title: "Add Rejected Note",
-                              onSubmit: (note) {
-                                print("Submitted note: $note");
-                                vm.updateContactSupport(
-                                  note: note,
-                                  id: item.id!,
-                                  status: "rejected",
-                                );
-                              },
-                            );
-                          }),
-                    ],
-                  ),
-                )
-              : (status == 'completed')
-                  ? Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: greenShade1,
-                      ),
-                      padding: defaultPadding8 - topPadding4 - bottomPadding4,
-                      child: Text(
-                        item.status!,
-                        style: fontFamilySemiBold.size12.white,
-                      ),
-                    )
-                  : Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: red,
-                      ),
-                      padding: defaultPadding8 - topPadding4 - bottomPadding4,
-                      child: Text(
-                        item.status!,
-                        style: fontFamilySemiBold.size12.white,
-                      ),
+                        }),
+                  ],
+                ),
+              )
+            : (status == 'completed')
+                ? Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: greenShade1,
                     ),
-        ),
+                    padding: defaultPadding8 - topPadding4 - bottomPadding4,
+                    child: Text(
+                      item.status!,
+                      style: fontFamilySemiBold.size12.white,
+                    ),
+                  )
+                : Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: red,
+                    ),
+                    padding: defaultPadding8 - topPadding4 - bottomPadding4,
+                    child: Text(
+                      item.status.toString().capitalizeFirst(),
+                      style: fontFamilySemiBold.size12.white,
+                    ),
+                  )),
       ],
     );
   }
