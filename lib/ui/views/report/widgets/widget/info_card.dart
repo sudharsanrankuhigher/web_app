@@ -42,8 +42,8 @@ class InfoSalesProjectCard extends StatelessWidget {
             child: Center(
               child: SvgPicture.asset(
                 iconPath,
-                height: 24,
-                width: 24,
+                height: 26,
+                width: 26,
                 color: appGreen600,
               ),
             ),

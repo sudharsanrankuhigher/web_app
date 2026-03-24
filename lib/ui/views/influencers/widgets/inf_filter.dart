@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:webapp/ui/common/shared/styles.dart';
 
 class InfFilter extends StatelessWidget {
   final bool initialCheckbox;
@@ -61,6 +62,26 @@ class InfFilter extends StatelessWidget {
                     );
                   }).toList(),
                   onChanged: (val) => setState(() => selectedCategory = val),
+                  decoration: InputDecoration(
+                    hintText: "Select Category",
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    filled: true,
+                    fillColor: backgroundColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide(color: disableColor),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide(color: disableColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                  ),
                 ),
 
                 const SizedBox(height: 12),
@@ -79,6 +100,26 @@ class InfFilter extends StatelessWidget {
                     );
                   }).toList(),
                   onChanged: (val) => setState(() => selectedService = val),
+                  decoration: InputDecoration(
+                    hintText: "Select Category",
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    filled: true,
+                    fillColor: backgroundColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: const BorderSide(color: disableColor),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: const BorderSide(color: disableColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: const BorderSide(color: Colors.blue),
+                    ),
+                  ),
                 ),
 
                 const SizedBox(height: 16),

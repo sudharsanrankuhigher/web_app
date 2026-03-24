@@ -978,17 +978,18 @@ class MockApiService extends _i1.Mock implements _i27.ApiService {
       ) as _i25.Future<_i3.GetAdminProfileResponse>);
 
   @override
-  _i25.Future<_i4.GetUsersResponse> getUsers() => (super.noSuchMethod(
+  _i25.Future<_i4.GetUsersResponse> getUsers(dynamic data) =>
+      (super.noSuchMethod(
         Invocation.method(
           #getUsers,
-          [],
+          [data],
         ),
         returnValue:
             _i25.Future<_i4.GetUsersResponse>.value(_FakeGetUsersResponse_2(
           this,
           Invocation.method(
             #getUsers,
-            [],
+            [data],
           ),
         )),
         returnValueForMissingStub:
@@ -996,7 +997,7 @@ class MockApiService extends _i1.Mock implements _i27.ApiService {
           this,
           Invocation.method(
             #getUsers,
-            [],
+            [data],
           ),
         )),
       ) as _i25.Future<_i4.GetUsersResponse>);

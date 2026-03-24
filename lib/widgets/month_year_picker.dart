@@ -56,63 +56,76 @@ class MonthYearPickerField extends StatelessWidget {
 }
 
 Future<DateTime?> showMonthYearPicker(
-  BuildContext context,
-  DateTime initialDate,
-) {
+    BuildContext context, DateTime initialDate) {
   DateTime selectedDate = initialDate;
 
   return showDialog<DateTime>(
     context: context,
     builder: (context) {
-      return AlertDialog(
-        title: const Text("Select Month & Year"),
-        content: SizedBox(
-          height: 200,
-          child: Column(
-            children: [
-              DropdownButton<int>(
-                value: selectedDate.year,
-                isExpanded: true,
-                items: List.generate(10, (index) {
-                  final year = DateTime.now().year - 5 + index;
-                  return DropdownMenuItem(
-                    value: year,
-                    child: Text(year.toString()),
-                  );
-                }),
-                onChanged: (value) {
-                  selectedDate = DateTime(value!, selectedDate.month);
-                },
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text("Select Month & Year"),
+            content: SizedBox(
+              height: 200,
+              child: Column(
+                children: [
+                  DropdownButton<int>(
+                    value: selectedDate.year,
+                    isExpanded: true,
+                    items: List.generate(10, (index) {
+                      final year = DateTime.now().year - 5 + index;
+                      return DropdownMenuItem(
+                        value: year,
+                        child: Text(year.toString()),
+                      );
+                    }),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedDate = DateTime(value!, selectedDate.month);
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButton<int>(
+                    value: selectedDate.month,
+                    isExpanded: true,
+                    items: List.generate(12, (index) {
+                      return DropdownMenuItem(
+                        value: index + 1,
+                        child: Text(
+                          DateFormat.MMMM().format(DateTime(0, index + 1)),
+                        ),
+                      );
+                    }),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedDate = DateTime(selectedDate.year, value!);
+                      });
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              DropdownButton<int>(
-                value: selectedDate.month,
-                isExpanded: true,
-                items: List.generate(12, (index) {
-                  return DropdownMenuItem(
-                    value: index + 1,
-                    child: Text(
-                      DateFormat.MMMM().format(DateTime(0, index + 1)),
-                    ),
-                  );
-                }),
-                onChanged: (value) {
-                  selectedDate = DateTime(selectedDate.year, value!);
-                },
+            ),
+            actions: [
+              TextButton(
+                style: ButtonStyle(
+                  foregroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Cancel"),
+              ),
+              ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(appGreen400),
+                ),
+                onPressed: () => Navigator.pop(context, selectedDate),
+                child: Text("Apply", style: fontFamilyBold.size12.white),
               ),
             ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, selectedDate),
-            child: const Text("Apply"),
-          ),
-        ],
+          );
+        },
       );
     },
   );

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/app.locator.dart';
@@ -45,8 +46,11 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
   // ---------------- Load Users ----------------
   Future<void> loadUsers() async {
     setBusy(true);
+    String formattedDate = DateFormat('yyyy-MM').format(selectedMonth);
+
     try {
-      final res = await _apiService.getUsers();
+      final data = {"month": formattedDate};
+      final res = await _apiService.getUsers(data);
       users = res.data ?? [];
     } catch (e) {
       users = [];

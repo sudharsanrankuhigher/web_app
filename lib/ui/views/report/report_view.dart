@@ -86,19 +86,41 @@ class ReportView extends StackedView<ReportViewModel> {
                           Row(
                             children: [
                               ElevatedButton.icon(
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          redShade),
+                                ),
                                 onPressed: () {
                                   viewModel.exportPdfWeb();
                                 },
-                                icon: const Icon(Icons.picture_as_pdf),
-                                label: const Text("Preview PDF"),
+                                icon: const Icon(
+                                  Icons.picture_as_pdf,
+                                  color: Colors.black,
+                                ),
+                                label: Text(
+                                  "Preview PDF",
+                                  style: fontFamilySemiBold.size13.black,
+                                ),
                               ),
                               const SizedBox(width: 10),
                               ElevatedButton.icon(
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          appGreen400),
+                                ),
                                 onPressed: () {
                                   viewModel.exportCsv();
                                 },
-                                icon: const Icon(Icons.download),
-                                label: const Text("Excel"),
+                                icon: const Icon(
+                                  Icons.download,
+                                  color: white,
+                                ),
+                                label: Text(
+                                  "Excel",
+                                  style: fontFamilySemiBold.size13.white,
+                                ),
                               ),
                             ],
                           ),
@@ -342,7 +364,7 @@ class ReportView extends StackedView<ReportViewModel> {
                         count: viewModel.monthlyReport[index]['totalIncome']
                                 .toString() ??
                             '',
-                        iconPath: 'assets/images/arrow-down.svg',
+                        iconPath: viewModel.icons[index],
                       ),
                     ),
                     verticalSpacing20,

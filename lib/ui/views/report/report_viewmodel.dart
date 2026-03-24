@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/app.locator.dart';
@@ -64,6 +63,13 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
 
     notifyListeners();
   }
+
+  List<String> icons = [
+    'assets/images/subscription_plan.svg',
+    'assets/images/influencer_banner.svg',
+    'assets/images/client_project_commission.svg',
+    'assets/images/promote_project_commission.svg'
+  ];
 
   List<Map<String, dynamic>> get monthlyReport {
     if (totalMonthlyIncomeReport == null) return [];

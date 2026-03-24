@@ -45,9 +45,9 @@ class ApiService {
   static ApiService init() {
     final dio = Dio(
       BaseOptions(
-        baseUrl: 'https://admin.promoteapp.in/',
+        // baseUrl: 'https://admin.promoteapp.in/',
         // baseUrl: 'http://172.20.25.23:8003/',
-        // baseUrl: 'http://172.20.25.54:8005/',
+        baseUrl: 'http://172.20.25.54:8005/',
         followRedirects: true,
         validateStatus: (status) => status != null && status < 500,
       ),
@@ -143,8 +143,8 @@ class ApiService {
   }
 
   /// Get : /api/admin/get-users
-  Future<GetUsersResponse> getUsers() async {
-    final response = await _dio.get('api/admin/get-users');
+  Future<GetUsersResponse> getUsers(data) async {
+    final response = await _dio.post('api/admin/get-users', data: data);
     if (response.statusCode == 200) {
       // Fluttertoast.showToast(msg: response.data["message"].toString());
       return GetUsersResponse.fromJson(response.data);
