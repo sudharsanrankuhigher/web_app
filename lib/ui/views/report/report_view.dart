@@ -88,7 +88,7 @@ class ReportView extends StackedView<ReportViewModel> {
                               ElevatedButton.icon(
                                 style: ButtonStyle(
                                   backgroundColor:
-                                      MaterialStateProperty.all<Color>(
+                                      WidgetStateProperty.all<Color>(
                                           redShade),
                                 ),
                                 onPressed: () {
@@ -107,7 +107,7 @@ class ReportView extends StackedView<ReportViewModel> {
                               ElevatedButton.icon(
                                 style: ButtonStyle(
                                   backgroundColor:
-                                      MaterialStateProperty.all<Color>(
+                                      WidgetStateProperty.all<Color>(
                                           appGreen400),
                                 ),
                                 onPressed: () {
@@ -141,7 +141,7 @@ class ReportView extends StackedView<ReportViewModel> {
                         //     ? (viewModel.tableSource!.rowCount * 50) + 50
                         //     : 100,
                         child: CommonPaginatedTable(
-                          key: ValueKey("subscription"), // 🔥 important
+                          key: const ValueKey("subscription"), // 🔥 important
                           headingTextStyle: fontFamilySemiBold.size12.greyColor,
                           heddingRowColor: greenShade,
                           columns: viewModel.subscriptionPlans,
@@ -176,7 +176,7 @@ class ReportView extends StackedView<ReportViewModel> {
                         //         50
                         //     : 100,
                         child: CommonPaginatedTable(
-                          key: ValueKey("highlight"), // 🔥 important
+                          key: const ValueKey("highlight"), // 🔥 important
 
                           headingTextStyle: fontFamilySemiBold.size12.greyColor,
                           heddingRowColor: pendingColorShade,
@@ -215,7 +215,7 @@ class ReportView extends StackedView<ReportViewModel> {
                         //         50
                         //     : 100,
                         child: CommonPaginatedTable(
-                          key: ValueKey("influencer"),
+                          key: const ValueKey("influencer"),
 
                           headingTextStyle: fontFamilySemiBold.size12.greyColor,
                           heddingRowColor: activeColorShade,
@@ -256,7 +256,7 @@ class ReportView extends StackedView<ReportViewModel> {
                             //         50
                             //     : 100,
                             child: CommonPaginatedTable(
-                              key: ValueKey("company"),
+                              key: const ValueKey("company"),
 
                               headingTextStyle:
                                   fontFamilySemiBold.size12.greyColor,
@@ -293,7 +293,7 @@ class ReportView extends StackedView<ReportViewModel> {
                             100,
                         // : 600,
                         child: CommonPaginatedTable(
-                          key: ValueKey("client"),
+                          key: const ValueKey("client"),
 
                           headingTextStyle: fontFamilySemiBold.size12.greyColor,
                           heddingRowColor: availableCampaignColor,
@@ -327,7 +327,7 @@ class ReportView extends StackedView<ReportViewModel> {
                         //         50
                         //     : 100,
                         child: CommonPaginatedTable(
-                          key: ValueKey("promote"),
+                          key: const ValueKey("promote"),
 
                           headingTextStyle: fontFamilySemiBold.size12.greyColor,
                           heddingRowColor: publisButtonColor.withOpacity(0.5),

@@ -1,0 +1,180 @@
+{
+  "status": true,
+  "month": "January 2026",
+  "totalAmount": 40000,
+
+  "Subscription_Plan": [
+    {
+      "sno": 1,
+      "clientId": "CL001",
+      "clientName": "Arun",
+      "mobile": "9659182096",
+      "packageName": "Gold Plan",
+      "paymentStatus": "Paid",
+      "amount": 2000,
+      "date": "2026-01-12"
+    },
+    {
+      "sno": 2,
+      "clientId": "CL002",
+      "clientName": "Naveen",
+      "mobile": "9854762101",
+      "packageName": "Silver Plan",
+      "paymentStatus": "Paid",
+      "amount": 1500,
+      "date": "2026-01-18"
+    }
+  ],
+
+  "influencers_profile_highlight": [
+    {
+      "sno": 1,
+      "influencerId": "IF001",
+      "influencerName": "Mani",
+      "mobile": "9876543210",
+      "packageName": "Profile Highlight – Premium",
+      "paymentStatus": "Paid",
+      "amount": 5000,
+      "date": "2026-01-10"
+    },
+    {
+      "sno": 2,
+      "influencerId": "IF002",
+      "influencerName": "Kumar",
+      "mobile": "9786541230",
+      "packageName": "Profile Highlight – Basic",
+      "paymentStatus": "Paid",
+      "amount": 3000,
+      "date": "2026-01-20"
+    }
+  ],
+
+  "dashboard_monthly_count_summary": {
+    "summary": {
+      "clientProject": 55,
+      "promoteProject": 22,
+      "incomingProfiles": {
+        "influencers": 20,
+        "movies": 5,
+        "tvStars": 12,
+        "sportsStars": 3
+      },
+      "incomingClients": 65,
+      "incomingCompanies": 26
+    }
+  },
+
+  "dashboardTotal": {
+    "clients": 120,
+    "companies": 40,
+    "influencers": 85,
+    "movieStars": 15,
+    "tvStars": 30,
+    "sportsStars": 18
+  },
+
+  "company_wise_project_count_report": [
+    {
+      "sno": 1,
+      "companyId": "CMP001",
+      "companyName": "ABC Media",
+      "projectCount": 18
+    },
+    {
+      "sno": 2,
+      "companyId": "CMP002",
+      "companyName": "XYZ Productions",
+      "projectCount": 24
+    }
+  ],
+
+  "influencers_project_count": [
+    {
+      "sno": 1,
+      "influencerId": "IF001",
+      "influencerName": "Mani",
+      "clientProject": 10,
+      "promoteProject": 5,
+      "totalProject": 15
+    },
+    {
+      "sno": 2,
+      "influencerId": "IF002",
+      "influencerName": "Kumar",
+      "clientProject": 8,
+      "promoteProject": 4,
+      "totalProject": 12
+    }
+  ],
+
+  "client_project_detailed_report": {
+    "status": true,
+    "total": {
+      "clientPayment": 14400,
+      "clientCommission": 2400,
+      "influencerPaid": 12000
+    },
+    "data": [
+      {
+        "sno": 1,
+        "cpCode": "CP001",
+        "clientName": "Arun",
+        "clientMobile": "9659182096",
+        "influencerId": "IF001",
+        "influencerName": "Mani",
+        "clientPayment": 6000,
+        "clientCommission": 1000,
+        "influencerPaid": 5000
+      },
+      {
+        "sno": 2,
+        "cpCode": "CP002",
+        "clientName": "Naveen",
+        "clientMobile": "9854762101",
+        "influencerId": "IF002",
+        "influencerName": "Kumar",
+        "clientPayment": 8400,
+        "clientCommission": 1400,
+        "influencerPaid": 7000
+      }
+    ]
+  },
+
+  "total_monthly_income_report": [
+    {
+      "sno": 1,
+      "particular": "Subscription Plan",
+      "totalIncome": 40000
+    },
+    {
+      "sno": 2,
+      "particular": "Influencers Profile Highlight",
+      "totalIncome": 20000
+    },
+    {
+      "sno": 3,
+      "particular": "Client Project Commission",
+      "totalIncome": 65000
+    },
+    {
+      "sno": 4,
+      "particular": "Promote Project Commission",
+      "totalIncome": 85000
+    }
+  ],
+
+  "grandTotal": 210000,
+
+  "promote_projectes": [
+    {
+      "id": 1,
+      "pp_code": 12,
+      "company_name": "company",
+      "inf_id": 123,
+      "inf_name1": "name",
+      "company_payment": 50000,
+      "company_commission": 2000,
+      "influencer_paid": 12365
+    }
+  ]
+}

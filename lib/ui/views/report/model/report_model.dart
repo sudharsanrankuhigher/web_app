@@ -18,6 +18,12 @@ class ReportModel {
   MonthlyIncome? monthlyIncome;
   String? grantTotal;
   List<PromoteProject>? promoteProject;
+  String? subScriptionPlanAmount;
+  String? bannerAmount;
+  String? totalMonthlyIncome;
+  String? totalCommission;
+  String? totalPayments;
+  String? totalAmounts;
 
   ReportModel({
     this.subscriptionPlan,
@@ -28,6 +34,12 @@ class ReportModel {
     this.monthlyIncome,
     this.grantTotal,
     this.promoteProject,
+    this.subScriptionPlanAmount,
+    this.bannerAmount,
+    this.totalMonthlyIncome,
+    this.totalAmounts,
+    this.totalPayments,
+    this.totalCommission,
   });
 
   factory ReportModel.fromJson(Map<String, dynamic> json) => ReportModel(
@@ -58,6 +70,12 @@ class ReportModel {
             ? []
             : List<PromoteProject>.from(json["promote_project"]!
                 .map((x) => PromoteProject.fromJson(x))),
+        subScriptionPlanAmount: json["subscription_plan_amount"]?.toString(),
+        bannerAmount: json["banner_amount"]?.toString(),
+        totalMonthlyIncome: json["total_monthly_income"]?.toString(),
+        totalAmounts: json["total_amounts"]?.toString(),
+        totalPayments: json["total_payments"]?.toString(),
+        totalCommission: json["total_commission"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -79,6 +97,12 @@ class ReportModel {
         "promote_project": promoteProject == null
             ? []
             : List<dynamic>.from(promoteProject!.map((x) => x.toJson())),
+        "subscription_plan_amount": subScriptionPlanAmount,
+        "total_monthly_income": totalMonthlyIncome,
+        "banner_amount": bannerAmount,
+        "total_commission": totalCommission,
+        "total_payments": totalPayments,
+        "total_amounts": totalAmounts,
       };
 }
 
@@ -311,9 +335,9 @@ class PromoteProject {
   String? companyName;
   String? companyMobile;
   int? infCount;
-  int? companyPayment;
-  int? companyCommission;
-  int? infPayment;
+  String? companyPayment;
+  String? companyCommission;
+  String? infPayment;
 
   PromoteProject({
     this.id,
@@ -332,9 +356,11 @@ class PromoteProject {
         companyName: json["company_name"],
         companyMobile: json["company_mobile"],
         infCount: json["inf_count"],
-        companyPayment: json["company_payment"],
-        companyCommission: json["company_commission"],
-        infPayment: json["inf_payment"],
+        companyPayment: json["company_payment"] == null
+            ? "0"
+            : json["company_payment"]?.toString(),
+        companyCommission: json["company_commission"]?.toString(),
+        infPayment: json["inf_payment"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {

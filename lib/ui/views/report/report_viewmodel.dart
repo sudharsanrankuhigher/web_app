@@ -36,6 +36,13 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
   List<Datum> clientProjectDetailedList = [];
   Total? clientProjectTotal;
   List<PromoteProject>? promoteProjectes;
+  String? totalMonthlyAmount;
+  String? subscriptionPlanAmount;
+  String? bannerAmount;
+  String? totalMontlyIncome;
+  String? totalCommissionAmount;
+  String? totalAmounts;
+  String? totalPayments;
 
   /// 🔹 Table source
   ReportTableSource? tableSource;
@@ -68,6 +75,7 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
     'assets/images/subscription_plan.svg',
     'assets/images/influencer_banner.svg',
     'assets/images/client_project_commission.svg',
+    'assets/images/promote_project_commission.svg',
     'assets/images/promote_project_commission.svg'
   ];
 
@@ -97,6 +105,11 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
         "totalIncome":
             totalMonthlyIncomeReport?.promoteProjectCommission?.toString() ??
                 "0"
+      },
+      {
+        "sno": 5,
+        "particular": "Total Monthly revenue",
+        "totalIncome": totalMonthlyAmount ?? "0"
       }
     ];
   }
@@ -181,15 +194,21 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
     clientProjectDetailedList = reportModel.clientProjectDetails!.data ?? [];
     clientProjectTotal = reportModel.clientProjectDetails!.total;
     promoteProjectes = reportModel.promoteProject;
+    totalMonthlyAmount = reportModel.totalMonthlyIncome.toString();
+    subscriptionPlanAmount = reportModel.subScriptionPlanAmount.toString();
+    bannerAmount = reportModel.bannerAmount.toString();
+    totalMontlyIncome = reportModel.totalMonthlyIncome.toString();
+    totalCommissionAmount = reportModel.totalCommission.toString();
+    totalAmounts = reportModel.totalAmounts.toString();
+    totalPayments = reportModel.totalPayments.toString();
 
     tableSource = ReportTableSource(
-      data: reports,
-      status: "requested",
-    );
+        data: reports, status: "requested", total: subscriptionPlanAmount);
 
     influencerHighlightTableSource = InfluencerHighlightTableSource(
       data: infHighLigtReprot,
       status: "requested",
+      bannerAmount: bannerAmount ?? '',
     );
 
     companyReportTableSource = CompanyReportTableSource(
@@ -211,6 +230,9 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
     companyDetailedTableSource = CompanyDetailedTableSource(
       data: promoteProjectes ?? [],
       status: "requested",
+      totalCommissions: totalCommissionAmount,
+      totalPayments: totalPayments,
+      totalInfPayments: totalAmounts,
     );
 
     notifyListeners();
@@ -252,9 +274,10 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
   List<List<dynamic>> getSelectedRows() {
     switch (_selectedReportType) {
       case ReportType.subscription:
-        return reports.asMap().entries.map((e) {
+        final rows = reports.asMap().entries.map((e) {
           final i = e.key;
           final item = e.value;
+
           return [
             i + 1,
             item.clientName ?? "-",
@@ -268,8 +291,15 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
           ];
         }).toList();
 
+        if (reports.isNotEmpty) {
+          rows.add(
+              ["", "", "", "", "TOTAL", subscriptionPlanAmount ?? "0", ""]);
+        }
+
+        return rows;
+
       case ReportType.clientDetailed:
-        return clientProjectDetailedList.asMap().entries.map((e) {
+        final rows = clientProjectDetailedList.asMap().entries.map((e) {
           final i = e.key;
           final item = e.value;
 
@@ -285,10 +315,26 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
           ];
         }).toList();
 
+        if (clientProjectDetailedList.isNotEmpty) {
+          rows.add([
+            "",
+            "",
+            "",
+            "",
+            "TOTAL",
+            clientProjectTotal?.clientPayment ?? 0,
+            clientProjectTotal?.commission ?? 0,
+            clientProjectTotal?.infPayment ?? 0,
+          ]);
+        }
+
+        return rows;
+
       case ReportType.promoteDetailed:
-        return promoteProjectes!.asMap().entries.map((e) {
+        final rows = promoteProjectes!.asMap().entries.map((e) {
           final i = e.key;
           final item = e.value;
+
           return [
             i + 1,
             item.id ?? "-",
@@ -300,10 +346,26 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
           ];
         }).toList();
 
+        if (promoteProjectes!.isNotEmpty) {
+          rows.add([
+            "",
+            "",
+            "",
+            "",
+            "TOTAL",
+            totalPayments ?? 0,
+            totalCommissionAmount ?? 0,
+            totalAmounts ?? 0,
+          ]);
+        }
+
+        return rows;
+
       case ReportType.influencerHighlight:
-        return infHighLigtReprot.asMap().entries.map((e) {
+        final rows = infHighLigtReprot.asMap().entries.map((e) {
           final i = e.key;
           final item = e.value;
+
           return [
             i + 1,
             item.name ?? "-",
@@ -316,10 +378,17 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
           ];
         }).toList();
 
+        if (infHighLigtReprot.isNotEmpty) {
+          rows.add(["", "", "", "TOTAL", bannerAmount ?? 0, ""]);
+        }
+
+        return rows;
+
       case ReportType.companyReport:
         return companyReport.asMap().entries.map((e) {
           final i = e.key;
           final item = e.value;
+
           return [
             i + 1,
             item.companyName ?? "-",
@@ -331,6 +400,7 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
         return influencerReport.asMap().entries.map((e) {
           final i = e.key;
           final item = e.value;
+
           return [
             i + 1,
             item.infName ?? "-",
@@ -390,11 +460,11 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
     String csv = '';
 
     // Header
-    csv += headers.join(",") + "\n";
+    csv += "${headers.join(",")}\n";
 
     // Rows
     for (var row in rows) {
-      csv += row.map((e) => '"${e ?? ""}"').join(",") + "\n";
+      csv += "${row.map((e) => '"${e ?? ""}"').join(",")}\n";
     }
 
     final bytes = utf8.encode(csv);
@@ -419,41 +489,37 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
     final data = getSelectedRows();
 
     if (data.isEmpty) {
-      // Fluttertoast.showToast(msg: "PDF Data Empty ❌");
       Fluttertoast.showToast(
-          timeInSecForIosWeb: 2,
-          gravity: ToastGravity.TOP,
-          webBgColor: "linear-gradient(to right, #000000, #000000)",
-          webPosition: "center",
-          webShowClose: true,
-          textColor: white,
-          msg: "PDF Data Empty ❌");
-      print("PDF Data Empty ❌");
+        timeInSecForIosWeb: 2,
+        gravity: ToastGravity.TOP,
+        webBgColor: "linear-gradient(to right, #000000, #000000)",
+        webPosition: "center",
+        webShowClose: true,
+        textColor: white,
+        msg: "PDF Data Empty ❌",
+      );
       return;
     }
 
     pdf.addPage(
-      pw.Page(
-        build: (context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text(
-              _selectedReportType?.title ?? "",
-              style: pw.TextStyle(font: ttf, fontSize: 18),
-            ),
-            pw.SizedBox(height: 10),
-            pw.Expanded(
-              child: pw.Table.fromTextArray(
-                headers: headers,
-                data: data.map((row) {
-                  return row.map((e) => e?.toString() ?? "").toList();
-                }).toList(),
-                headerStyle: pw.TextStyle(font: ttf),
-                cellStyle: pw.TextStyle(font: ttf),
-              ),
-            ),
-          ],
-        ),
+      pw.MultiPage(
+        // ✅ IMPORTANT
+        build: (context) => [
+          pw.Text(
+            _selectedReportType?.title ?? "",
+            style: pw.TextStyle(font: ttf, fontSize: 18),
+          ),
+          pw.SizedBox(height: 10),
+          pw.Table.fromTextArray(
+            headers: headers,
+            data: data.map((row) {
+              return row.map((e) => e?.toString() ?? "").toList();
+            }).toList(),
+            headerStyle:
+                pw.TextStyle(font: ttf, fontWeight: pw.FontWeight.bold),
+            cellStyle: pw.TextStyle(font: ttf),
+          ),
+        ],
       ),
     );
 

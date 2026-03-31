@@ -110,7 +110,7 @@ Future<DateTime?> showMonthYearPicker(
             actions: [
               TextButton(
                 style: ButtonStyle(
-                  foregroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                  foregroundColor: WidgetStateProperty.all<Color>(Colors.red),
                 ),
                 onPressed: () => Navigator.pop(context),
                 child: const Text("Cancel"),
@@ -118,7 +118,7 @@ Future<DateTime?> showMonthYearPicker(
               ElevatedButton(
                 style: ButtonStyle(
                   backgroundColor:
-                      MaterialStateProperty.all<Color>(appGreen400),
+                      WidgetStateProperty.all<Color>(appGreen400),
                 ),
                 onPressed: () => Navigator.pop(context, selectedDate),
                 child: Text("Apply", style: fontFamilyBold.size12.white),

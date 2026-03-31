@@ -6,11 +6,52 @@ import 'package:webapp/ui/views/report/model/report_model.dart';
 class CompanyDetailedTableSource extends DataTableSource {
   final List<PromoteProject> data;
   final String status;
+  final String? totalPayments;
+  final String? totalCommissions;
+  final String? totalInfPayments;
 
-  CompanyDetailedTableSource({required this.data, required this.status});
+  CompanyDetailedTableSource(
+      {required this.data,
+      required this.status,
+      required this.totalCommissions,
+      required this.totalInfPayments,
+      required this.totalPayments});
 
   @override
   DataRow? getRow(int index) {
+    if (index == data.length && data.isNotEmpty) {
+      return DataRow(
+          color: WidgetStateProperty.all(Colors.grey.shade300),
+          cells: [
+            DataCell(Text("")),
+            DataCell(Text("")),
+            DataCell(
+              Text(
+                "TOTAL",
+                style: fontFamilySemiBold.size13.black,
+              ),
+            ),
+            DataCell(Center(child: Text(""))),
+            DataCell(
+              Text(
+                totalPayments!,
+                style: fontFamilySemiBold.size13.black,
+              ),
+            ),
+            DataCell(
+              Text(
+                totalCommissions!,
+                style: fontFamilySemiBold.size13.black,
+              ),
+            ),
+            DataCell(
+              Text(
+                totalInfPayments!,
+                style: fontFamilySemiBold.size13.black,
+              ),
+            ),
+          ]);
+    }
     if (data.isEmpty) {
       return const DataRow(
         cells: [
@@ -76,7 +117,7 @@ class CompanyDetailedTableSource extends DataTableSource {
   @override
   bool get isRowCountApproximate => false;
   @override
-  int get rowCount => data.isEmpty ? 1 : data.length;
+  int get rowCount => data.isEmpty ? 1 : data.length + 1;
   @override
   int get selectedRowCount => 0;
 }

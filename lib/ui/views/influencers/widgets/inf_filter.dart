@@ -71,15 +71,15 @@ class InfFilter extends StatelessWidget {
                     fillColor: backgroundColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: BorderSide(color: disableColor),
+                      borderSide: const BorderSide(color: disableColor),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: BorderSide(color: disableColor),
+                      borderSide: const BorderSide(color: disableColor),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: BorderSide(color: Colors.blue),
+                      borderSide: const BorderSide(color: Colors.blue),
                     ),
                   ),
                 ),

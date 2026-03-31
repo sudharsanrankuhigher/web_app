@@ -8,7 +8,6 @@ import 'package:webapp/core/model/get_profile_model.dart';
 import 'package:webapp/core/model/get_user_model.dart';
 import 'package:webapp/core/model/login_model.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import 'package:webapp/ui/common/shared/styles.dart' as Colors;
 import 'package:webapp/ui/views/banner/model/all_banner_model.dart';
 import 'package:webapp/ui/views/city/model/city_model.dart' as city_model;
 import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
@@ -45,9 +44,9 @@ class ApiService {
   static ApiService init() {
     final dio = Dio(
       BaseOptions(
-        // baseUrl: 'https://admin.promoteapp.in/',
+        baseUrl: 'https://admin.promoteapp.in/',
         // baseUrl: 'http://172.20.25.23:8003/',
-        baseUrl: 'http://172.20.25.54:8005/',
+        // baseUrl: 'http://172.20.25.54:8005/',
         followRedirects: true,
         validateStatus: (status) => status != null && status < 500,
       ),
