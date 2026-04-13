@@ -148,13 +148,11 @@ class CommonPlanDialog {
                         {
                           'planName': planName,
                           'connections': int.tryParse(conn ?? "0") ?? 0,
-                          'regular_price':
-                              int.tryParse(amt ?? "0") ?? initial!.amount,
-                          'sale_price': int.tryParse(saleAmt ?? "0") ??
-                              initial!.saleAmount,
+                          'regular_price': amt,
+                          'sale_price': saleAmt,
                           'gst': int.tryParse(gst ?? "0") ?? initial!.gst,
                           'badge': badge ?? "",
-                          'category': selectedCategory['id'], // ✅ numeric
+                          'category_id': selectedCategory['id'], // ✅ numeric
                         },
                       );
                     },

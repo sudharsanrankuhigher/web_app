@@ -144,25 +144,25 @@ class PlansViewModel extends BaseViewModel {
   }
 
   // 🔥 Add Plan
-  Future<void> addPlan(BuildContext context) async {
-    final result = await CommonPlanDialog.show(context, isAdd: true);
-    if (result != null) {
-      final newPlan = plan_model.Datum(
-        // id: DateTime.now().millisecondsSinceEpoch,
-        name: result['planName'],
-        connections: result['connections'],
-        amount: result['amount'],
-        badge: result['badge'],
-        category: result['category'] == 1
-            ? "Influencers"
-            : result['category'] == 2
-                ? "Movie Stars"
-                : "TV Stars",
-      );
-      saveOrUpdate(newPlan);
-    }
-    notifyListeners();
-  }
+  // Future<void> addPlan(BuildContext context) async {
+  //   final result = await CommonPlanDialog.show(context, isAdd: true);
+  //   if (result != null) {
+  //     final newPlan = plan_model.Datum(
+  //       // id: DateTime.now().millisecondsSinceEpoch,
+  //       name: result['planName'],
+  //       connections: result['connections'],
+  //       amount: result['amount'],
+  //       badge: result['badge'],
+  //       category: result['category'] == 1
+  //           ? "Influencers"
+  //           : result['category'] == 2
+  //               ? "Movie Stars"
+  //               : "TV Stars",
+  //     );
+  //     saveOrUpdate(newPlan);
+  //   }
+  //   notifyListeners();
+  // }
 
   Future<void> editPlan(BuildContext context, plan_model.Datum plan) async {
     final result = await CommonPlanDialog.show(context, initial: plan);
@@ -170,10 +170,22 @@ class PlansViewModel extends BaseViewModel {
       final updated = {
         "id": plan.id,
         "name": result['planName'],
-        "connections": result['connections'],
-        "amount": result['amount'],
+        "connections": result['connections'] is int
+            ? result['connections']
+            : int.tryParse(result['connections']?.toString() ?? '0') ?? 0,
+        "regular_price":
+            double.tryParse(result['regular_price']?.toString() ?? '0')
+                    ?.toString() ??
+                "0",
+        "sale_price": double.tryParse(result['sale_price']?.toString() ?? '0')
+                ?.toString() ??
+            "0",
+        "gst": (result['gst'] is int
+                ? result['gst']
+                : int.tryParse(result['gst']?.toString() ?? '0') ?? 0)
+            .toString(),
         "badge": result['badge'],
-        "category": result['category'],
+        "category_id": result['category_id'],
       };
       saveOrUpdate(updated);
     }

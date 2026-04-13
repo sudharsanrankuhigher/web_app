@@ -95,7 +95,7 @@ class InfluencersViewModel extends BaseViewModel {
       }
 
       addField("city", influencerData['city']);
-      addField("category", influencerData['category']);
+      addField("category_id", influencerData['category']);
       addField("instagram_name", influencerData['instagramName']);
       addField("youtube_name", influencerData['youtubeName']);
       addField("facebook_name", influencerData['facebookName']);
@@ -172,7 +172,7 @@ class InfluencersViewModel extends BaseViewModel {
       /// ---------------- TEXT FIELDS ----------------
       addField("id", influencerData['id']);
       addField("name", influencerData['name']);
-      addField("category", influencerData['category']);
+      addField("category_id", influencerData['category']);
       addField("email", influencerData['email']);
       addField("phone", influencerData['phone']);
       addField("alt_phone", influencerData['altPhone']); // ✅ FIXED

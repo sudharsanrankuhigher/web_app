@@ -87,7 +87,7 @@ class CompanyDetailedTableSource extends DataTableSource {
           style: fontFamilySemiBold.size13.black,
         )),
         DataCell(Text(
-          "${item.companyName ?? 0}",
+          "${item.companyMobile ?? 0}",
           style: fontFamilySemiBold.size13.black,
         )),
         // DataCell(Text(

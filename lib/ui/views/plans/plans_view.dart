@@ -161,7 +161,7 @@ class PlansView extends StackedView<PlansViewModel> {
                                                     0)
                                             .toString(),
                                         "badge": result['badge'],
-                                        "category": result['category'],
+                                        "category_id": result['category_id'],
                                       };
 
                                       viewModel.saveOrUpdate(newPlan);
@@ -204,6 +204,7 @@ class PlansView extends StackedView<PlansViewModel> {
                                 DataColumn(label: Text("Regular Price")),
                                 DataColumn(label: Text("Sale Price")),
                                 DataColumn(label: Text("GST")),
+                                DataColumn(label: Text("Category")),
                                 DataColumn(label: Text("Badge")),
                                 DataColumn(
                                     headingRowAlignment:

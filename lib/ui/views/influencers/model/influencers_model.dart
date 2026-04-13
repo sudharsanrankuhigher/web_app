@@ -59,7 +59,7 @@ class Datum {
   String? instagramLink;
   int? instagramFollowers;
   String? facebookLink;
-  int? facebookFollowers;
+  int? facebookFollowers; 
   String? youtubeLink;
   int? youtubeFollowers;
   String? accountNo;
@@ -148,7 +148,7 @@ class Datum {
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
-        "category": category,
+        "categoryid": category,
         "image": image,
         "email": email,
         "phone": phone,

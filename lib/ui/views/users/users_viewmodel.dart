@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
@@ -74,8 +73,6 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
         "type": user.type,
         "city": user.city,
         "state": user.state,
-        "plan": user.plan,
-        "connections": user.connections,
       },
     );
 
@@ -90,8 +87,6 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
           type: result["type"] ?? user.type,
           city: result["city"] ?? user.city,
           state: result["state"] ?? user.state,
-          plan: result["plan"] ?? user.plan,
-          connections: result["connections"] ?? user.connections,
         );
 
         tableSource = UserTableSource(users: users, onAdd: () {});

@@ -38,6 +38,7 @@ class InfluencerTableSource extends DataTableSource {
   }
 
   String getCategoryName(int? categoryId) {
+    print("categoryId: $categoryId");
     switch (categoryId) {
       case 1:
         return "Influencers";

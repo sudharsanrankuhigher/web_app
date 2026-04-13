@@ -72,7 +72,7 @@ class Datum {
             json["sale_price"] == null ? '0' : json["sale_price"].toString(),
         gst: json["gst"] == null ? '0' : json["gst"].toString(),
         badge: json["badge"],
-        category: json["category"],
+        category: json["category_id"],
         createdAt: json["created_at"] == null
             ? null
             : DateTime.parse(json["created_at"]),
@@ -89,7 +89,7 @@ class Datum {
         "sale_price": saleAmount,
         "gst": gst,
         "badge": badge,
-        "category": category,
+        "category_id": category,
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
       };

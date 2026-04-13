@@ -14,6 +14,20 @@ class PlanTableSource extends DataTableSource {
     required this.onView,
     required this.onDelete,
   });
+  String getCategoryName(int? categoryId) {
+    switch (categoryId) {
+      case 1:
+        return "Influencers";
+      case 2:
+        return "Movie Stars";
+      case 3:
+        return "TV Stars";
+      case 4:
+        return "Sports Stars";
+      default:
+        return "Unknown";
+    }
+  }
 
   @override
   DataRow? getRow(int index) {
@@ -21,9 +35,9 @@ class PlanTableSource extends DataTableSource {
     if (plans.isEmpty) {
       return DataRow(
         cells: List.generate(
-          8, // total columns
+          9, // total columns
           (i) {
-            if (i == 4) {
+            if (i == 5) {
               // column index where message should show
               return const DataCell(
                 Center(
@@ -60,6 +74,8 @@ class PlanTableSource extends DataTableSource {
           DataCell(Text("₹${plan.amount}")),
           DataCell(Text("₹${plan.saleAmount}")),
           DataCell(Text("${plan.gst}")),
+          DataCell(
+              Text(getCategoryName(int.tryParse(plan.category.toString())))),
           plan.badge != null
               ? DataCell(
                   Container(

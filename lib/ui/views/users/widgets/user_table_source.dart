@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/core/model/get_user_model.dart' as user_model;
 
 class UserTableSource extends DataTableSource {
   final List<user_model.Datum> originalList;
   List<user_model.Datum> filteredList;
+  final navigatorKey = StackedService.navigatorKey!;
   // final void Function(UserModel) onEdit;
   // final Function(UserModel) onDelete;
   final Function() onAdd;
@@ -39,7 +41,7 @@ class UserTableSource extends DataTableSource {
     if (filteredList.isEmpty) {
       return DataRow(
         cells: List.generate(
-          8,
+          7,
           (i) {
             if (i == 4) {
               return const DataCell(
@@ -76,8 +78,14 @@ class UserTableSource extends DataTableSource {
         DataCell(Text(user.mobileNumber ?? "")),
         DataCell(Text(user.type ?? "")),
         DataCell(Text("${user.city}/${user.state}")),
-        DataCell(Text(user.plan ?? "")),
-        DataCell(Text("${user.connections}")),
+        DataCell(
+          IconButton(
+            icon: const Icon(Icons.remove_red_eye, color: Colors.blue),
+            onPressed: () {
+              _showPlansDialog(user);
+            },
+          ),
+        ),
         // DataCell(CommonButton(
         //   text: 'ADD',
         //   textStyle: fontFamilyBold.size12.white,
@@ -117,4 +125,72 @@ class UserTableSource extends DataTableSource {
 
   @override
   int get selectedRowCount => 0;
+  void _showPlansDialog(user_model.Datum user) {
+    final ScrollController verticalController = ScrollController();
+    final ScrollController horizontalController = ScrollController();
+
+    showDialog(
+      context: navigatorKey.currentContext!,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("${user.name} Plans"),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(
+              minHeight: 100,
+              maxHeight: 400,
+              minWidth: 350,
+              maxWidth: 550,
+            ),
+            child: user.plans == null || user.plans!.isEmpty
+                ? const Center(child: Text("No Plans Available"))
+                : Scrollbar(
+                    controller: verticalController, // ✅ attach controller
+                    thumbVisibility: true,
+                    child: SingleChildScrollView(
+                      controller: verticalController, // ✅ same controller
+                      child: Scrollbar(
+                        controller: horizontalController, // ✅ horizontal
+                        thumbVisibility: true,
+                        notificationPredicate: (notif) =>
+                            notif.metrics.axis == Axis.horizontal,
+                        child: SingleChildScrollView(
+                          controller: horizontalController,
+                          scrollDirection: Axis.horizontal,
+                          child: DataTable(
+                            columnSpacing: 40,
+                            headingRowColor: MaterialStateProperty.all(
+                              Colors.grey.shade200,
+                            ),
+                            columns: const [
+                              DataColumn(label: Text("Category")),
+                              DataColumn(label: Text("Sub Plan")),
+                              DataColumn(label: Text("Total")),
+                              DataColumn(label: Text("Used")),
+                            ],
+                            rows: user.plans!.map((plan) {
+                              return DataRow(
+                                cells: [
+                                  DataCell(Text(plan.categoryName ?? "")),
+                                  DataCell(Text(plan.subName ?? "")),
+                                  DataCell(Text(plan.totalConnection ?? "")),
+                                  DataCell(Text("${plan.connection ?? 0}")),
+                                ],
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Close"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

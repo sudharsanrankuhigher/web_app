@@ -387,6 +387,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       "id": data["id"],
       "status": data["status"],
       "client_id": data["client_id"],
+      "category_id": data["category_id"],
     };
 
     try {
@@ -466,6 +467,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
             "id": model.id,
             "status": 8,
             "client_id": model.client!.id,
+            "category_id": model.category
           };
           await statusChange(data);
         });
@@ -538,6 +540,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           "id": model.id,
           "status": 7,
           "client_id": model.client!.id,
+          "category_id": model.category
         };
         statusChange(data);
       },

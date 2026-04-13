@@ -51,7 +51,7 @@ class Datum {
   DateTime? dob;
   String? state;
   String? city;
-  String? plan;
+  List<Plan>? plans;
   int? connections;
 
   Datum({
@@ -66,7 +66,7 @@ class Datum {
     this.dob,
     this.state,
     this.city,
-    this.plan,
+    this.plans,
     this.connections,
   });
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -85,7 +85,9 @@ class Datum {
             : DateTime.tryParse(json["dob"].toString()),
         state: json["state"]?.toString() ?? "",
         city: json["city"]?.toString() ?? "",
-        plan: json["plan"]?.toString(),
+        plans: json["plans"] == null
+            ? []
+            : List<Plan>.from(json["plans"].map((x) => Plan.fromJson(x))),
         connections: json["connections"] is int
             ? json["connections"]
             : int.tryParse(json["connections"]?.toString() ?? ""),
@@ -104,7 +106,37 @@ class Datum {
             "${dob!.year.toString().padLeft(4, '0')}-${dob!.month.toString().padLeft(2, '0')}-${dob!.day.toString().padLeft(2, '0')}",
         "state": state,
         "city": city,
-        "plan": plan,
+        "plans": plans,
         "connections": connections,
+      };
+}
+
+class Plan {
+  String? categoryName;
+  String? subName;
+  String? totalConnection;
+  int? connection;
+
+  Plan({
+    this.categoryName,
+    this.subName,
+    this.totalConnection,
+    this.connection,
+  });
+
+  factory Plan.fromJson(Map<String, dynamic> json) => Plan(
+        categoryName: json["category_name"]?.toString(),
+        subName: json["sub_name"]?.toString(),
+        totalConnection: json["total_connection"]?.toString(),
+        connection: json["connection"] is int
+            ? json["connection"]
+            : int.tryParse(json["connection"]?.toString() ?? ""),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "category_name": categoryName,
+        "sub_name": subName,
+        "total_connection": totalConnection,
+        "connection": connection,
       };
 }

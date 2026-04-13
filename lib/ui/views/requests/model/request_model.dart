@@ -50,6 +50,7 @@ class Datum {
   Payment? payment;
   Promotion? promotion;
   int? status;
+  String? category;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -62,6 +63,7 @@ class Datum {
     this.payment,
     this.promotion,
     this.status,
+    this.category,
     this.createdAt,
     this.updatedAt,
   });
@@ -78,6 +80,7 @@ class Datum {
         status: json["status"] != null
             ? int.tryParse(json["status"].toString())
             : null,
+        category: json["category_id"],
         createdAt: json["created_at"] == null
             ? null
             : DateTime.tryParse(json["created_at"]),
@@ -95,6 +98,7 @@ class Datum {
         "payment": payment?.toJson(),
         "promotion": promotion?.toJson(),
         "status": status,
+        "category_id": category,
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
       };
