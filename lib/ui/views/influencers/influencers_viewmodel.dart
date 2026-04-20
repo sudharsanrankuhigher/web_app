@@ -578,7 +578,10 @@ class InfluencersViewModel extends BaseViewModel {
       temp = temp.where((inf) {
         return (inf.name ?? '').toLowerCase().contains(currentSearch) ||
             (inf.phone ?? '').contains(currentSearch) ||
-            (inf.city ?? '').toLowerCase().contains(currentSearch);
+            (inf.city ?? '').toLowerCase().contains(currentSearch) ||
+            (inf.infId != null && inf.infId.toString().contains(currentSearch));
+
+        ;
       }).toList();
     }
 

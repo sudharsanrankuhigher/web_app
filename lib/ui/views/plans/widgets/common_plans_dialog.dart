@@ -24,13 +24,22 @@ class CommonPlanDialog {
 
     /// ---------------- CATEGORY DROPDOWN DATA ----------------
     dynamic selectedCategory;
+    dynamic selectedPlan;
     bool isCategoryError = false;
+    bool isPlanError = false;
 
     final List<Map<String, dynamic>> categoryList = [
       {'id': 1, 'name': 'Influencers'},
       {'id': 2, 'name': 'Movie Stars'},
       {'id': 3, 'name': 'TV Stars'},
       {'id': 4, 'name': 'Sports Stars'},
+    ];
+
+    final List<String> planNames = [
+      "Silver",
+      "Gold",
+      "Platinum",
+      "Diamond",
     ];
 
     /// Preselect category (Edit / View)
@@ -78,6 +87,32 @@ class CommonPlanDialog {
                     children: [
                       _field("Plan Name", planName, (v) => planName = v,
                           isView: isView),
+                      Container(
+                          padding: leftPadding20,
+                          alignment: Alignment.centerLeft,
+                          child: Text('Selected Plan Category')),
+                      verticalSpacing8,
+                      IgnorePointer(
+                        ignoring: isView,
+                        child: SizedBox(
+                          width: 400,
+                          child: DynamicSingleSearchDropdown(
+                            label: "plan category",
+                            items: planNames,
+                            selectedItem: selectedPlan,
+                            isError: isPlanError,
+                            errorText: "PleaseselectedPlan select a plans",
+                            onChanged: (value) {
+                              setState(() {
+                                selectedPlan = value;
+                                isPlanError = false;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                      verticalSpacing10,
+
                       _field("Connections", conn, (v) => conn = v,
                           isView: isView, isNumber: true),
                       _field("Regular Amount", amt, (v) => amt = v,
@@ -147,6 +182,7 @@ class CommonPlanDialog {
                         StackedService.navigatorKey!.currentContext!,
                         {
                           'planName': planName,
+                          'selectedPlan': selectedPlan,
                           'connections': int.tryParse(conn ?? "0") ?? 0,
                           'regular_price': amt,
                           'sale_price': saleAmt,

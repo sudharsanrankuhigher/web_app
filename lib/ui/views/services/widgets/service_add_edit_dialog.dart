@@ -1,8 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
+import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/services/services_viewmodel.dart';
 import 'package:webapp/widgets/editable_profile_avatar.dart';
+import 'package:webapp/widgets/image_picker.dart';
 import 'package:webapp/widgets/initial_textform.dart';
 
 class CommonServiceDialog {
@@ -51,17 +54,37 @@ class CommonServiceDialog {
                       const SizedBox(height: 12),
 
                       // ----- Image Picker -----
-                      EditableServiceImagePicker(
-                        imageUrl: existingImagePath, // network
-                        imageBytes: model.imageBytes, // web
-                        imagePath: model.imagePath, // mobile
-                        onImageSelected: (bytes, path) {
-                          if (bytes != null) {
-                            model.setImageBytes(bytes);
-                          } else {
-                            model.setImagePath(path!);
+                      GestureDetector(
+                        onTap: () async {
+                          final result = await UniversalImagePicker.pickImage();
+
+                          if (result != null) {
+                            if (kIsWeb && result['bytes'] != null) {
+                              model.setImageBytes(result['bytes']);
+                            } else {
+                              model.setImagePath(result['path']);
+                            }
                           }
                         },
+                        child: Stack(
+                          alignment: AlignmentGeometry.bottomRight,
+                          children: [
+                            EditableServiceImagePicker(
+                              imageUrl: existingImagePath, // network
+                              imageBytes: model.imageBytes, // web
+                              imagePath: model.imagePath, // mobile
+                              onImageSelected: (bytes, path) {
+                                if (bytes != null) {
+                                  model.setImageBytes(bytes);
+                                } else {
+                                  model.setImagePath(path!);
+                                }
+                              },
+                            ),
+                            Icon(Icons.cloud_upload,
+                                size: 30, color: Colors.black.withOpacity(0.7))
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -75,6 +98,9 @@ class CommonServiceDialog {
                   child: const Text("Cancel"),
                 ),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                  ),
                   onPressed: () {
                     // VALIDATE BEFORE SAVE
                     if (!formKey.currentState!.validate()) return;
@@ -85,7 +111,10 @@ class CommonServiceDialog {
                       "imagePath": model.imagePath,
                     });
                   },
-                  child: Text(existingName == null ? "Save" : "Update"),
+                  child: Text(
+                    existingName == null ? "Save" : "Update",
+                    style: fontFamilySemiBold.size12.white,
+                  ),
                 ),
               ],
             );

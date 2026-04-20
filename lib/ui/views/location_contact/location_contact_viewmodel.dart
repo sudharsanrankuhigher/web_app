@@ -82,92 +82,133 @@ class LocationContactViewModel extends BaseViewModel with NavigationMixin {
   // ADD CONTACT
   // ------------------------------------------------------------
   Future<void> addContact(BuildContext context) async {
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AddressDialog(
-        states: allStates.map((e) => e.name!).toList(),
-        onSave: ({
-          required String state,
-          required CityModel city,
-          required String phone,
-          String? code,
-        }) {
-          final newContact = {
-            "state": state,
-            "city": city.name,
-            "code": city.id,
-            "mobile_number": phone
-          };
+  await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => AddressDialog(
+      states: allStates.map((e) => e.name!).toList(),
+      multi: true, // 🔥 enable multi select
 
-          _saveOrUpdate(newContact);
-        },
-      ),
-    );
-  }
+      /// 🔹 SINGLE (optional)
+      onSave: ({
+        required String state,
+        required CityModel city,
+        required String phone,
+        String? code,
+      }) {
+        final newContact = {
+          "state": state,
+          "city": city.name,
+          "code": city.id,
+          "mobile_number": phone
+        };
+      },
+
+      /// 🔥 MULTI
+      onSaveMulti: ({
+        required String state,
+        required List<CityModel> cities,
+        required String phone,
+      }) {
+        final newContact = {
+          "state": state,
+          "city_ids": cities.map((e) => e.id).toList(),
+          "cities": cities.map((e) => e.name).toList(),
+          "mobile_number": phone
+        };
+
+        print("ADD MULTI: $newContact");
+
+        // _saveOrUpdate(newContact);
+      },
+    ),
+  );
+}
 
   // ------------------------------------------------------------
   // EDIT CONTACT
   // ------------------------------------------------------------
   Future<void> editContact(
-    BuildContext context,
-    contact.Datum contact,
-  ) async {
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AddressDialog(
-        states: allStates.map((e) => e.name!).toList(),
+  BuildContext context,
+  contact.Datum contact,
+) async {
+  await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => AddressDialog(
+      states: allStates.map((e) => e.name!).toList(),
+      multi: true, // 🔥 enable multi
 
-        isView: false, // 🔥 View mode
-        isEdit: true,
-        initialData: contact.toJson(),
+      isView: false,
+      isEdit: true,
+      initialData: contact.toJson(),
 
-        onSave: ({
-          required String state,
-          required CityModel city,
-          required String phone,
-        }) {
-          final updatedContact = {
-            "state": state,
-            "city": city.name,
-            "code": city.id,
-            "mobile_number": phone,
-            "id": contact.id,
-          };
-          _saveOrUpdate(updatedContact);
-        },
-      ),
-    );
-  }
+      /// 🔹 SINGLE
+      onSave: ({
+        required String state,
+        required CityModel city,
+        required String phone,
+      }) {
+        final updatedContact = {
+          "state": state,
+          "city": city.name,
+          "code": city.id,
+          "mobile_number": phone,
+          "id": contact.id,
+        };
+
+        _saveOrUpdate(updatedContact);
+      },
+
+      /// 🔥 MULTI
+      onSaveMulti: ({
+        required String state,
+        required List<CityModel> cities,
+        required String phone,
+      }) {
+        final updatedContact = {
+          "state": state,
+          "city_ids": cities.map((e) => e.id).toList(),
+          "cities": cities.map((e) => e.name).toList(),
+          "mobile_number": phone,
+          "id": contact.id,
+        };
+
+        print("EDIT MULTI: $updatedContact");
+
+        _saveOrUpdate(updatedContact);
+      },
+    ),
+  );
+}
 
   // ------------------------------------------------------------
   // VIEW CONTACT (READ ONLY)
   // ------------------------------------------------------------
   Future<void> viewContact(
-    BuildContext context,
-    contact.Datum contact,
-  ) async {
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AddressDialog(
-        states: allStates.map((e) => e.name!).toList(),
+  BuildContext context,
+  contact.Datum contact,
+) async {
+  await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => AddressDialog(
+      states: allStates.map((e) => e.name!).toList(),
 
-        isView: true, // 🔥 View mode
-        isEdit: false,
-        initialData: contact.toJson(),
+      isView: true,
+      isEdit: false,
+      multi: false, // 👈 no need multi in view
 
-        onSave: ({
-          required String state,
-          required CityModel city,
-          required String phone,
-        }) {
-          // Not used in view mode
-        },
-      ),
-    );
-  }
+      initialData: contact.toJson(),
+
+      onSave: ({
+        required String state,
+        required CityModel city,
+        required String phone,
+      }) {},
+    ),
+  );
+}
 
   // ------------------------------------------------------------
   // SAVE / UPDATE

@@ -1,4 +1,9 @@
-[
+[   {
+        "id":"0",
+        "name": "All",
+        "state": "Tamil Nadu"
+    },
+
     {
         "id": "1",
         "name": "Mumbai",

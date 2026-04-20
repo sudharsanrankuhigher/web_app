@@ -5,6 +5,7 @@ import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
     as influencer_model;
 import 'package:webapp/ui/views/services/model/service_model.dart'
     as service_model;
+import 'package:webapp/widgets/profile_image.dart';
 
 class InfluencerTableSource extends DataTableSource {
   final List<influencer_model.Datum> influencers;
@@ -63,7 +64,7 @@ class InfluencerTableSource extends DataTableSource {
     if (influencers.isEmpty) {
       return DataRow(
         cells: List.generate(
-          12, // total columns
+          13, // total columns
           (i) {
             if (i == 6) {
               // column index where message should show
@@ -99,6 +100,20 @@ class InfluencerTableSource extends DataTableSource {
       ),
       cells: [
         DataCell(Text("${index + 1}")),
+        DataCell(
+
+            // Text(row.imageUrl)
+            IgnorePointer(
+          ignoring: true,
+          child: Padding(
+            padding: defaultPadding4,
+            child: ProfileImageEdit(
+              imageUrl: item.image,
+              radius: 20,
+              onImageSelected: (_, a) {},
+            ),
+          ),
+        )), // Name
 
         DataCell(Text(item.infId.toString())),
         DataCell(Text(item.name!)),

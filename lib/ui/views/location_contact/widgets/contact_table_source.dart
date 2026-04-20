@@ -65,7 +65,8 @@ class ContactTableSource extends DataTableSource {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IgnorePointer(
-                ignoring: PermissionHelper.instance.canView('contact_support'),
+                ignoring:
+                    !PermissionHelper.instance.canView('location_contact'),
                 child: IconButton(
                     icon: const Icon(
                       Icons.visibility,
@@ -75,7 +76,8 @@ class ContactTableSource extends DataTableSource {
                     onPressed: () => onView(plan)),
               ),
               IgnorePointer(
-                ignoring: PermissionHelper.instance.canEdit('contact_support'),
+                ignoring:
+                    !PermissionHelper.instance.canEdit('location_contact'),
                 child: IconButton(
                     icon: const Icon(
                       Icons.edit,
@@ -86,7 +88,7 @@ class ContactTableSource extends DataTableSource {
               ),
               IgnorePointer(
                 ignoring:
-                    PermissionHelper.instance.canDelete('contact_support'),
+                    !PermissionHelper.instance.canDelete('location_contact'),
                 child: IconButton(
                     icon: const Icon(Icons.delete, size: 16, color: red),
                     onPressed: () => onDelete(plan)),

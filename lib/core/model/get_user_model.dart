@@ -48,6 +48,7 @@ class Datum {
   dynamic updatedAt;
   String? mobileNumber;
   String? type;
+  String? notes;
   DateTime? dob;
   String? state;
   String? city;
@@ -63,6 +64,7 @@ class Datum {
     this.updatedAt,
     this.mobileNumber,
     this.type,
+    this.notes,
     this.dob,
     this.state,
     this.city,
@@ -80,6 +82,7 @@ class Datum {
         updatedAt: json["updated_at"],
         mobileNumber: json["mobile_number"]?.toString(),
         type: json["type"]?.toString(),
+        notes: json["notes"]?.toString(),
         dob: json["dob"] == null
             ? null
             : DateTime.tryParse(json["dob"].toString()),
@@ -102,6 +105,7 @@ class Datum {
         "updated_at": updatedAt,
         "mobile_number": mobileNumber,
         "type": type,
+        "notes": notes,
         "dob":
             "${dob!.year.toString().padLeft(4, '0')}-${dob!.month.toString().padLeft(2, '0')}-${dob!.day.toString().padLeft(2, '0')}",
         "state": state,

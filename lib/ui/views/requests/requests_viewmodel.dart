@@ -139,9 +139,16 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       filteredData = requests.where((e) {
         final service = (e.client ?? "").toString().toLowerCase();
         final client = (e.inf?.name ?? "").toLowerCase();
+        final infId = (e.inf?.infId ?? "").toString().toLowerCase();
+        final phone = (e.inf?.phone ?? "").toString().toLowerCase();
+        final projectId = (e.projectId ?? "").toString().toLowerCase();
         final search = value.toLowerCase();
 
-        return service.contains(search) || client.contains(search);
+        return service.contains(search) ||
+            client.contains(search) ||
+            infId.contains(search) ||
+            phone.contains(search) ||
+            projectId.contains(search);
       }).toList();
     }
 
@@ -194,6 +201,26 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         return bDate.compareTo(aDate);
       });
     }
+    tableSource = RequestTableSource(
+        filteredData,
+        _selectedString!,
+        onReject,
+        onWaiting,
+        onProceed,
+        onPreparing,
+        onGoToPromoteVerified,
+        onRevoke,
+        onGotoPromotePay,
+        onPaymentDialog,
+        onGotoPromoteCommission,
+        onClientPaymentVerified,
+        onReAssign,
+        infReject);
+
+    // 🔥 notify UI
+    print("Applied sort: $sortType, specialFilter: $specialFilter");
+
+    notifyListeners();
   }
 
   List<DataColumn> getColumnsByStatus(String status) {
@@ -211,7 +238,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Client")),
           DataColumn(label: Text("Client Phone")),
           DataColumn(
-              label: Text("Inf_ID / Inf_No"),
+              label: Text("Inf_name \n /Inf_ID / Inf_No"),
               headingRowAlignment: MainAxisAlignment.center),
           DataColumn(label: Text("Requested Date")),
           DataColumn(
@@ -488,6 +515,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       onConfirm: () {
         final data = {
           "id": model.id,
+          // "status": 12,
           "status": 2,
           "client_id": model.client!.id,
         };
@@ -502,7 +530,12 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       context: StackedService.navigatorKey!.currentContext!,
       onSave: (data) {
         debugPrint(data.toString());
-        final datas = {"id": model.id, "status": 3, "data": data};
+        final datas = {
+          "id": model.id,
+          "status": 12,
+          // "status": 3,
+          "data": data
+        };
         waitingAccept(datas);
         print(datas);
       },
@@ -559,7 +592,8 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       onConfirm: () {
         final data = {
           "id": model.id,
-          "status": 12,
+          "status": 9,
+          // "status": 12,
           "client_id": model.client!.id,
         };
         statusChange(data);
@@ -678,13 +712,14 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       confirmText: "Client Payment Verified",
       image: "assets/images/pay.svg",
       message:
-          "Are you sure you want to mark the payment for ${model.projectId} as verified?",
+          "Are you sure you want to move the ${model.projectId} to the waiting accept section?",
       icon: Icons.free_cancellation,
       confirmColor: publisButtonColor,
       onConfirm: () {
         final data = {
           "id": model.id,
-          "status": 9,
+          "status": 3,
+          // "status": 9,
           "client_id": model.client!.id,
         };
         print("data client id $data");

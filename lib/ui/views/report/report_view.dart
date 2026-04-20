@@ -88,8 +88,7 @@ class ReportView extends StackedView<ReportViewModel> {
                               ElevatedButton.icon(
                                 style: ButtonStyle(
                                   backgroundColor:
-                                      WidgetStateProperty.all<Color>(
-                                          redShade),
+                                      WidgetStateProperty.all<Color>(redShade),
                                 ),
                                 onPressed: () {
                                   viewModel.exportPdfWeb();

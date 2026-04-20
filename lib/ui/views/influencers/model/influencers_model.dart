@@ -59,7 +59,7 @@ class Datum {
   String? instagramLink;
   int? instagramFollowers;
   String? facebookLink;
-  int? facebookFollowers; 
+  int? facebookFollowers;
   String? youtubeLink;
   int? youtubeFollowers;
   String? accountNo;

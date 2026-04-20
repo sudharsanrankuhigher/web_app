@@ -64,7 +64,8 @@ class RequestTableSource extends DataTableSource {
           DataCell(Text(m.client!.name ?? "")),
           DataCell(Text(m.client!.mobileNumber ?? "")),
           DataCell(Center(
-              child: Text("${m.inf!.infId ?? "-"} / ${m.inf!.phone ?? "-"}"))),
+              child: Text(
+                  "${m.inf!.name ?? "-"} \n ${m.inf!.infId ?? "-"} / ${m.inf!.phone ?? "-"}"))),
           DataCell(Text(DateFormatter.formatToDDMMMYYYY(
               m.dates!.requestedAt.toString()))),
           DataCell(
@@ -398,27 +399,56 @@ class RequestTableSource extends DataTableSource {
           DataCell(Text(
               DateFormatter.formatToDDMMMYYYY(m.dates!.assignedAt.toString()) ??
                   "")),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(m.dates!.completed.toString()) ??
-                  "")),
           DataCell(
             Builder(
               builder: (_) {
-                final url = m.promotion?.youtube ??
-                    m.promotion?.instagram ??
-                    m.promotion?.facebook;
+                final links = <Widget>[];
 
-                if (url != null && url.isNotEmpty) {
-                  return ViewLink(
-                    url: url,
-                    text: "ViewLink",
+                if (m.promotion?.youtube != null &&
+                    m.promotion!.youtube!.isNotEmpty) {
+                  links.add(
+                    ViewLink(
+                      url: m.promotion!.youtube!,
+                      text: "YouTube",
+                    ),
                   );
                 }
 
-                return const Text('-');
+                if (m.promotion?.instagram != null &&
+                    m.promotion!.instagram!.isNotEmpty) {
+                  links.add(
+                    ViewLink(
+                      url: m.promotion!.instagram!,
+                      text: "Instagram",
+                    ),
+                  );
+                }
+
+                if (m.promotion?.facebook != null &&
+                    m.promotion!.facebook!.isNotEmpty) {
+                  links.add(
+                    ViewLink(
+                      url: m.promotion!.facebook!,
+                      text: "Facebook",
+                    ),
+                  );
+                }
+
+                if (links.isEmpty) {
+                  return const Text('-');
+                }
+
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: links,
+                );
               },
             ),
           ),
+          DataCell(Text(
+              DateFormatter.formatToDDMMMYYYY(m.dates!.completed.toString()) ??
+                  "")),
           DataCell(Center(
               child: m.status == 9
                   ? InkWell(

@@ -15,6 +15,7 @@ import 'package:webapp/widgets/image_picker.dart';
 import 'package:webapp/widgets/initial_textform.dart';
 import 'package:webapp/widgets/search_drop_down_widget.dart';
 import 'package:webapp/widgets/state_city_drop_down.dart';
+import 'package:webapp/widgets/state_city_dynamic_dropdown.dart';
 import 'package:webapp/widgets/web_image_loading.dart';
 import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
     as influencer_model;
@@ -115,6 +116,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
   late String gender;
   late String state = "Tamil Nadu";
   late String city = "Coimbatore";
+  List<String> selectedCities = []; // 🔥 multi select
 
   late List<ImageItem> images;
 
@@ -139,6 +141,10 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
   final formKey = GlobalKey<FormState>();
 
   void _filterInfluencers() {
+    print("====================================");
+    print("STATE: $state");
+    print("SELECTED CITIES: $selectedCities");
+    print("SELECTED SERVICES: $selectedService");
     if (allInfluencersSelected) {
       filteredInfluencers = List.from(allInfluencers);
     } else {
@@ -147,12 +153,22 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
         if (state.isNotEmpty && inf['state'] != null && inf['state'] != state) {
           return false;
         }
+        final bool isAllSelected = selectedCities.contains("All");
 
         // 🔹 City filter
-        if (city.isNotEmpty && inf['city'] != null && inf['city'] != city) {
-          return false;
+        // if (city.isNotEmpty && inf['city'] != null && inf['city'] != city) {
+        //   return false;
+        // }
+        /// 🔹 CITY FILTER (SMART LOGIC)
+        /// 🔹 CITY FILTER (FIXED)
+        /// 🔹 CITY FILTER (FINAL FIX)
+        /// 🔹 CITY FILTER
+        /// 🔹 CITY FILTER (FINAL)
+        if (!isAllSelected && selectedCities.isNotEmpty) {
+          if (inf['city'] == null || !selectedCities.contains(inf['city'])) {
+            return false;
+          }
         }
-
         // 🔹 Services filter
         if (selectedService.isNotEmpty) {
           final List<int> influencerServices =
@@ -167,6 +183,16 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
         return true;
       }).toList();
     }
+
+    /// 🔥 FINAL RESULT PRINT
+    print("----------- FILTERED RESULT -----------");
+    print("Total Filtered: ${filteredInfluencers.length}");
+
+    for (var inf in filteredInfluencers) {
+      print("✔ ${inf['id']} - ${inf['city']} - ${inf['state']}");
+    }
+
+    print("====================================");
 
     // ❗ Remove invalid selected influencers
     selectedInfluencers = selectedInfluencers
@@ -318,6 +344,12 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
   }
 
   @override
+  void dispose() {
+    thumbnailScrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Dialog(
       insetPadding: const EdgeInsets.all(16),
@@ -434,94 +466,166 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     /// THUMBNAILS
-                                    SizedBox(
-                                      height: 80,
-                                      child: ListView.separated(
-                                        controller: thumbnailScrollController,
-                                        scrollDirection: Axis.horizontal,
-                                        itemCount: images.length,
-                                        separatorBuilder: (_, __) =>
-                                            const SizedBox(width: 8),
-                                        itemBuilder: (_, index) {
-                                          final selected =
-                                              index == selectedImageIndex;
+                                    Stack(
+                                      children: [
+                                        SizedBox(
+                                          height: 80,
+                                          child: ListView.separated(
+                                            controller:
+                                                thumbnailScrollController,
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: images.length,
+                                            separatorBuilder: (_, __) =>
+                                                const SizedBox(width: 8),
+                                            itemBuilder: (_, index) {
+                                              final selected =
+                                                  index == selectedImageIndex;
 
-                                          return Stack(
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  setState(() {
-                                                    selectedImageIndex = index;
-                                                  });
-                                                },
-                                                child: Container(
-                                                  width: 80,
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                      color: selected
-                                                          ? Colors.blue
-                                                          : Colors.grey,
-                                                      width: selected ? 2 : 1,
-                                                    ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            6),
-                                                  ),
-                                                  child: ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            6),
-                                                    child: IgnorePointer(
-                                                      child: buildImage(
-                                                        images[index],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-
-                                              /// ❌ REMOVE ICON
-                                              if (!isView) // hide remove in view mode
-                                                Positioned(
-                                                  top: 4,
-                                                  right: 4,
-                                                  child: GestureDetector(
+                                              return Stack(
+                                                children: [
+                                                  GestureDetector(
                                                     onTap: () {
                                                       setState(() {
-                                                        images.removeAt(index);
-
-                                                        // Fix selected index
-                                                        if (selectedImageIndex >=
-                                                            images.length) {
-                                                          selectedImageIndex =
-                                                              images.isEmpty
-                                                                  ? 0
-                                                                  : images.length -
-                                                                      1;
-                                                        }
+                                                        selectedImageIndex =
+                                                            index;
                                                       });
                                                     },
                                                     child: Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              4),
+                                                      width: 80,
                                                       decoration: BoxDecoration(
-                                                        color: Colors.black
-                                                            .withOpacity(0.6),
-                                                        shape: BoxShape.circle,
+                                                        border: Border.all(
+                                                          color: selected
+                                                              ? Colors.blue
+                                                              : Colors.grey,
+                                                          width:
+                                                              selected ? 2 : 1,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(6),
                                                       ),
-                                                      child: const Icon(
-                                                        Icons.close,
-                                                        size: 14,
-                                                        color: Colors.white,
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(6),
+                                                        child: IgnorePointer(
+                                                          child: buildImage(
+                                                            images[index],
+                                                          ),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
-                                                ),
+
+                                                  /// ❌ REMOVE ICON
+                                                  if (!isView) // hide remove in view mode
+                                                    Positioned(
+                                                      top: 4,
+                                                      right: 4,
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            images.removeAt(
+                                                                index);
+
+                                                            // Fix selected index
+                                                            if (selectedImageIndex >=
+                                                                images.length) {
+                                                              selectedImageIndex =
+                                                                  images.isEmpty
+                                                                      ? 0
+                                                                      : images.length -
+                                                                          1;
+                                                            }
+                                                          });
+                                                        },
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(4),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                    0.6),
+                                                            shape:
+                                                                BoxShape.circle,
+                                                          ),
+                                                          child: const Icon(
+                                                            Icons.close,
+                                                            size: 14,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                        Positioned.fill(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              /// ◀ LEFT
+                                              IconButton(
+                                                icon: const Icon(
+                                                    Icons.arrow_back_ios,
+                                                    size: 16,
+                                                    color: Colors.grey),
+                                                onPressed: () {
+                                                  final newOffset =
+                                                      thumbnailScrollController
+                                                              .offset -
+                                                          100;
+
+                                                  thumbnailScrollController
+                                                      .animateTo(
+                                                    newOffset.clamp(
+                                                      0.0,
+                                                      thumbnailScrollController
+                                                          .position
+                                                          .maxScrollExtent,
+                                                    ),
+                                                    duration: const Duration(
+                                                        milliseconds: 300),
+                                                    curve: Curves.easeInOut,
+                                                  );
+                                                },
+                                              ),
+
+                                              /// ▶ RIGHT
+                                              IconButton(
+                                                icon: const Icon(
+                                                    Icons.arrow_forward_ios,
+                                                    size: 16,
+                                                    color: Colors.grey),
+                                                onPressed: () {
+                                                  final newOffset =
+                                                      thumbnailScrollController
+                                                              .offset +
+                                                          100;
+
+                                                  thumbnailScrollController
+                                                      .animateTo(
+                                                    newOffset.clamp(
+                                                      0.0,
+                                                      thumbnailScrollController
+                                                          .position
+                                                          .maxScrollExtent,
+                                                    ),
+                                                    duration: const Duration(
+                                                        milliseconds: 300),
+                                                    curve: Curves.easeInOut,
+                                                  );
+                                                },
+                                              ),
                                             ],
-                                          );
-                                        },
-                                      ),
+                                          ),
+                                        )
+                                      ],
                                     ),
 
                                     verticalSpacing16,
@@ -705,27 +809,83 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                     verticalSpacing12,
 
                                     /// Location (FULL WIDTH)
+                                    // IgnorePointer(
+                                    //   ignoring: isView,
+                                    //   child: _buildField(
+                                    //     label: 'Location',
+                                    //     child: StateCityDropdown(
+                                    //       isVertical: true,
+                                    //       showCity: true,
+                                    //       initialState: state,
+                                    //       initialCity: city,
+                                    //       isStateError: isStateError,
+                                    //       isCityError: isCityError,
+                                    //       onStateChanged: (val) {
+                                    //         state = val;
+                                    //         _filterInfluencers();
+                                    //       },
+                                    //       onCityChanged: (val) {
+                                    //         city = val ?? '';
+
+                                    //         _filterInfluencers();
+                                    //       },
+                                    //     ),
+                                    //   ),
+                                    // ),
                                     IgnorePointer(
                                       ignoring: isView,
                                       child: _buildField(
                                         label: 'Location',
-                                        child: StateCityDropdown(
-                                          isVertical: true,
-                                          showCity: true,
-                                          initialState: state,
-                                          initialCity: city,
-                                          isStateError: isStateError,
-                                          isCityError: isCityError,
-                                          onStateChanged: (val) {
-                                            state = val;
-                                            _filterInfluencers();
-                                          },
-                                          onCityChanged: (val) {
-                                            city = val ?? '';
+                                        child: StateCityDynamicDropdown(
+                                            isVertical: true,
+                                            showCity: true,
+                                            multi: true, // 🔥 enable multi
 
-                                            _filterInfluencers();
-                                          },
-                                        ),
+                                            initialState: state,
+                                            initialCity: city,
+                                            initialCities:
+                                                selectedCities, // 🔥 important
+
+                                            isStateError: isStateError,
+                                            isCityError: isCityError,
+
+                                            /// 🔹 STATE
+                                            onStateChanged: (val) {
+                                              setState(() {
+                                                state = val;
+                                                city = "";
+                                                selectedCities =
+                                                    []; // 🔥 reset multi
+                                              });
+
+                                              _filterInfluencers();
+                                            },
+
+                                            /// 🔹 SINGLE (optional fallback)
+                                            onCityChanged: (val) {
+                                              setState(() {
+                                                city = val ?? "";
+                                                selectedCities = [];
+                                              });
+
+                                              _filterInfluencers();
+                                            },
+
+                                            /// 🔥 MULTI
+                                            onCitiesChanged: (list) {
+                                              setState(() {
+                                                if (list.contains("All")) {
+                                                  selectedCities = [
+                                                    "All"
+                                                  ]; // 🔥 keep only "All"
+                                                } else {
+                                                  selectedCities =
+                                                      List.from(list);
+                                                }
+                                              });
+
+                                              _filterInfluencers();
+                                            }),
                                       ),
                                     ),
                                     verticalSpacing12,
@@ -788,43 +948,16 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                                     //               : null,
                                                     //         })
                                                     //     .toList(),
-                                                    items: (widget
-                                                                .influencers ??
-                                                            [])
-                                                        .where((e) {
-                                                          if (state
-                                                                  .isNotEmpty &&
-                                                              e.state !=
-                                                                  state) {
-                                                            return false;
-                                                          }
-                                                          if (city.isNotEmpty &&
-                                                              e.city != city) {
-                                                            return false;
-                                                          }
-
-                                                          if (selectedService
-                                                              .isNotEmpty) {
-                                                            final services =
-                                                                e.service ?? [];
-                                                            if (!selectedService.any(
-                                                                (id) => services
-                                                                    .contains(
-                                                                        id))) {
-                                                              return false;
-                                                            }
-                                                          }
-
-                                                          return true;
-                                                        })
+                                                    items: filteredInfluencers
                                                         .map((e) => {
-                                                              'id': e.id,
-                                                              'name': e.name,
-                                                              'image': (e.image !=
+                                                              'id': e['id'],
+                                                              'name': e['name'],
+                                                              'image': (e['image'] !=
                                                                           null &&
-                                                                      e.image!
+                                                                      e['image']
+                                                                          .toString()
                                                                           .isNotEmpty)
-                                                                  ? "${e.image}"
+                                                                  ? "${e['image']}"
                                                                   : null,
                                                             })
                                                         .toList(),

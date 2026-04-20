@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -16,7 +17,8 @@ import 'package:webapp/widgets/common_button.dart';
 class UsersViewModel extends BaseViewModel with NavigationMixin {
   UsersViewModel() {
     // Initialize tableSource to avoid LateInitializationError
-    tableSource = UserTableSource(users: users, onAdd: () {});
+    tableSource = UserTableSource(
+        users: users, onAdd: () {}, onNotesEdit: (user) => onNoteEdit(user));
   }
 
   final _dialogService = locator<DialogService>();
@@ -56,7 +58,8 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
       log('Error loading users: $e');
     } finally {
       // Update tableSource after fetching data
-      tableSource = UserTableSource(users: users, onAdd: () {});
+      tableSource = UserTableSource(
+          users: users, onAdd: () {}, onNotesEdit: (user) => onNoteEdit(user));
       setBusy(false);
       notifyListeners();
     }
@@ -89,7 +92,10 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
           state: result["state"] ?? user.state,
         );
 
-        tableSource = UserTableSource(users: users, onAdd: () {});
+        tableSource = UserTableSource(
+            users: users,
+            onAdd: () {},
+            onNotesEdit: (user) => onNoteEdit(user));
         notifyListeners();
       }
     }
@@ -98,7 +104,8 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
   // ---------------- Delete User ----------------
   void deleteUser(user_model.Datum user) {
     users.removeWhere((u) => u.id == user.id);
-    tableSource = UserTableSource(users: users, onAdd: () {});
+    tableSource = UserTableSource(
+        users: users, onAdd: () {}, onNotesEdit: (user) => onNoteEdit(user));
     notifyListeners();
   }
 
@@ -134,17 +141,15 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
 
   // ---------------- Sorting ----------------
   void applySort(bool specialFilter, String sortType) {
-    if (specialFilter) {
-      // Add special filter logic if needed
-    }
-
     switch (sortType) {
       case "A-Z":
         users.sort((a, b) => (a.name ?? '').compareTo(b.name ?? ''));
         break;
+
       case "clientAsc":
         users.sort((a, b) => (a.id ?? 0).compareTo(b.id ?? 0));
         break;
+
       case "newer":
         users.sort((a, b) {
           DateTime aDate = a.createdAt != null
@@ -156,6 +161,7 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
           return bDate.compareTo(aDate);
         });
         break;
+
       case "older":
         users.sort((a, b) {
           DateTime aDate = a.createdAt != null
@@ -167,12 +173,139 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
           return aDate.compareTo(bDate);
         });
         break;
-      default:
-        // No sorting
-        break;
     }
 
-    tableSource = UserTableSource(users: users, onAdd: () {});
+    tableSource = UserTableSource(
+      users: users,
+      onAdd: () {},
+      onNotesEdit: (user) => onNoteEdit(user),
+    );
+
     notifyListeners();
+  }
+
+  Future<void> onNoteEdit(user_model.Datum user) async {
+    final result = await showNotesDialog(user);
+
+    if (result != null) {
+      // 👉 call API here
+      // await ApiService.updateNotes(
+      //   userId: user.id,
+      //   notes: result,
+      // );
+
+      Fluttertoast.showToast(
+        msg: "Notes updated successfully",
+      );
+    }
+  }
+
+  Future<String?> showNotesDialog(user_model.Datum user) {
+    final context = StackedService.navigatorKey!.currentContext!;
+    final controller = TextEditingController(text: user.notes ?? "");
+
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text("${user.name} Notes"),
+          content: SizedBox(
+            width: 400,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: controller,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    hintText: "Enter notes...",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: publisButtonColor,
+              ),
+              onPressed: () {
+                final text = controller.text.trim();
+                if (text.isEmpty) return;
+
+                Navigator.pop(dialogContext, text);
+              },
+              child: Text(
+                "Update",
+                style: fontFamilySemiBold.size13.white,
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text("Close", style: fontFamilySemiBold.size13.red),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class CommonTableDialog {
+  static Future<T?> show<T>({
+    required BuildContext context,
+    required String title,
+    required Widget content,
+    double minWidth = 350,
+    double maxWidth = 550,
+    double minHeight = 100,
+    double maxHeight = 400,
+  }) {
+    final ScrollController verticalController = ScrollController();
+    final ScrollController horizontalController = ScrollController();
+
+    return showDialog<T>(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: Text(title),
+          content: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: minHeight,
+              maxHeight: maxHeight,
+              minWidth: minWidth,
+              maxWidth: maxWidth,
+            ),
+            child: Scrollbar(
+              controller: verticalController,
+              thumbVisibility: true,
+              child: SingleChildScrollView(
+                controller: verticalController,
+                child: Scrollbar(
+                  controller: horizontalController,
+                  thumbVisibility: true,
+                  notificationPredicate: (notif) =>
+                      notif.metrics.axis == Axis.horizontal,
+                  child: SingleChildScrollView(
+                    controller: horizontalController,
+                    scrollDirection: Axis.horizontal,
+                    child: content,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Close"),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

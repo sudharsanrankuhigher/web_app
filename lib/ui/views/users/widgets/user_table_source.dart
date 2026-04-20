@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/core/model/get_user_model.dart' as user_model;
+import 'package:webapp/ui/common/shared/styles.dart';
 
 class UserTableSource extends DataTableSource {
   final List<user_model.Datum> originalList;
   List<user_model.Datum> filteredList;
   final navigatorKey = StackedService.navigatorKey!;
+  final void Function(user_model.Datum)? onNotesEdit;
+
   // final void Function(UserModel) onEdit;
   // final Function(UserModel) onDelete;
   final Function() onAdd;
@@ -14,6 +17,7 @@ class UserTableSource extends DataTableSource {
     required List<user_model.Datum> users,
     // required this.onEdit,
     // required this.onDelete,
+    required this.onNotesEdit,
     required this.onAdd,
   })  : originalList = List.from(users),
         filteredList = List.from(users);
@@ -41,7 +45,7 @@ class UserTableSource extends DataTableSource {
     if (filteredList.isEmpty) {
       return DataRow(
         cells: List.generate(
-          7,
+          8,
           (i) {
             if (i == 4) {
               return const DataCell(
@@ -77,10 +81,28 @@ class UserTableSource extends DataTableSource {
         DataCell(Text(user.email ?? "")),
         DataCell(Text(user.mobileNumber ?? "")),
         DataCell(Text(user.type ?? "")),
+        DataCell(Row(
+          children: [
+            IconButton(
+              icon: const Icon(
+                Icons.edit,
+                color: Colors.blue,
+                size: 15,
+              ),
+              onPressed: () => onNotesEdit != null ? onNotesEdit!(user) : null,
+            ),
+            horizontalSpacing4,
+            Text(user.notes ?? ""),
+          ],
+        )),
         DataCell(Text("${user.city}/${user.state}")),
         DataCell(
           IconButton(
-            icon: const Icon(Icons.remove_red_eye, color: Colors.blue),
+            icon: const Icon(
+              Icons.remove_red_eye,
+              color: Colors.blue,
+              size: 20,
+            ),
             onPressed: () {
               _showPlansDialog(user);
             },

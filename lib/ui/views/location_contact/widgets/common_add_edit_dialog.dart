@@ -3,25 +3,35 @@ import 'package:webapp/core/model/cities_model.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/widgets/state_city_drop_down.dart';
+import 'package:webapp/widgets/state_city_dynamic_dropdown.dart';
 
 class AddressDialog extends StatefulWidget {
   final List<String> states;
   final bool isView;
   final bool isEdit;
+  final bool multi; // 🔥 NEW
   final Map<String, dynamic>? initialData;
 
   final void Function({
     required String state,
     required CityModel city,
     required String phone,
-  }) onSave;
+  })? onSave;
+
+  final void Function({
+    required String state,
+    required List<CityModel> cities,
+    required String phone,
+  })? onSaveMulti; // 🔥 NEW
 
   const AddressDialog({
     super.key,
     required this.states,
-    required this.onSave,
+    this.onSave,
+    this.onSaveMulti,
     this.isView = false,
     this.isEdit = false,
+    this.multi = false,
     this.initialData,
   });
 
@@ -35,10 +45,14 @@ class _AddressDialogState extends State<AddressDialog> {
 
   String? selectedState;
   String? selectedCity;
+  List<String> selectedCities = []; // 🔥 NEW
+
   String? selectedId;
 
   bool isStateError = false;
   bool isCityError = false;
+
+  List<CityModel> cities = []; // 🔥 IMPORTANT
 
   @override
   void dispose() {
@@ -49,26 +63,73 @@ class _AddressDialogState extends State<AddressDialog> {
   void _onSave() {
     setState(() {
       isStateError = selectedState == null;
-      isCityError = selectedCity == null;
+
+      // 🔥 handle both cases
+      isCityError =
+          widget.multi ? selectedCities.isEmpty : selectedCity == null;
     });
 
-    print("Saving ID: $selectedId");
+    if (!_formKey.currentState!.validate() || selectedState == null) {
+      return;
+    }
 
-    if (_formKey.currentState!.validate() &&
-        selectedState != null &&
-        selectedCity != null) {
-      widget.onSave(
+    /// ================= MULTI SELECT =================
+    if (widget.multi) {
+      final selectedCityModels =
+          cities.where((c) => selectedCities.contains(c.name)).toList();
+
+      /// 🔥 DEBUG PRINT
+      print("Selected Cities:");
+      for (var city in selectedCityModels) {
+        print("${city.id} - ${city.name}");
+      }
+
+      /// 🔥 API FORMAT
+      final body = {
+        "state": selectedState,
+        "city_ids": selectedCityModels.map((e) => e.id).toList(),
+        "phone": _phoneController.text.trim(),
+      };
+
+      print("API BODY (MULTI): $body");
+
+      /// 🔥 CALLBACK
+      widget.onSaveMulti?.call(
         state: selectedState!,
-        city: CityModel(
-          name: selectedCity!,
-          state: selectedState!,
-          id: selectedId!,
-        ),
+        cities: selectedCityModels,
         phone: _phoneController.text.trim(),
       );
-
-      Navigator.pop(context);
     }
+
+    /// ================= SINGLE SELECT =================
+    else {
+      if (selectedCity == null) return;
+
+      final cityModel = cities.firstWhere(
+        (c) => c.name == selectedCity,
+      );
+
+      /// 🔥 DEBUG PRINT
+      print("Selected City: ${cityModel.id} - ${cityModel.name}");
+
+      /// 🔥 API FORMAT
+      final body = {
+        "state": selectedState,
+        "city_id": cityModel.id,
+        "phone": _phoneController.text.trim(),
+      };
+
+      print("API BODY (SINGLE): $body");
+
+      /// 🔥 CALLBACK
+      widget.onSave!(
+        state: selectedState!,
+        city: cityModel,
+        phone: _phoneController.text.trim(),
+      );
+    }
+
+    Navigator.pop(context);
   }
 
   @override
@@ -76,6 +137,9 @@ class _AddressDialogState extends State<AddressDialog> {
     if (widget.initialData != null) {
       selectedState = widget.initialData!['state'];
       selectedCity = widget.initialData!['city'];
+      selectedCities = widget.initialData!['cities'] != null
+          ? List<String>.from(widget.initialData!['cities'])
+          : [];
       selectedId = widget.initialData!['code'];
       _phoneController.text = widget.initialData!['mobile_number'];
     }
@@ -120,37 +184,52 @@ class _AddressDialogState extends State<AddressDialog> {
 
                 /// STATE & CITY
                 IgnorePointer(
-                  ignoring: widget.isView == true ? true : false,
-                  child: StateCityDropdown(
-                    showCity: true,
-                    states: widget.states,
-                    initialState: selectedState,
-                    initialCity: selectedCity,
-                    isStateError: isStateError,
-                    isCityError: isCityError,
-                    onStateChanged: (state) {
-                      setState(() {
-                        selectedState = state;
-                        selectedCity = null;
-                        selectedId = null; // reset id when state changes
+                    ignoring: widget.isView == true ? true : false,
+                    child: StateCityDynamicDropdown(
+                      showCity: true,
+                      multi: widget.multi,
+                      initialCities: selectedCities,
+                      states: widget.states,
+                      initialState: selectedState,
+                      initialCity: selectedCity,
+                      isStateError: isStateError,
+                      isCityError: isCityError,
 
-                        isStateError = false;
-                      });
-                    },
-                    onCityChanged: (city) {
-                      setState(() {
-                        selectedCity = city;
-                        isCityError = false;
-                      });
-                    },
-                    onChangeId: (id) {
-                      setState(() {
+                      /// 🔥 ADD THIS (MULTI VALUES)
+                      onCitiesChanged: (list) {
+                        setState(() {
+                          selectedCities = list;
+                          isCityError = false;
+                        });
+                      },
+
+                      /// 🔥 ADD THIS (FULL CITY DATA)
+                      onCitiesLoaded: (list) {
+                        cities = list;
+                        print("Loaded cities count: ${cities.length}");
+                      },
+
+                      onStateChanged: (state) {
+                        setState(() {
+                          selectedState = state;
+                          selectedCity = null;
+                          selectedCities = []; // 🔥 reset multi
+                          selectedId = null;
+                          isStateError = false;
+                        });
+                      },
+
+                      onCityChanged: (city) {
+                        setState(() {
+                          selectedCity = city;
+                          isCityError = false;
+                        });
+                      },
+
+                      onChangeId: (id) {
                         selectedId = id;
-                        print("Received ID in AddressDialog: $selectedId");
-                      });
-                    },
-                  ),
-                ),
+                      },
+                    )),
 
                 const SizedBox(height: 16),
 

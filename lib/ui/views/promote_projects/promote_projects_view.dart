@@ -62,9 +62,7 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            onChanged: viewModel.isProjectVisible == true
-                                ? null
-                                : (value) => viewModel.searchPlans,
+                            onChanged: (value) => viewModel.searchPlans(value),
                           ),
                         ),
                         horizontalSpacing10,
@@ -458,7 +456,7 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                       initialCheckbox: false,
                                       initialSort: "A-Z",
                                       onApply: (isChecked, sortType) {
-                                        // viewModel.applySort(isChecked, sortType);
+                                        viewModel.applyPromoteSort(sortType);
                                       },
                                     );
                                   },

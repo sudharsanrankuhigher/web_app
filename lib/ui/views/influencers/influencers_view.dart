@@ -210,6 +210,7 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                               dataRowHeight: 65.h,
                               columns: const [
                                 DataColumn(label: Text("S.No")),
+                                DataColumn(label: Text("Image")),
                                 DataColumn(label: Text("IF.ID")),
                                 DataColumn(label: Text("Name")),
                                 DataColumn(label: Text("Phone")),

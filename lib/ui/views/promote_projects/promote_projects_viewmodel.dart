@@ -450,9 +450,11 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     final filtered = plans.where((p) {
       return p.companyName!.toLowerCase().contains(query.toLowerCase()) ||
           p.projectCode!.toLowerCase().contains(query.toLowerCase()) ||
+          p.projectCode!.toLowerCase().contains(query.toLowerCase()) ||
           p.projectName!.toLowerCase().contains(query.toLowerCase());
     }).toList();
     tableSource.updateData(filtered);
+    notifyListeners();
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -474,6 +476,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
   List<dynamic> dataLists = [];
   String? _totalSplitAmount;
   String? get totalSplitAmount => _totalSplitAmount;
+  String _promoteSort = "";
 
   void onRowSelected(int projectId) {
     _selectedProjectId = projectId;
@@ -558,12 +561,15 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(seconds: 1));
+      // await Future.delayed(const Duration(seconds: 1));
 
       final allData = await _apiService.getSubProjects(
           {"promote_id": _selectedProjectId, "status": _projectStatus});
 
       tableData = allData.data ?? [];
+      if (_promoteSort.isNotEmpty) {
+        sortPromoteList(tableData, _promoteSort);
+      }
 
       _projectCode = allData.projectCode;
 
@@ -1011,7 +1017,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     //   if (specialFilter) {
     //     // implement custom filter
     //   }
-    if (_isProjectVisible == false) {
+    if (_isProjectVisible == true) {
       if (sortType == "A-Z") {
         companies.sort((a, b) {
           final nameCompare = (a.companyName ?? '')
@@ -1056,7 +1062,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
         // No sorting
       }
 
-      loadCompanies();
+      // loadCompanies();
     } else {
       if (sortType == "A-Z") {
         plans.sort((a, b) {
@@ -1107,8 +1113,10 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       } else {
         // No sorting
       }
+      tableSource.updateData(plans);
 
-      loadProjects();
+      notifyListeners();
+      // loadProjects();
     }
   }
 
@@ -1151,6 +1159,68 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
         reAssignInfluencer(data);
       }
     }
+  }
+
+  void sortPromoteList(List list, String sortType) {
+    if (sortType == "A-Z") {
+      list.sort((a, b) {
+        final nameCompare = (a.companyName ?? '')
+            .toLowerCase()
+            .compareTo((b.companyName ?? '').toLowerCase());
+
+        if (nameCompare != 0) return nameCompare;
+
+        return (a.projectCode ?? '')
+            .toLowerCase()
+            .compareTo((b.projectCode ?? '').toLowerCase());
+      });
+    } else if (sortType == "clientAsc") {
+      list.sort((a, b) => (a.id ?? 0).compareTo(b.id ?? 0));
+    } else if (sortType == "older") {
+      list.sort((a, b) {
+        DateTime aDate = a.createdAt != null
+            ? DateTime.parse(a.createdAt.toString())
+            : DateTime(1970);
+        DateTime bDate = b.createdAt != null
+            ? DateTime.parse(b.createdAt.toString())
+            : DateTime(1970);
+
+        return aDate.compareTo(bDate);
+      });
+    } else if (sortType == "newer") {
+      list.sort((a, b) {
+        DateTime aDate = a.createdAt != null
+            ? DateTime.parse(a.createdAt.toString())
+            : DateTime(1970);
+        DateTime bDate = b.createdAt != null
+            ? DateTime.parse(b.createdAt.toString())
+            : DateTime(1970);
+
+        return bDate.compareTo(aDate);
+      });
+    }
+  }
+
+  void applyPromoteSort(String sortType) {
+    _promoteSort = sortType;
+
+    sortPromoteList(tableData, sortType);
+
+    promoteTableSource = PromoteTableSource(
+      data: tableData,
+      status: selectedStatus,
+      onReject: onReject,
+      onVerify: onVerify,
+      onGotoPromoteVerified: onGotoPromoteVerified,
+      onGotoPromotePay: onGotoPromotePay,
+      onGotoPromoteCommission: onGotoPromoteCommission,
+      showBankDetails: showBankDetails,
+      onReAssign: onReAssign,
+      onRevoke: onRevoke,
+      onCompanyPaymentVerified: onCompanyPaymentVerified,
+    );
+
+    notifyListeners();
   }
 }
 

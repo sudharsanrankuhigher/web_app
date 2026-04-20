@@ -117,8 +117,7 @@ Future<DateTime?> showMonthYearPicker(
               ),
               ElevatedButton(
                 style: ButtonStyle(
-                  backgroundColor:
-                      WidgetStateProperty.all<Color>(appGreen400),
+                  backgroundColor: WidgetStateProperty.all<Color>(appGreen400),
                 ),
                 onPressed: () => Navigator.pop(context, selectedDate),
                 child: Text("Apply", style: fontFamilyBold.size12.white),

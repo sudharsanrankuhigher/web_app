@@ -250,6 +250,9 @@ class CommonSubAdminDialog {
                           initialDate: dob,
                         );
                         if (picked != null) dob = picked;
+                        print("dob: $dob");
+                        print("picked: $picked");
+                        setState(() {});
                       },
                       child: InputDecorator(
                         decoration: decoration("Date of Birth").copyWith(
@@ -328,7 +331,7 @@ class CommonSubAdminDialog {
                                       path: idProofPath,
                                       isPdf: isPdf,
                                       isEdit: false,
-                                      imageUrl: model!.docImg,
+                                      imageUrl: model?.docImg ?? "",
                                       onRemove: () {
                                         setState(() {
                                           idProofBytes = null;
