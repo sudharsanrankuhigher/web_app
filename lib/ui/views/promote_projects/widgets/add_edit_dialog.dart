@@ -361,12 +361,13 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
           height: 650,
           child: Stack(
             children: [
-              WebImage(
-                imageUrl: "https://dummyimage.com/600x400/eeeeee/eeeeee.png",
-                height: MediaQuery.of(context).size.height * 0.9,
-                width: MediaQuery.of(context).size.width * 0.9,
-                fit: BoxFit.cover,
-              ),
+              Positioned.fill(child: const ColoredBox(color: disableColor)),
+              // WebImage(
+              //   imageUrl: "https://dummyimage.com/600x400/eeeeee/eeeeee.png",
+              //   height: MediaQuery.of(context).size.height * 0.9,
+              //   width: MediaQuery.of(context).size.width * 0.9,
+              //   fit: BoxFit.cover,
+              // ),
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -1242,12 +1243,20 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
       {double? width, double? height, BoxFit fit = BoxFit.cover}) {
     // ================= NETWORK =================
     if (item.isNetwork && item.url != null) {
-      return WebImageTwo(
-        imageUrl: item.url!,
-        width: width ?? double.infinity,
-        height: height ?? double.infinity,
-        fit: BoxFit.cover,
+        return Image.network(
+        item.url!,
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: (_, __, ___) =>
+            const Icon(Icons.broken_image, color: Colors.red),
       );
+      // return WebImageTwo(
+      //   imageUrl: item.url!,
+      //   width: width ?? double.infinity,
+      //   height: height ?? double.infinity,
+      //   fit: BoxFit.cover,
+      // );
     }
 
     // ================= WEB MEMORY =================
