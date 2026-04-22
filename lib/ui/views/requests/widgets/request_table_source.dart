@@ -21,6 +21,8 @@ class RequestTableSource extends DataTableSource {
   final void Function(request_model.Datum) onClientPaymentVerified;
   final void Function(request_model.Datum) onReAssign;
   final void Function(request_model.Datum) infReject;
+  final void Function(request_model.Datum) onBankDetails;
+  final void Function(request_model.Datum)? showNote;
 
   final String status;
 
@@ -38,7 +40,9 @@ class RequestTableSource extends DataTableSource {
       this.onGotoPromoteCommission,
       this.onClientPaymentVerified,
       this.onReAssign,
-      this.infReject);
+      this.onBankDetails,
+      this.infReject,
+      this.showNote);
 
   @override
   DataRow? getRow(int index) {
@@ -153,7 +157,8 @@ class RequestTableSource extends DataTableSource {
       case "waiting_accept":
         return [
           DataCell(Text('${index + 1}')),
-          DataCell(Text(m.projectId ?? "")),
+          DataCell(InkWell(
+              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
           DataCell(Text(m.client!.name ?? "")),
           DataCell(Text(m.client!.mobileNumber ?? "")),
           DataCell(Text(m.inf!.name ?? "")),
@@ -193,7 +198,8 @@ class RequestTableSource extends DataTableSource {
       case "completed_pending":
         return [
           DataCell(Text('${index + 1}')),
-          DataCell(Text(m.projectId ?? "")),
+          DataCell(InkWell(
+              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
           DataCell(Text(m.client!.name ?? "")),
           DataCell(Text(m.client!.mobileNumber ?? "")),
           DataCell(Text("${m.inf!.name ?? ""} / ${m.inf!.phone ?? ""}")),
@@ -308,7 +314,8 @@ class RequestTableSource extends DataTableSource {
       case "completed":
         return [
           DataCell(Text('${index + 1}')),
-          DataCell(Text(m.projectId ?? "")),
+          DataCell(InkWell(
+              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
           DataCell(Text(m.client!.name ?? "")),
           DataCell(Text(m.client!.mobileNumber ?? "")),
           DataCell(Text("${m.inf!.name ?? ""} / ${m.inf!.phone ?? ""}")),
@@ -339,7 +346,8 @@ class RequestTableSource extends DataTableSource {
       case "influencer_cancelled":
         return [
           DataCell(Text('${index + 1}')),
-          DataCell(Text(m.projectId ?? "")),
+          DataCell(InkWell(
+              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
           DataCell(Text(m.client!.name ?? "")),
           DataCell(Text(m.inf!.name ?? "")),
           DataCell(Text(m.client!.mobileNumber ?? "")),
@@ -368,7 +376,8 @@ class RequestTableSource extends DataTableSource {
       case "rejected":
         return [
           DataCell(Text('${index + 1}')),
-          DataCell(Text(m.projectId ?? "")),
+          DataCell(InkWell(
+              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
           DataCell(Text(m.client!.name ?? "")),
           DataCell(Text(m.inf!.name ?? "")),
           DataCell(Text(m.client!.mobileNumber ?? "")),
@@ -391,7 +400,8 @@ class RequestTableSource extends DataTableSource {
       case "promote_verified":
         return [
           DataCell(Text('${index + 1}')),
-          DataCell(Text(m.projectId ?? "")),
+          DataCell(InkWell(
+              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
           DataCell(Text(m.client!.name ?? "")),
           DataCell(Text(m.client!.mobileNumber ?? "")),
           DataCell(Text(m.inf!.name ?? "")),
@@ -473,13 +483,15 @@ class RequestTableSource extends DataTableSource {
       case "promote_pay":
         return [
           DataCell(Text('${index + 1}')),
-          DataCell(Text(m.projectId ?? "")),
+          DataCell(InkWell(
+              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
           DataCell(Text("${m.inf!.name ?? ""} / ${m.inf!.infId ?? ""}")),
           DataCell(Text(m.inf!.phone ?? "")),
           DataCell(Text(
               DateFormatter.formatToDDMMMYYYY(m.dates!.completed.toString()) ??
                   "")),
-          DataCell(Text(m.payment!.bankDetails ?? "")),
+          DataCell(InkWell(
+              onTap: () => onBankDetails(m), child: Text(m.inf!.upiId ?? ""))),
           DataCell(Text("${m.payment!.amount ?? 0}")),
           DataCell(Text("${m.payment!.commission ?? 0}")),
           DataCell((m.payment!.status == '1')
@@ -498,7 +510,8 @@ class RequestTableSource extends DataTableSource {
                   ),
                 )
               : InkWell(
-                  onTap: () => onGotoPromoteCommission(m),
+                  onTap: () =>
+                      m.status == 11 ? null : onGotoPromoteCommission(m),
                   child: Row(
                     children: [
                       Text(
@@ -516,7 +529,8 @@ class RequestTableSource extends DataTableSource {
       case "promote_commission":
         return [
           DataCell(Text('${index + 1}')),
-          DataCell(Text(m.projectId ?? "")),
+          DataCell(InkWell(
+              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
           DataCell(Text("${m.inf!.name ?? ""} / ${m.inf!.infId ?? ""}")),
           DataCell(Text(m.inf!.phone ?? "")),
           DataCell(Text(
@@ -539,7 +553,8 @@ class RequestTableSource extends DataTableSource {
       case "client_payment_verified":
         return [
           DataCell(Text('${index + 1}')),
-          DataCell(Text(m.projectId ?? "")),
+          DataCell(InkWell(
+              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
           DataCell(Text("${m.client!.name ?? ""} ")),
           DataCell(Text(m.client!.mobileNumber ?? "")),
           DataCell(Text(

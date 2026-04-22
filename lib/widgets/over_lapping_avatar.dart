@@ -38,9 +38,9 @@ class OverlappingAvatars extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(size / 2),
-                  child: Image.network(
-                    visibleImages[i],
+                  child: WebImage(
                     fit: BoxFit.cover,
+                    imageUrl: visibleImages[i],
                     width: size - 4,
                     height: size - 4,
                   ),

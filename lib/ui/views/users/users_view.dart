@@ -139,7 +139,11 @@ class UsersView extends StackedView<UsersViewModel> {
                                   DataColumn(label: Text("Email")),
                                   DataColumn(label: Text("Phone")),
                                   DataColumn(label: Text("Type")),
-                                  DataColumn(label: Text("notes")),
+                                  DataColumn(
+                                    label: Text("notes"),
+                                    headingRowAlignment:
+                                        MainAxisAlignment.center,
+                                  ),
                                   DataColumn(label: Text("City/State")),
                                   DataColumn(label: Text("View")),
                                   // DataColumn(label: Text("Actions")),

@@ -99,7 +99,7 @@ class CommonPlanDialog {
                           child: DynamicSingleSearchDropdown(
                             label: "plan category",
                             items: planNames,
-                            selectedItem: selectedPlan,
+                            selectedItem: selectedPlan ?? initial?.selectedPlan,
                             isError: isPlanError,
                             errorText: "PleaseselectedPlan select a plans",
                             onChanged: (value) {

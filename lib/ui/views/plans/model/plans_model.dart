@@ -44,6 +44,7 @@ class Datum {
   String? saleAmount;
   String? gst;
   String? badge;
+  String? selectedPlan;
   String? category;
   DateTime? createdAt;
   DateTime? updatedAt;
@@ -57,6 +58,7 @@ class Datum {
     this.category,
     this.createdAt,
     this.updatedAt,
+    this.selectedPlan,
     this.gst,
     this.saleAmount,
   });
@@ -72,6 +74,7 @@ class Datum {
             json["sale_price"] == null ? '0' : json["sale_price"].toString(),
         gst: json["gst"] == null ? '0' : json["gst"].toString(),
         badge: json["badge"],
+        selectedPlan: json["selected_plan"],
         category: json["category_id"],
         createdAt: json["created_at"] == null
             ? null
@@ -89,6 +92,7 @@ class Datum {
         "sale_price": saleAmount,
         "gst": gst,
         "badge": badge,
+        "selected_plan": selectedPlan,
         "category_id": category,
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),

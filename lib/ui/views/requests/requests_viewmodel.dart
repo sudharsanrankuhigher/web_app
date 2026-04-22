@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -7,6 +8,7 @@ import 'package:webapp/core/enum/requested_status.dart';
 import 'package:webapp/core/navigation/navigation_mixin.dart';
 import 'package:webapp/services/api_service.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/requests/model/request_model.dart'
     as request_model;
 import 'package:webapp/ui/views/requests/widgets/confirmation_dialog.dart';
@@ -84,7 +86,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     try {
       final res = await _apiService.getClientRequest(tabStatus.apiCode);
       requests = res.data ?? [];
-
+      print("Total requests fetched: ${requests.length}");
       final filteredData = requests.where((e) {
         final apiStatus = e.status; // INT from backend
         return tabStatus.filterBackendCodes.contains(apiStatus);
@@ -105,7 +107,9 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           onGotoPromoteCommission,
           onClientPaymentVerified,
           onReAssign,
-          infReject);
+          onBankDetails,
+          infReject,
+          showNote);
 
       _isRequest = false;
     } catch (e) {
@@ -123,7 +127,9 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           onGotoPromoteCommission,
           onClientPaymentVerified,
           onReAssign,
-          infReject);
+          onBankDetails,
+          infReject,
+          showNote);
 
       _isRequest = false;
     }
@@ -166,7 +172,9 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         onGotoPromoteCommission,
         onClientPaymentVerified,
         onReAssign,
-        infReject);
+        onBankDetails,
+        infReject,
+        showNote);
     notifyListeners();
   }
 
@@ -215,7 +223,9 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         onGotoPromoteCommission,
         onClientPaymentVerified,
         onReAssign,
-        infReject);
+        onBankDetails,
+        infReject,
+        showNote);
 
     // 🔥 notify UI
     print("Applied sort: $sortType, specialFilter: $specialFilter");
@@ -524,6 +534,87 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     );
   }
 
+  onBankDetails(request_model.Datum model) {
+    if (model.inf == null) {
+      Fluttertoast.showToast(msg: "No bank details available");
+      return;
+    }
+
+    showBankDetailsDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      bankDetails: model.inf!,
+    );
+  }
+
+  void showBankDetailsDialog({
+    required request_model.Inf bankDetails,
+    required BuildContext context,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        dynamic details;
+
+        details = bankDetails;
+        // if (bankDetails is List && bankDetails.isNotEmpty) {
+        //   details = bankDetails.first;
+        // } else {}
+
+        return AlertDialog(
+          title: const Text("Bank Details"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _detailRow(
+                "Account Holder Name",
+                details.holderName,
+              ),
+              _detailRow(
+                "Account Number",
+                details.accountNumber,
+              ),
+              _detailRow(
+                "IFSC Code",
+                details.ifscCode,
+              ),
+              _detailRow("UPI id", details.upiId),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("Close"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _detailRow(
+    String label,
+    String? value, {
+    TextStyle? labelStyle,
+    TextStyle? valueStyle,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+                text: "$label: ",
+                style: labelStyle ?? fontFamilySemiBold.size13.black),
+            TextSpan(
+                text: value?.isNotEmpty == true ? value! : "-",
+                style: valueStyle ?? fontFamilyMedium.size13.grey),
+          ],
+        ),
+      ),
+    );
+  }
+
   //waiting accept
   onProceed(request_model.Datum model) {
     showAdminPaymentConfigDialog(
@@ -539,6 +630,17 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         waitingAccept(datas);
         print(datas);
       },
+    );
+  }
+
+  showNote(request_model.Datum model) {
+    print("Note: ${model.payment?.note}");
+    showAPaymentConfigDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      note: model.payment?.note ?? "",
+      instagram: model.promotion?.instagram != null ? true : false,
+      facebook: model.promotion?.facebook != null ? true : false,
+      youtube: model.promotion?.youtube != null ? true : false,
     );
   }
 

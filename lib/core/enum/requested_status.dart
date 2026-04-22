@@ -79,7 +79,9 @@ extension RequestStatusFilter on RequestStatus {
       case RequestStatus.promoteVerified:
         // promote_verified tab shows client_payment_verified also
         return [9, 12];
-
+      case RequestStatus.promotePay:
+        return [10, 11];
+      // promote_pay tab shows promote_commission also
       case RequestStatus.clientPaymentVerified:
         // client_payment_verified shows ONLY itself
         return [12];

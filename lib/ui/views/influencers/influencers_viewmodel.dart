@@ -570,18 +570,53 @@ class InfluencersViewModel extends BaseViewModel {
   String currentSearch = "";
   String currentSort = "A-Z";
 
+  String getFormattedId(int? categoryId, int? id) {
+    if (categoryId == null || id == null) return "UNKNOWN";
+
+    String prefix;
+
+    switch (categoryId) {
+      case 1:
+        prefix = "INF";
+        break;
+      case 2:
+        prefix = "MOV";
+        break;
+      case 3:
+        prefix = "TV";
+        break;
+      case 4:
+        prefix = "SP";
+        break;
+      default:
+        prefix = "UNK";
+    }
+
+    // pad id to 4 digits → 1 => 0001, 10 => 0010
+    final paddedId = id.toString().padLeft(4, '0');
+
+    return "$prefix$paddedId";
+  }
+
   void applySearchAndSort() {
     List<influencer_model.Datum> temp = List.from(filteredInfluencers);
 
     /// SEARCH
     if (currentSearch.isNotEmpty) {
       temp = temp.where((inf) {
-        return (inf.name ?? '').toLowerCase().contains(currentSearch) ||
-            (inf.phone ?? '').contains(currentSearch) ||
-            (inf.city ?? '').toLowerCase().contains(currentSearch) ||
-            (inf.infId != null && inf.infId.toString().contains(currentSearch));
+        final name = (inf.name ?? '').toLowerCase();
+        final phone = (inf.phone ?? '');
+        final city = (inf.city ?? '').toLowerCase();
 
-        ;
+        // ✅ formatted ID (INF0001, MOV0009, etc)
+        final formattedId = getFormattedId(inf.category, inf.id).toLowerCase();
+
+        return name.contains(currentSearch) ||
+            phone.contains(currentSearch) ||
+            city.contains(currentSearch) ||
+            formattedId
+                .contains(currentSearch) || // 🔥 THIS LINE FIXES YOUR ISSUE
+            (inf.id != null && inf.id.toString().contains(currentSearch));
       }).toList();
     }
 

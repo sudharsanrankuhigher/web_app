@@ -186,17 +186,19 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
 
   Future<void> onNoteEdit(user_model.Datum user) async {
     final result = await showNotesDialog(user);
-
     if (result != null) {
       // 👉 call API here
-      // await ApiService.updateNotes(
-      //   userId: user.id,
-      //   notes: result,
-      // );
+      final res = await _apiService
+          .updateNotes(
+            userId: user.id,
+            notes: result,
+          )
+          .then((value) => loadUsers());
 
-      Fluttertoast.showToast(
-        msg: "Notes updated successfully",
-      );
+      print("Updated Notes: $result for User ID: ${user.id}");
+      // Fluttertoast.showToast(
+      //   msg: "Notes updated successfully $result",
+      // );
     }
   }
 

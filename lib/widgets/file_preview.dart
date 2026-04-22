@@ -1,15 +1,14 @@
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:webapp/widgets/web_image_loading.dart';
 
 class FilePreview extends StatelessWidget {
-  final Uint8List? bytes; // For new upload
-  final String? path; // File path
-  final String? imageUrl; // For existing image
+  final Uint8List? bytes;
+  final String? path;
+  final String? imageUrl;
   final bool isPdf;
-  final bool isEdit; // true = editing, don't show clear
-  final VoidCallback? onRemove; // only needed for new upload
+  final bool isEdit;
+  final VoidCallback? onRemove;
 
   const FilePreview({
     super.key,
@@ -23,14 +22,32 @@ class FilePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ Detect PDF automatically
+    final bool isPdfFile = isPdf ||
+        (path?.toLowerCase().endsWith('.pdf') ?? false) ||
+        (imageUrl?.toLowerCase().endsWith('.pdf') ?? false);
+
     Widget preview;
 
-    // if (isPdf) {
-    //   // PDF preview
-    //   preview = const Icon(Icons.picture_as_pdf, size: 40, color: Colors.red);
-    // } else
-    if (bytes != null) {
-      // New image upload preview
+    // 🔴 PDF Preview
+    if (isPdfFile) {
+      preview = Container(
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+          color: Colors.red.shade50,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: const Icon(
+          Icons.picture_as_pdf,
+          size: 30,
+          color: Colors.red,
+        ),
+      );
+    }
+
+    // 🖼️ Memory Image
+    else if (bytes != null) {
       preview = ClipRRect(
         borderRadius: BorderRadius.circular(6),
         child: Image.memory(
@@ -40,27 +57,39 @@ class FilePreview extends StatelessWidget {
           fit: BoxFit.cover,
         ),
       );
-    } else if (imageUrl != null && imageUrl!.isNotEmpty) {
-      // Existing image from URL (WebImage)
-      preview = WebImage(
-        imageUrl: imageUrl!,
-        width: 50,
-        height: 50,
-        fit: BoxFit.cover,
+    }
+
+    // 🌐 Network Image (using your WebImage)
+    else if (imageUrl != null && imageUrl!.isNotEmpty) {
+      preview = ClipRRect(
+        borderRadius: BorderRadius.circular(6),
+        child: WebImage(
+          imageUrl: imageUrl!,
+          width: 50,
+          height: 50,
+          fit: BoxFit.cover,
+        ),
       );
-    } else {
-      // fallback placeholder
-      preview =
-          const Icon(Icons.insert_drive_file, size: 40, color: Colors.grey);
+    }
+
+    // ⚪ Fallback
+    else {
+      preview = const Icon(
+        Icons.insert_drive_file,
+        size: 40,
+        color: Colors.grey,
+      );
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Row(
         children: [
           preview,
           const SizedBox(width: 10),
-          if (path != null)
+
+          // 📄 File name
+          if (path != null && path!.isNotEmpty)
             Expanded(
               child: Text(
                 path!.split('/').last,
@@ -68,6 +97,8 @@ class FilePreview extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+
+          // ❌ Remove button
           if (!isEdit && onRemove != null)
             IconButton(
               icon: const Icon(Icons.close, color: Colors.red),

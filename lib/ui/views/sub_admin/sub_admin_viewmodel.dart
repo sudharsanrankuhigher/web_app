@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
@@ -13,6 +15,8 @@ import 'package:webapp/ui/views/sub_admin/widgets/sub_admin_add_edit_dialog.dart
 import 'package:webapp/ui/views/sub_admin/widgets/sub_admin_table_source.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/ui/views/roles/model/roles_model.dart' as roles_model;
+import 'package:webapp/widgets/file_preview.dart';
+import 'package:webapp/widgets/file_preview_widget.dart';
 import 'package:webapp/widgets/web_image_loading.dart';
 
 class SubAdminViewModel extends BaseViewModel with NavigationMixin {
@@ -120,7 +124,7 @@ class SubAdminViewModel extends BaseViewModel with NavigationMixin {
           'profile_image',
           MultipartFile.fromBytes(
             result['image'],
-            filename: 'profile_image.png',
+            filename: 'profile_image',
           ),
         ),
       );
@@ -135,7 +139,7 @@ class SubAdminViewModel extends BaseViewModel with NavigationMixin {
           'document_image',
           MultipartFile.fromBytes(
             result['idImage'],
-            filename: 'document_image.pdf',
+            filename: 'document_image',
           ),
         ),
       );
@@ -144,6 +148,39 @@ class SubAdminViewModel extends BaseViewModel with NavigationMixin {
     }
 
     await saveOrUpdate(formData);
+  }
+
+  String getFileExtension(Uint8List bytes) {
+    if (bytes.length < 4) return 'bin';
+
+    // PDF: %PDF
+    if (bytes[0] == 0x25 &&
+        bytes[1] == 0x50 &&
+        bytes[2] == 0x44 &&
+        bytes[3] == 0x46) {
+      return 'pdf';
+    }
+
+    // PNG
+    if (bytes[0] == 0x89 &&
+        bytes[1] == 0x50 &&
+        bytes[2] == 0x4E &&
+        bytes[3] == 0x47) {
+      return 'png';
+    }
+
+    // JPG
+    if (bytes[0] == 0xFF && bytes[1] == 0xD8) {
+      return 'jpg';
+    }
+
+    return 'bin'; // fallback
+  }
+
+  String generateFileName(Uint8List bytes, String prefix) {
+    final ext = getFileExtension(bytes);
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    return '${prefix}_$timestamp.$ext';
   }
 
   // ---------- EDIT ----------
@@ -173,13 +210,16 @@ class SubAdminViewModel extends BaseViewModel with NavigationMixin {
     // addField('profile_image', result["image"]);
 
     if (result['image'] != null) {
+      final bytes = result['image'];
+      final fileName = generateFileName(bytes, 'profile_image');
+
       // Web upload
       formData.files.add(
         MapEntry(
           "profile_image",
           MultipartFile.fromBytes(
             result['image'],
-            filename: "profile_image.png",
+            filename: fileName,
           ),
         ),
       );
@@ -188,12 +228,14 @@ class SubAdminViewModel extends BaseViewModel with NavigationMixin {
     }
 
     if (result['idImage'] != null) {
+      final bytes = result['idImage'];
+      final fileName = generateFileName(bytes, 'document');
       formData.files.add(
         MapEntry(
           "document_image",
           MultipartFile.fromBytes(
             result['idImage'],
-            filename: "document_image.png",
+            filename: fileName,
           ),
         ),
       );
@@ -412,6 +454,7 @@ class SubAdminViewModel extends BaseViewModel with NavigationMixin {
   }
 
   void viewDoc(String imageUrl) {
+    var isPdf = imageUrl.toLowerCase().endsWith(".pdf");
     showDialog(
       context: StackedService.navigatorKey!.currentContext!,
       barrierDismissible: true,
@@ -425,25 +468,26 @@ class SubAdminViewModel extends BaseViewModel with NavigationMixin {
               SizedBox(
                 width: 400,
                 height: 400,
-                child: WebImage(
-                  imageUrl: imageUrl,
-                  fit: BoxFit.contain,
-                ),
+                child:
+                    // WebImage(
+                    //   imageUrl: imageUrl,
+                    //   fit: BoxFit.contain,
+                    // ),
+                    FullPreviewWidget(url: imageUrl),
               ),
 
-              /// ❌ CLOSE BUTTON
-              Positioned(
-                top: 10,
-                right: 10,
-                child: GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: const Icon(
-                    Icons.close,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                ),
-              ),
+              // Positioned(
+              //   top: 10,
+              //   left: 10,
+              //   child: GestureDetector(
+              //     onTap: () => Navigator.pop(context),
+              //     child: const Icon(
+              //       Icons.close,
+              //       color: Colors.white,
+              //       size: 28,
+              //     ),
+              //   ),
+              // ),   /// ❌ CLOSE BUTTON
             ],
           ),
         );

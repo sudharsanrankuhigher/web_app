@@ -62,9 +62,6 @@ class PromoteProjectsTableSource extends DataTableSource {
       project_model.PaymentElement? pay, int index) {
     return [
       DataCell(Text('${index + 1}')),
-      DataCell(Text(item.projectCode ?? '')),
-      DataCell(Text(item.companyName ?? '')),
-      DataCell(Text(item.projectName ?? '')),
       DataCell(
         vm.isDialogOpen
             ? Container(
@@ -78,6 +75,9 @@ class PromoteProjectsTableSource extends DataTableSource {
                 size: 34,
               ),
       ),
+      DataCell(Text(item.projectCode ?? '')),
+      DataCell(Text(item.companyName ?? '')),
+      DataCell(Text(item.projectName ?? '')),
       DataCell(Text('${item.influencers?.length ?? 0}')),
       DataCell(
         Tooltip(
@@ -110,9 +110,6 @@ class PromoteProjectsTableSource extends DataTableSource {
       project_model.PaymentElement? pay, int index) {
     return [
       DataCell(Text('${index + 1}')),
-      DataCell(Text(item.projectCode ?? '')),
-      DataCell(Text(item.companyName ?? '')),
-      DataCell(Text(item.projectName ?? '')),
       DataCell(
         OverlappingAvatars(
           imageUrls:
@@ -121,6 +118,9 @@ class PromoteProjectsTableSource extends DataTableSource {
           size: 34,
         ),
       ),
+      DataCell(Text(item.projectCode ?? '')),
+      DataCell(Text(item.companyName ?? '')),
+      DataCell(Text(item.projectName ?? '')),
       DataCell(Text(item.description ?? '')),
       const DataCell(Text('10')),
       DataCell(Text('₹${pay?.payment ?? "0"}')),

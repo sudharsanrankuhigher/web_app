@@ -146,7 +146,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       "company_id": request["companyId"],
       "service_ids": request["selectedServiceIds"],
       "state": request["state"],
-      "city": request["city"],
+      "cities": request["cities"],
       "gender": request["gender"].toLowerCase(),
       "inf_ids": request["selectedInfluencerIds"],
       "payment": [
@@ -175,7 +175,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       addField("project_name", data["project_name"]);
       addField("company_id", data["company_id"]);
       addField("state", data["state"]);
-      addField("city", data["city"]);
+      // addField("city", data["city"]);
       addField("gender", data["gender"]);
       // ================= LINK =================
       if (data["link"] is Map) {
@@ -263,6 +263,13 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           );
         }
       }
+      if (data["cities"] is List && data["cities"].isNotEmpty) {
+        for (var i = 0; i < data["cities"].length; i++) {
+          formData.fields.add(
+            MapEntry("cities[$i]", data["cities"][i].toString()),
+          );
+        }
+      }
       if (data["inf_ids"] is List && data["inf_ids"].isNotEmpty) {
         for (var i = 0; i < data["inf_ids"].length; i++) {
           formData.fields.add(
@@ -316,9 +323,9 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       },
     );
 
-    loadProjects();
     getInfluencers();
     getServices();
+    loadProjects();
     loadCompanies();
   }
 
@@ -353,7 +360,9 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       companies: companies,
       service: services,
       onSave: (project) {
+        print("project: $project");
         createPromoteProject(project);
+
         // addProject(project);
       },
     );
@@ -413,10 +422,10 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
   /// 🔹 Columns
   final inProgressColumns = const [
     DataColumn(label: Text("S.No")),
+    DataColumn(label: Text("Inf_icons")),
     DataColumn(label: Text("Project Code")),
     DataColumn(label: Text("Client Name")),
     DataColumn(label: Text("Project Title")),
-    DataColumn(label: Text("Inf_icons")),
     DataColumn(label: Text("Project Count")),
     DataColumn(label: Text("Note")),
     DataColumn(
@@ -435,10 +444,10 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
 
   final completedColumns = const [
     DataColumn(label: Text("S.No")),
+    DataColumn(label: Text("Inf_icons")),
     DataColumn(label: Text("Project Code")),
     DataColumn(label: Text("Client Name")),
     DataColumn(label: Text("Project Title")),
-    DataColumn(label: Text("Inf_icons")),
     DataColumn(label: Text("Notes")),
     DataColumn(label: Text("Project Count")),
     DataColumn(label: Text("Total promotepay")),

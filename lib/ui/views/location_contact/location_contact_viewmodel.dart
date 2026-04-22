@@ -71,8 +71,7 @@ class LocationContactViewModel extends BaseViewModel with NavigationMixin {
   void searchContacts(String query) {
     final filtered = contacts.where((c) {
       return c.state!.toLowerCase().contains(query.toLowerCase()) ||
-          c.city!.toLowerCase().contains(query.toLowerCase()) ||
-          c.code!.contains(query);
+          c.mobileNumber!.contains(query);
     }).toList();
 
     // _refreshTable(filtered: filtered);
@@ -82,133 +81,141 @@ class LocationContactViewModel extends BaseViewModel with NavigationMixin {
   // ADD CONTACT
   // ------------------------------------------------------------
   Future<void> addContact(BuildContext context) async {
-  await showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => AddressDialog(
-      states: allStates.map((e) => e.name!).toList(),
-      multi: true, // 🔥 enable multi select
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AddressDialog(
+        states: allStates.map((e) => e.name!).toList(),
+        multi: true, // 🔥 enable multi select
 
-      /// 🔹 SINGLE (optional)
-      onSave: ({
-        required String state,
-        required CityModel city,
-        required String phone,
-        String? code,
-      }) {
-        final newContact = {
-          "state": state,
-          "city": city.name,
-          "code": city.id,
-          "mobile_number": phone
-        };
-      },
+        /// 🔹 SINGLE (optional)
+        onSave: ({
+          required String state,
+          required CityModel city,
+          required String phone,
+          String? code,
+        }) {
+          final newContact = {
+            "state": state,
+            "city": city.name,
+            "code": city.id,
+            "mobile_number": phone
+          };
+        },
 
-      /// 🔥 MULTI
-      onSaveMulti: ({
-        required String state,
-        required List<CityModel> cities,
-        required String phone,
-      }) {
-        final newContact = {
-          "state": state,
-          "city_ids": cities.map((e) => e.id).toList(),
-          "cities": cities.map((e) => e.name).toList(),
-          "mobile_number": phone
-        };
+        /// 🔥 MULTI
+        onSaveMulti: ({
+          required String state,
+          required List<CityModel> cities,
+          required String phone,
+        }) {
+          final newContact = {
+            "state": state,
+            "city": cities
+                .map((e) => {
+                      "id": e.id,
+                      "name": e.name,
+                    })
+                .toList(),
+            "mobile_number": phone,
+          };
 
-        print("ADD MULTI: $newContact");
+          print("ADD MULTI: $newContact");
 
-        // _saveOrUpdate(newContact);
-      },
-    ),
-  );
-}
+          _saveOrUpdate(newContact);
+        },
+      ),
+    );
+  }
 
   // ------------------------------------------------------------
   // EDIT CONTACT
   // ------------------------------------------------------------
   Future<void> editContact(
-  BuildContext context,
-  contact.Datum contact,
-) async {
-  await showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => AddressDialog(
-      states: allStates.map((e) => e.name!).toList(),
-      multi: true, // 🔥 enable multi
+    BuildContext context,
+    contact.Datum contact,
+  ) async {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AddressDialog(
+        states: allStates.map((e) => e.name!).toList(),
+        multi: true, // 🔥 enable multi
 
-      isView: false,
-      isEdit: true,
-      initialData: contact.toJson(),
+        isView: false,
+        isEdit: true,
+        initialData: contact.toJson(),
 
-      /// 🔹 SINGLE
-      onSave: ({
-        required String state,
-        required CityModel city,
-        required String phone,
-      }) {
-        final updatedContact = {
-          "state": state,
-          "city": city.name,
-          "code": city.id,
-          "mobile_number": phone,
-          "id": contact.id,
-        };
+        // /// 🔹 SINGLE
+        // onSave: ({
+        //   required String state,
+        //   required CityModel city,
+        //   required String phone,
+        // }) {
+        //   final updatedContact = {
+        //     "state": state,
+        //     "city": city.name,
+        //     "code": city.id,
+        //     "mobile_number": phone,
+        //     "id": contact.id,
+        //   };
 
-        _saveOrUpdate(updatedContact);
-      },
+        //   _saveOrUpdate(updatedContact);
+        // },
 
-      /// 🔥 MULTI
-      onSaveMulti: ({
-        required String state,
-        required List<CityModel> cities,
-        required String phone,
-      }) {
-        final updatedContact = {
-          "state": state,
-          "city_ids": cities.map((e) => e.id).toList(),
-          "cities": cities.map((e) => e.name).toList(),
-          "mobile_number": phone,
-          "id": contact.id,
-        };
+        /// 🔥 MULTI
+        onSaveMulti: ({
+          required String state,
+          required List<CityModel> cities,
+          required String phone,
+        }) {
+          final newContact = {
+            "id": contact.id,
+            "state": state,
+            "city": cities
+                .map((e) => {
+                      "id": e.id,
+                      "name": e.name,
+                    })
+                .toList(),
+            "mobile_number": phone,
+          };
 
-        print("EDIT MULTI: $updatedContact");
+          print("ADD MULTI: $newContact");
 
-        _saveOrUpdate(updatedContact);
-      },
-    ),
-  );
-}
+          _saveOrUpdate(newContact);
+        },
+      ),
+    );
+  }
 
   // ------------------------------------------------------------
   // VIEW CONTACT (READ ONLY)
   // ------------------------------------------------------------
   Future<void> viewContact(
-  BuildContext context,
-  contact.Datum contact,
-) async {
-  await showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => AddressDialog(
-      states: allStates.map((e) => e.name!).toList(),
+    BuildContext context,
+    contact.Datum contact,
+  ) async {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AddressDialog(
+        states: allStates.map((e) => e.name!).toList(),
 
-      isView: true,
-      isEdit: false,
-      multi: false, // 👈 no need multi in view
+        isView: true,
+        isEdit: false,
+        multi: true, // 👈 no need multi in view
 
-      initialData: contact.toJson(),
+        initialData: contact.toJson(),
 
-      onSave: ({
-        required String state,
-        required CityModel city,
-        required String phone,
-      }) {},
-    ),
-  );
-}
+        onSave: ({
+          required String state,
+          required CityModel city,
+          required String phone,
+        }) {},
+      ),
+    );
+  }
 
   // ------------------------------------------------------------
   // SAVE / UPDATE
@@ -307,7 +314,6 @@ class LocationContactViewModel extends BaseViewModel with NavigationMixin {
   void searchPlans(String query) {
     final filtered = contacts.where((p) {
       return p.state!.toLowerCase().contains(query.toLowerCase()) ||
-          p.city!.toLowerCase().contains(query.toLowerCase()) ||
           p.mobileNumber.toString().contains(query);
     }).toList();
 
@@ -320,7 +326,7 @@ class LocationContactViewModel extends BaseViewModel with NavigationMixin {
     //   }
     if (sortType == "A-Z") {
       contacts.sort((a, b) {
-        final cityCompare = a.city!.compareTo(b.city!);
+        // final cityCompare = a.city!.compareTo(b.city!);
 
         final phoneCompare = a.mobileNumber!.compareTo(b.mobileNumber!);
 
@@ -328,9 +334,9 @@ class LocationContactViewModel extends BaseViewModel with NavigationMixin {
           return phoneCompare;
         }
 
-        if (cityCompare != 0) {
-          return cityCompare;
-        }
+        // if (cityCompare != 0) {
+        //   return cityCompare;
+        // }
 
         return a.state!.compareTo(b.state!);
       });

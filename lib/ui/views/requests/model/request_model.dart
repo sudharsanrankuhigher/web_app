@@ -186,15 +186,31 @@ class Inf {
   dynamic infId;
   String? name;
   String? phone;
+  String? accountNumber;
+  String? ifscCode;
+  String? holderName;
+  String? upiId;
   int? ids;
 
-  Inf({this.infId, this.name, this.phone, this.ids});
+  Inf(
+      {this.infId,
+      this.name,
+      this.phone,
+      this.ids,
+      this.accountNumber,
+      this.ifscCode,
+      this.holderName,
+      this.upiId});
 
   factory Inf.fromJson(Map<String, dynamic> json) => Inf(
         infId: json["inf_id"],
         name: json["name"]?.toString(),
         phone: json["phone"]?.toString(),
         ids: json["id"],
+        accountNumber: json["account_no"]?.toString(),
+        ifscCode: json["ifsc_code"]?.toString(),
+        holderName: json["account_holder_name"]?.toString(),
+        upiId: json["upi_id"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -202,12 +218,17 @@ class Inf {
         "name": name,
         "phone": phone,
         "id": ids,
+        "account_no": accountNumber,
+        "ifsc_code": ifscCode,
+        "account_holder_name": holderName,
+        "upi_id": upiId,
       };
 }
 
 class Payment {
   int? amount;
   String? status;
+  String? note;
   DateTime? paidDate;
   int? commission;
   String? bankDetails;
@@ -215,6 +236,7 @@ class Payment {
   Payment({
     this.amount,
     this.status,
+    this.note,
     this.paidDate,
     this.commission,
     this.bankDetails,
@@ -223,6 +245,7 @@ class Payment {
   factory Payment.fromJson(Map<String, dynamic> json) => Payment(
         amount: _parseInt(json["payment"]),
         status: json["payment_status"]?.toString(),
+        note: json["note"]?.toString(),
         paidDate: json["paid_date"] == null
             ? null
             : DateTime.tryParse(json["paid_date"]),
@@ -238,6 +261,7 @@ class Payment {
         "paid_date": paidDate?.toIso8601String(),
         "commission": commission,
         "bank_details": bankDetails,
+        "note": note,
       };
 }
 

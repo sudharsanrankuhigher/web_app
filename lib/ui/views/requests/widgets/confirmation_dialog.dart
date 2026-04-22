@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
@@ -389,6 +390,13 @@ Future<void> showAdminPaymentConfigDialog({
                           if (val == null || val.trim().isEmpty) {
                             return "Please enter commission";
                           }
+                          if (double.tryParse(paymentCtrl.text) != null &&
+                              double.tryParse(commissionCtrl.text) != null) {
+                            if (double.parse(commissionCtrl.text) >
+                                double.parse(paymentCtrl.text)) {
+                              return "Commission cannot be greater than payment amount";
+                            }
+                          }
                           return null;
                         },
                       ),
@@ -530,6 +538,11 @@ Widget _underlineField({
   return TextFormField(
     controller: controller,
     validator: validator,
+    keyboardType: TextInputType.number,
+    inputFormatters: [
+      FilteringTextInputFormatter.digitsOnly,
+      LengthLimitingTextInputFormatter(10)
+    ],
     decoration: InputDecoration(
       labelText: label,
       labelStyle: const TextStyle(fontSize: 13),
@@ -1019,6 +1032,197 @@ Future<void> showPaymentStatusDialog({
             ),
           ),
         ),
+      );
+    },
+  );
+}
+
+Future<void> showAPaymentConfigDialog({
+  required BuildContext context,
+  String note = "",
+  bool instagram = false,
+  bool facebook = false,
+  bool youtube = false,
+}) {
+  final noteCtrl = TextEditingController(text: note);
+
+  final formKey = GlobalKey<FormState>();
+
+  // bool instagram = false;
+  // bool facebook = false;
+  // bool youtube = false;
+
+  String? checkboxError;
+
+  return showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420, minWidth: 320),
+              child: Stack(
+                children: [
+                  Positioned(
+                    right: 10,
+                    top: 10,
+                    child: InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: Icon(Icons.close, size: 20)),
+                  ),
+                  IgnorePointer(
+                    ignoring: true,
+                    child: Form(
+                      key: formKey,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 🔵 Title
+                            const Text(
+                              "Admin Payment Configuration",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.blue,
+                              ),
+                            ),
+
+                            verticalSpacing10,
+
+                            // SM Verification
+                            const Text(
+                              "SM Verification",
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey,
+                              ),
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            _checkItem(
+                              text: "Instagram",
+                              value: instagram,
+                              onChanged: (v) {
+                                setState(() {
+                                  instagram = v;
+                                  checkboxError = null;
+                                });
+                              },
+                            ),
+                            _checkItem(
+                              text: "Facebook",
+                              value: facebook,
+                              onChanged: (v) {
+                                setState(() {
+                                  facebook = v;
+                                  checkboxError = null;
+                                });
+                              },
+                            ),
+                            _checkItem(
+                              text: "Youtube",
+                              value: youtube,
+                              onChanged: (v) {
+                                setState(() {
+                                  youtube = v;
+                                  checkboxError = null;
+                                });
+                              },
+                            ),
+
+                            // Checkbox error
+                            if (checkboxError != null)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 12, top: 4),
+                                child: Text(
+                                  checkboxError!,
+                                  style: const TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ),
+
+                            const SizedBox(height: 16),
+
+                            // Note
+                            _underlineField(
+                              label: "Note",
+                              controller: noteCtrl,
+                            ),
+
+                            const SizedBox(height: 24),
+
+                            // Actions
+                            // Row(
+                            //   mainAxisAlignment: MainAxisAlignment.end,
+                            //   children: [
+                            //     TextButton(
+                            //       onPressed: () => Navigator.pop(context),
+                            //       child: const Text("Cancel"),
+                            //     ),
+                            //     const SizedBox(width: 12),
+                            //     ElevatedButton(
+                            //       style: ButtonStyle(
+                            //         backgroundColor:
+                            //             WidgetStateProperty.all(Colors.blue),
+                            //       ),
+                            //       onPressed: () {
+                            //         final isFormValid =
+                            //             formKey.currentState!.validate();
+                            //         final isCheckboxValid =
+                            //             instagram || facebook || youtube;
+
+                            //         setState(() {
+                            //           checkboxError = isCheckboxValid
+                            //               ? null
+                            //               : "Select at least one platform";
+                            //         });
+
+                            //         if (!isFormValid || !isCheckboxValid) return;
+
+                            //         Navigator.pop(context);
+                            //         onSave({
+                            //           "payment": {
+                            //             "payment": paymentCtrl.text,
+                            //             "commission": commissionCtrl.text,
+                            //             "note": noteCtrl.text,
+                            //           },
+                            //           "verification": {
+                            //             if (instagram == true) "instagram": null,
+                            //             if (facebook == true) "facebook": null,
+                            //             if (youtube == true) "youtube": null,
+                            //           },
+                            //         });
+                            //       },
+                            //       child: Text(
+                            //         "Save",
+                            //         style: fontFamilySemiBold.size13.white,
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       );
     },
   );

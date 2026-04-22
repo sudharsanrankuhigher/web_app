@@ -44,8 +44,8 @@ class ApiService {
   static ApiService init() {
     final dio = Dio(
       BaseOptions(
-        baseUrl: 'https://admin.promoteapp.in/',
-        // baseUrl: 'http://172.20.25.23:8003/',
+        // baseUrl: 'https://admin.promoteapp.in/',
+        baseUrl: 'http://172.20.25.23:8003/',
         // baseUrl: 'http://172.20.25.54:8005/',
         followRedirects: true,
         validateStatus: (status) => status != null && status < 500,
@@ -147,6 +147,35 @@ class ApiService {
     if (response.statusCode == 200) {
       // Fluttertoast.showToast(msg: response.data["message"].toString());
       return GetUsersResponse.fromJson(response.data);
+    } else {
+      final message = response.data?['message'] ?? 'Server error';
+      Fluttertoast.showToast(
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          webBgColor: "linear-gradient(to right, #EF5350, #000000)",
+          webPosition: "center",
+          webShowClose: true,
+          msg: message);
+      throw Exception(message);
+    }
+  }
+
+  ///POST : /api/admin/client/note
+  Future<void> updateNotes(
+      {required int? userId, required String notes}) async {
+    final data = {
+      "client_id": userId,
+      "note": notes,
+    };
+    final response = await _dio.post('api/admin/client/note', data: data);
+    if (response.statusCode == 200) {
+      Fluttertoast.showToast(
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          webBgColor: "linear-gradient(to right, #000000, #000000)",
+          webPosition: "center",
+          webShowClose: true,
+          msg: response.data["message"].toString());
     } else {
       final message = response.data?['message'] ?? 'Server error';
       Fluttertoast.showToast(

@@ -128,6 +128,7 @@ class PlansView extends StackedView<PlansViewModel> {
                                       final newPlan = {
                                         "id": null,
                                         "name": result['planName'],
+                                        "selected_plan": result['selectedPlan'],
                                         "connections": result['connections']
                                                 is int
                                             ? result['connections']

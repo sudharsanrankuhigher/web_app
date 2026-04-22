@@ -43,6 +43,7 @@ class Message {
   List<Influencer>? influencers;
   String? state;
   String? city;
+  List<String>? cities; // 🔥 NEW FIELD
   PaymentElement? payment;
   DateTime? createdAt;
   dynamic completedAt;
@@ -62,6 +63,7 @@ class Message {
       this.influencers,
       this.state,
       this.city,
+      this.cities,
       this.payment,
       this.createdAt,
       this.completedAt,
@@ -78,6 +80,9 @@ class Message {
         companyId: json["company_id"],
         projectName: json["project_name"],
         description: json["description"],
+        cities: json["cities"] == null
+            ? []
+            : List<String>.from(json["cities"].map((x) => x.toString())),
 
         influencers: json["influencers"] == null
             ? []
@@ -124,6 +129,7 @@ class Message {
             : List<dynamic>.from(influencers!.map((x) => x.toJson())),
         "state": state,
         "city": city,
+        "cities": cities ?? [], // 🔥 NEW FIELD
         "payment": payment?.toJson(),
         "created_at": createdAt?.toIso8601String(),
         "completed_at": completedAt,

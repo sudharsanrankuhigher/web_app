@@ -82,6 +82,7 @@ class UserTableSource extends DataTableSource {
         DataCell(Text(user.mobileNumber ?? "")),
         DataCell(Text(user.type ?? "")),
         DataCell(Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             IconButton(
               icon: const Icon(
@@ -92,7 +93,13 @@ class UserTableSource extends DataTableSource {
               onPressed: () => onNotesEdit != null ? onNotesEdit!(user) : null,
             ),
             horizontalSpacing4,
-            Text(user.notes ?? ""),
+            Expanded(
+              child: Text(
+                user.notes ?? "",
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         )),
         DataCell(Text("${user.city}/${user.state}")),

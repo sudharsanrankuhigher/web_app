@@ -185,6 +185,7 @@ class PlansViewModel extends BaseViewModel {
                 : int.tryParse(result['gst']?.toString() ?? '0') ?? 0)
             .toString(),
         "badge": result['badge'],
+        "selected_plan": result['selectedPlan'],
         "category_id": result['category_id'],
       };
       saveOrUpdate(updated);

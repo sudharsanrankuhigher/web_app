@@ -54,6 +54,34 @@ class InfluencerTableSource extends DataTableSource {
     }
   }
 
+  String getFormattedId(int? categoryId, int? id) {
+    if (categoryId == null || id == null) return "UNKNOWN";
+
+    String prefix;
+
+    switch (categoryId) {
+      case 1:
+        prefix = "INF";
+        break;
+      case 2:
+        prefix = "MOV";
+        break;
+      case 3:
+        prefix = "TV";
+        break;
+      case 4:
+        prefix = "SP";
+        break;
+      default:
+        prefix = "UNK";
+    }
+
+    // pad id to 4 digits → 1 => 0001, 10 => 0010
+    final paddedId = id.toString().padLeft(4, '0');
+
+    return "$prefix$paddedId";
+  }
+
   @override
   DataRow? getRow(int index) {
     /// -------------------------------
@@ -115,7 +143,7 @@ class InfluencerTableSource extends DataTableSource {
           ),
         )), // Name
 
-        DataCell(Text(item.infId.toString())),
+        DataCell(Text(getFormattedId(item.category, item.id))),
         DataCell(Text(item.name!)),
         DataCell(Text(item.phone!)),
         DataCell(Text("${item.city}/${item.state}")),

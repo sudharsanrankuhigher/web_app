@@ -25,7 +25,7 @@ class ContactTableSource extends DataTableSource {
         cells: List.generate(
           4, // total columns
           (i) {
-            if (i == 3) {
+            if (i == 2) {
               // column index where message should show
               return const DataCell(
                 Center(

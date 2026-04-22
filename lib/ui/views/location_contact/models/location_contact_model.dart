@@ -41,44 +41,65 @@ class LocationContactModel {
 
 class Datum {
   int? id;
-  String? code;
-  String? city;
+  List<City>? city;
   String? state;
   String? mobileNumber;
   DateTime? createdAt;
-  DateTime? updatedAt;
 
   Datum({
     this.id,
-    this.code,
     this.city,
     this.state,
     this.mobileNumber,
     this.createdAt,
-    this.updatedAt,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         id: json["id"],
-        code: json["code"],
-        city: json["city"],
+        city: json["city"] == null
+            ? []
+            : List<City>.from(json["city"]!.map((x) => City.fromJson(x))),
         state: json["state"],
-        mobileNumber: json["mobile_number"],
+
+        /// 🔥 FIX HERE
+        mobileNumber: json["mobile_number"] == null
+            ? null
+            : json["mobile_number"] is List
+                ? (json["mobile_number"] as List).join(", ")
+                : json["mobile_number"].toString(),
+
         createdAt: json["created_at"] == null
             ? null
             : DateTime.parse(json["created_at"]),
-        updatedAt: json["updated_at"] == null
-            ? null
-            : DateTime.parse(json["updated_at"]),
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
-        "code": code,
-        "city": city,
+        "city": city == null
+            ? []
+            : List<dynamic>.from(city!.map((x) => x.toJson())),
         "state": state,
         "mobile_number": mobileNumber,
         "created_at": createdAt?.toIso8601String(),
-        "updated_at": updatedAt?.toIso8601String(),
+      };
+}
+
+class City {
+  String? id;
+  String? name;
+
+  City({
+    this.id,
+    this.name,
+  });
+
+  factory City.fromJson(Map<String, dynamic> json) => City(
+        id: json["id"],
+        name: json["name"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
       };
 }

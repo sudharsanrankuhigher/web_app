@@ -136,10 +136,17 @@ class _AddressDialogState extends State<AddressDialog> {
   void initState() {
     if (widget.initialData != null) {
       selectedState = widget.initialData!['state'];
-      selectedCity = widget.initialData!['city'];
-      selectedCities = widget.initialData!['cities'] != null
-          ? List<String>.from(widget.initialData!['cities'])
-          : [];
+
+      /// 🔥 FIX CITY LIST
+      final cityData = widget.initialData!['city'];
+      selectedCities = cityData == null
+          ? []
+          : List<String>.from(
+              (cityData as List).map((e) => e['name'].toString()),
+            );
+
+      /// optional single city fallback
+      selectedCity = selectedCities.isNotEmpty ? selectedCities.first : null;
       selectedId = widget.initialData!['code'];
       _phoneController.text = widget.initialData!['mobile_number'];
     }

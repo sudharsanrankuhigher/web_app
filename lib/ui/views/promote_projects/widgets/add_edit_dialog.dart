@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:webapp/core/helper/dialog_state.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
@@ -204,6 +205,22 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
     setState(() {});
   }
 
+  String formatSelectedCities(List<String> cities) {
+    if (cities.isEmpty) return "Select City";
+
+    // If "All" selected → show only All
+    if (cities.contains("All")) return "All";
+
+    if (cities.length <= 2) {
+      return cities.join(", ");
+    }
+
+    final firstTwo = cities.take(2).join(", ");
+    final remaining = cities.length - 2;
+
+    return "$firstTwo +$remaining more";
+  }
+
   @override
   void initState() {
     super.initState();
@@ -221,6 +238,8 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
     gender = widget.model.gender ?? genders.first;
     state = widget.model.state ?? "Tamil Nadu";
     city = widget.model.city ?? "Coimbatore";
+    selectedCities = widget.model.cities ?? [];
+
     instagram = (widget.model.link != null)
         ? widget.model.link!.instagram == null
             ? false
@@ -565,67 +584,69 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                             },
                                           ),
                                         ),
-                                        Positioned.fill(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              /// ◀ LEFT
-                                              IconButton(
-                                                icon: const Icon(
-                                                    Icons.arrow_back_ios,
-                                                    size: 16,
-                                                    color: Colors.grey),
-                                                onPressed: () {
-                                                  final newOffset =
-                                                      thumbnailScrollController
-                                                              .offset -
-                                                          100;
+                                        if (images.length > 7)
+                                          Positioned.fill(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                /// ◀ LEFT
+                                                IconButton(
+                                                  icon: const Icon(
+                                                      Icons.arrow_back_ios,
+                                                      size: 16,
+                                                      color: Colors.grey),
+                                                  onPressed: () {
+                                                    final newOffset =
+                                                        thumbnailScrollController
+                                                                .offset -
+                                                            100;
 
-                                                  thumbnailScrollController
-                                                      .animateTo(
-                                                    newOffset.clamp(
-                                                      0.0,
-                                                      thumbnailScrollController
-                                                          .position
-                                                          .maxScrollExtent,
-                                                    ),
-                                                    duration: const Duration(
-                                                        milliseconds: 300),
-                                                    curve: Curves.easeInOut,
-                                                  );
-                                                },
-                                              ),
+                                                    thumbnailScrollController
+                                                        .animateTo(
+                                                      newOffset.clamp(
+                                                        0.0,
+                                                        thumbnailScrollController
+                                                            .position
+                                                            .maxScrollExtent,
+                                                      ),
+                                                      duration: const Duration(
+                                                          milliseconds: 300),
+                                                      curve: Curves.easeInOut,
+                                                    );
+                                                  },
+                                                ),
 
-                                              /// ▶ RIGHT
-                                              IconButton(
-                                                icon: const Icon(
-                                                    Icons.arrow_forward_ios,
-                                                    size: 16,
-                                                    color: Colors.grey),
-                                                onPressed: () {
-                                                  final newOffset =
-                                                      thumbnailScrollController
-                                                              .offset +
-                                                          100;
+                                                /// ▶ RIGHT
+                                                IconButton(
+                                                  icon: const Icon(
+                                                      Icons.arrow_forward_ios,
+                                                      size: 16,
+                                                      color: Colors.grey),
+                                                  onPressed: () {
+                                                    final newOffset =
+                                                        thumbnailScrollController
+                                                                .offset +
+                                                            100;
 
-                                                  thumbnailScrollController
-                                                      .animateTo(
-                                                    newOffset.clamp(
-                                                      0.0,
-                                                      thumbnailScrollController
-                                                          .position
-                                                          .maxScrollExtent,
-                                                    ),
-                                                    duration: const Duration(
-                                                        milliseconds: 300),
-                                                    curve: Curves.easeInOut,
-                                                  );
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        )
+                                                    thumbnailScrollController
+                                                        .animateTo(
+                                                      newOffset.clamp(
+                                                        0.0,
+                                                        thumbnailScrollController
+                                                            .position
+                                                            .maxScrollExtent,
+                                                      ),
+                                                      duration: const Duration(
+                                                          milliseconds: 300),
+                                                      curve: Curves.easeInOut,
+                                                    );
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          )
                                       ],
                                     ),
 
@@ -762,6 +783,10 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                             label: 'Payment',
                                             child: InitialTextForm(
                                               radius: 10,
+                                              inputFormatters: [
+                                                FilteringTextInputFormatter
+                                                    .digitsOnly,
+                                              ],
                                               controller: paymentCtrl,
                                               hintText: 'Payment',
                                               readOnly: isView,
@@ -791,6 +816,10 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                               readOnly: isView,
                                               keyboardType:
                                                   TextInputType.number,
+                                              inputFormatters: [
+                                                FilteringTextInputFormatter
+                                                    .digitsOnly,
+                                              ],
                                               validator: (val) {
                                                 if (val == null ||
                                                     val.isEmpty) {
@@ -1243,20 +1272,12 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
       {double? width, double? height, BoxFit fit = BoxFit.cover}) {
     // ================= NETWORK =================
     if (item.isNetwork && item.url != null) {
-        return Image.network(
-        item.url!,
-        width: width,
-        height: height,
-        fit: fit,
-        errorBuilder: (_, __, ___) =>
-            const Icon(Icons.broken_image, color: Colors.red),
+      return WebImageTwo(
+        imageUrl: item.url!,
+        width: width ?? double.infinity,
+        height: height ?? double.infinity,
+        fit: BoxFit.cover,
       );
-      // return WebImageTwo(
-      //   imageUrl: item.url!,
-      //   width: width ?? double.infinity,
-      //   height: height ?? double.infinity,
-      //   fit: BoxFit.cover,
-      // );
     }
 
     // ================= WEB MEMORY =================
@@ -1328,7 +1349,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
     setState(() {
       isInfluencerSelected = selectedInfluencerIds.isEmpty;
       isStateError = state.isEmpty;
-      isCityError = city.isEmpty;
+      isCityError = selectedCities.isEmpty;
       isGenderError = gender.isEmpty;
       isImageError = images.isEmpty;
       isCompanyError = selectedCompany == null; // ✅ ADD THIS
@@ -1358,7 +1379,8 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
       "projectTitle": titleCtrl.text,
       "gender": gender,
       "state": state,
-      "city": city,
+      // "city": city,
+      "cities": selectedCities, // 🔥 multi select
       "influencers": selectedInfluencerIds,
       "companyId": selectedCompany!['id'],
       "companyName": selectedCompany!['name'],

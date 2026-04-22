@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:webapp/core/model/cities_model.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+
 class StateCityDynamicDropdown extends StatefulWidget {
   final bool showCity;
   final bool multi;
@@ -56,8 +57,7 @@ class StateCityDynamicDropdown extends StatefulWidget {
       _StateCityDynamicDropdownState();
 }
 
-class _StateCityDynamicDropdownState
-    extends State<StateCityDynamicDropdown> {
+class _StateCityDynamicDropdownState extends State<StateCityDynamicDropdown> {
   List<CityModel> cities = [];
   List<String> states = [];
 
@@ -92,8 +92,7 @@ class _StateCityDynamicDropdownState
   }
 
   Future<void> loadCities() async {
-    final String data =
-        await rootBundle.loadString('assets/json/cities.json');
+    final String data = await rootBundle.loadString('assets/json/cities.json');
     final List jsonData = json.decode(data);
 
     cities = jsonData.map((e) => CityModel.fromJson(e)).toList();
@@ -106,10 +105,7 @@ class _StateCityDynamicDropdownState
 
   List<String> getCitiesByState(String state) {
     if (cities.isEmpty) return [];
-    return cities
-        .where((c) => c.state == state)
-        .map((c) => c.name)
-        .toList();
+    return cities.where((c) => c.state == state).map((c) => c.name).toList();
   }
 
   CityModel? getCityByName(String name) {
@@ -136,10 +132,7 @@ class _StateCityDynamicDropdownState
 
                   return states.where((s) {
                     if (search.isEmpty) return true;
-                    return s
-                        .toLowerCase()
-                        .replaceAll(' ', '')
-                        .contains(search);
+                    return s.toLowerCase().replaceAll(' ', '').contains(search);
                   }).toList();
                 },
                 onChanged: (value) {
@@ -151,6 +144,18 @@ class _StateCityDynamicDropdownState
 
                   if (value != null) widget.onStateChanged(value);
                 },
+                decoratorProps: DropDownDecoratorProps(
+                  decoration: InputDecoration(
+                    hintText: "Select State",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    fillColor: white.withOpacity(0.5),
+                    filled: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10),
+                  ),
+                ),
               ),
 
               if (widget.showCity) ...[
@@ -160,14 +165,48 @@ class _StateCityDynamicDropdownState
                 widget.multi
                     ? DropdownSearch<String>.multiSelection(
                         selectedItems: selectedCities,
+
                         items: (String filter, LoadProps? props) {
                           if (selectedState == null) return [];
                           return getCitiesByState(selectedState!);
                         },
+
                         onChanged: (values) {
                           setState(() => selectedCities = values);
                           widget.onCitiesChanged?.call(values);
                         },
+
+                        /// ✅ UI display control (NOT data change)
+                        dropdownBuilder: (context, selectedItems) {
+                          if (selectedItems.isEmpty) {
+                            return const Text("Select City");
+                          }
+
+                          if (selectedItems.contains("All")) {
+                            return const Text("All");
+                          }
+
+                          final display = selectedItems.length <= 2
+                              ? selectedItems.join(", ")
+                              : "${selectedItems.take(2).join(", ")} +${selectedItems.length - 2} more";
+
+                          return Text(
+                            display,
+                            overflow: TextOverflow.ellipsis,
+                          );
+                        },
+                        decoratorProps: DropDownDecoratorProps(
+                          decoration: InputDecoration(
+                            hintText: "",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            fillColor: white.withOpacity(0.5),
+                            filled: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
+                          ),
+                        ),
                       )
                     : DropdownSearch<String>(
                         selectedItem: selectedCity,
@@ -175,6 +214,18 @@ class _StateCityDynamicDropdownState
                           if (selectedState == null) return [];
                           return getCitiesByState(selectedState!);
                         },
+                        decoratorProps: DropDownDecoratorProps(
+                          decoration: InputDecoration(
+                            hintText: "Select State",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            fillColor: white.withOpacity(0.5),
+                            filled: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
+                          ),
+                        ),
                         onChanged: (value) {
                           final city = getCityByName(value ?? "");
 
@@ -199,11 +250,48 @@ class _StateCityDynamicDropdownState
                   child: widget.multi
                       ? DropdownSearch<String>.multiSelection(
                           selectedItems: selectedCities,
-                          items: (f, p) =>
-                              getCitiesByState(selectedState ?? ''),
+
+                          items: (String filter, LoadProps? props) {
+                            if (selectedState == null) return [];
+                            return getCitiesByState(selectedState!);
+                          },
+
                           onChanged: (values) {
                             setState(() => selectedCities = values);
                             widget.onCitiesChanged?.call(values);
+                          },
+
+                          decoratorProps: DropDownDecoratorProps(
+                            decoration: InputDecoration(
+                              hintText: "",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              fillColor: white.withOpacity(0.7),
+                              filled: true,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 10),
+                            ),
+                          ),
+
+                          /// ✅ UI display control (NOT data change)
+                          dropdownBuilder: (context, selectedItems) {
+                            if (selectedItems.isEmpty) {
+                              return const Text("Select City");
+                            }
+
+                            if (selectedItems.contains("All")) {
+                              return const Text("All");
+                            }
+
+                            final display = selectedItems.length <= 2
+                                ? selectedItems.join(", ")
+                                : "${selectedItems.take(2).join(", ")} +${selectedItems.length - 2} more";
+
+                            return Text(
+                              display,
+                              overflow: TextOverflow.ellipsis,
+                            );
                           },
                         )
                       : _buildCity(),
@@ -215,6 +303,19 @@ class _StateCityDynamicDropdownState
   Widget _buildState() => DropdownSearch<String>(
         selectedItem: selectedState,
         items: (f, p) => states,
+        decoratorProps: DropDownDecoratorProps(
+          decoration: InputDecoration(
+            hintText: "",
+            border: OutlineInputBorder(
+              borderSide: BorderSide(color: white.withOpacity(0.7)),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            fillColor: white.withOpacity(0.7),
+            filled: true,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          ),
+        ),
         onChanged: (v) {
           setState(() {
             selectedState = v;
@@ -233,4 +334,18 @@ class _StateCityDynamicDropdownState
           widget.onCityChanged?.call(v);
         },
       );
+}
+
+String formatSelectedCities(List<String> cities) {
+  if (cities.isEmpty) return "Select City";
+  if (cities.contains("All")) return "All";
+
+  if (cities.length <= 2) {
+    return cities.join(", ");
+  }
+
+  final firstTwo = cities.take(2).join(", ");
+  final remaining = cities.length - 2;
+
+  return "$firstTwo +$remaining more";
 }

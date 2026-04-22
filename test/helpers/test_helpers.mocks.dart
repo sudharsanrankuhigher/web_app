@@ -1003,6 +1003,24 @@ class MockApiService extends _i1.Mock implements _i27.ApiService {
       ) as _i25.Future<_i4.GetUsersResponse>);
 
   @override
+  _i25.Future<void> updateNotes({
+    required int? userId,
+    required String? notes,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #updateNotes,
+          [],
+          {
+            #userId: userId,
+            #notes: notes,
+          },
+        ),
+        returnValue: _i25.Future<void>.value(),
+        returnValueForMissingStub: _i25.Future<void>.value(),
+      ) as _i25.Future<void>);
+
+  @override
   _i25.Future<_i5.StateModel> addState(dynamic addStateRequest) =>
       (super.noSuchMethod(
         Invocation.method(
