@@ -44,6 +44,34 @@ class RequestTableSource extends DataTableSource {
       this.infReject,
       this.showNote);
 
+  String getFormattedId(int? categoryId, int? id) {
+    if (categoryId == null || id == null) return "UNKNOWN";
+
+    String prefix;
+
+    switch (categoryId) {
+      case 1:
+        prefix = "INF";
+        break;
+      case 2:
+        prefix = "MOV";
+        break;
+      case 3:
+        prefix = "TV";
+        break;
+      case 4:
+        prefix = "SP";
+        break;
+      default:
+        prefix = "UNK";
+    }
+
+    // pad id to 4 digits → 1 => 0001, 10 => 0010
+    final paddedId = id.toString().padLeft(4, '0');
+
+    return "$prefix$paddedId";
+  }
+
   @override
   DataRow? getRow(int index) {
     if (index >= data.length) return null;
@@ -512,16 +540,21 @@ class RequestTableSource extends DataTableSource {
               : InkWell(
                   onTap: () =>
                       m.status == 11 ? null : onGotoPromoteCommission(m),
-                  child: Row(
-                    children: [
-                      Text(
-                        'Paid',
-                        style: fontFamilySemiBold.size13.continueButton,
-                      ),
-                      horizontalSpacing4,
-                      Text(
-                          " / ${DateFormatter.formatToDDMMMYYYY(m.dates!.payment.toString())}"),
-                    ],
+                  child: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: (m.status == 10) ? 'Paid' : 'Success',
+                          style: fontFamilySemiBold.size13.continueButton,
+                        ),
+                        TextSpan(
+                          text:
+                              " / ${DateFormatter.formatToDDMMMYYYY(m.dates!.payment.toString())}",
+                          style: fontFamilyRegular
+                              .size13, // adjust style if needed
+                        ),
+                      ],
+                    ),
                   ),
                 )),
         ];

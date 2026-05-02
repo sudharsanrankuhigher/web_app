@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webapp/core/model/cities_model.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
-import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 
 class StateCityDynamicDropdown extends StatefulWidget {
   final bool showCity;

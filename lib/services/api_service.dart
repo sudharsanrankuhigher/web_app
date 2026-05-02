@@ -44,8 +44,8 @@ class ApiService {
   static ApiService init() {
     final dio = Dio(
       BaseOptions(
-        // baseUrl: 'https://admin.promoteapp.in/',
-        baseUrl: 'http://172.20.25.23:8003/',
+        baseUrl: 'https://admin.promoteapp.in/',
+        // baseUrl: 'http://172.20.25.23:8003/',
         // baseUrl: 'http://172.20.25.54:8005/',
         followRedirects: true,
         validateStatus: (status) => status != null && status < 500,
@@ -1123,6 +1123,40 @@ class ApiService {
       // Fluttertoast.showToast(msg: response.data["message"].toString());
 
       return request_model.ProjectRequestModel.fromJson(response.data);
+    } else {
+      final message = response.data?['message'] ?? 'Server error';
+      Fluttertoast.showToast(
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          webBgColor: "linear-gradient(to right, #EF5350, #000000)",
+          webPosition: "center",
+          webShowClose: true,
+          msg: message);
+      throw Exception(message);
+    }
+  }
+
+  ///POST: /api/admin/promote/note
+  Future<void> addPromoteNote(requestId, note) async {
+    final req = {
+      "promote_project_id": requestId,
+      "note": note,
+    };
+    final response = await _dio.post('api/admin/promote/note',
+        data: req,
+        options: Options(
+          validateStatus: (status) => status != null && status < 500,
+        ));
+    if (response.statusCode == 200) {
+      Fluttertoast.showToast(
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          webBgColor: "linear-gradient(to right, #000000, #000000)",
+          webPosition: "center",
+          webShowClose: true,
+          msg: response.data["message"].toString());
+
+      return response.data;
     } else {
       final message = response.data?['message'] ?? 'Server error';
       Fluttertoast.showToast(

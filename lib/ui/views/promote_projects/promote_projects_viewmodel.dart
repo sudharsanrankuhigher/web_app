@@ -10,6 +10,7 @@ import 'package:webapp/app/app.locator.dart' show locator;
 import 'package:webapp/core/navigation/navigation_mixin.dart';
 import 'package:webapp/services/api_service.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/promote_projects/model/payment_split_model.dart'
     as split_model;
 import 'package:webapp/ui/views/promote_projects/model/prmote_table_model.dart'
@@ -594,6 +595,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
         onReAssign: onReAssign,
         onRevoke: onRevoke,
         onCompanyPaymentVerified: onCompanyPaymentVerified,
+        onNotesEdit: onNoteEdit,
       );
     } catch (_) {
       tableData = [];
@@ -1227,9 +1229,81 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       onReAssign: onReAssign,
       onRevoke: onRevoke,
       onCompanyPaymentVerified: onCompanyPaymentVerified,
+      onNotesEdit: onNoteEdit,
     );
 
     notifyListeners();
+  }
+
+  Future<void> onNoteEdit(promote_table_model.Datum user) async {
+    final result = await showNotesDialog(user);
+    if (result != null) {
+      // 👉 call API here
+      final res = await _apiService
+          .addPromoteNote(
+            user.id,
+            result,
+          )
+          .then((value) => loadPromoteTable(selectedStatus));
+
+      print("Updated Notes: $result for User ID: ${user.id}");
+      // Fluttertoast.showToast(
+      //   msg: "Notes updated successfully $result",
+      // );
+    }
+  }
+
+  Future<String?> showNotesDialog(promote_table_model.Datum user) {
+    final context = StackedService.navigatorKey!.currentContext!;
+    final controller = TextEditingController(text: user.note ?? "");
+
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text("${user.influencerName} Notes"),
+          content: SizedBox(
+            width: 400,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: controller,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    hintText: "Enter notes...",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: publisButtonColor,
+              ),
+              onPressed: () {
+                final text = controller.text.trim();
+                if (text.isEmpty) return;
+
+                Navigator.pop(dialogContext, text);
+              },
+              child: Text(
+                "Update",
+                style: fontFamilySemiBold.size13.white,
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text("Close", style: fontFamilySemiBold.size13.red),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 

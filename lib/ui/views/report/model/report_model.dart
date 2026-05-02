@@ -131,6 +131,34 @@ class ClientProjectDetails {
       };
 }
 
+String getFormattedId(int? categoryId, int? id) {
+  if (categoryId == null || id == null) return "UNKNOWN";
+
+  String prefix;
+
+  switch (categoryId) {
+    case 1:
+      prefix = "INF";
+      break;
+    case 2:
+      prefix = "MOV";
+      break;
+    case 3:
+      prefix = "TV";
+      break;
+    case 4:
+      prefix = "SP";
+      break;
+    default:
+      prefix = "UNK";
+  }
+
+  // pad id to 4 digits → 1 => 0001, 10 => 0010
+  final paddedId = id.toString().padLeft(4, '0');
+
+  return "$prefix$paddedId";
+}
+
 class Datum {
   int? id;
   String? clientName;
@@ -156,7 +184,7 @@ class Datum {
         id: json["id"],
         clientName: json["client_name"],
         clientPhone: json["client_phone"],
-        infId: json["inf_id"],
+        infId: getFormattedId(json['inf_category_id'], json['inf_id']),
         infName: json["inf_name"],
         clientPayment: json["client_payment"],
         clientCommission: json["client_commission"],

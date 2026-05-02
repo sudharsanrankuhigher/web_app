@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:webapp/ui/views/requests/model/request_model.dart';
+
 PromoteTableModel promoteTableModelFromJson(String str) =>
     PromoteTableModel.fromJson(json.decode(str));
 
@@ -37,6 +39,34 @@ class PromoteTableModel {
             : List<dynamic>.from(data!.map((x) => x.toJson())),
         "project_code": projectCode,
       };
+}
+
+String getFormattedId(int? categoryId, int? id) {
+  if (categoryId == null || id == null) return "UNKNOWN";
+
+  String prefix;
+
+  switch (categoryId) {
+    case 1:
+      prefix = "INF";
+      break;
+    case 2:
+      prefix = "MOV";
+      break;
+    case 3:
+      prefix = "TV";
+      break;
+    case 4:
+      prefix = "SP";
+      break;
+    default:
+      prefix = "UNK";
+  }
+
+  // pad id to 4 digits → 1 => 0001, 10 => 0010
+  final paddedId = id.toString().padLeft(4, '0');
+
+  return "$prefix$paddedId";
 }
 
 class Datum {
@@ -85,9 +115,11 @@ class Datum {
     this.reworkStatus,
     this.link,
   });
+
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         id: json["id"],
-        influencerId: json["influencer_id"],
+        influencerId:
+            getFormattedId(json['influencer_category_id'], json['inf_id']),
         infId: json["inf_id"],
         influencerName: json["influencer_name"],
         influencerPhone: json["influencer_phone"],

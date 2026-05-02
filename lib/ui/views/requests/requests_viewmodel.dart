@@ -634,13 +634,18 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
   }
 
   showNote(request_model.Datum model) {
-    print("Note: ${model.payment?.note}");
+    final promo = model.promotion;
+
+    bool hasInstagram = promo?.raw.containsKey("instagram") ?? false;
+    bool hasFacebook = promo?.raw.containsKey("facebook") ?? false;
+    bool hasYoutube = promo?.raw.containsKey("youtube") ?? false;
+
     showAPaymentConfigDialog(
       context: StackedService.navigatorKey!.currentContext!,
       note: model.payment?.note ?? "",
-      instagram: model.promotion?.instagram != null ? true : false,
-      facebook: model.promotion?.facebook != null ? true : false,
-      youtube: model.promotion?.youtube != null ? true : false,
+      instagram: hasInstagram,
+      facebook: hasFacebook,
+      youtube: hasYoutube,
     );
   }
 
@@ -735,7 +740,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       final data = {
         "client_project_id": model.id,
         "inf_id": selected.id,
-        "status": 3
+        "status": 2
       };
       await assignInfluencer(data);
       print(data);

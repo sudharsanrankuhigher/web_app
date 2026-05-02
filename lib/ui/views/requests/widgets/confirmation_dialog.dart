@@ -370,6 +370,10 @@ Future<void> showAdminPaymentConfigDialog({
 
                       // Payment Amount
                       _underlineField(
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10)
+                        ],
                         label: "Payment Amount",
                         controller: paymentCtrl,
                         validator: (val) {
@@ -384,6 +388,10 @@ Future<void> showAdminPaymentConfigDialog({
 
                       // Commission
                       _underlineField(
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10)
+                        ],
                         label: "Commission",
                         controller: commissionCtrl,
                         validator: (val) {
@@ -534,15 +542,13 @@ Widget _underlineField({
   required String label,
   required TextEditingController controller,
   String? Function(String?)? validator,
+  List<TextInputFormatter>? inputFormatters,
 }) {
   return TextFormField(
     controller: controller,
     validator: validator,
     keyboardType: TextInputType.number,
-    inputFormatters: [
-      FilteringTextInputFormatter.digitsOnly,
-      LengthLimitingTextInputFormatter(10)
-    ],
+    inputFormatters: inputFormatters,
     decoration: InputDecoration(
       labelText: label,
       labelStyle: const TextStyle(fontSize: 13),
@@ -1073,7 +1079,7 @@ Future<void> showAPaymentConfigDialog({
                     top: 10,
                     child: InkWell(
                         onTap: () => Navigator.pop(context),
-                        child: Icon(Icons.close, size: 20)),
+                        child: const Icon(Icons.close, size: 20)),
                   ),
                   IgnorePointer(
                     ignoring: true,

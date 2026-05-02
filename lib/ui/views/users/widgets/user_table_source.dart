@@ -187,7 +187,7 @@ class UserTableSource extends DataTableSource {
                           scrollDirection: Axis.horizontal,
                           child: DataTable(
                             columnSpacing: 40,
-                            headingRowColor: MaterialStateProperty.all(
+                            headingRowColor: WidgetStateProperty.all(
                               Colors.grey.shade200,
                             ),
                             columns: const [

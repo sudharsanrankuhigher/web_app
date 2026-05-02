@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:webapp/core/model/cities_model.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
-import 'package:webapp/widgets/state_city_drop_down.dart';
 import 'package:webapp/widgets/state_city_dynamic_dropdown.dart';
 
 class AddressDialog extends StatefulWidget {

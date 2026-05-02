@@ -21,23 +21,23 @@ class ReportTableSource extends DataTableSource {
       return DataRow(
           color: WidgetStateProperty.all(Colors.grey.shade300),
           cells: [
-            DataCell(Text("")),
-            DataCell(Text("")),
+            const DataCell(Text("")),
+            const DataCell(Text("")),
             DataCell(
               Text(
                 "TOTAL",
                 style: fontFamilySemiBold.size13.black,
               ),
             ),
-            DataCell(Center(child: Text(""))),
-            DataCell(Text("")),
+            const DataCell(Center(child: Text(""))),
+            const DataCell(Text("")),
             DataCell(
               Text(
                 total!,
                 style: fontFamilySemiBold.size13.black,
               ),
             ),
-            DataCell(Text("")),
+            const DataCell(Text("")),
           ]);
     }
 

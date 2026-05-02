@@ -182,6 +182,34 @@ class Dates {
       };
 }
 
+String getFormattedId(int? categoryId, int? id) {
+  if (categoryId == null || id == null) return "UNKNOWN";
+
+  String prefix;
+
+  switch (categoryId) {
+    case 1:
+      prefix = "INF";
+      break;
+    case 2:
+      prefix = "MOV";
+      break;
+    case 3:
+      prefix = "TV";
+      break;
+    case 4:
+      prefix = "SP";
+      break;
+    default:
+      prefix = "UNK";
+  }
+
+  // pad id to 4 digits → 1 => 0001, 10 => 0010
+  final paddedId = id.toString().padLeft(4, '0');
+
+  return "$prefix$paddedId";
+}
+
 class Inf {
   dynamic infId;
   String? name;
@@ -203,7 +231,7 @@ class Inf {
       this.upiId});
 
   factory Inf.fromJson(Map<String, dynamic> json) => Inf(
-        infId: json["inf_id"],
+        infId: getFormattedId(json["category_id"], json["id"]),
         name: json["name"]?.toString(),
         phone: json["phone"]?.toString(),
         ids: json["id"],
@@ -283,21 +311,40 @@ class Promotion {
   String? facebook;
   String? instagram;
 
+  // ✅ ADD THIS
+  Map<String, dynamic> raw;
+
   Promotion({
     this.youtube,
     this.facebook,
     this.instagram,
+    required this.raw,
   });
 
-  factory Promotion.fromJson(Map<String, dynamic> json) => Promotion(
-        youtube: json["youtube"]?.toString(),
-        facebook: json["facebook"]?.toString(),
-        instagram: json["instagram"]?.toString(),
+  factory Promotion.fromJson(dynamic json) {
+    // Handle [] case
+    if (json == null || json is List) {
+      return Promotion(
+        youtube: null,
+        facebook: null,
+        instagram: null,
+        raw: {},
       );
+    }
+
+    final map = Map<String, dynamic>.from(json);
+
+    return Promotion(
+      youtube: map["youtube"]?.toString(),
+      facebook: map["facebook"]?.toString(),
+      instagram: map["instagram"]?.toString(),
+      raw: map, // ✅ store original keys
+    );
+  }
 
   Map<String, dynamic> toJson() => {
-        "youtube": youtube,
-        "facebook": facebook,
-        "instagram": instagram,
+        if (raw.containsKey("youtube")) "youtube": youtube,
+        if (raw.containsKey("facebook")) "facebook": facebook,
+        if (raw.containsKey("instagram")) "instagram": instagram,
       };
 }

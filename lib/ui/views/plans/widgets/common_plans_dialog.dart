@@ -90,7 +90,7 @@ class CommonPlanDialog {
                       Container(
                           padding: leftPadding20,
                           alignment: Alignment.centerLeft,
-                          child: Text('Selected Plan Category')),
+                          child: const Text('Selected Plan Category')),
                       verticalSpacing8,
                       IgnorePointer(
                         ignoring: isView,

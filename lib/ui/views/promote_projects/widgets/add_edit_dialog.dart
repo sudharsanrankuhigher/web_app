@@ -380,7 +380,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
           height: 650,
           child: Stack(
             children: [
-              Positioned.fill(child: const ColoredBox(color: disableColor)),
+              const Positioned.fill(child: ColoredBox(color: disableColor)),
               // WebImage(
               //   imageUrl: "https://dummyimage.com/600x400/eeeeee/eeeeee.png",
               //   height: MediaQuery.of(context).size.height * 0.9,
