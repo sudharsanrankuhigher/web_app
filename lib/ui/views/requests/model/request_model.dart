@@ -50,6 +50,7 @@ class Datum {
   Payment? payment;
   Promotion? promotion;
   int? status;
+  int? refundStatus;
   String? category;
   DateTime? createdAt;
   DateTime? updatedAt;
@@ -63,6 +64,7 @@ class Datum {
     this.payment,
     this.promotion,
     this.status,
+    this.refundStatus,
     this.category,
     this.createdAt,
     this.updatedAt,
@@ -81,6 +83,9 @@ class Datum {
             ? int.tryParse(json["status"].toString())
             : null,
         category: json["category_id"],
+        refundStatus: json["refund_status"] != null
+            ? int.tryParse(json["refund_status"].toString())
+            : null,
         createdAt: json["created_at"] == null
             ? null
             : DateTime.tryParse(json["created_at"]),
@@ -98,6 +103,7 @@ class Datum {
         "payment": payment?.toJson(),
         "promotion": promotion?.toJson(),
         "status": status,
+        "refund_status": refundStatus,
         "category_id": category,
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
@@ -154,6 +160,8 @@ class Dates {
   dynamic completed;
   dynamic payment;
   dynamic cancelled;
+  DateTime? refund;
+  DateTime? refundUpdated;
 
   Dates({
     this.requestedAt,
@@ -161,6 +169,8 @@ class Dates {
     this.completed,
     this.payment,
     this.cancelled,
+    this.refund,
+    this.refundUpdated,
   });
 
   factory Dates.fromJson(Map<String, dynamic> json) => Dates(
@@ -171,6 +181,11 @@ class Dates {
         completed: json["completed"],
         payment: json["payment"],
         cancelled: json["cancelled"],
+        refund:
+            json["refund"] == null ? null : DateTime.tryParse(json["refund"]),
+        refundUpdated: json["refund_updated"] == null
+            ? null
+            : DateTime.tryParse(json["refund_updated"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -179,6 +194,8 @@ class Dates {
         "completed": completed,
         "payment": payment,
         "cancelled": cancelled,
+        "refund": refund?.toIso8601String(),
+        "refund_updated": refundUpdated?.toIso8601String(),
       };
 }
 

@@ -78,6 +78,7 @@ class CommonSubAdminDialog {
     Uint8List? idProofBytes;
     String? idProofPath = model?.docImg;
     bool isPdf = false;
+    String? idProofExtension;
 
     Widget uploadPlaceholder() {
       return const Center(
@@ -310,10 +311,12 @@ class CommonSubAdminDialog {
                               if (idProofPath != null) {
                                 isPdf =
                                     idProofPath!.toLowerCase().endsWith('.pdf');
+                                idProofExtension = idProofPath!.split('.').last;
                               }
                               print(idProofBytes);
                               print(idProofPath);
                               print(isPdf);
+                              print(idProofExtension);
                             });
                           },
                           child: Container(
@@ -467,6 +470,7 @@ class CommonSubAdminDialog {
                   "existing_image": model?.profileImage,
                   "existing_doc": model?.docImg,
                   "idImage": idProofBytes,
+                  "id_proof_extension": idProofExtension,
                   "status": status,
                 });
                 state = '';

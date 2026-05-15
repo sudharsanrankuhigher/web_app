@@ -176,4 +176,17 @@ class ContactSupportViewModel extends BaseViewModel {
       onConfirm: () => deleteSelected(),
     );
   }
+
+  void applySort(bool isChecked, String sortType) {
+    if (sortType == "A-Z") {
+      clients.sort((a, b) =>
+          (a.name ?? '').toLowerCase().compareTo((b.name ?? '').toLowerCase()));
+    } else if (sortType == "older") {
+      clients.sort((a, b) => (a.id ?? 0).compareTo(b.id ?? 0));
+    } else if (sortType == "newer") {
+      clients.sort((a, b) => (b.id ?? 0).compareTo(a.id ?? 0));
+    }
+    tableSource.updateData(clients);
+    notifyListeners();
+  }
 }

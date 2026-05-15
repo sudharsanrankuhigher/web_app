@@ -8,6 +8,7 @@ import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_chips.dart';
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
+import 'package:webapp/widgets/no_access_widget.dart';
 
 import 'requests_viewmodel.dart';
 
@@ -20,6 +21,10 @@ class RequestsView extends StackedView<RequestsViewModel> {
     RequestsViewModel viewModel,
     Widget? child,
   ) {
+    if (!PermissionHelper.instance.canView('requests')) {
+      return const Scaffold(body: NoAccessWidget());
+    }
+
     final bool isExtended = MediaQuery.of(context).size.width > 900;
 
     return Scaffold(
@@ -244,6 +249,23 @@ class RequestsView extends StackedView<RequestsViewModel> {
                             onTap: () => viewModel.setSelected(9),
                             margin: defaultPadding10,
                           ),
+                          if ((PermissionHelper.instance
+                              .has('client_payment_approval')))
+                            CommonStatusChip(
+                              text: "ReFund",
+                              imagePath: "assets/images/verified.svg",
+                              textStyle: viewModel.isSelected == 11
+                                  ? fontFamilySemiBold.size14.white
+                                  : fontFamilySemiBold.size14.black,
+                              bgColor: viewModel.isSelected == 11
+                                  ? appGreen400
+                                  : white,
+                              imageColor: viewModel.isSelected == 11
+                                  ? white
+                                  : appSecond950,
+                              onTap: () => viewModel.setSelected(11),
+                              margin: defaultPadding10,
+                            ),
                         ],
                       ),
                       verticalSpacing20,
@@ -342,4 +364,11 @@ class RequestsView extends StackedView<RequestsViewModel> {
     BuildContext context,
   ) =>
       RequestsViewModel();
+
+  @override
+  void onViewModelReady(RequestsViewModel viewModel) {
+    if (PermissionHelper.instance.canView('requests')) {
+      viewModel.setSelected(0);
+    }
+  }
 }

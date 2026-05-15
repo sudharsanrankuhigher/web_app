@@ -10,6 +10,7 @@ enum RequestStatus {
   promotePay,
   promoteCommission,
   clientPaymentVerified,
+  refund
 }
 
 extension RequestStatusMapper on RequestStatus {
@@ -38,6 +39,8 @@ extension RequestStatusMapper on RequestStatus {
         return [11];
       case RequestStatus.clientPaymentVerified:
         return [12];
+      case RequestStatus.refund:
+        return [13];
       default:
         return [];
     }
@@ -63,6 +66,8 @@ extension RequestStatusX on RequestStatus {
         return "promote_commission";
       case RequestStatus.clientPaymentVerified:
         return "client_payment_verified";
+      case RequestStatus.refund:
+        return "refund";
       default:
         return name;
     }
@@ -85,6 +90,9 @@ extension RequestStatusFilter on RequestStatus {
       case RequestStatus.clientPaymentVerified:
         // client_payment_verified shows ONLY itself
         return [12];
+      case RequestStatus.refund:
+        // refund shows ONLY itself
+        return [13];
 
       default:
         return backendCodes;

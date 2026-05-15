@@ -100,7 +100,7 @@ class ContactSupportView extends StackedView<ContactSupportViewModel> {
                                     initialCheckbox: false,
                                     initialSort: "A-Z",
                                     onApply: (isChecked, sortType) {
-                                      // viewModel.applySort(isChecked, sortType);
+                                      viewModel.applySort(isChecked, sortType);
                                     },
                                   );
                                 },
@@ -124,7 +124,7 @@ class ContactSupportView extends StackedView<ContactSupportViewModel> {
                                   DataColumn(label: Text('Phone')),
                                   DataColumn(label: Text('description')),
                                   DataColumn(label: Text('Note')),
-                                  // DataColumn(label: Text('Contact No')),
+                                  DataColumn(label: Text('status')),
                                   DataColumn(label: Text('Actions')),
                                 ],
                                 rowsperPage: viewModel.tableSource.rowCount < 10

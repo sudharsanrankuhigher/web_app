@@ -248,6 +248,7 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
         name,
       ),
     );
+    print('filteredService $filteredService');
     notifyListeners();
   }
 
@@ -257,25 +258,54 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
     //   }
     if (sortType == "A-Z") {
       influencers.sort((a, b) => a.name!.compareTo(b.name!));
+      filteredService.sort((a, b) {
+        final nameA = influencerNameMap[a.infId] ?? '';
+        final nameB = influencerNameMap[b.infId] ?? '';
+        return nameA.compareTo(nameB);
+      });
+      allService.sort((a, b) {
+        final nameA = influencerNameMap[a.infId] ?? '';
+        final nameB = influencerNameMap[b.infId] ?? '';
+        return nameA.compareTo(nameB);
+      });
     } else if (sortType == "clientAsc") {
-      bannerList.sort((a, b) => a.id!.compareTo(b.id!));
+      filteredService.sort((a, b) => a.id!.compareTo(b.id!));
+      allService.sort((a, b) => a.id!.compareTo(b.id!));
     } else if (sortType == "older") {
-      bannerList.sort((a, b) {
-        DateTime aDate = a.createdAt != null
+      filteredService.sort((a, b) {
+        DateTime aDate = b.createdAt != null
+            ? DateTime.parse(b.createdAt.toString())
+            : DateTime(1970);
+        DateTime bDate = a.createdAt != null
             ? DateTime.parse(a.createdAt.toString())
             : DateTime(1970);
-        DateTime bDate = b.createdAt != null
+        return bDate.compareTo(aDate);
+      });
+      allService.sort((a, b) {
+        DateTime aDate = b.createdAt != null
             ? DateTime.parse(b.createdAt.toString())
+            : DateTime(1970);
+        DateTime bDate = a.createdAt != null
+            ? DateTime.parse(a.createdAt.toString())
             : DateTime(1970);
         return bDate.compareTo(aDate);
       });
     } else if (sortType == "newer") {
-      bannerList.sort((a, b) {
-        DateTime aDate = a.createdAt != null
+      filteredService.sort((a, b) {
+        DateTime aDate = b.createdAt != null
+            ? DateTime.parse(b.createdAt.toString())
+            : DateTime(1970);
+        DateTime bDate = a.createdAt != null
             ? DateTime.parse(a.createdAt.toString())
             : DateTime(1970);
-        DateTime bDate = b.createdAt != null
+        return aDate.compareTo(bDate);
+      });
+      allService.sort((a, b) {
+        DateTime aDate = b.createdAt != null
             ? DateTime.parse(b.createdAt.toString())
+            : DateTime(1970);
+        DateTime bDate = a.createdAt != null
+            ? DateTime.parse(a.createdAt.toString())
             : DateTime(1970);
         return aDate.compareTo(bDate);
       });

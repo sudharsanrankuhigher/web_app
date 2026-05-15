@@ -44,9 +44,9 @@ class ApiService {
   static ApiService init() {
     final dio = Dio(
       BaseOptions(
-        baseUrl: 'https://admin.promoteapp.in/',
+        // baseUrl: 'https://admin.promoteapp.in/',
         // baseUrl: 'http://172.20.25.23:8003/',
-        // baseUrl: 'http://172.20.25.54:8005/',
+        baseUrl: 'http://172.20.25.54:8005/',
         followRedirects: true,
         validateStatus: (status) => status != null && status < 500,
       ),
@@ -1395,6 +1395,36 @@ class ApiService {
     }
   }
 
+  ///POST: /promote/refund/status
+  Future<dynamic> refundPromoteProject(request) async {
+    final response = await _dio.post('api/admin/promote/refund/status',
+        data: request,
+        options: Options(
+          validateStatus: (status) => status != null && status < 500,
+        ));
+    if (response.statusCode == 200) {
+      Fluttertoast.showToast(
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          webBgColor: "linear-gradient(to right, #000000, #000000)",
+          webPosition: "center",
+          webShowClose: true,
+          msg: response.data["message"].toString());
+
+      return response.data;
+    } else {
+      final message = response.data?['message'] ?? 'Server error';
+      Fluttertoast.showToast(
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          webBgColor: "linear-gradient(to right, #EF5350, #000000)",
+          webPosition: "center",
+          webShowClose: true,
+          msg: message);
+      throw Exception(message);
+    }
+  }
+
   ///POST: /api/admin/payment/list
   Future<PaymentSplitModel> getPaymentSplit(request) async {
     final response = await _dio.post('api/admin/payment/list', data: request);
@@ -1653,6 +1683,41 @@ class ApiService {
     } catch (e) {
       print("Report API Error: $e");
       rethrow; // let stacked handle busy/error state
+    }
+  }
+
+  ///POST: /api/admin/refund/status
+  Future<void> refundStatus(
+    connectionId,
+  ) async {
+    final req = {
+      "connection_id": connectionId,
+    };
+    final response = await _dio.post('api/admin/refund/status',
+        data: req,
+        options: Options(
+          validateStatus: (status) => status != null && status < 500,
+        ));
+    if (response.statusCode == 200) {
+      Fluttertoast.showToast(
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          webBgColor: "linear-gradient(to right, #000000, #000000)",
+          webPosition: "center",
+          webShowClose: true,
+          msg: response.data["message"].toString());
+
+      return response.data;
+    } else {
+      final message = response.data?['message'] ?? 'Server error';
+      Fluttertoast.showToast(
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          webBgColor: "linear-gradient(to right, #EF5350, #000000)",
+          webPosition: "center",
+          webShowClose: true,
+          msg: message);
+      throw Exception(message);
     }
   }
 }

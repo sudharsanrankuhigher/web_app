@@ -10,8 +10,13 @@ import 'package:webapp/ui/views/contact_support/model/client_model.dart'
 import 'package:webapp/ui/views/contact_support/widget/show_note_dialog.dart';
 
 class ClientTableSource extends DataTableSource {
-  final List<client_model.Datum> data;
+  List<client_model.Datum> data;
   final ContactSupportViewModel vm;
+
+  void updateData(List<client_model.Datum> newData) {
+    data = newData;
+    notifyListeners();
+  }
 
   ClientTableSource({
     required this.data,
@@ -32,7 +37,7 @@ class ClientTableSource extends DataTableSource {
     if (data.isEmpty) {
       return DataRow(
         cells: List.generate(
-          7, // total columns
+          8, // total columns
           (i) {
             if (i == 3) {
               // column index where message should show
@@ -84,6 +89,29 @@ class ClientTableSource extends DataTableSource {
         DataCell(Text(item.mobile!)), // Phone
         DataCell(Text(item.description!)), // Phone
         DataCell(Text(item.note!)), // Note
+        DataCell((status == 'completed')
+            ? Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: greenShade1,
+                ),
+                padding: defaultPadding8 - topPadding4 - bottomPadding4,
+                child: Text(
+                  item.status!,
+                  style: fontFamilySemiBold.size12.white,
+                ),
+              )
+            : Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: red,
+                ),
+                padding: defaultPadding8 - topPadding4 - bottomPadding4,
+                child: Text(
+                  item.status.toString().capitalizeFirst(),
+                  style: fontFamilySemiBold.size12.white,
+                ),
+              )), // Note
         // DataCell(Text(item.alternativeNo!)), // Contact No
         DataCell((status == 'pending')
             ? IgnorePointer(
@@ -133,29 +161,7 @@ class ClientTableSource extends DataTableSource {
                   ],
                 ),
               )
-            : (status == 'completed')
-                ? Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: greenShade1,
-                    ),
-                    padding: defaultPadding8 - topPadding4 - bottomPadding4,
-                    child: Text(
-                      item.status!,
-                      style: fontFamilySemiBold.size12.white,
-                    ),
-                  )
-                : Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: red,
-                    ),
-                    padding: defaultPadding8 - topPadding4 - bottomPadding4,
-                    child: Text(
-                      item.status.toString().capitalizeFirst(),
-                      style: fontFamilySemiBold.size12.white,
-                    ),
-                  )),
+            : Container()),
       ],
     );
   }

@@ -6,6 +6,7 @@ import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_chips.dart';
+import 'package:webapp/widgets/no_access_widget.dart';
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
 
@@ -20,6 +21,10 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
     PromoteProjectsViewModel viewModel,
     Widget? child,
   ) {
+    if (!PermissionHelper.instance.canView('promotion_projects')) {
+      return const Scaffold(body: NoAccessWidget());
+    }
+
     final bool isExtended = MediaQuery.of(context).size.width > 1440;
 
     return Scaffold(
@@ -118,23 +123,27 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                 },
                               ),
                             ),
-                            horizontalSpacing8,
-                            SizedBox(
-                              // width: 180,
-                              child: CommonButton(
-                                padding: defaultPadding12,
-                                icon: const Icon(Icons.add,
-                                    color: white, size: 16),
-                                buttonColor: continueButton,
-                                textStyle: fontFamilyMedium.size14.white,
-                                margin: EdgeInsets.zero,
-                                borderRadius: 10,
-                                text: isExtended ? "Add Projects" : "",
-                                onTap: () async {
-                                  viewModel.createProject(context);
-                                },
+                            if (PermissionHelper.instance
+                                .has('add_promotion_projects'))
+                              horizontalSpacing8,
+                            if (PermissionHelper.instance
+                                .has('add_promotion_projects'))
+                              SizedBox(
+                                // width: 180,
+                                child: CommonButton(
+                                  padding: defaultPadding12,
+                                  icon: const Icon(Icons.add,
+                                      color: white, size: 16),
+                                  buttonColor: continueButton,
+                                  textStyle: fontFamilyMedium.size14.white,
+                                  margin: EdgeInsets.zero,
+                                  borderRadius: 10,
+                                  text: isExtended ? "Add Projects" : "",
+                                  onTap: () async {
+                                    viewModel.createProject(context);
+                                  },
+                                ),
                               ),
-                            ),
                             horizontalSpacing8,
                             SizedBox(
                               // width: 180,
@@ -180,15 +189,16 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                               viewModel.isProjectTableLoading == true
                           ? const Center(child: CircularProgressIndicator())
                           : CommonPaginatedTable(
+                              key: ValueKey(viewModel.tableSource.rowCount),
                               columns: viewModel.isInprogress
                                   ? viewModel.inProgressColumns
                                   : viewModel.completedColumns,
                               source: viewModel.tableSource,
-                              rowsperPage: viewModel.tableSource.rowCount == 0
-                                  ? 1
-                                  : (viewModel.tableSource.rowCount < 10
-                                      ? viewModel.tableSource.rowCount
-                                      : 10),
+                              rowsperPage: viewModel.tableSource.rowCount < 10
+                                  ? (viewModel.tableSource.rowCount == 0
+                                      ? 1
+                                      : viewModel.tableSource.rowCount)
+                                  : 10,
                               minWidth: 1000,
                             ),
                     ),
@@ -427,6 +437,26 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                 },
                                 margin: defaultPadding10,
                               ),
+                              if (PermissionHelper.instance
+                                  .has('company_payment_approval'))
+                                CommonStatusChip(
+                                  text: "Refund",
+                                  imagePath: "assets/images/pay.svg",
+                                  textStyle: viewModel.isChipSelected == 9
+                                      ? fontFamilySemiBold.size14.white
+                                      : fontFamilySemiBold.size14.black,
+                                  bgColor: viewModel.isChipSelected == 9
+                                      ? appGreen400
+                                      : white,
+                                  imageColor: viewModel.isChipSelected == 9
+                                      ? white
+                                      : null,
+                                  onTap: () {
+                                    print("Completed");
+                                    viewModel.setChipSelected(9);
+                                  },
+                                  margin: defaultPadding10,
+                                ),
                               SizedBox(
                                 width: 180,
                                 child: CommonButton(
@@ -473,6 +503,7 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                     child: CircularProgressIndicator(),
                                   )
                                 : CommonPaginatedTable(
+                                    key: ValueKey(viewModel.promoteTableSource),
                                     columns: viewModel.getColumnsByStatus(
                                         viewModel.promoteTableSource.status),
                                     source: viewModel.promoteTableSource,
@@ -506,4 +537,11 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
     BuildContext context,
   ) =>
       PromoteProjectsViewModel();
+
+  @override
+  void onViewModelReady(PromoteProjectsViewModel viewModel) {
+    if (PermissionHelper.instance.canView('promotion_projects')) {
+      viewModel.init();
+    }
+  }
 }

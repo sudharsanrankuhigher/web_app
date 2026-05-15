@@ -1862,6 +1862,17 @@ class MockApiService extends _i1.Mock implements _i27.ApiService {
       ) as _i25.Future<dynamic>);
 
   @override
+  _i25.Future<dynamic> refundPromoteProject(dynamic request) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #refundPromoteProject,
+          [request],
+        ),
+        returnValue: _i25.Future<dynamic>.value(),
+        returnValueForMissingStub: _i25.Future<dynamic>.value(),
+      ) as _i25.Future<dynamic>);
+
+  @override
   _i25.Future<_i18.PaymentSplitModel> getPaymentSplit(dynamic request) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -2095,4 +2106,14 @@ class MockApiService extends _i1.Mock implements _i27.ApiService {
           ),
         )),
       ) as _i25.Future<_i21.ReportModel>);
+
+  @override
+  _i25.Future<void> refundStatus(dynamic connectionId) => (super.noSuchMethod(
+        Invocation.method(
+          #refundStatus,
+          [connectionId],
+        ),
+        returnValue: _i25.Future<void>.value(),
+        returnValueForMissingStub: _i25.Future<void>.value(),
+      ) as _i25.Future<void>);
 }

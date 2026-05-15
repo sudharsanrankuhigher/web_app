@@ -266,9 +266,9 @@ class AddEditCompanyPage {
                             fillColor: white,
                             hintText: 'GST Number',
                             initialValue: initial?.gstNo,
-                            validator: (value) => value == null || value.isEmpty
-                                ? 'Please enter GST number'
-                                : null,
+                            // validator: (value) => value == null || value.isEmpty
+                            //     ? 'Please enter GST number'
+                            //     : null,
                             onSaved: (value) {
                               setDialogState(() {
                                 gstNo = value;

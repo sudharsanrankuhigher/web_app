@@ -624,11 +624,11 @@ class InfluencersViewModel extends BaseViewModel {
     if (currentSort == "A-Z") {
       temp.sort((a, b) => (a.name ?? '').compareTo(b.name ?? ''));
     } else if (currentSort == "older") {
-      temp.sort((a, b) => (b.createdAt ?? DateTime(1970))
-          .compareTo(a.createdAt ?? DateTime(1970)));
-    } else if (currentSort == "newer") {
       temp.sort((a, b) => (a.createdAt ?? DateTime(1970))
           .compareTo(b.createdAt ?? DateTime(1970)));
+    } else if (currentSort == "newer") {
+      temp.sort((a, b) => (b.createdAt ?? DateTime(1970))
+          .compareTo(a.createdAt ?? DateTime(1970)));
     }
 
     displayInfluencers = temp;

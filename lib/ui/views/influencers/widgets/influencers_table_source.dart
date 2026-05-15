@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:webapp/core/helper/date_helper.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
@@ -92,7 +93,7 @@ class InfluencerTableSource extends DataTableSource {
     if (influencers.isEmpty) {
       return DataRow(
         cells: List.generate(
-          13, // total columns
+          14, // total columns
           (i) {
             if (i == 6) {
               // column index where message should show
@@ -155,6 +156,8 @@ class InfluencerTableSource extends DataTableSource {
         DataCell(Text(item.instagramFollowers!.toString())),
         DataCell(Text(item.youtubeFollowers.toString())),
         DataCell(Text(item.facebookFollowers.toString())),
+        DataCell(
+            Text(DateFormatter.formatToDDMMMYYYY(item.createdAt!).toString())),
 
         /// ACTION BUTTONS
         DataCell(

@@ -18,7 +18,7 @@ import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
 
 class RequestsViewModel extends BaseViewModel with NavigationMixin {
   RequestsViewModel() {
-    setSelected(0);
+    // Moved to onViewModelReady in RequestsView
   }
   String? _selectedString;
   int _isSelected = 0;
@@ -45,6 +45,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     RequestStatus.promotePay,
     RequestStatus.promoteCommission,
     RequestStatus.clientPaymentVerified,
+    RequestStatus.refund,
   ];
 
   final _dialogService = locator<DialogService>();
@@ -87,49 +88,56 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       final res = await _apiService.getClientRequest(tabStatus.apiCode);
       requests = res.data ?? [];
       print("Total requests fetched: ${requests.length}");
-      final filteredData = requests.where((e) {
+      filteredData = requests.where((e) {
         final apiStatus = e.status; // INT from backend
         return tabStatus.filterBackendCodes.contains(apiStatus);
       }).toList();
 
       requests = filteredData;
       tableSource = RequestTableSource(
-          filteredData,
-          tabStatus.value,
-          onReject,
-          onWaiting,
-          onProceed,
-          onPreparing,
-          onGoToPromoteVerified,
-          onRevoke,
-          onGotoPromotePay,
-          onPaymentDialog,
-          onGotoPromoteCommission,
-          onClientPaymentVerified,
-          onReAssign,
-          onBankDetails,
-          infReject,
-          showNote);
+        filteredData,
+        tabStatus.value,
+        onReject,
+        onWaiting,
+        onProceed,
+        onPreparing,
+        onGoToPromoteVerified,
+        onRevoke,
+        onGotoPromotePay,
+        onPaymentDialog,
+        onGotoPromoteCommission,
+        onClientPaymentVerified,
+        onReAssign,
+        onBankDetails,
+        infReject,
+        onRefund,
+        onRefundDialog,
+        showNote,
+      );
 
       _isRequest = false;
     } catch (e) {
       requests = [];
-      tableSource = RequestTableSource([],
-          tabStatus.value,
-          onReject,
-          onWaiting,
-          onProceed,
-          onPreparing,
-          onGoToPromoteVerified,
-          onRevoke,
-          onGotoPromotePay,
-          onPaymentDialog,
-          onGotoPromoteCommission,
-          onClientPaymentVerified,
-          onReAssign,
-          onBankDetails,
-          infReject,
-          showNote);
+      tableSource = RequestTableSource(
+        [],
+        tabStatus.value,
+        onReject,
+        onWaiting,
+        onProceed,
+        onPreparing,
+        onGoToPromoteVerified,
+        onRevoke,
+        onGotoPromotePay,
+        onPaymentDialog,
+        onGotoPromoteCommission,
+        onClientPaymentVerified,
+        onReAssign,
+        onBankDetails,
+        infReject,
+        onRefund,
+        onRefundDialog,
+        showNote,
+      );
 
       _isRequest = false;
     }
@@ -159,33 +167,50 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     }
 
     tableSource = RequestTableSource(
-        filteredData,
-        _selectedString!,
-        onReject,
-        onWaiting,
-        onProceed,
-        onPreparing,
-        onGoToPromoteVerified,
-        onRevoke,
-        onGotoPromotePay,
-        onPaymentDialog,
-        onGotoPromoteCommission,
-        onClientPaymentVerified,
-        onReAssign,
-        onBankDetails,
-        infReject,
-        showNote);
+      filteredData,
+      _selectedString!,
+      onReject,
+      onWaiting,
+      onProceed,
+      onPreparing,
+      onGoToPromoteVerified,
+      onRevoke,
+      onGotoPromotePay,
+      onPaymentDialog,
+      onGotoPromoteCommission,
+      onClientPaymentVerified,
+      onReAssign,
+      onBankDetails,
+      infReject,
+      onRefund,
+      onRefundDialog,
+      showNote,
+    );
     notifyListeners();
   }
 
   void applySort(bool specialFilter, String sortType) {
     if (sortType == "A-Z") {
       filteredData.sort((a, b) =>
-          (a.client ?? "").toString().compareTo(b.client.toString() ?? ""));
+          (a.client ?? "").toString().compareTo((b.client ?? "").toString()));
+      requests.sort((a, b) =>
+          (a.client ?? "").toString().compareTo((b.client ?? "").toString()));
     } else if (sortType == "clientAsc") {
       filteredData.sort((a, b) => (a.id ?? 0).compareTo(b.id ?? 0));
+      requests.sort((a, b) => (a.id ?? 0).compareTo(b.id ?? 0));
     } else if (sortType == "older") {
       filteredData.sort((a, b) {
+        DateTime aDate = a.createdAt != null
+            ? DateTime.parse(a.createdAt!.toString())
+            : DateTime(1970);
+
+        DateTime bDate = b.createdAt != null
+            ? DateTime.parse(b.createdAt!.toString())
+            : DateTime(1970);
+
+        return aDate.compareTo(bDate);
+      });
+      requests.sort((a, b) {
         DateTime aDate = a.createdAt != null
             ? DateTime.parse(a.createdAt!.toString())
             : DateTime(1970);
@@ -208,24 +233,38 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
 
         return bDate.compareTo(aDate);
       });
+      requests.sort((a, b) {
+        DateTime aDate = a.createdAt != null
+            ? DateTime.parse(a.createdAt!.toString())
+            : DateTime(1970);
+
+        DateTime bDate = b.createdAt != null
+            ? DateTime.parse(b.createdAt!.toString())
+            : DateTime(1970);
+
+        return bDate.compareTo(aDate);
+      });
     }
     tableSource = RequestTableSource(
-        filteredData,
-        _selectedString!,
-        onReject,
-        onWaiting,
-        onProceed,
-        onPreparing,
-        onGoToPromoteVerified,
-        onRevoke,
-        onGotoPromotePay,
-        onPaymentDialog,
-        onGotoPromoteCommission,
-        onClientPaymentVerified,
-        onReAssign,
-        onBankDetails,
-        infReject,
-        showNote);
+      filteredData,
+      _selectedString!,
+      onReject,
+      onWaiting,
+      onProceed,
+      onPreparing,
+      onGoToPromoteVerified,
+      onRevoke,
+      onGotoPromotePay,
+      onPaymentDialog,
+      onGotoPromoteCommission,
+      onClientPaymentVerified,
+      onReAssign,
+      onBankDetails,
+      infReject,
+      onRefund,
+      onRefundDialog,
+      showNote,
+    );
 
     // 🔥 notify UI
     print("Applied sort: $sortType, specialFilter: $specialFilter");
@@ -311,6 +350,9 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(
               label: Text("Action"),
               headingRowAlignment: MainAxisAlignment.center),
+          DataColumn(
+              label: Text("Cancel"),
+              headingRowAlignment: MainAxisAlignment.center),
         ];
 
       // 5. Completed
@@ -338,7 +380,15 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Client Phone")),
           DataColumn(label: Text("Influencer Phone")),
           DataColumn(label: Text("Requested Date")),
-          DataColumn(label: Text("Action")),
+          DataColumn(
+              label: Text("Revoke"),
+              headingRowAlignment: MainAxisAlignment.center),
+          DataColumn(
+              label: Text("Reassign"),
+              headingRowAlignment: MainAxisAlignment.center),
+          DataColumn(
+              label: Text("Refunded"),
+              headingRowAlignment: MainAxisAlignment.center),
         ];
 
       // 7. Rejected
@@ -352,7 +402,15 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Influencer Phone")),
           DataColumn(label: Text("Requested Date")),
           DataColumn(label: Text("Rejected Date")),
-          DataColumn(label: Text("Action")),
+          DataColumn(
+              label: Text("Revoke"),
+              headingRowAlignment: MainAxisAlignment.center),
+          DataColumn(
+              label: Text("Reassign"),
+              headingRowAlignment: MainAxisAlignment.center),
+          DataColumn(
+              label: Text("Refunded"),
+              headingRowAlignment: MainAxisAlignment.center),
         ];
 
       // 8. Promote Verified
@@ -399,6 +457,8 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
               label: Text("Action"),
               headingRowAlignment: MainAxisAlignment.center),
         ];
+
+      // 11. Client Payment Verified
       case "client_payment_verified":
         return const [
           DataColumn(label: Text("S.No")),
@@ -410,6 +470,23 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(
               label: Text("Action"),
               headingRowAlignment: MainAxisAlignment.center),
+        ];
+
+      //13: Refund
+      case "refund":
+        return const [
+          DataColumn(label: Text("S.No")),
+          DataColumn(label: Text("Project Code")),
+          DataColumn(label: Text("client_name")),
+          DataColumn(label: Text("client_Phone")),
+          DataColumn(label: Text("Refund amount")),
+          DataColumn(label: Text("Refunded created")),
+          DataColumn(label: Text("Refunded completed")),
+          DataColumn(
+            label: Text("status"),
+            // headingRowAlignment: MainAxisAlignment.center
+          ),
+          DataColumn(label: Text("Action")),
         ];
 
       default:
@@ -510,8 +587,6 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         });
   }
 
-  //reAssign
-
   //waiting
   onWaiting(request_model.Datum model) {
     showActionConfirmationDialog(
@@ -527,6 +602,28 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           "id": model.id,
           // "status": 12,
           "status": 2,
+          "client_id": model.client!.id,
+        };
+        statusChange(data);
+      },
+    );
+  }
+
+  //reFunded
+
+  onRefund(request_model.Datum model) {
+    showActionConfirmationDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      title: 'Refunded',
+      confirmText: "Refund",
+      message:
+          "Are you sure you want to move the ${model.projectId} to the refunded section?",
+      icon: Icons.hourglass_top,
+      confirmColor: Colors.green,
+      onConfirm: () {
+        final data = {
+          "id": model.id,
+          "status": 13,
           "client_id": model.client!.id,
         };
         statusChange(data);
@@ -720,7 +817,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       onConfirm: () {
         final data = {
           "id": model.id,
-          "status": 4,
+          "status": 2,
           "client_id": model.client!.id,
         };
         statusChange(data);
@@ -835,6 +932,23 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     );
   }
 
+  onRefundDialog(request_model.Datum model) {
+    showActionConfirmationDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      title: 'Refunded',
+      confirmText: "Refunded",
+      image: "assets/images/pay.svg",
+      message:
+          "Are you sure you want to completed refund for the ${model.projectId} project?",
+      icon: Icons.free_cancellation,
+      confirmColor: publisButtonColor,
+      onConfirm: () async {
+        await _apiService.refundStatus(model.id);
+        await onRefresh();
+      },
+    );
+  }
+
   Future<void> onRefresh() async {
     setSelected(_isSelected);
   }
@@ -851,3 +965,5 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
 //9:Promote-Verified,
 //10:Promote-Pay,
 //11:Promote-Commission
+//12:client-payment-verified
+//13:refunded

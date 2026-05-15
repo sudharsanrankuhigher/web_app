@@ -8,6 +8,7 @@ class PromoteStatus {
   static const promotePay = 'promote_pay';
   static const promoteCommission = 'promote_commission';
   static const companyPaymentVerified = 'company_payment_verified';
+  static const refund = 'refund';
 
   /// UI status → backend status code
   static const Map<String, int> statusCode = {
@@ -20,5 +21,6 @@ class PromoteStatus {
     promotePay: 7,
     promoteCommission: 8,
     companyPaymentVerified: 9,
+    refund: 10,
   };
 }

@@ -18,7 +18,7 @@ class ProjectModel {
   });
 
   factory ProjectModel.fromJson(Map<String, dynamic> json) => ProjectModel(
-        status: json["status"],
+        status: _toInt(json["status"]),
         message: json["message"] == null
             ? []
             : List<Message>.from(
@@ -74,7 +74,7 @@ class Message {
       this.link});
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
-        id: json["id"],
+        id: _toInt(json["id"]),
         projectCode: json["project_code"],
         companyName: json["company_name"],
         companyId: json["company_id"],
@@ -114,7 +114,7 @@ class Message {
 
         gender: json["gender"],
         link: _parseLink(json["link"]),
-        isEditable: json["is_editable"] ?? 0,
+        isEditable: _toInt(json["is_editable"]) ?? 0,
       );
 
   Map<String, dynamic> toJson() => {
@@ -183,7 +183,7 @@ class ProjectImage {
   ProjectImage({this.id, this.image});
 
   factory ProjectImage.fromJson(Map<String, dynamic> json) => ProjectImage(
-        id: json["id"],
+        id: _toInt(json["id"]),
         image: json["image"],
       );
 
@@ -201,7 +201,7 @@ class Influencer {
   Influencer({this.id, this.name, this.image});
 
   factory Influencer.fromJson(Map<String, dynamic> json) => Influencer(
-        id: json["id"],
+        id: _toInt(json["id"]),
         name: json["name"],
         image: json["image"],
       );
@@ -216,17 +216,31 @@ class Influencer {
 class PaymentElement {
   int? payment;
   int? commission;
+  int? gst;
+  int? totalAmount;
+  int? commissionPercent;
 
-  PaymentElement({this.payment, this.commission});
+  PaymentElement(
+      {this.payment,
+      this.commission,
+      this.gst,
+      this.totalAmount,
+      this.commissionPercent});
 
   factory PaymentElement.fromJson(Map<String, dynamic> json) => PaymentElement(
         payment: int.tryParse(json["payment"].toString()),
         commission: int.tryParse(json["commission"].toString()),
+        gst: int.tryParse(json["gst"].toString()),
+        totalAmount: int.tryParse(json["total_amount"].toString()),
+        commissionPercent: int.tryParse(json["commission_percent"].toString()),
       );
 
   Map<String, dynamic> toJson() => {
         "payment": payment,
         "commission": commission,
+        "gst": gst,
+        "total_amount": totalAmount,
+        "commission_percent": commissionPercent,
       };
 }
 
@@ -252,4 +266,12 @@ class LinkElement {
         "facebook": facebook,
         "instagram": instagram,
       };
+}
+
+int? _toInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is String) return int.tryParse(value);
+  if (value is double) return value.toInt();
+  return null;
 }

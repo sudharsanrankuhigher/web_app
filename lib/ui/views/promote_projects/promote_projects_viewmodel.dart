@@ -33,7 +33,7 @@ import 'package:webapp/ui/views/add_company/model/company_model.dart'
 
 class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
   PromoteProjectsViewModel() {
-    init();
+    // Moved to onViewModelReady in PromoteProjectsView
   }
 
   /// 🔹 Master data
@@ -115,19 +115,38 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     try {
       final res = await _apiService.changePromoteStatus(request);
 
-      // ✅ LOCAL variable (important)
-      final bool isSuccess = res['status'] == 200;
+      const bool isSuccess = true;
 
-      _dialogService.showDialog(
-        title: isSuccess ? "Success" : "Error",
-        description: res['message'] ??
-            (isSuccess
-                ? "Status changed successfully."
-                : "Failed to change status."),
+      await _dialogService.showDialog(
+        title: "Success",
+        description: res['message'] ?? "Status changed successfully.",
       );
 
       if (isSuccess) {
-        loadPromoteTable(selectedStatus);
+        await loadPromoteTable(selectedStatus);
+      }
+    } catch (e) {
+      log(e.toString());
+      _dialogService.showDialog(
+        title: "Error",
+        description: "An error occurred while changing status.",
+      );
+    }
+  }
+
+  Future<void> changeRefundStatus(request) async {
+    try {
+      final res = await _apiService.refundPromoteProject(request);
+
+      const bool isSuccess = true;
+
+      await _dialogService.showDialog(
+        title: "Success",
+        description: res['message'] ?? "Status changed successfully.",
+      );
+
+      if (isSuccess) {
+        await loadPromoteTable(selectedStatus);
       }
     } catch (e) {
       log(e.toString());
@@ -154,6 +173,9 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
         {
           "payment": request["payment"],
           "commission": request["commission"],
+          "gst": request['tax_percent'],
+          "total_amount": request['total_amount'],
+          "commission_percent": request['commission_percent'],
         }
       ],
       "description": request["note"],
@@ -203,6 +225,17 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           );
           formData.fields.add(
             MapEntry("payment[$i][commission]", item["commission"].toString()),
+          );
+          formData.fields.add(
+            MapEntry("payment[$i][gst]", item["gst"].toString()),
+          );
+          formData.fields.add(
+            MapEntry(
+                "payment[$i][total_amount]", item["total_amount"].toString()),
+          );
+          formData.fields.add(
+            MapEntry("payment[$i][commission_percent]",
+                item["commission_percent"].toString()),
           );
         }
       }
@@ -560,6 +593,9 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       case PromoteStatus.companyPaymentVerified:
         _projectStatus = 9;
         break;
+      case PromoteStatus.refund:
+        _projectStatus = 10;
+        break;
       default:
         _projectStatus = 0;
     }
@@ -596,6 +632,8 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
         onRevoke: onRevoke,
         onCompanyPaymentVerified: onCompanyPaymentVerified,
         onNotesEdit: onNoteEdit,
+        refunInit: refunInit,
+        onRefund: onRefund,
       );
     } catch (_) {
       tableData = [];
@@ -657,6 +695,9 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
               headingRowAlignment: MainAxisAlignment.center),
           DataColumn(
               label: Text("Action"),
+              headingRowAlignment: MainAxisAlignment.center), // 9 columns
+          DataColumn(
+              label: Text("Reject"),
               headingRowAlignment: MainAxisAlignment.center), // 9 columns
         ];
 
@@ -742,7 +783,21 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Assigned Date")),
           DataColumn(label: Text("Completed Date")),
           DataColumn(label: Text("Bank Details")),
-          DataColumn(label: Text("Commission")),
+          DataColumn(label: Text("Payment Amount")),
+          DataColumn(label: Text("Action")),
+          DataColumn(label: Text("Refund ")),
+        ];
+
+      case PromoteStatus.refund:
+        return const [
+          DataColumn(label: Text("S.No")),
+          DataColumn(label: Text("Project Code")),
+          DataColumn(label: Text("Influencers")),
+          DataColumn(label: Text("Influencer ID")),
+          DataColumn(label: Text("Payment Amount")),
+          DataColumn(label: Text("Refund status")),
+          DataColumn(label: Text("refund initiated")),
+          DataColumn(label: Text("refund Completed")),
           DataColumn(label: Text("Action")),
         ];
 
@@ -783,6 +838,9 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
         break;
       case 8:
         await loadPromoteTable(PromoteStatus.companyPaymentVerified);
+        break;
+      case 9:
+        await loadPromoteTable(PromoteStatus.refund);
         break;
     }
 
@@ -964,6 +1022,39 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     );
   }
 
+  Future<void> refunInit(model) async {
+    showActionConfirmationDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      title: 'Refund initiated',
+      confirmText: "Refund initiated",
+      message: "Are you sure you want to refund initiated the ${model.subId}?",
+      icon: Icons.hourglass_top,
+      confirmColor: Colors.green,
+      onConfirm: () async {
+        await changeStatus({
+          "promote_project_id": model.id,
+          "status": 10,
+        });
+      },
+    );
+  }
+
+  Future<void> onRefund(model) async {
+    showActionConfirmationDialog(
+      context: StackedService.navigatorKey!.currentContext!,
+      title: 'Refund',
+      confirmText: "Refund",
+      message: "Are you sure you want to refund completed the ${model.subId}?",
+      icon: Icons.hourglass_top,
+      confirmColor: Colors.green,
+      onConfirm: () async {
+        await changeRefundStatus({
+          "promote_project_id": model.id,
+        });
+      },
+    );
+  }
+
   onGotoPromotePay(model) {
     showActionConfirmationDialog(
       context: StackedService.navigatorKey!.currentContext!,
@@ -1051,23 +1142,15 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
         companies.sort((a, b) => a.id!.compareTo(b.id!));
       } else if (sortType == "older") {
         companies.sort((a, b) {
-          DateTime aDate = a.createdAt != null
-              ? DateTime.parse(a.createdAt.toString())
-              : DateTime(1970);
-          DateTime bDate = b.createdAt != null
-              ? DateTime.parse(b.createdAt.toString())
-              : DateTime(1970);
-          return bDate.compareTo(aDate);
+          DateTime aDate = a.createdAt ?? DateTime(1970);
+          DateTime bDate = b.createdAt ?? DateTime(1970);
+          return aDate.compareTo(bDate);
         });
       } else if (sortType == "newer") {
         companies.sort((a, b) {
-          DateTime aDate = a.createdAt != null
-              ? DateTime.parse(a.createdAt.toString())
-              : DateTime(1970);
-          DateTime bDate = b.createdAt != null
-              ? DateTime.parse(b.createdAt.toString())
-              : DateTime(1970);
-          return aDate.compareTo(bDate);
+          DateTime aDate = a.createdAt ?? DateTime(1970);
+          DateTime bDate = b.createdAt ?? DateTime(1970);
+          return bDate.compareTo(aDate);
         });
       } else {
         // No sorting
@@ -1103,31 +1186,19 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
         plans.sort((a, b) => a.id!.compareTo(b.id!));
       } else if (sortType == "older") {
         plans.sort((a, b) {
-          DateTime aDate = a.createdAt != null
-              ? DateTime.parse(a.createdAt.toString())
-              : DateTime(1970);
-          DateTime bDate = b.createdAt != null
-              ? DateTime.parse(b.createdAt.toString())
-              : DateTime(1970);
-          return bDate.compareTo(aDate);
+          DateTime aDate = a.createdAt ?? DateTime(1970);
+          DateTime bDate = b.createdAt ?? DateTime(1970);
+          return aDate.compareTo(bDate);
         });
       } else if (sortType == "newer") {
         plans.sort((a, b) {
-          DateTime aDate = a.createdAt != null
-              ? DateTime.parse(a.createdAt.toString())
-              : DateTime(1970);
-          DateTime bDate = b.createdAt != null
-              ? DateTime.parse(b.createdAt.toString())
-              : DateTime(1970);
-          return aDate.compareTo(bDate);
+          DateTime aDate = a.createdAt ?? DateTime(1970);
+          DateTime bDate = b.createdAt ?? DateTime(1970);
+          return bDate.compareTo(aDate);
         });
-      } else {
-        // No sorting
       }
       tableSource.updateData(plans);
-
       notifyListeners();
-      // loadProjects();
     }
   }
 
@@ -1172,53 +1243,55 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     }
   }
 
-  void sortPromoteList(List list, String sortType) {
+  void sortPromoteList(List<promote_table_model.Datum> list, String sortType) {
+    print(
+        "Sorting promote list with type: $sortType, list size: ${list.length}");
+    if (list.isNotEmpty) {
+      print(
+          "First item before sort: ${list.first.influencerName} / ${list.first.createdAt}");
+    }
     if (sortType == "A-Z") {
       list.sort((a, b) {
-        final nameCompare = (a.companyName ?? '')
+        final nameCompare = (a.influencerName ?? '')
             .toLowerCase()
-            .compareTo((b.companyName ?? '').toLowerCase());
+            .compareTo((b.influencerName ?? '').toLowerCase());
 
         if (nameCompare != 0) return nameCompare;
 
-        return (a.projectCode ?? '')
+        return (a.subId ?? '')
             .toLowerCase()
-            .compareTo((b.projectCode ?? '').toLowerCase());
+            .compareTo((b.subId ?? '').toLowerCase());
       });
     } else if (sortType == "clientAsc") {
       list.sort((a, b) => (a.id ?? 0).compareTo(b.id ?? 0));
     } else if (sortType == "older") {
       list.sort((a, b) {
-        DateTime aDate = a.createdAt != null
-            ? DateTime.parse(a.createdAt.toString())
-            : DateTime(1970);
-        DateTime bDate = b.createdAt != null
-            ? DateTime.parse(b.createdAt.toString())
-            : DateTime(1970);
-
+        DateTime aDate =
+            a.infCompleted ?? a.completedAt ?? a.createdAt ?? DateTime(1970);
+        DateTime bDate =
+            b.infCompleted ?? b.completedAt ?? b.createdAt ?? DateTime(1970);
         return aDate.compareTo(bDate);
       });
     } else if (sortType == "newer") {
       list.sort((a, b) {
-        DateTime aDate = a.createdAt != null
-            ? DateTime.parse(a.createdAt.toString())
-            : DateTime(1970);
-        DateTime bDate = b.createdAt != null
-            ? DateTime.parse(b.createdAt.toString())
-            : DateTime(1970);
-
+        DateTime aDate =
+            a.infCompleted ?? a.completedAt ?? a.createdAt ?? DateTime(1970);
+        DateTime bDate =
+            b.infCompleted ?? b.completedAt ?? b.createdAt ?? DateTime(1970);
         return bDate.compareTo(aDate);
       });
     }
   }
 
   void applyPromoteSort(String sortType) {
+    print("Applying promote sort: $sortType");
     _promoteSort = sortType;
 
     sortPromoteList(tableData, sortType);
 
+    // Create a fresh source instance to force a UI rebuild
     promoteTableSource = PromoteTableSource(
-      data: tableData,
+      data: List.from(tableData),
       status: selectedStatus,
       onReject: onReject,
       onVerify: onVerify,
@@ -1230,6 +1303,8 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       onRevoke: onRevoke,
       onCompanyPaymentVerified: onCompanyPaymentVerified,
       onNotesEdit: onNoteEdit,
+      onRefund: onRefund,
+      refunInit: refunInit,
     );
 
     notifyListeners();
@@ -1316,3 +1391,4 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
 //7:Promote-Pay,
 //8:Promote-Commission,
 //9:company-payment-verified
+//10:refund

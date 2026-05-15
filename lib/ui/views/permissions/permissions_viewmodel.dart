@@ -157,7 +157,13 @@ class PermissionsViewModel extends BaseViewModel {
       PermissionType.delete
     }),
     PermissionRow(
-        name: 'requests', allowed: {PermissionType.view, PermissionType.edit}),
+        name: 'requests',
+        allowed: {
+          PermissionType.view,
+          PermissionType.edit,
+          PermissionType.add,
+          PermissionType.delete
+        }),
     PermissionRow(name: 'promotion_projects', allowed: {
       PermissionType.add,
       PermissionType.view,

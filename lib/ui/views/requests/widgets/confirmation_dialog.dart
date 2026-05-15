@@ -326,6 +326,8 @@ Future<void> showAdminPaymentConfigDialog({
 }) {
   final paymentCtrl = TextEditingController();
   final commissionCtrl = TextEditingController();
+  final commissionPercentageCtrl = TextEditingController();
+  final gstCtrl = TextEditingController();
   final noteCtrl = TextEditingController();
 
   final formKey = GlobalKey<FormState>();
@@ -335,6 +337,29 @@ Future<void> showAdminPaymentConfigDialog({
   bool youtube = false;
 
   String? checkboxError;
+
+  double gstAmount = 0;
+  double totalAmount = 0;
+
+  void calculateAmounts(StateSetter setState) {
+    final payment = double.tryParse(paymentCtrl.text) ?? 0;
+    final commissionPercentage =
+        double.tryParse(commissionPercentageCtrl.text) ?? 0;
+    final gstPercentage = double.tryParse(gstCtrl.text) ?? 0;
+
+    // Commission calculation
+    final commission = (payment * commissionPercentage) / 100;
+
+    commissionCtrl.text = commission == 0 ? "" : commission.toStringAsFixed(0);
+
+    // GST calculation
+    gstAmount = (commission * gstPercentage) / 100;
+
+    // Total amount
+    totalAmount = payment + gstAmount;
+
+    setState(() {});
+  }
 
   return showDialog(
     context: context,
@@ -352,181 +377,258 @@ Future<void> showAdminPaymentConfigDialog({
                 key: formKey,
                 child: Padding(
                   padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // 🔵 Title
-                      const Text(
-                        "Admin Payment Configuration",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.blue,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 🔵 Title
+                        const Text(
+                          "Admin Payment Configuration",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.blue,
+                          ),
                         ),
-                      ),
 
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                      // Payment Amount
-                      _underlineField(
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(10)
-                        ],
-                        label: "Payment Amount",
-                        controller: paymentCtrl,
-                        validator: (val) {
-                          if (val == null || val.trim().isEmpty) {
-                            return "Please enter payment amount";
-                          }
-                          return null;
-                        },
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      // Commission
-                      _underlineField(
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(10)
-                        ],
-                        label: "Commission",
-                        controller: commissionCtrl,
-                        validator: (val) {
-                          if (val == null || val.trim().isEmpty) {
-                            return "Please enter commission";
-                          }
-                          if (double.tryParse(paymentCtrl.text) != null &&
-                              double.tryParse(commissionCtrl.text) != null) {
-                            if (double.parse(commissionCtrl.text) >
-                                double.parse(paymentCtrl.text)) {
-                              return "Commission cannot be greater than payment amount";
+                        // Payment Amount
+                        _underlineField(
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(10)
+                          ],
+                          label: "Payment Amount",
+                          controller: paymentCtrl,
+                          onChanged: (v) {
+                            calculateAmounts(setState);
+                          },
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) {
+                              return "Please enter payment amount";
                             }
-                          }
-                          return null;
-                        },
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // SM Verification
-                      const Text(
-                        "SM Verification",
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey,
+                            return null;
+                          },
                         ),
-                      ),
 
-                      const SizedBox(height: 8),
+                        const SizedBox(height: 12),
 
-                      _checkItem(
-                        text: "Instagram",
-                        value: instagram,
-                        onChanged: (v) {
-                          setState(() {
-                            instagram = v;
-                            checkboxError = null;
-                          });
-                        },
-                      ),
-                      _checkItem(
-                        text: "Facebook",
-                        value: facebook,
-                        onChanged: (v) {
-                          setState(() {
-                            facebook = v;
-                            checkboxError = null;
-                          });
-                        },
-                      ),
-                      _checkItem(
-                        text: "Youtube",
-                        value: youtube,
-                        onChanged: (v) {
-                          setState(() {
-                            youtube = v;
-                            checkboxError = null;
-                          });
-                        },
-                      ),
+                        // Commission Percentage
+                        _underlineField(
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(2),
+                          ],
+                          label: "Commission Percentage (%)",
+                          controller: commissionPercentageCtrl,
+                          onChanged: (v) {
+                            calculateAmounts(setState);
+                          },
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) {
+                              return "Please enter commission percentage";
+                            }
+                            return null;
+                          },
+                        ),
 
-                      // Checkbox error
-                      if (checkboxError != null)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 12, top: 4),
-                          child: Text(
-                            checkboxError!,
-                            style: const TextStyle(
-                              color: Colors.red,
-                              fontSize: 11,
-                            ),
+                        const SizedBox(height: 12),
+
+                        // Commission Amount
+                        _underlineField(
+                          readOnly: true,
+                          label: "Commission",
+                          controller: commissionCtrl,
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) {
+                              return "Commission amount required";
+                            }
+                            return null;
+                          },
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // GST Percentage
+                        _underlineField(
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(2),
+                          ],
+                          label: "GST Percentage (%)",
+                          controller: gstCtrl,
+                          onChanged: (v) {
+                            calculateAmounts(setState);
+                          },
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) {
+                              return "Please enter GST percentage";
+                            }
+                            return null;
+                          },
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // GST Amount
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.grey.shade100,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "GST Amount : ₹ ${gstAmount.toStringAsFixed(2)}",
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                "Total Amount : ₹ ${totalAmount.toStringAsFixed(2)}",
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
 
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                      // Note
-                      _underlineField(
-                        label: "Note",
-                        controller: noteCtrl,
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Actions
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text("Cancel"),
+                        // SM Verification
+                        const Text(
+                          "SM Verification",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey,
                           ),
-                          const SizedBox(width: 12),
-                          ElevatedButton(
-                            style: ButtonStyle(
-                              backgroundColor:
-                                  WidgetStateProperty.all(Colors.blue),
-                            ),
-                            onPressed: () {
-                              final isFormValid =
-                                  formKey.currentState!.validate();
-                              final isCheckboxValid =
-                                  instagram || facebook || youtube;
+                        ),
 
-                              setState(() {
-                                checkboxError = isCheckboxValid
-                                    ? null
-                                    : "Select at least one platform";
-                              });
+                        const SizedBox(height: 8),
 
-                              if (!isFormValid || !isCheckboxValid) return;
+                        _checkItem(
+                          text: "Instagram",
+                          value: instagram,
+                          onChanged: (v) {
+                            setState(() {
+                              instagram = v;
+                              checkboxError = null;
+                            });
+                          },
+                        ),
 
-                              Navigator.pop(context);
-                              onSave({
-                                "payment": {
-                                  "payment": paymentCtrl.text,
-                                  "commission": commissionCtrl.text,
-                                  "note": noteCtrl.text,
-                                },
-                                "verification": {
-                                  if (instagram == true) "instagram": null,
-                                  if (facebook == true) "facebook": null,
-                                  if (youtube == true) "youtube": null,
-                                },
-                              });
-                            },
+                        _checkItem(
+                          text: "Facebook",
+                          value: facebook,
+                          onChanged: (v) {
+                            setState(() {
+                              facebook = v;
+                              checkboxError = null;
+                            });
+                          },
+                        ),
+
+                        _checkItem(
+                          text: "Youtube",
+                          value: youtube,
+                          onChanged: (v) {
+                            setState(() {
+                              youtube = v;
+                              checkboxError = null;
+                            });
+                          },
+                        ),
+
+                        // Checkbox error
+                        if (checkboxError != null)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12, top: 4),
                             child: Text(
-                              "Save",
-                              style: fontFamilySemiBold.size13.white,
+                              checkboxError!,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 11,
+                              ),
                             ),
                           ),
-                        ],
-                      ),
-                    ],
+
+                        const SizedBox(height: 16),
+
+                        // Note
+                        _underlineField(
+                          label: "Note",
+                          controller: noteCtrl,
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        // Actions
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text("Cancel"),
+                            ),
+                            const SizedBox(width: 12),
+                            ElevatedButton(
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    WidgetStateProperty.all(Colors.blue),
+                              ),
+                              onPressed: () {
+                                final isFormValid =
+                                    formKey.currentState!.validate();
+
+                                final isCheckboxValid =
+                                    instagram || facebook || youtube;
+
+                                setState(() {
+                                  checkboxError = isCheckboxValid
+                                      ? null
+                                      : "Select at least one platform";
+                                });
+
+                                if (!isFormValid || !isCheckboxValid) return;
+
+                                Navigator.pop(context);
+
+                                onSave({
+                                  "payment": {
+                                    "payment": paymentCtrl.text,
+                                    "commission": commissionCtrl.text,
+                                    "note": noteCtrl.text,
+                                    "gst percentage": gstCtrl.text,
+                                    "gst amount": gstAmount,
+                                    "total amount": totalAmount,
+                                  },
+                                  "verification": {
+                                    if (instagram == true) "instagram": null,
+                                    if (facebook == true) "facebook": null,
+                                    if (youtube == true) "youtube": null,
+                                  },
+                                });
+                              },
+                              child: Text(
+                                "Save",
+                                style: fontFamilySemiBold.size13.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -542,13 +644,17 @@ Widget _underlineField({
   required String label,
   required TextEditingController controller,
   String? Function(String?)? validator,
+  void Function(String)? onChanged,
+  bool readOnly = false,
   List<TextInputFormatter>? inputFormatters,
 }) {
   return TextFormField(
+    readOnly: readOnly,
     controller: controller,
     validator: validator,
     keyboardType: TextInputType.number,
     inputFormatters: inputFormatters,
+    onChanged: onChanged,
     decoration: InputDecoration(
       labelText: label,
       labelStyle: const TextStyle(fontSize: 13),

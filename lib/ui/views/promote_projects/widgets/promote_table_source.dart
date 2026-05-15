@@ -7,9 +7,16 @@ import 'package:webapp/ui/views/promote_projects/model/prmote_table_model.dart'
 import 'package:webapp/ui/views/promote_projects/widgets/promote_status.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/view_link.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 
 class PromoteTableSource extends DataTableSource {
-  final List<promote_table_model.Datum> data;
+  List<promote_table_model.Datum> data;
+
+  void updateData(List<promote_table_model.Datum> newData) {
+    data = newData;
+    notifyListeners();
+  }
+
   final String status;
   final void Function(promote_table_model.Datum)? onReject;
   final void Function(promote_table_model.Datum)? onVerify;
@@ -21,6 +28,8 @@ class PromoteTableSource extends DataTableSource {
   final void Function(promote_table_model.Datum)? onRevoke;
   final void Function(promote_table_model.Datum)? onCompanyPaymentVerified;
   final void Function(promote_table_model.Datum)? onNotesEdit;
+  final void Function(promote_table_model.Datum)? onRefund;
+  final void Function(promote_table_model.Datum)? refunInit;
 
   PromoteTableSource({
     required this.data,
@@ -35,6 +44,8 @@ class PromoteTableSource extends DataTableSource {
     this.onRevoke,
     this.onCompanyPaymentVerified,
     this.onNotesEdit,
+    this.onRefund,
+    this.refunInit,
   });
 
   @override
@@ -75,7 +86,7 @@ class PromoteTableSource extends DataTableSource {
         return [
           DataCell(Text('${index + 1}')),
           DataCell(Text(item.subId ?? "")),
-          DataCell(Text("${item.influencerName} / ${item.influencerId}")),
+          DataCell(Text("${item.influencerName} / ${item.infId}")),
           DataCell(Text(item.influencerPhone.toString() ?? "")),
           DataCell(Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -113,20 +124,22 @@ class PromoteTableSource extends DataTableSource {
                   style: fontFamilyMedium.size11.white,
                 )),
           )),
-          DataCell(CommonButton(
-            text: 'Reject',
-            onTap: () => onReject?.call(item),
-            buttonColor: red,
-            padding: defaultPadding4 + rightPadding4 + leftPadding4,
-            margin: defaultPadding10 + leftPadding8 + rightPadding8,
-            textStyle: fontFamilyMedium.size12.white,
-          )),
+          DataCell(PermissionHelper.instance.has('edit_promotion_projects')
+              ? CommonButton(
+                  text: 'Reject',
+                  onTap: () => onReject?.call(item),
+                  buttonColor: red,
+                  padding: defaultPadding4 + rightPadding4 + leftPadding4,
+                  margin: defaultPadding10 + leftPadding8 + rightPadding8,
+                  textStyle: fontFamilyMedium.size12.white,
+                )
+              : const SizedBox()),
         ];
       case PromoteStatus.infAccepted:
         return [
           DataCell(Text('${index + 1}')),
           DataCell(Text(item.subId ?? "")),
-          DataCell(Text("${item.influencerName} / ${item.influencerId}")),
+          DataCell(Text("${item.influencerName} / ${item.infId}")),
           DataCell(Text(item.influencerPhone.toString() ?? "")),
           DataCell(Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -169,7 +182,7 @@ class PromoteTableSource extends DataTableSource {
         return [
           DataCell(Text('${index + 1}')),
           DataCell(Text(item.subId ?? "")),
-          DataCell(Text("${item.influencerName} / ${item.influencerId}")),
+          DataCell(Text("${item.influencerName} / ${item.infId}")),
           DataCell(Text(item.influencerPhone.toString() ?? "")),
           DataCell(Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -234,20 +247,37 @@ class PromoteTableSource extends DataTableSource {
               ),
             ),
           ),
-          DataCell(CommonButton(
-            text: item.reworkStatus == 0 ? 'Verify' : 'Rework',
-            onTap: () => item.reworkStatus == 0 ? onVerify?.call(item) : null,
-            buttonColor: greenShade1,
-            padding: defaultPadding4 + rightPadding4 + leftPadding4,
-            margin: defaultPadding10 + leftPadding8 + rightPadding8,
-            textStyle: fontFamilyMedium.size12.white,
+          DataCell(Center(
+            child: PermissionHelper.instance.has('edit_promotion_projects')
+                ? CommonButton(
+                    text: item.reworkStatus == 0 ? 'Verify' : 'Rework',
+                    onTap: () =>
+                        item.reworkStatus == 0 ? onVerify?.call(item) : null,
+                    buttonColor: greenShade1,
+                    padding: defaultPadding4 + rightPadding4 + leftPadding4,
+                    margin: defaultPadding10 + leftPadding8 + rightPadding8,
+                    textStyle: fontFamilyMedium.size12.white,
+                  )
+                : const SizedBox(),
+          )),
+          DataCell(Center(
+            child: PermissionHelper.instance.has('edit_promotion_projects')
+                ? CommonButton(
+                    text: 'Reject',
+                    onTap: () => onReject?.call(item),
+                    buttonColor: red,
+                    padding: defaultPadding4 + rightPadding4 + leftPadding4,
+                    margin: defaultPadding10 + leftPadding8 + rightPadding8,
+                    textStyle: fontFamilyMedium.size12.white,
+                  )
+                : const SizedBox(),
           )),
         ];
 
       case PromoteStatus.adminVerified:
         return [
           DataCell(Text('${index + 1}')),
-          DataCell(Text(item.influencerId.toString() ?? "")),
+          DataCell(Text(item.infId.toString() ?? "")),
           DataCell(Text(item.influencerName ?? "")),
           DataCell(Text(
               DateFormatter.formatToDDMMMYYYY(item.createdAt.toString()) ??
@@ -258,20 +288,23 @@ class PromoteTableSource extends DataTableSource {
                   "")),
           DataCell(
             Center(
-              child: Container(
-                margin: defaultPadding4 + leftPadding8 + rightPadding8,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: greenShade1,
-                    padding: defaultPadding4 + rightPadding4 + leftPadding4,
-                  ),
-                  onPressed: () => onGotoPromoteVerified?.call(item),
-                  child: Text(
-                    "Promote Verify",
-                    style: fontFamilySemiBold.size12.white,
-                  ),
-                ),
-              ),
+              child: PermissionHelper.instance.has('edit_promotion_projects')
+                  ? Container(
+                      margin: defaultPadding4 + leftPadding8 + rightPadding8,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: greenShade1,
+                          padding:
+                              defaultPadding4 + rightPadding4 + leftPadding4,
+                        ),
+                        onPressed: () => onGotoPromoteVerified?.call(item),
+                        child: Text(
+                          "Promote Verify",
+                          style: fontFamilySemiBold.size12.white,
+                        ),
+                      ),
+                    )
+                  : const SizedBox(),
             ),
           ),
         ];
@@ -331,26 +364,30 @@ class PromoteTableSource extends DataTableSource {
               : "")),
           DataCell(
             Center(
-              child: Container(
-                margin: defaultPadding4 + leftPadding8 + rightPadding8,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: greenShade1,
-                    padding: defaultPadding4 + rightPadding4 + leftPadding4,
-                  ),
-                  onPressed: () =>
-                      item.status == "6" ? onGotoPromotePay?.call(item) : null,
-                  child: Center(
-                    child: Text(
-                      textAlign: TextAlign.center,
-                      item.status == "6"
-                          ? "Promote pay"
-                          : "Waiting to payment verified",
-                      style: fontFamilySemiBold.size12.white,
-                    ),
-                  ),
-                ),
-              ),
+              child: PermissionHelper.instance.has('edit_promotion_projects')
+                  ? Container(
+                      margin: defaultPadding4 + leftPadding8 + rightPadding8,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: greenShade1,
+                          padding:
+                              defaultPadding4 + rightPadding4 + leftPadding4,
+                        ),
+                        onPressed: () => item.status == "6"
+                            ? onGotoPromotePay?.call(item)
+                            : null,
+                        child: Center(
+                          child: Text(
+                            textAlign: TextAlign.center,
+                            item.status == "6"
+                                ? "Promote pay"
+                                : "Waiting to payment verified",
+                            style: fontFamilySemiBold.size12.white,
+                          ),
+                        ),
+                      ),
+                    )
+                  : const SizedBox(),
             ),
           ),
         ];
@@ -373,19 +410,21 @@ class PromoteTableSource extends DataTableSource {
               child: Text(item.payment!.upi.toString() ?? ""))),
           DataCell(Text(item.amount.toString())),
           DataCell(
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: pendingColor,
-                padding: defaultPadding4 + rightPadding4 + leftPadding4,
-              ),
-              onPressed: () => onGotoPromoteCommission?.call(item),
-              child: Center(
-                  child: Text(
-                "promote Commission",
-                style: fontFamilySemiBold.size12.white,
-                textAlign: TextAlign.center,
-              )),
-            ),
+            PermissionHelper.instance.has('edit_promotion_projects')
+                ? ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: pendingColor,
+                      padding: defaultPadding4 + rightPadding4 + leftPadding4,
+                    ),
+                    onPressed: () => onGotoPromoteCommission?.call(item),
+                    child: Center(
+                        child: Text(
+                      "promote Commission",
+                      style: fontFamilySemiBold.size12.white,
+                      textAlign: TextAlign.center,
+                    )),
+                  )
+                : const SizedBox(),
           ),
         ];
 
@@ -421,19 +460,21 @@ class PromoteTableSource extends DataTableSource {
               child: Text(item.payment!.upi.toString() ?? ""))),
           DataCell(Text(item.amount.toString())),
           DataCell(
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: pendingColor,
-                padding: defaultPadding4 + rightPadding4 + leftPadding4,
-              ),
-              onPressed: () => onCompanyPaymentVerified?.call(item),
-              child: Center(
-                  child: Text(
-                "Company Payment Verified",
-                style: fontFamilySemiBold.size12.white,
-                textAlign: TextAlign.center,
-              )),
-            ),
+            PermissionHelper.instance.has('edit_promotion_projects')
+                ? ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: pendingColor,
+                      padding: defaultPadding4 + rightPadding4 + leftPadding4,
+                    ),
+                    onPressed: () => onCompanyPaymentVerified?.call(item),
+                    child: Center(
+                        child: Text(
+                      "Company Payment Verified",
+                      style: fontFamilySemiBold.size12.white,
+                      textAlign: TextAlign.center,
+                    )),
+                  )
+                : const SizedBox(),
           ),
         ];
       case PromoteStatus.rejected:
@@ -453,27 +494,75 @@ class PromoteTableSource extends DataTableSource {
               onTap: () => showBankDetails?.call(item),
               child: Text(item.payment!.upi.toString() ?? ""))),
           DataCell(Text(item.amount.toString())),
-          DataCell(Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              InkWell(
-                onTap: () => onRevoke!(item),
-                child: Text(
-                  'Revoke',
-                  style: fontFamilySemiBold.size11.red,
-                ),
-              ),
-              const Text('&'),
-              InkWell(
-                onTap: () => onReAssign!(item),
-                child: Text(
-                  'Re-Assign',
-                  style: fontFamilySemiBold.size11.continueButton,
-                ),
-              ),
-            ],
-          )),
+          DataCell(PermissionHelper.instance.has('edit_promotion_projects')
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    InkWell(
+                      onTap: () => onRevoke!(item),
+                      child: Text(
+                        'Revoke',
+                        style: fontFamilySemiBold.size11.red,
+                      ),
+                    ),
+                    const Text('&'),
+                    InkWell(
+                      onTap: () => onReAssign!(item),
+                      child: Text(
+                        'Re-Assign',
+                        style: fontFamilySemiBold.size11.continueButton,
+                      ),
+                    ),
+                  ],
+                )
+              : const SizedBox()),
+          DataCell(
+            PermissionHelper.instance.has('edit_promotion_projects')
+                ? InkWell(
+                    onTap: () => refunInit!(item),
+                    child: Text(
+                      'Refund',
+                      style: fontFamilySemiBold.size11.continueButton,
+                    ),
+                  )
+                : const SizedBox(),
+          ),
+        ];
+
+      case PromoteStatus.refund:
+        return [
+          DataCell(Text('${index + 1}')),
+          DataCell(Text(item.subId.toString() ?? "")),
+          DataCell(Text(item.influencerName ?? "")),
+          DataCell(Text(item.infId.toString() ?? "")),
+          DataCell(Text(item.amount.toString())),
+          DataCell(
+              Text(item.refundStatus == 1 ? 'Refund Initiated' : 'Completed')),
+          DataCell(Text(DateFormatter.formatToDDMMMYYYY(
+                  item.refundInitiatedAt.toString()) ??
+              "")),
+          DataCell(Text(DateFormatter.formatToDDMMMYYYY(
+                  item.refundCompletedAt.toString()) ??
+              "")),
+          DataCell(
+            Center(
+              child: PermissionHelper.instance.has('edit_promotion_projects')
+                  ? InkWell(
+                      onTap: () =>
+                          item.refundStatus == 2 ? null : onRefund!(item),
+                      child: Text(
+                        item.refundStatus == 1
+                            ? 'Refund Initiated'
+                            : 'Refund completed',
+                        style: item.refundStatus == 1
+                            ? fontFamilySemiBold.size11.red
+                            : fontFamilySemiBold.size11.appGreen400,
+                      ),
+                    )
+                  : const SizedBox(),
+            ),
+          ),
         ];
 
       default:
@@ -494,13 +583,15 @@ class PromoteTableSource extends DataTableSource {
       case PromoteStatus.promotePay:
         return 10;
       case PromoteStatus.infCompleted:
-        return 9;
-      case PromoteStatus.rejected:
         return 10;
+      case PromoteStatus.rejected:
+        return 11;
       case PromoteStatus.promoteCommission:
         return 9;
       case PromoteStatus.companyPaymentVerified:
         return 10;
+      case PromoteStatus.refund:
+        return 9;
       default:
         return 0;
     }

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:webapp/core/enum/report_enum.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/report/widgets/widget/info_card.dart';
 
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/month_year_picker.dart';
+import 'package:webapp/widgets/no_access_widget.dart';
 import 'package:webapp/widgets/search_drop_down_widget.dart';
 
 import 'report_viewmodel.dart';
@@ -24,10 +26,12 @@ class ReportView extends StackedView<ReportViewModel> {
 
     final rowCount = viewModel.tableSource?.rowCount ?? 0;
 
-    if (rowCount == 0) {
-      return const Scaffold(
-          body: Center(
-              child: CircularProgressIndicator())); // loading / empty state
+    if (!PermissionHelper.instance.canView('report')) {
+      return const Scaffold(body: NoAccessWidget());
+    }
+
+    if (viewModel.isBusy || rowCount == 0) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -382,6 +386,8 @@ class ReportView extends StackedView<ReportViewModel> {
 
   @override
   void onViewModelReady(ReportViewModel viewModel) async {
-    await viewModel.loadReport(viewModel.selectedMonth);
+    if (PermissionHelper.instance.canView('report')) {
+      await viewModel.loadReport(viewModel.selectedMonth);
+    }
   }
 }

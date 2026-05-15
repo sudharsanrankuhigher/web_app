@@ -4,8 +4,6 @@
 
 import 'dart:convert';
 
-import 'package:webapp/ui/views/requests/model/request_model.dart';
-
 PromoteTableModel promoteTableModelFromJson(String str) =>
     PromoteTableModel.fromJson(json.decode(str));
 
@@ -25,7 +23,7 @@ class PromoteTableModel {
 
   factory PromoteTableModel.fromJson(Map<String, dynamic> json) =>
       PromoteTableModel(
-        status: json["status"],
+        status: _toInt(json["status"]),
         data: json["data"] == null
             ? []
             : List<Datum>.from(json["data"]!.map((x) => Datum.fromJson(x))),
@@ -89,7 +87,10 @@ class Datum {
   dynamic rejectedAt;
   Payment? payment;
   String? status;
+  int? refundStatus;
   int? reworkStatus;
+  DateTime? refundInitiatedAt;
+  DateTime? refundCompletedAt;
   Link? link;
 
   Datum({
@@ -112,15 +113,18 @@ class Datum {
     this.rejectedAt,
     this.payment,
     this.status,
+    this.refundStatus,
     this.reworkStatus,
+    this.refundInitiatedAt,
+    this.refundCompletedAt,
     this.link,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        id: json["id"],
-        influencerId:
-            getFormattedId(json['influencer_category_id'], json['inf_id']),
-        infId: json["inf_id"],
+        id: _toInt(json["id"]),
+        influencerId: getFormattedId(
+            _toInt(json['influencer_category_id']), _toInt(json['inf_id'])),
+        infId: _toInt(json["inf_id"]),
         influencerName: json["influencer_name"],
         influencerPhone: json["influencer_phone"],
         subId: json["sub_id"],
@@ -137,8 +141,11 @@ class Datum {
         rejectedAt: parseDate(json["rejected_at"]),
         payment:
             json["payment"] == null ? null : Payment.fromJson(json["payment"]),
-        status: json["status"],
-        reworkStatus: json["rework_status"],
+        status: json["status"]?.toString(),
+        reworkStatus: _toInt(json["rework_status"]),
+        refundStatus: _toInt(json["refund_status"]),
+        refundInitiatedAt: parseDate(json["refund_at"]),
+        refundCompletedAt: parseDate(json["refund_updated_at"]),
         link: _parseLink(json["link"]),
       );
 
@@ -161,7 +168,10 @@ class Datum {
         "rejected_at": rejectedAt,
         "payment": payment?.toJson(),
         "status": status,
+        "refund_status": refundStatus,
         "rework_status": reworkStatus,
+        "refund_at": refundInitiatedAt?.toIso8601String(),
+        "refund_updated_at": refundCompletedAt?.toIso8601String(),
         "link": link?.toJson(),
       };
 
@@ -249,5 +259,13 @@ DateTime? parseDate(dynamic value) {
         : DateTime.fromMillisecondsSinceEpoch(value);
   }
 
+  return null;
+}
+
+int? _toInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is String) return int.tryParse(value);
+  if (value is double) return value.toInt();
   return null;
 }

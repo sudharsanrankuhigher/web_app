@@ -15,9 +15,7 @@ import 'package:webapp/widgets/drop_down_widget.dart';
 import 'package:webapp/widgets/image_picker.dart';
 import 'package:webapp/widgets/initial_textform.dart';
 import 'package:webapp/widgets/search_drop_down_widget.dart';
-import 'package:webapp/widgets/state_city_drop_down.dart';
 import 'package:webapp/widgets/state_city_dynamic_dropdown.dart';
-import 'package:webapp/widgets/web_image_loading.dart';
 import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
     as influencer_model;
 import 'package:webapp/ui/views/services/model/service_model.dart'
@@ -112,6 +110,9 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
   late TextEditingController companyCtrl;
   late TextEditingController noteCtrl;
   late TextEditingController paymentCtrl;
+  late TextEditingController taxPercentCtrl;
+  late TextEditingController totalAmountCtrl;
+  late TextEditingController commPercentCtrl;
   late TextEditingController commissionCtrl;
 
   late String gender;
@@ -234,6 +235,18 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
         text: widget.model.payment?.payment?.toString() ?? "0");
     commissionCtrl = TextEditingController(
         text: widget.model.payment?.commission?.toString() ?? "0");
+
+    taxPercentCtrl = TextEditingController(
+        text: widget.model.payment?.gst?.toString() ?? "0");
+    totalAmountCtrl = TextEditingController(
+        text: widget.model.payment?.totalAmount?.toString() ?? "0");
+    commPercentCtrl = TextEditingController(
+        text: widget.model.payment?.commissionPercent?.toString() ?? "0");
+
+    // Add listeners for automatic calculations
+    paymentCtrl.addListener(_calculateValues);
+    taxPercentCtrl.addListener(_calculateValues);
+    commPercentCtrl.addListener(_calculateValues);
 
     gender = widget.model.gender ?? genders.first;
     state = widget.model.state ?? "Tamil Nadu";
@@ -364,6 +377,15 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
 
   @override
   void dispose() {
+    codeCtrl.dispose();
+    titleCtrl.dispose();
+    companyCtrl.dispose();
+    noteCtrl.dispose();
+    paymentCtrl.dispose();
+    taxPercentCtrl.dispose();
+    totalAmountCtrl.dispose();
+    commPercentCtrl.dispose();
+    commissionCtrl.dispose();
     thumbnailScrollController.dispose();
     super.dispose();
   }
@@ -415,11 +437,6 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                   });
                                 },
                               ),
-                            // if (isView)
-                            //   IconButton(
-                            //     icon: const Icon(Icons.delete, color: Colors.red),
-                            //     onPressed: () => Navigator.pop(context, 'delete'),
-                            //   ),
                             IconButton(
                               icon: const Icon(Icons.close),
                               onPressed: () => Navigator.pop(context),
@@ -434,35 +451,30 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                     Expanded(
                       child: Form(
                         key: formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            /// LEFT: Image Section
-                            Expanded(
-                              flex: 5,
+                        child: CustomScrollView(
+                          slivers: [
+                            SliverToBoxAdapter(
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  /// MAIN IMAGE
-                                  Expanded(
-                                    child: Container(
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade200,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: images.isEmpty
-                                          ? const Center(
-                                              child: Text('No Image'))
-                                          : ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              child: buildImage(
-                                                  images[selectedImageIndex]),
-                                            ),
+                                  /// TOP: Image Section
+                                  Container(
+                                    height: 300,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade200,
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
+                                    child: images.isEmpty
+                                        ? const Center(child: Text('No Image'))
+                                        : ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            child: buildImage(
+                                                images[selectedImageIndex]),
+                                          ),
                                   ),
 
-                                  verticalSpacing12,
                                   if (isImageError == true)
                                     const Padding(
                                       padding: EdgeInsets.only(top: 4),
@@ -472,665 +484,706 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                             color: Colors.red, fontSize: 12),
                                       ),
                                     ),
+
+                                  verticalSpacing12,
                                 ],
                               ),
                             ),
+                            SliverToBoxAdapter(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  /// BOTTOM: Form Section
+                                  /// THUMBNAILS
+                                  Stack(
+                                    children: [
+                                      SizedBox(
+                                        height: 80,
+                                        child: ListView.separated(
+                                          controller: thumbnailScrollController,
+                                          scrollDirection: Axis.horizontal,
+                                          itemCount: images.length,
+                                          separatorBuilder: (_, __) =>
+                                              const SizedBox(width: 8),
+                                          itemBuilder: (_, index) {
+                                            final selected =
+                                                index == selectedImageIndex;
 
-                            verticalSpacing12,
-
-                            /// RIGHT: Form Section
-                            Expanded(
-                              flex: 6,
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    /// THUMBNAILS
-                                    Stack(
-                                      children: [
-                                        SizedBox(
-                                          height: 80,
-                                          child: ListView.separated(
-                                            controller:
-                                                thumbnailScrollController,
-                                            scrollDirection: Axis.horizontal,
-                                            itemCount: images.length,
-                                            separatorBuilder: (_, __) =>
-                                                const SizedBox(width: 8),
-                                            itemBuilder: (_, index) {
-                                              final selected =
-                                                  index == selectedImageIndex;
-
-                                              return Stack(
-                                                children: [
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        selectedImageIndex =
-                                                            index;
-                                                      });
-                                                    },
-                                                    child: Container(
-                                                      width: 80,
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: selected
-                                                              ? Colors.blue
-                                                              : Colors.grey,
-                                                          width:
-                                                              selected ? 2 : 1,
-                                                        ),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(6),
+                                            return Stack(
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      selectedImageIndex =
+                                                          index;
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    width: 80,
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                        color: selected
+                                                            ? Colors.blue
+                                                            : Colors.grey,
+                                                        width: selected ? 2 : 1,
                                                       ),
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(6),
-                                                        child: IgnorePointer(
-                                                          child: buildImage(
-                                                            images[index],
-                                                          ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              6),
+                                                    ),
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              6),
+                                                      child: IgnorePointer(
+                                                        child: buildImage(
+                                                          images[index],
                                                         ),
                                                       ),
                                                     ),
                                                   ),
+                                                ),
 
-                                                  /// ❌ REMOVE ICON
-                                                  if (!isView) // hide remove in view mode
-                                                    Positioned(
-                                                      top: 4,
-                                                      right: 4,
-                                                      child: GestureDetector(
-                                                        onTap: () {
-                                                          setState(() {
-                                                            images.removeAt(
-                                                                index);
+                                                /// ❌ REMOVE ICON
+                                                if (!isView) // hide remove in view mode
+                                                  Positioned(
+                                                    top: 4,
+                                                    right: 4,
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          images
+                                                              .removeAt(index);
 
-                                                            // Fix selected index
-                                                            if (selectedImageIndex >=
-                                                                images.length) {
-                                                              selectedImageIndex =
-                                                                  images.isEmpty
-                                                                      ? 0
-                                                                      : images.length -
-                                                                          1;
-                                                            }
-                                                          });
-                                                        },
-                                                        child: Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(4),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Colors.black
-                                                                .withOpacity(
-                                                                    0.6),
-                                                            shape:
-                                                                BoxShape.circle,
-                                                          ),
-                                                          child: const Icon(
-                                                            Icons.close,
-                                                            size: 14,
-                                                            color: Colors.white,
-                                                          ),
+                                                          // Fix selected index
+                                                          if (selectedImageIndex >=
+                                                              images.length) {
+                                                            selectedImageIndex =
+                                                                images.isEmpty
+                                                                    ? 0
+                                                                    : images.length -
+                                                                        1;
+                                                          }
+                                                        });
+                                                      },
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(4),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.black
+                                                              .withOpacity(0.6),
+                                                          shape:
+                                                              BoxShape.circle,
+                                                        ),
+                                                        child: const Icon(
+                                                          Icons.close,
+                                                          size: 14,
+                                                          color: Colors.white,
                                                         ),
                                                       ),
                                                     ),
-                                                ],
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                        if (images.length > 7)
-                                          Positioned.fill(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                /// ◀ LEFT
-                                                IconButton(
-                                                  icon: const Icon(
-                                                      Icons.arrow_back_ios,
-                                                      size: 16,
-                                                      color: Colors.grey),
-                                                  onPressed: () {
-                                                    final newOffset =
-                                                        thumbnailScrollController
-                                                                .offset -
-                                                            100;
-
-                                                    thumbnailScrollController
-                                                        .animateTo(
-                                                      newOffset.clamp(
-                                                        0.0,
-                                                        thumbnailScrollController
-                                                            .position
-                                                            .maxScrollExtent,
-                                                      ),
-                                                      duration: const Duration(
-                                                          milliseconds: 300),
-                                                      curve: Curves.easeInOut,
-                                                    );
-                                                  },
-                                                ),
-
-                                                /// ▶ RIGHT
-                                                IconButton(
-                                                  icon: const Icon(
-                                                      Icons.arrow_forward_ios,
-                                                      size: 16,
-                                                      color: Colors.grey),
-                                                  onPressed: () {
-                                                    final newOffset =
-                                                        thumbnailScrollController
-                                                                .offset +
-                                                            100;
-
-                                                    thumbnailScrollController
-                                                        .animateTo(
-                                                      newOffset.clamp(
-                                                        0.0,
-                                                        thumbnailScrollController
-                                                            .position
-                                                            .maxScrollExtent,
-                                                      ),
-                                                      duration: const Duration(
-                                                          milliseconds: 300),
-                                                      curve: Curves.easeInOut,
-                                                    );
-                                                  },
-                                                ),
+                                                  ),
                                               ],
-                                            ),
-                                          )
-                                      ],
-                                    ),
-
-                                    verticalSpacing16,
-                                    ElevatedButton.icon(
-                                      onPressed: isView ? null : _pickImages,
-                                      icon: const Icon(Icons.upload),
-                                      label: const Text('Upload Image'),
-                                    ),
-
-                                    /// Project Code & Company
-                                    ///   Expanded(
-                                    //   child: _buildField(
-                                    //     label: 'Project Code',
-                                    //     child: InitialTextForm(
-                                    //       radius: 10,
-                                    //       controller: codeCtrl,
-                                    //       hintText: 'Project Code',
-                                    //       readOnly: isView,
-                                    //       validator: (value) {
-                                    //         if (value == null ||
-                                    //             value.isEmpty) {
-                                    //           return 'Project Code is required';
-                                    //         }
-                                    //         return null;
-                                    //       },
-                                    //     ),
-                                    //   ),
-                                    // ),
-                                    // horizontalSpacing12,
-                                    IgnorePointer(
-                                      ignoring: isView,
-                                      child: _buildField(
-                                        label: 'Company Name',
-                                        child: DynamicSingleSearchDropdown(
-                                          label: "Company",
-                                          items: widget.companies!
-                                              .map((c) => {
-                                                    'id': c.id,
-                                                    'name': c.companyName,
-                                                  })
-                                              .toList(),
-                                          selectedItem: selectedCompany,
-                                          onChanged: (v) {
-                                            setState(() {
-                                              selectedCompany = v;
-                                              companyId = v['id'];
-                                              isCompanyError = false;
-                                            });
+                                            );
                                           },
-                                          isError: isCompanyError,
-                                          nameKey: "name",
                                         ),
                                       ),
-                                    ),
-                                    verticalSpacing12,
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: _buildField(
-                                            label: 'Project Title',
-                                            child: InitialTextForm(
-                                              radius: 10,
-                                              controller: titleCtrl,
-                                              hintText: 'Project Title',
-                                              readOnly: isView,
-                                              validator: (val) {
-                                                if (val == null ||
-                                                    val.isEmpty) {
-                                                  return 'Project Title is required';
-                                                }
-                                                return null;
-                                              },
-                                            ),
-                                          ),
-                                        ),
-                                        horizontalSpacing12,
-                                        Expanded(
-                                          child: IgnorePointer(
-                                            ignoring: isView,
-                                            child: _buildField(
-                                              label: 'Services',
-                                              child: DynamicMultiSearchDropdown(
-                                                label: 'Services',
-                                                selectedItems: selectedServices,
-                                                items: (widget.service ?? [])
-                                                    .map((e) => {
-                                                          'id': e.id,
-                                                          'name': e.name,
-                                                        })
-                                                    .toList(),
-                                                onChanged: isView
-                                                    ? (_) {}
-                                                    : (values) {
-                                                        setState(() {
-                                                          selectedServices = (widget
-                                                                      .service ??
-                                                                  [])
-                                                              .map((e) => {
-                                                                    'id': e.id,
-                                                                    'name':
-                                                                        e.name,
-                                                                  })
-                                                              .where((item) =>
-                                                                  values.any((v) =>
-                                                                      v['id'] ==
-                                                                      item[
-                                                                          'id']))
-                                                              .toList();
+                                      if (images.length > 7)
+                                        Positioned.fill(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              /// ◀ LEFT
+                                              IconButton(
+                                                icon: const Icon(
+                                                    Icons.arrow_back_ios,
+                                                    size: 16,
+                                                    color: Colors.grey),
+                                                onPressed: () {
+                                                  final newOffset =
+                                                      thumbnailScrollController
+                                                              .offset -
+                                                          100;
 
-                                                          selectedService =
-                                                              selectedServices
-                                                                  .map((e) =>
-                                                                      e['id'])
-                                                                  .toList();
-                                                        });
-                                                        _filterInfluencers();
-                                                      },
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-
-                                    verticalSpacing12,
-
-                                    /// Payment & Commission
-
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: _buildField(
-                                            label: 'Payment',
-                                            child: InitialTextForm(
-                                              radius: 10,
-                                              inputFormatters: [
-                                                FilteringTextInputFormatter
-                                                    .digitsOnly,
-                                              ],
-                                              controller: paymentCtrl,
-                                              hintText: 'Payment',
-                                              readOnly: isView,
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              validator: (val) {
-                                                if (val == null ||
-                                                    val.isEmpty) {
-                                                  return 'Payment is required';
-                                                } else if (paymentCtrl.text ==
-                                                    "0") {
-                                                  return 'Payment cannot be 0';
-                                                }
-                                                return null;
-                                              },
-                                            ),
-                                          ),
-                                        ),
-                                        horizontalSpacing12,
-                                        Expanded(
-                                          child: _buildField(
-                                            label: 'Commission',
-                                            child: InitialTextForm(
-                                              radius: 10,
-                                              controller: commissionCtrl,
-                                              hintText: 'Commission',
-                                              readOnly: isView,
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              inputFormatters: [
-                                                FilteringTextInputFormatter
-                                                    .digitsOnly,
-                                              ],
-                                              validator: (val) {
-                                                if (val == null ||
-                                                    val.isEmpty) {
-                                                  return 'Commission is required';
-                                                } else if (commissionCtrl
-                                                        .text ==
-                                                    "0") {
-                                                  return 'Commission cannot be 0';
-                                                }
-                                                return null;
-                                              },
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    verticalSpacing12,
-
-                                    /// Location (FULL WIDTH)
-                                    // IgnorePointer(
-                                    //   ignoring: isView,
-                                    //   child: _buildField(
-                                    //     label: 'Location',
-                                    //     child: StateCityDropdown(
-                                    //       isVertical: true,
-                                    //       showCity: true,
-                                    //       initialState: state,
-                                    //       initialCity: city,
-                                    //       isStateError: isStateError,
-                                    //       isCityError: isCityError,
-                                    //       onStateChanged: (val) {
-                                    //         state = val;
-                                    //         _filterInfluencers();
-                                    //       },
-                                    //       onCityChanged: (val) {
-                                    //         city = val ?? '';
-
-                                    //         _filterInfluencers();
-                                    //       },
-                                    //     ),
-                                    //   ),
-                                    // ),
-                                    IgnorePointer(
-                                      ignoring: isView,
-                                      child: _buildField(
-                                        label: 'Location',
-                                        child: StateCityDynamicDropdown(
-                                            isVertical: true,
-                                            showCity: true,
-                                            multi: true, // 🔥 enable multi
-
-                                            initialState: state,
-                                            initialCity: city,
-                                            initialCities:
-                                                selectedCities, // 🔥 important
-
-                                            isStateError: isStateError,
-                                            isCityError: isCityError,
-
-                                            /// 🔹 STATE
-                                            onStateChanged: (val) {
-                                              setState(() {
-                                                state = val;
-                                                city = "";
-                                                selectedCities =
-                                                    []; // 🔥 reset multi
-                                              });
-
-                                              _filterInfluencers();
-                                            },
-
-                                            /// 🔹 SINGLE (optional fallback)
-                                            onCityChanged: (val) {
-                                              setState(() {
-                                                city = val ?? "";
-                                                selectedCities = [];
-                                              });
-
-                                              _filterInfluencers();
-                                            },
-
-                                            /// 🔥 MULTI
-                                            onCitiesChanged: (list) {
-                                              setState(() {
-                                                if (list.contains("All")) {
-                                                  selectedCities = [
-                                                    "All"
-                                                  ]; // 🔥 keep only "All"
-                                                } else {
-                                                  selectedCities =
-                                                      List.from(list);
-                                                }
-                                              });
-
-                                              _filterInfluencers();
-                                            }),
-                                      ),
-                                    ),
-                                    verticalSpacing12,
-
-                                    /// Gender & influencer
-                                    IgnorePointer(
-                                      ignoring: isView,
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: _buildField(
-                                              label: 'Gender',
-                                              child:
-                                                  DynamicSingleSearchDropdown(
-                                                items: const [
-                                                  "Male",
-                                                  "Female",
-                                                  "Others",
-                                                ],
-                                                selectedItem: gender,
-                                                onChanged: (v) {
-                                                  gender = v;
-                                                },
-                                                label: "Gender",
-                                                isError: isGenderError,
-                                                nameKey: "name",
-                                              ),
-                                            ),
-                                          ),
-                                          horizontalSpacing12,
-                                          Expanded(
-                                            child: _buildField(
-                                              label: 'Influencers',
-                                              child: Builder(
-                                                builder: (context) {
-                                                  // 🔹 Debug: check the data before passing to dropdown
-                                                  for (var e
-                                                      in (widget.influencers ??
-                                                          [])) {
-                                                    debugPrint(
-                                                        "id=${e.id}, name=${e.name}, image=${e.image}");
-                                                  }
-
-                                                  return DynamicMultiSearchDropdown(
-                                                    label: 'Influencers',
-                                                    selectedItems:
-                                                        selectedInfluencers,
-                                                    // items:
-
-                                                    // (widget.influencers ?? [])
-                                                    //     .map((e) => {
-                                                    //           'id': e.id,
-                                                    //           'name': e.name,
-                                                    //           // 🔹 Normalize image to full URL if needed
-                                                    //           'image': (e.image !=
-                                                    //                       null &&
-                                                    //                   e.image!
-                                                    //                       .isNotEmpty)
-                                                    //               ? "${e.image}"
-                                                    //               : null,
-                                                    //         })
-                                                    //     .toList(),
-                                                    items: filteredInfluencers
-                                                        .map((e) => {
-                                                              'id': e['id'],
-                                                              'name': e['name'],
-                                                              'image': (e['image'] !=
-                                                                          null &&
-                                                                      e['image']
-                                                                          .toString()
-                                                                          .isNotEmpty)
-                                                                  ? "${e['image']}"
-                                                                  : null,
-                                                            })
-                                                        .toList(),
-
-                                                    onChanged: isView
-                                                        ? (_) {} // 🔒 view mode
-                                                        : (values) {
-                                                            setState(() {
-                                                              selectedInfluencers = (widget
-                                                                          .influencers ??
-                                                                      [])
-                                                                  .map((e) => {
-                                                                        'id': e
-                                                                            .id,
-                                                                        'name':
-                                                                            e.name,
-                                                                        'image': (e.image != null &&
-                                                                                e.image!.isNotEmpty)
-                                                                            ? "https://yourserver.com/${e.image}"
-                                                                            : null,
-                                                                      })
-                                                                  .where((item) =>
-                                                                      values.any((v) =>
-                                                                          v['id'] ==
-                                                                          item[
-                                                                              'id']))
-                                                                  .toList();
-
-                                                              selectedInfluencerIds =
-                                                                  selectedInfluencers
-                                                                      .map((e) =>
-                                                                          e['id'])
-                                                                      .toList();
-                                                            });
-
-                                                            debugPrint(
-                                                                "Selected Influencer IDs: $selectedInfluencerIds");
-                                                          },
-                                                    isError:
-                                                        isInfluencerSelected,
-                                                    errorText:
-                                                        "Please select at least one influencer",
+                                                  thumbnailScrollController
+                                                      .animateTo(
+                                                    newOffset.clamp(
+                                                      0.0,
+                                                      thumbnailScrollController
+                                                          .position
+                                                          .maxScrollExtent,
+                                                    ),
+                                                    duration: const Duration(
+                                                        milliseconds: 300),
+                                                    curve: Curves.easeInOut,
                                                   );
                                                 },
                                               ),
-                                            ),
+
+                                              /// ▶ RIGHT
+                                              IconButton(
+                                                icon: const Icon(
+                                                    Icons.arrow_forward_ios,
+                                                    size: 16,
+                                                    color: Colors.grey),
+                                                onPressed: () {
+                                                  final newOffset =
+                                                      thumbnailScrollController
+                                                              .offset +
+                                                          100;
+
+                                                  thumbnailScrollController
+                                                      .animateTo(
+                                                    newOffset.clamp(
+                                                      0.0,
+                                                      thumbnailScrollController
+                                                          .position
+                                                          .maxScrollExtent,
+                                                    ),
+                                                    duration: const Duration(
+                                                        milliseconds: 300),
+                                                    curve: Curves.easeInOut,
+                                                  );
+                                                },
+                                              ),
+                                            ],
                                           ),
-                                        ],
+                                        )
+                                    ],
+                                  ),
+
+                                  verticalSpacing16,
+                                  ElevatedButton.icon(
+                                    onPressed: isView ? null : _pickImages,
+                                    icon: const Icon(Icons.upload),
+                                    label: const Text('Upload Image'),
+                                  ),
+
+                                  /// Project Code & Company
+                                  ///   Expanded(
+                                  //   child: _buildField(
+                                  //     label: 'Project Code',
+                                  //     child: InitialTextForm(
+                                  //       radius: 10,
+                                  //       controller: codeCtrl,
+                                  //       hintText: 'Project Code',
+                                  //       readOnly: isView,
+                                  //       validator: (value) {
+                                  //         if (value == null ||
+                                  //             value.isEmpty) {
+                                  //           return 'Project Code is required';
+                                  //         }
+                                  //         return null;
+                                  //       },
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  // horizontalSpacing12,
+                                  IgnorePointer(
+                                    ignoring: isView,
+                                    child: _buildField(
+                                      label: 'Company Name',
+                                      child: DynamicSingleSearchDropdown(
+                                        label: "Company",
+                                        items: widget.companies!
+                                            .map((c) => {
+                                                  'id': c.id,
+                                                  'name': c.companyName,
+                                                })
+                                            .toList(),
+                                        selectedItem: selectedCompany,
+                                        onChanged: (v) {
+                                          setState(() {
+                                            selectedCompany = v;
+                                            companyId = v['id'];
+                                            isCompanyError = false;
+                                          });
+                                        },
+                                        isError: isCompanyError,
+                                        nameKey: "name",
                                       ),
                                     ),
-                                    verticalSpacing12,
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        IgnorePointer(
+                                  ),
+                                  verticalSpacing12,
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildField(
+                                          label: 'Project Title',
+                                          child: InitialTextForm(
+                                            radius: 10,
+                                            controller: titleCtrl,
+                                            hintText: 'Project Title',
+                                            readOnly: isView,
+                                            validator: (val) {
+                                              if (val == null || val.isEmpty) {
+                                                return 'Project Title is required';
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                      horizontalSpacing12,
+                                      Expanded(
+                                        child: IgnorePointer(
                                           ignoring: isView,
                                           child: _buildField(
-                                            label: "Social media platforms",
-                                            child: Row(
-                                              children: [
-                                                _checkItem(
-                                                  text: "Instagram",
-                                                  value: instagram,
-                                                  onChanged: (v) {
-                                                    setState(() {
-                                                      instagram = v;
-                                                      checkboxError = null;
-                                                    });
-                                                  },
-                                                ),
-                                                _checkItem(
-                                                  text: "Facebook",
-                                                  value: facebook,
-                                                  onChanged: (v) {
-                                                    setState(() {
-                                                      facebook = v;
-                                                      checkboxError = null;
-                                                    });
-                                                  },
-                                                ),
-                                                _checkItem(
-                                                  text: "Youtube",
-                                                  value: youtube,
-                                                  onChanged: (v) {
-                                                    setState(() {
-                                                      youtube = v;
-                                                      checkboxError = null;
-                                                    });
-                                                  },
-                                                ),
-                                              ],
+                                            label: 'Services',
+                                            child: DynamicMultiSearchDropdown(
+                                              label: 'Services',
+                                              selectedItems: selectedServices,
+                                              items: (widget.service ?? [])
+                                                  .map((e) => {
+                                                        'id': e.id,
+                                                        'name': e.name,
+                                                      })
+                                                  .toList(),
+                                              onChanged: isView
+                                                  ? (_) {}
+                                                  : (values) {
+                                                      setState(() {
+                                                        selectedServices = (widget
+                                                                    .service ??
+                                                                [])
+                                                            .map((e) => {
+                                                                  'id': e.id,
+                                                                  'name':
+                                                                      e.name,
+                                                                })
+                                                            .where((item) =>
+                                                                values.any((v) =>
+                                                                    v['id'] ==
+                                                                    item['id']))
+                                                            .toList();
+
+                                                        selectedService =
+                                                            selectedServices
+                                                                .map((e) =>
+                                                                    e['id'])
+                                                                .toList();
+                                                      });
+                                                      _filterInfluencers();
+                                                    },
                                             ),
                                           ),
                                         ),
-                                        // checkItem(
-                                        //   text: "All Influencers",
-                                        //   value: allInfluencersSelected,
-                                        //   onChanged: (v) {
-                                        //     setState(() {
-                                        //       allInfluencersSelected = v;
-                                        //       _filterInfluencers();
-                                        //       checkboxError = null;
-                                        //     });
-                                        //   },
-                                        // ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  verticalSpacing12,
+
+                                  /// Payment & Commission
+
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildField(
+                                          label: 'Payment',
+                                          child: InitialTextForm(
+                                            radius: 10,
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly,
+                                            ],
+                                            controller: paymentCtrl,
+                                            hintText: 'Payment',
+                                            readOnly: isView,
+                                            keyboardType: TextInputType.number,
+                                            validator: (val) {
+                                              if (val == null || val.isEmpty) {
+                                                return 'Payment is required';
+                                              } else if (paymentCtrl.text ==
+                                                  "0") {
+                                                return 'Payment cannot be 0';
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                      horizontalSpacing12,
+                                      Expanded(
+                                        child: _buildField(
+                                          label: 'Tax %',
+                                          child: InitialTextForm(
+                                            radius: 10,
+                                            controller: taxPercentCtrl,
+                                            hintText: 'Tax %',
+                                            readOnly: isView,
+                                            keyboardType: TextInputType.number,
+                                            suffixIcon: const Icon(
+                                                Icons.percent,
+                                                size: 16),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly,
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  verticalSpacing12,
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildField(
+                                          label: 'Total Amount (Inc. Tax)',
+                                          child: InitialTextForm(
+                                            radius: 10,
+                                            controller: totalAmountCtrl,
+                                            hintText: 'Total Amount',
+                                            readOnly: true, // Auto-calculated
+                                            keyboardType: TextInputType.number,
+                                            fillColor: Colors.grey.shade100,
+                                          ),
+                                        ),
+                                      ),
+                                      horizontalSpacing12,
+                                      Expanded(
+                                        child: _buildField(
+                                          label: 'Commission %',
+                                          child: InitialTextForm(
+                                            radius: 10,
+                                            controller: commPercentCtrl,
+                                            hintText: 'Comm %',
+                                            readOnly: isView,
+                                            keyboardType: TextInputType.number,
+                                            suffixIcon: const Icon(
+                                                Icons.percent,
+                                                size: 16),
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly,
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  verticalSpacing12,
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildField(
+                                          label: 'Commission Amount',
+                                          child: InitialTextForm(
+                                            radius: 10,
+                                            controller: commissionCtrl,
+                                            hintText: 'Commission Amount',
+                                            readOnly: true, // Auto-calculated
+                                            keyboardType: TextInputType.number,
+                                            fillColor: Colors.grey.shade100,
+                                            validator: (val) {
+                                              if (val == null || val.isEmpty) {
+                                                return 'Commission is required';
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                      horizontalSpacing12,
+                                      const Expanded(child: SizedBox()),
+                                    ],
+                                  ),
+                                  verticalSpacing12,
+
+                                  /// Location (FULL WIDTH)
+                                  // IgnorePointer(
+                                  //   ignoring: isView,
+                                  //   child: _buildField(
+                                  //     label: 'Location',
+                                  //     child: StateCityDropdown(
+                                  //       isVertical: true,
+                                  //       showCity: true,
+                                  //       initialState: state,
+                                  //       initialCity: city,
+                                  //       isStateError: isStateError,
+                                  //       isCityError: isCityError,
+                                  //       onStateChanged: (val) {
+                                  //         state = val;
+                                  //         _filterInfluencers();
+                                  //       },
+                                  //       onCityChanged: (val) {
+                                  //         city = val ?? '';
+
+                                  //         _filterInfluencers();
+                                  //       },
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  IgnorePointer(
+                                    ignoring: isView,
+                                    child: _buildField(
+                                      label: 'Location',
+                                      child: StateCityDynamicDropdown(
+                                          isVertical: true,
+                                          showCity: true,
+                                          multi: true, // 🔥 enable multi
+
+                                          initialState: state,
+                                          initialCity: city,
+                                          initialCities:
+                                              selectedCities, // 🔥 important
+
+                                          isStateError: isStateError,
+                                          isCityError: isCityError,
+
+                                          /// 🔹 STATE
+                                          onStateChanged: (val) {
+                                            setState(() {
+                                              state = val;
+                                              city = "";
+                                              selectedCities =
+                                                  []; // 🔥 reset multi
+                                            });
+
+                                            _filterInfluencers();
+                                          },
+
+                                          /// 🔹 SINGLE (optional fallback)
+                                          onCityChanged: (val) {
+                                            setState(() {
+                                              city = val ?? "";
+                                              selectedCities = [];
+                                            });
+
+                                            _filterInfluencers();
+                                          },
+
+                                          /// 🔥 MULTI
+                                          onCitiesChanged: (list) {
+                                            setState(() {
+                                              if (list.contains("All")) {
+                                                selectedCities = [
+                                                  "All"
+                                                ]; // 🔥 keep only "All"
+                                              } else {
+                                                selectedCities =
+                                                    List.from(list);
+                                              }
+                                            });
+
+                                            _filterInfluencers();
+                                          }),
+                                    ),
+                                  ),
+                                  verticalSpacing12,
+
+                                  /// Gender & influencer
+                                  IgnorePointer(
+                                    ignoring: isView,
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: _buildField(
+                                            label: 'Gender',
+                                            child: DynamicSingleSearchDropdown(
+                                              items: const [
+                                                "Male",
+                                                "Female",
+                                                "Others",
+                                              ],
+                                              selectedItem: gender,
+                                              onChanged: (v) {
+                                                gender = v;
+                                              },
+                                              label: "Gender",
+                                              isError: isGenderError,
+                                              nameKey: "name",
+                                            ),
+                                          ),
+                                        ),
+                                        horizontalSpacing12,
+                                        Expanded(
+                                          child: _buildField(
+                                            label: 'Influencers',
+                                            child: Builder(
+                                              builder: (context) {
+                                                // 🔹 Debug: check the data before passing to dropdown
+                                                for (var e
+                                                    in (widget.influencers ??
+                                                        [])) {
+                                                  debugPrint(
+                                                      "id=${e.id}, name=${e.name}, image=${e.image}");
+                                                }
+
+                                                return DynamicMultiSearchDropdown(
+                                                  label: 'Influencers',
+                                                  selectedItems:
+                                                      selectedInfluencers,
+                                                  // items:
+
+                                                  // (widget.influencers ?? [])
+                                                  //     .map((e) => {
+                                                  //           'id': e.id,
+                                                  //           'name': e.name,
+                                                  //           // 🔹 Normalize image to full URL if needed
+                                                  //           'image': (e.image !=
+                                                  //                       null &&
+                                                  //                   e.image!
+                                                  //                       .isNotEmpty)
+                                                  //               ? "${e.image}"
+                                                  //               : null,
+                                                  //         })
+                                                  //     .toList(),
+                                                  items: filteredInfluencers
+                                                      .map((e) => {
+                                                            'id': e['id'],
+                                                            'name': e['name'],
+                                                            'image': (e['image'] !=
+                                                                        null &&
+                                                                    e['image']
+                                                                        .toString()
+                                                                        .isNotEmpty)
+                                                                ? "${e['image']}"
+                                                                : null,
+                                                          })
+                                                      .toList(),
+
+                                                  onChanged: isView
+                                                      ? (_) {} // 🔒 view mode
+                                                      : (values) {
+                                                          setState(() {
+                                                            selectedInfluencers = (widget
+                                                                        .influencers ??
+                                                                    [])
+                                                                .map((e) => {
+                                                                      'id':
+                                                                          e.id,
+                                                                      'name': e
+                                                                          .name,
+                                                                      'image': (e.image != null &&
+                                                                              e.image!.isNotEmpty)
+                                                                          ? "https://yourserver.com/${e.image}"
+                                                                          : null,
+                                                                    })
+                                                                .where((item) =>
+                                                                    values.any((v) =>
+                                                                        v['id'] ==
+                                                                        item[
+                                                                            'id']))
+                                                                .toList();
+
+                                                            selectedInfluencerIds =
+                                                                selectedInfluencers
+                                                                    .map((e) =>
+                                                                        e['id'])
+                                                                    .toList();
+                                                          });
+
+                                                          debugPrint(
+                                                              "Selected Influencer IDs: $selectedInfluencerIds");
+                                                        },
+                                                  isError: isInfluencerSelected,
+                                                  errorText:
+                                                      "Please select at least one influencer",
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
                                       ],
                                     ),
-
-                                    /// Description (FULL WIDTH)
-                                    _buildField(
-                                      label: 'Description',
-                                      child: InitialTextForm(
-                                        radius: 10,
-                                        controller: noteCtrl,
-                                        hintText: 'Description',
-                                        readOnly: isView,
-                                        maxLines: 4,
+                                  ),
+                                  verticalSpacing12,
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      IgnorePointer(
+                                        ignoring: isView,
+                                        child: _buildField(
+                                          label: "Social media platforms",
+                                          child: Row(
+                                            children: [
+                                              _checkItem(
+                                                text: "Instagram",
+                                                value: instagram,
+                                                onChanged: (v) {
+                                                  setState(() {
+                                                    instagram = v;
+                                                    checkboxError = null;
+                                                  });
+                                                },
+                                              ),
+                                              _checkItem(
+                                                text: "Facebook",
+                                                value: facebook,
+                                                onChanged: (v) {
+                                                  setState(() {
+                                                    facebook = v;
+                                                    checkboxError = null;
+                                                  });
+                                                },
+                                              ),
+                                              _checkItem(
+                                                text: "Youtube",
+                                                value: youtube,
+                                                onChanged: (v) {
+                                                  setState(() {
+                                                    youtube = v;
+                                                    checkboxError = null;
+                                                  });
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
+                                      // checkItem(
+                                      //   text: "All Influencers",
+                                      //   value: allInfluencersSelected,
+                                      //   onChanged: (v) {
+                                      //     setState(() {
+                                      //       allInfluencersSelected = v;
+                                      //       _filterInfluencers();
+                                      //       checkboxError = null;
+                                      //     });
+                                      //   },
+                                      // ),
+                                    ],
+                                  ),
+
+                                  /// Description (FULL WIDTH)
+                                  _buildField(
+                                    label: 'Description',
+                                    child: InitialTextForm(
+                                      radius: 10,
+                                      controller: noteCtrl,
+                                      hintText: 'Description',
+                                      readOnly: isView,
+                                      maxLines: 4,
                                     ),
+                                  ),
 
-                                    const SizedBox(height: 16),
+                                  const SizedBox(height: 16),
 
-                                    /// ACTION BUTTONS
-                                    if (!isView)
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          CommonButton(
-                                            text: 'Save',
-                                            buttonColor: continueButton,
-                                            onTap: _save,
-                                            padding: defaultPadding8 +
-                                                rightPadding8 +
-                                                leftPadding8,
-                                            textStyle:
-                                                fontFamilySemiBold.size14.white,
-                                          )
-                                        ],
-                                      ),
-                                  ],
-                                ),
+                                  /// ACTION BUTTONS
+                                  if (!isView)
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        CommonButton(
+                                          text: 'Save',
+                                          buttonColor: continueButton,
+                                          onTap: _save,
+                                          padding: defaultPadding8 +
+                                              rightPadding8 +
+                                              leftPadding8,
+                                          textStyle:
+                                              fontFamilySemiBold.size14.white,
+                                        )
+                                      ],
+                                    ),
+                                ],
                               ),
                             ),
                           ],
@@ -1145,6 +1198,21 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
         ),
       ),
     );
+  }
+
+  void _calculateValues() {
+    double payment = double.tryParse(paymentCtrl.text) ?? 0;
+    double taxPercent = double.tryParse(taxPercentCtrl.text) ?? 0;
+    double commPercent = double.tryParse(commPercentCtrl.text) ?? 0;
+
+    double taxAmount = (payment * taxPercent) / 100;
+    double totalAmount = payment + taxAmount;
+    double commissionAmount = (payment * commPercent) / 100;
+
+    // Use a flag to prevent recursive listener calls if necessary,
+    // but since we only update total and commission (which don't have listeners), it's fine.
+    totalAmountCtrl.text = totalAmount.toStringAsFixed(2);
+    commissionCtrl.text = commissionAmount.toStringAsFixed(2);
   }
 
   Future<void> _pickImages() async {
@@ -1276,7 +1344,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
         imageUrl: item.url!,
         width: width ?? double.infinity,
         height: height ?? double.infinity,
-        fit: BoxFit.cover,
+        fit: BoxFit.fill,
       );
     }
 
@@ -1385,6 +1453,9 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
       "companyId": selectedCompany!['id'],
       "companyName": selectedCompany!['name'],
       "payment": double.tryParse(paymentCtrl.text) ?? 0,
+      "tax_percent": double.tryParse(taxPercentCtrl.text) ?? 0,
+      "total_amount": double.tryParse(totalAmountCtrl.text) ?? 0,
+      "commission_percent": double.tryParse(commPercentCtrl.text) ?? 0,
       "commission": double.tryParse(commissionCtrl.text) ?? 0,
       "note": noteCtrl.text,
       "projectImages": images,

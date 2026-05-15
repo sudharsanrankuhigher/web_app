@@ -222,21 +222,21 @@ class ServicesViewModel extends BaseViewModel with NavigationMixin {
       services.sort((a, b) => a.id!.compareTo(b.id!));
     } else if (sortType == "older") {
       services.sort((a, b) {
-        DateTime aDate = a.createdAt != null
-            ? DateTime.parse(a.createdAt.toString())
-            : DateTime(1970);
-        DateTime bDate = b.createdAt != null
+        DateTime aDate = b.createdAt != null
             ? DateTime.parse(b.createdAt.toString())
+            : DateTime(1970);
+        DateTime bDate = a.createdAt != null
+            ? DateTime.parse(a.createdAt.toString())
             : DateTime(1970);
         return bDate.compareTo(aDate);
       });
     } else if (sortType == "newer") {
       services.sort((a, b) {
-        DateTime aDate = a.createdAt != null
-            ? DateTime.parse(a.createdAt.toString())
-            : DateTime(1970);
-        DateTime bDate = b.createdAt != null
+        DateTime aDate = b.createdAt != null
             ? DateTime.parse(b.createdAt.toString())
+            : DateTime(1970);
+        DateTime bDate = a.createdAt != null
+            ? DateTime.parse(a.createdAt.toString())
             : DateTime(1970);
         return aDate.compareTo(bDate);
       });

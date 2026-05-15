@@ -19,7 +19,7 @@ class PaymentSplitModel {
 
   factory PaymentSplitModel.fromJson(Map<String, dynamic> json) {
     return PaymentSplitModel(
-      status: json["status"] as int?,
+      status: _toInt(json["status"]),
       data: json["data"] == null
           ? []
           : List<Datum>.from(
@@ -60,8 +60,8 @@ class Datum {
 
   factory Datum.fromJson(Map<String, dynamic> json) {
     return Datum(
-      id: json["id"] as int?,
-      infId: json["inf_id"] as int?,
+      id: _toInt(json["id"]),
+      infId: _toInt(json["inf_id"]),
       influencerId: json["influencer_id"].toString(),
       influencerName: json["influencer_name"]?.toString(),
       influencerPhone: json["influencer_phone"]?.toString(),
@@ -81,4 +81,12 @@ class Datum {
         "payment": payment,
         "status": status,
       };
+}
+
+int? _toInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is String) return int.tryParse(value);
+  if (value is double) return value.toInt();
+  return null;
 }

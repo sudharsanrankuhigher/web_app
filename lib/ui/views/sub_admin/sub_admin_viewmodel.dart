@@ -137,7 +137,7 @@ class SubAdminViewModel extends BaseViewModel with NavigationMixin {
           'document_image',
           MultipartFile.fromBytes(
             result['idImage'],
-            filename: 'document_image',
+            filename: 'document_image.${result['id_proof_extension'] ?? 'jpg'}',
           ),
         ),
       );

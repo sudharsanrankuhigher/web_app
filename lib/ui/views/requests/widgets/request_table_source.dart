@@ -6,6 +6,7 @@ import 'package:webapp/ui/views/requests/model/request_model.dart'
     as request_model;
 import 'package:webapp/widgets/common_chips.dart';
 import 'package:webapp/widgets/view_link.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 
 class RequestTableSource extends DataTableSource {
   final List<request_model.Datum> data;
@@ -23,6 +24,8 @@ class RequestTableSource extends DataTableSource {
   final void Function(request_model.Datum) infReject;
   final void Function(request_model.Datum) onBankDetails;
   final void Function(request_model.Datum)? showNote;
+  final void Function(request_model.Datum) onRefund;
+  final void Function(request_model.Datum) onRefundDialog;
 
   final String status;
 
@@ -42,6 +45,8 @@ class RequestTableSource extends DataTableSource {
       this.onReAssign,
       this.onBankDetails,
       this.infReject,
+      this.onRefund,
+      this.onRefundDialog,
       this.showNote);
 
   String getFormattedId(int? categoryId, int? id) {
@@ -106,31 +111,30 @@ class RequestTableSource extends DataTableSource {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CommonStatusChip(
-                    onTap: () => onReject(m),
-                    imageheight: 22,
-                    imagewidth: 22,
-                    margin: zeroPadding,
-                    text: 'Reject',
-                    imagePath: 'assets/images/rejected.svg',
-                    bgColor: red,
-                    imageColor: white,
-                    textStyle: fontFamilySemiBold.size10.white,
-                  ),
-                  CommonStatusChip(
-                    onTap: () => onWaiting(m),
-                    imageheight: 22,
-                    imagewidth: 22,
-                    margin: zeroPadding,
-                    text: 'Waiting',
-                    imagePath: 'assets/images/complete-pending-list.svg',
-                    bgColor: greenShade1,
-                    imageColor: white,
-                    textStyle: fontFamilySemiBold.size10.white,
-                  ),
-                  // Text("Reject", style: TextStyle(color: Colors.red)),
-                  // Text("Move to Waiting",
-                  //     style: TextStyle(color: Colors.green)),
+                  if (PermissionHelper.instance.has('edit_requests'))
+                    CommonStatusChip(
+                      onTap: () => onReject(m),
+                      imageheight: 22,
+                      imagewidth: 22,
+                      margin: zeroPadding,
+                      text: 'Reject',
+                      imagePath: 'assets/images/rejected.svg',
+                      bgColor: red,
+                      imageColor: white,
+                      textStyle: fontFamilySemiBold.size10.white,
+                    ),
+                  if (PermissionHelper.instance.has('edit_requests'))
+                    CommonStatusChip(
+                      onTap: () => onWaiting(m),
+                      imageheight: 22,
+                      imagewidth: 22,
+                      margin: zeroPadding,
+                      text: 'Waiting',
+                      imagePath: 'assets/images/complete-pending-list.svg',
+                      bgColor: greenShade1,
+                      imageColor: white,
+                      textStyle: fontFamilySemiBold.size10.white,
+                    ),
                 ],
               ),
             ),
@@ -153,31 +157,31 @@ class RequestTableSource extends DataTableSource {
           DataCell(Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              CommonStatusChip(
-                onTap: () => onReject(m),
-                imageheight: 20,
-                imagewidth: 20,
-                margin: zeroPadding,
-                text: 'Reject',
-                imagePath: 'assets/images/rejected.svg',
-                bgColor: red,
-                imageColor: white,
-                textStyle: fontFamilySemiBold.size10.white,
-              ),
+              if (PermissionHelper.instance.has('edit_requests'))
+                CommonStatusChip(
+                  onTap: () => onReject(m),
+                  imageheight: 20,
+                  imagewidth: 20,
+                  margin: zeroPadding,
+                  text: 'Reject',
+                  imagePath: 'assets/images/rejected.svg',
+                  bgColor: red,
+                  imageColor: white,
+                  textStyle: fontFamilySemiBold.size10.white,
+                ),
               horizontalSpacing10,
-              CommonStatusChip(
-                onTap: () => onProceed(m),
-                imageheight: 20,
-                imagewidth: 20,
-                margin: zeroPadding,
-                text: 'Proceed',
-                imagePath: 'assets/images/complete-pending-list.svg',
-                bgColor: greenShade1,
-                imageColor: white,
-                textStyle: fontFamilySemiBold.size10.white,
-              ),
-              //   Text("Reject", style: TextStyle(color: Colors.red)),
-              //   Text("Proceed", style: TextStyle(color: Colors.green)),
+              if (PermissionHelper.instance.has('edit_requests'))
+                CommonStatusChip(
+                  onTap: () => onProceed(m),
+                  imageheight: 20,
+                  imagewidth: 20,
+                  margin: zeroPadding,
+                  text: 'Proceed',
+                  imagePath: 'assets/images/complete-pending-list.svg',
+                  bgColor: greenShade1,
+                  imageColor: white,
+                  textStyle: fontFamilySemiBold.size10.white,
+                ),
             ],
           )),
         ];
@@ -209,17 +213,19 @@ class RequestTableSource extends DataTableSource {
             ),
           ),
           DataCell(
-            CommonStatusChip(
-              onTap: () => infReject(m),
-              imageheight: 20,
-              imagewidth: 20,
-              margin: zeroPadding,
-              text: 'Reject',
-              imagePath: 'assets/images/rejected.svg',
-              bgColor: red,
-              imageColor: white,
-              textStyle: fontFamilySemiBold.size10.white,
-            ),
+            PermissionHelper.instance.has('edit_requests')
+                ? CommonStatusChip(
+                    onTap: () => infReject(m),
+                    imageheight: 20,
+                    imagewidth: 20,
+                    margin: zeroPadding,
+                    text: 'Reject',
+                    imagePath: 'assets/images/rejected.svg',
+                    bgColor: red,
+                    imageColor: white,
+                    textStyle: fontFamilySemiBold.size10.white,
+                  )
+                : const SizedBox(),
           ),
         ];
 
@@ -306,36 +312,61 @@ class RequestTableSource extends DataTableSource {
           ),
 
           DataCell(Center(
-            child: CommonStatusChip(
-              onTap: () => m.status == 5
-                  ? null
-                  : (m.promotion?.youtube != null &&
-                              m.promotion!.youtube!.isNotEmpty) ||
-                          (m.promotion?.instagram != null &&
-                              m.promotion!.instagram!.isNotEmpty) ||
-                          (m.promotion?.facebook != null &&
-                              m.promotion!.facebook!.isNotEmpty)
-                      ? onPreparing(m)
-                      : null,
-              imageheight: 20,
-              imagewidth: 20,
-              margin: zeroPadding,
-              text: m.status == 5
-                  ? "Rework"
-                  : (m.promotion?.youtube != null &&
-                              m.promotion!.youtube!.isNotEmpty) ||
-                          (m.promotion?.instagram != null &&
-                              m.promotion!.instagram!.isNotEmpty) ||
-                          (m.promotion?.facebook != null &&
-                              m.promotion!.facebook!.isNotEmpty)
-                      ? 'Inf- complete'
-                      : 'Preparing',
-              imagePath: 'assets/images/pending.svg',
-              bgColor: pending,
-              imageColor: white,
-              textStyle: fontFamilySemiBold.size10.white,
-              padding: defaultPadding4 + rightPadding4,
-            ),
+            child: PermissionHelper.instance.has('edit_requests')
+                ? CommonStatusChip(
+                    onTap: () => m.status == 5
+                        ? null
+                        : (m.promotion?.youtube != null &&
+                                    m.promotion!.youtube!.isNotEmpty) ||
+                                (m.promotion?.instagram != null &&
+                                    m.promotion!.instagram!.isNotEmpty) ||
+                                (m.promotion?.facebook != null &&
+                                    m.promotion!.facebook!.isNotEmpty)
+                            ? onPreparing(m)
+                            : null,
+                    imageheight: 20,
+                    imagewidth: 20,
+                    margin: zeroPadding,
+                    text: m.status == 5
+                        ? "Rework"
+                        : (m.promotion?.youtube != null &&
+                                    m.promotion!.youtube!.isNotEmpty) ||
+                                (m.promotion?.instagram != null &&
+                                    m.promotion!.instagram!.isNotEmpty) ||
+                                (m.promotion?.facebook != null &&
+                                    m.promotion!.facebook!.isNotEmpty)
+                            ? 'Inf- complete'
+                            : 'Preparing',
+                    imagePath: 'assets/images/pending.svg',
+                    bgColor: pending,
+                    imageColor: white,
+                    textStyle: fontFamilySemiBold.size10.white,
+                    padding: defaultPadding4 + rightPadding4,
+                  )
+                : const SizedBox(),
+          )),
+          DataCell(Center(
+            child: PermissionHelper.instance.has('delete_requests')
+                ? CommonStatusChip(
+                    onTap: () => (m.promotion?.youtube != null &&
+                                m.promotion!.youtube!.isNotEmpty) ||
+                            (m.promotion?.instagram != null &&
+                                m.promotion!.instagram!.isNotEmpty) ||
+                            (m.promotion?.facebook != null &&
+                                m.promotion!.facebook!.isNotEmpty)
+                        ? null
+                        : infReject(m),
+                    imageheight: 20,
+                    imagewidth: 20,
+                    margin: zeroPadding,
+                    text: 'Cancel',
+                    imagePath: 'assets/images/rejected.svg',
+                    bgColor: red,
+                    imageColor: white,
+                    textStyle: fontFamilySemiBold.size10.white,
+                    padding: defaultPadding4 + rightPadding4,
+                  )
+                : const SizedBox(),
           )),
         ];
 
@@ -355,18 +386,20 @@ class RequestTableSource extends DataTableSource {
                   "")),
           DataCell(
             Center(
-              child: CommonStatusChip(
-                onTap: () => onGoToPromoteVerified(m),
-                imageheight: 20,
-                imagewidth: 20,
-                margin: zeroPadding,
-                text: 'go to verified',
-                imagePath: 'assets/images/verified.svg',
-                bgColor: greenShade1,
-                imageColor: white,
-                textStyle: fontFamilySemiBold.size10.white,
-                padding: defaultPadding4 + rightPadding4,
-              ),
+              child: PermissionHelper.instance.has('edit_requests')
+                  ? CommonStatusChip(
+                      onTap: () => onGoToPromoteVerified(m),
+                      imageheight: 20,
+                      imagewidth: 20,
+                      margin: zeroPadding,
+                      text: 'go to verified',
+                      imagePath: 'assets/images/verified.svg',
+                      bgColor: greenShade1,
+                      imageColor: white,
+                      textStyle: fontFamilySemiBold.size10.white,
+                      padding: defaultPadding4 + rightPadding4,
+                    )
+                  : const SizedBox(),
             ),
           ),
         ];
@@ -385,18 +418,56 @@ class RequestTableSource extends DataTableSource {
               "")),
           DataCell(
             Center(
-              child: CommonStatusChip(
-                onTap: () => onRevoke(m),
-                imageheight: 20,
-                imagewidth: 20,
-                margin: zeroPadding,
-                text: 'Revoke',
-                imagePath: 'assets/images/assigned.svg',
-                bgColor: redShade,
-                imageColor: Colors.black,
-                textStyle: fontFamilySemiBold.size10.black,
-                padding: defaultPadding4 + rightPadding4,
-              ),
+              child: PermissionHelper.instance.has('edit_requests')
+                  ? CommonStatusChip(
+                      onTap: () => onRevoke(m),
+                      imageheight: 20,
+                      imagewidth: 20,
+                      margin: zeroPadding,
+                      text: 'Revoke',
+                      imagePath: 'assets/images/assigned.svg',
+                      bgColor: redShade,
+                      imageColor: Colors.black,
+                      textStyle: fontFamilySemiBold.size10.black,
+                      padding: defaultPadding4 + rightPadding4,
+                    )
+                  : const SizedBox(),
+            ),
+          ),
+          DataCell(
+            Center(
+              child: PermissionHelper.instance.has('edit_requests')
+                  ? CommonStatusChip(
+                      onTap: () => onReAssign(m),
+                      imageheight: 20,
+                      imagewidth: 20,
+                      margin: zeroPadding,
+                      text: 'ReAssign',
+                      imagePath: 'assets/images/assigned.svg',
+                      bgColor: greenShade1,
+                      imageColor: white,
+                      textStyle: fontFamilySemiBold.size10.white,
+                      padding: defaultPadding4 + rightPadding4,
+                    )
+                  : const SizedBox(),
+            ),
+          ),
+          DataCell(
+            Center(
+              child: PermissionHelper.instance.has('edit_requests')
+                  ? CommonStatusChip(
+                      onTap: () => onRefund(m),
+                      imageheight: 20,
+                      imagewidth: 20,
+                      margin: zeroPadding,
+                      text: 'Refunded',
+                      imagePath: 'assets/images/assigned.svg',
+                      bgColor: onGoing,
+                      imageColor: white,
+                      textStyle: fontFamilySemiBold.size10.white,
+                      padding: defaultPadding4 + rightPadding4,
+                    )
+                  : const SizedBox(),
             ),
           ),
         ];
@@ -416,13 +487,60 @@ class RequestTableSource extends DataTableSource {
           DataCell(Text(
               DateFormatter.formatToDDMMMYYYY(m.dates!.cancelled.toString()) ??
                   "")),
-          DataCell(InkWell(
-            onTap: () => onReAssign(m),
-            child: Text(
-              "Re-Assign",
-              style: fontFamilySemiBold.size13.continueButton,
+          DataCell(
+            Center(
+              child: PermissionHelper.instance.has('edit_requests')
+                  ? CommonStatusChip(
+                      onTap: () => onRevoke(m),
+                      imageheight: 20,
+                      imagewidth: 20,
+                      margin: zeroPadding,
+                      text: 'Revoke',
+                      imagePath: 'assets/images/assigned.svg',
+                      bgColor: redShade,
+                      imageColor: Colors.black,
+                      textStyle: fontFamilySemiBold.size10.black,
+                      padding: defaultPadding4 + rightPadding4,
+                    )
+                  : const SizedBox(),
             ),
-          )),
+          ),
+          DataCell(
+            Center(
+              child: PermissionHelper.instance.has('edit_requests')
+                  ? CommonStatusChip(
+                      onTap: () => onReAssign(m),
+                      imageheight: 20,
+                      imagewidth: 20,
+                      margin: zeroPadding,
+                      text: 'ReAssign',
+                      imagePath: 'assets/images/assigned.svg',
+                      bgColor: greenShade1,
+                      imageColor: white,
+                      textStyle: fontFamilySemiBold.size10.white,
+                      padding: defaultPadding4 + rightPadding4,
+                    )
+                  : const SizedBox(),
+            ),
+          ),
+          DataCell(
+            Center(
+              child: PermissionHelper.instance.has('edit_requests')
+                  ? CommonStatusChip(
+                      onTap: () => onRefund(m),
+                      imageheight: 20,
+                      imagewidth: 20,
+                      margin: zeroPadding,
+                      text: 'Refunded',
+                      imagePath: 'assets/images/assigned.svg',
+                      bgColor: onGoing,
+                      imageColor: white,
+                      textStyle: fontFamilySemiBold.size10.white,
+                      padding: defaultPadding4 + rightPadding4,
+                    )
+                  : const SizedBox(),
+            ),
+          ),
         ];
 
       case "promote_verified":
@@ -593,12 +711,41 @@ class RequestTableSource extends DataTableSource {
           DataCell(Text(
               m.payment!.amount != null ? m.payment!.amount.toString() : "")),
           DataCell(Text("${m.payment!.commission ?? 0}")),
+          DataCell(PermissionHelper.instance.has('edit_requests')
+              ? InkWell(
+                  onTap: () => onClientPaymentVerified(m),
+                  child: Center(
+                    child: Text(
+                      'Check & Verify',
+                      style: fontFamilySemiBold.size13.continueButton,
+                    ),
+                  ),
+                )
+              : const SizedBox()),
+        ];
+
+      case "refund":
+        return [
+          DataCell(Text('${index + 1}')),
           DataCell(InkWell(
-            onTap: () => onClientPaymentVerified(m),
+              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
+          DataCell(Text(m.client!.name ?? "")),
+          DataCell(Text(m.client!.mobileNumber ?? "")),
+          DataCell(Text(
+              m.payment!.amount != null ? m.payment!.amount.toString() : "")),
+          DataCell(Text(
+              DateFormatter.formatToDDMMMYYYY(m.dates!.refund.toString()))),
+          DataCell(Text(DateFormatter.formatToDDMMMYYYY(
+              m.dates!.refundUpdated.toString()))),
+          DataCell(Text(m.refundStatus == 2 ? "Completed" : "Pending")),
+          DataCell(InkWell(
+            onTap: () => m.refundStatus == 2 ? null : onRefundDialog(m),
             child: Center(
               child: Text(
-                'Check & Verify',
-                style: fontFamilySemiBold.size13.continueButton,
+                m.refundStatus == 2 ? "Completed" : "Refund initiated",
+                style: m.refundStatus == 2
+                    ? fontFamilyBold.size13.appGreen400
+                    : fontFamilySemiBold.size13.continueButton,
               ),
             ),
           )),

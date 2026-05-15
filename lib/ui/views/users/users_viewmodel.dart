@@ -157,7 +157,7 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
           DateTime bDate = b.createdAt != null
               ? DateTime.parse(b.createdAt.toString())
               : DateTime(1970);
-          return bDate.compareTo(aDate);
+          return aDate.compareTo(bDate);
         });
         break;
 
@@ -169,7 +169,7 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
           DateTime bDate = b.createdAt != null
               ? DateTime.parse(b.createdAt.toString())
               : DateTime(1970);
-          return aDate.compareTo(bDate);
+          return bDate.compareTo(aDate);
         });
         break;
     }

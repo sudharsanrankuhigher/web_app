@@ -222,6 +222,7 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                                 DataColumn(label: Text("Instagram")),
                                 DataColumn(label: Text("YouTube")),
                                 DataColumn(label: Text("Facebook")),
+                                DataColumn(label: Text("Onboarded")),
                                 DataColumn(label: Text("Actions")),
                                 DataColumn(label: Text("Status")),
                               ],
