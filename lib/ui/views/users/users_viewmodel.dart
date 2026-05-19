@@ -152,24 +152,34 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
       case "newer":
         users.sort((a, b) {
           DateTime aDate = a.createdAt != null
-              ? DateTime.parse(a.createdAt.toString())
+              ? DateTime.tryParse(a.createdAt.toString()) ?? DateTime(1970)
               : DateTime(1970);
           DateTime bDate = b.createdAt != null
-              ? DateTime.parse(b.createdAt.toString())
+              ? DateTime.tryParse(b.createdAt.toString()) ?? DateTime(1970)
               : DateTime(1970);
-          return aDate.compareTo(bDate);
+
+          int dateCompare = bDate.compareTo(aDate);
+          if (dateCompare == 0) {
+            return (b.id ?? 0).compareTo(a.id ?? 0);
+          }
+          return dateCompare;
         });
         break;
 
       case "older":
         users.sort((a, b) {
           DateTime aDate = a.createdAt != null
-              ? DateTime.parse(a.createdAt.toString())
+              ? DateTime.tryParse(a.createdAt.toString()) ?? DateTime(1970)
               : DateTime(1970);
           DateTime bDate = b.createdAt != null
-              ? DateTime.parse(b.createdAt.toString())
+              ? DateTime.tryParse(b.createdAt.toString()) ?? DateTime(1970)
               : DateTime(1970);
-          return bDate.compareTo(aDate);
+
+          int dateCompare = aDate.compareTo(bDate);
+          if (dateCompare == 0) {
+            return (a.id ?? 0).compareTo(b.id ?? 0);
+          }
+          return dateCompare;
         });
         break;
     }

@@ -4,12 +4,13 @@ import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/core/enum/permission_enum.dart';
+import 'package:webapp/core/navigation/navigation_mixin.dart';
 import 'package:webapp/services/api_service.dart';
 import 'package:webapp/ui/views/permissions/model/permission_row.dart';
 import 'package:webapp/ui/views/permissions/model/permmission_check_model.dart';
 import 'package:webapp/ui/views/roles/model/roles_model.dart' as role_model;
 
-class PermissionsViewModel extends BaseViewModel {
+class PermissionsViewModel extends BaseViewModel with NavigationMixin {
   PermissionsViewModel() {
     getRoles();
   }
@@ -156,14 +157,12 @@ class PermissionsViewModel extends BaseViewModel {
       PermissionType.edit,
       PermissionType.delete
     }),
-    PermissionRow(
-        name: 'requests',
-        allowed: {
-          PermissionType.view,
-          PermissionType.edit,
-          PermissionType.add,
-          PermissionType.delete
-        }),
+    PermissionRow(name: 'requests', allowed: {
+      PermissionType.view,
+      PermissionType.edit,
+      PermissionType.add,
+      PermissionType.delete
+    }),
     PermissionRow(name: 'promotion_projects', allowed: {
       PermissionType.add,
       PermissionType.view,

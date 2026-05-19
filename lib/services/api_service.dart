@@ -44,9 +44,9 @@ class ApiService {
   static ApiService init() {
     final dio = Dio(
       BaseOptions(
-        // baseUrl: 'https://admin.promoteapp.in/',
+        baseUrl: 'https://admin.promoteapp.in/',
         // baseUrl: 'http://172.20.25.23:8003/',
-        baseUrl: 'http://172.20.25.54:8005/',
+        // baseUrl: 'http://172.20.25.54:8005/',
         followRedirects: true,
         validateStatus: (status) => status != null && status < 500,
       ),

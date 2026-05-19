@@ -1200,12 +1200,14 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
     );
   }
 
+  double _taxAmount = 0;
   void _calculateValues() {
     double payment = double.tryParse(paymentCtrl.text) ?? 0;
     double taxPercent = double.tryParse(taxPercentCtrl.text) ?? 0;
     double commPercent = double.tryParse(commPercentCtrl.text) ?? 0;
 
     double taxAmount = (payment * taxPercent) / 100;
+    _taxAmount = taxAmount;
     double totalAmount = payment + taxAmount;
     double commissionAmount = (payment * commPercent) / 100;
 
@@ -1454,6 +1456,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
       "companyName": selectedCompany!['name'],
       "payment": double.tryParse(paymentCtrl.text) ?? 0,
       "tax_percent": double.tryParse(taxPercentCtrl.text) ?? 0,
+      "tax_amount": _taxAmount,
       "total_amount": double.tryParse(totalAmountCtrl.text) ?? 0,
       "commission_percent": double.tryParse(commPercentCtrl.text) ?? 0,
       "commission": double.tryParse(commissionCtrl.text) ?? 0,

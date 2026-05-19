@@ -76,7 +76,9 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
     'assets/images/influencer_banner.svg',
     'assets/images/client_project_commission.svg',
     'assets/images/promote_project_commission.svg',
-    'assets/images/promote_project_commission.svg'
+    'assets/images/promote_project_commission.svg',
+    'assets/images/pay.svg',
+    'assets/images/pay.svg',
   ];
 
   List<Map<String, dynamic>> get monthlyReport {
@@ -110,6 +112,16 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
         "sno": 5,
         "particular": "Total Monthly revenue",
         "totalIncome": totalMonthlyAmount ?? "0"
+      },
+      {
+        "sno": 6,
+        "particular": "Client Project GST",
+        "totalIncome": totalMonthlyIncomeReport?.clientProjectGSTAmount ?? "0"
+      },
+      {
+        "sno": 7,
+        "particular": "Promote Project GST",
+        "totalIncome": totalMonthlyIncomeReport?.promoteProjectGSTAmount ?? "0"
       }
     ];
   }

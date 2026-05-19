@@ -502,6 +502,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       "status": data["status"],
       "client_id": data["client_id"],
       "category_id": data["category_id"],
+      "link": data["link"] ?? "",
     };
 
     try {
@@ -724,6 +725,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           // "status": 3,
           "data": data
         };
+
         waitingAccept(datas);
         print(datas);
       },
@@ -758,7 +760,10 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         "id": model.id,
         "status": result['name'] == "Completed" ? 6 : 5,
         "client_id": model.client!.id,
+        "link":
+            model.promotion?.raw.map((key, value) => MapEntry(key, null)) ?? {},
       };
+      print(data);
       statusChange(data);
     }
   }

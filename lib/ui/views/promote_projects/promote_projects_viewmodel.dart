@@ -176,6 +176,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           "gst": request['tax_percent'],
           "total_amount": request['total_amount'],
           "commission_percent": request['commission_percent'],
+          "gst_amount": request['tax_amount'],
         }
       ],
       "description": request["note"],
@@ -236,6 +237,9 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           formData.fields.add(
             MapEntry("payment[$i][commission_percent]",
                 item["commission_percent"].toString()),
+          );
+          formData.fields.add(
+            MapEntry("payment[$i][gst_amount]", item["gst_amount"].toString()),
           );
         }
       }
@@ -999,6 +1003,9 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
         await changeStatus({
           "promote_project_id": model.subId,
           "rework": 1,
+          "link": [
+            model.link?.raw.map((key, value) => MapEntry(key, null)) ?? {}
+          ],
         });
       }
     }

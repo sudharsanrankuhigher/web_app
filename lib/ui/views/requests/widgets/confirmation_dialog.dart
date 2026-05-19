@@ -353,7 +353,7 @@ Future<void> showAdminPaymentConfigDialog({
     commissionCtrl.text = commission == 0 ? "" : commission.toStringAsFixed(0);
 
     // GST calculation
-    gstAmount = (commission * gstPercentage) / 100;
+    gstAmount = (payment * gstPercentage) / 100;
 
     // Total amount
     totalAmount = payment + gstAmount;
@@ -609,9 +609,9 @@ Future<void> showAdminPaymentConfigDialog({
                                     "payment": paymentCtrl.text,
                                     "commission": commissionCtrl.text,
                                     "note": noteCtrl.text,
-                                    "gst percentage": gstCtrl.text,
-                                    "gst amount": gstAmount,
-                                    "total amount": totalAmount,
+                                    "gst_percentage": gstCtrl.text,
+                                    "gst_amount": gstAmount,
+                                    "total_amount": totalAmount,
                                   },
                                   "verification": {
                                     if (instagram == true) "instagram": null,

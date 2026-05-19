@@ -198,22 +198,29 @@ class Link {
   dynamic instagram;
   dynamic facebook;
 
+  // ✅ ADD THIS
+  Map<String, dynamic> raw;
+
   Link({
     this.youtube,
     this.instagram,
     this.facebook,
+    required this.raw,
   });
 
-  factory Link.fromJson(Map<String, dynamic> json) => Link(
-        youtube: json["youtube"]?.toString(),
-        instagram: json["instagram"]?.toString(),
-        facebook: json["facebook"]?.toString(),
-      );
+  factory Link.fromJson(Map<String, dynamic> json) {
+    return Link(
+      youtube: json["youtube"]?.toString(),
+      instagram: json["instagram"]?.toString(),
+      facebook: json["facebook"]?.toString(),
+      raw: json, // ✅ store original keys
+    );
+  }
 
   Map<String, dynamic> toJson() => {
-        "youtube": youtube,
-        "instagram": instagram,
-        "facebook": facebook,
+        if (raw.containsKey("youtube")) "youtube": youtube,
+        if (raw.containsKey("instagram")) "instagram": instagram,
+        if (raw.containsKey("facebook")) "facebook": facebook,
       };
 }
 

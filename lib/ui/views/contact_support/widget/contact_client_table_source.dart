@@ -113,7 +113,7 @@ class ClientTableSource extends DataTableSource {
                 ),
               )), // Note
         // DataCell(Text(item.alternativeNo!)), // Contact No
-        DataCell((status == 'pending')
+        DataCell((status != 'completed')
             ? IgnorePointer(
                 ignoring: PermissionHelper.instance.has('contact_support')
                     ? false

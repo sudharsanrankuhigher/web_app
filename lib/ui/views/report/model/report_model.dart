@@ -330,12 +330,16 @@ class MonthlyIncome {
   String? bannerAmount;
   int? clientProjectCommission;
   int? promoteProjectCommission;
+  double? clientProjectGSTAmount;
+  double? promoteProjectGSTAmount;
 
   MonthlyIncome({
     this.subscription,
     this.bannerAmount,
     this.clientProjectCommission,
     this.promoteProjectCommission,
+    this.clientProjectGSTAmount,
+    this.promoteProjectGSTAmount,
   });
 
   factory MonthlyIncome.fromJson(Map<String, dynamic> json) => MonthlyIncome(
@@ -347,6 +351,8 @@ class MonthlyIncome {
             : "0",
         clientProjectCommission: json["client_project_commission"],
         promoteProjectCommission: json["promote_project_commission"],
+        clientProjectGSTAmount: toDouble(json["client_project_tax"]),
+        promoteProjectGSTAmount: toDouble(json["promote_project_tax"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -354,6 +360,8 @@ class MonthlyIncome {
         "banner_amount": bannerAmount,
         "client_project_commission": clientProjectCommission,
         "promote_project_commission": promoteProjectCommission,
+        "client_project_tax": clientProjectGSTAmount,
+        "promote_project_tax": promoteProjectGSTAmount,
       };
 }
 
@@ -448,4 +456,10 @@ class SubscriptionPlan {
         "amount": amount,
         "payment_date": paymentDate?.toIso8601String(),
       };
+}
+
+double? toDouble(dynamic value) {
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  return double.tryParse(value.toString());
 }
