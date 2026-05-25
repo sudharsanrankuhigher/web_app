@@ -46,6 +46,7 @@ class ApiService {
       BaseOptions(
         baseUrl: 'https://admin.promoteapp.in/',
         // baseUrl: 'http://172.20.25.23:8003/',
+        // baseUrl: 'http://172.20.25.23:8002/',
         // baseUrl: 'http://172.20.25.54:8005/',
         followRedirects: true,
         validateStatus: (status) => status != null && status < 500,

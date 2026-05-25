@@ -22,6 +22,7 @@ import 'package:webapp/ui/views/plans/plans_view.dart';
 import 'package:webapp/ui/views/requests/requests_view.dart';
 import 'package:webapp/ui/views/login/login_view.dart';
 import 'package:webapp/ui/views/startup/startup_view.dart';
+import 'package:webapp/ui/views/notifications/notifications_view.dart';
 
 final goRouterKey = GlobalKey<NavigatorState>();
 
@@ -144,6 +145,11 @@ final GoRouter router = GoRouter(
           path: '/home/banner',
           name: 'banner',
           builder: (context, state) => const BannerView(),
+        ),
+        GoRoute(
+          path: '/home/notifications',
+          name: 'notifications',
+          builder: (context, state) => const NotificationsView(),
         ),
       ],
     ),

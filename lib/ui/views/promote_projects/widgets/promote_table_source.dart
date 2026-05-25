@@ -411,19 +411,22 @@ class PromoteTableSource extends DataTableSource {
           DataCell(Text(item.amount.toString())),
           DataCell(
             PermissionHelper.instance.has('edit_promotion_projects')
-                ? ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: pendingColor,
-                      padding: defaultPadding4 + rightPadding4 + leftPadding4,
-                    ),
-                    onPressed: () => onGotoPromoteCommission?.call(item),
-                    child: Center(
-                        child: Text(
-                      "promote Commission",
-                      style: fontFamilySemiBold.size12.white,
-                      textAlign: TextAlign.center,
-                    )),
-                  )
+                ? (item.status == 7)
+                    ? ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: pendingColor,
+                          padding:
+                              defaultPadding4 + rightPadding4 + leftPadding4,
+                        ),
+                        onPressed: () => onGotoPromoteCommission?.call(item),
+                        child: Center(
+                            child: Text(
+                          "promote Commission",
+                          style: fontFamilySemiBold.size12.white,
+                          textAlign: TextAlign.center,
+                        )),
+                      )
+                    : Center(child: Text("Success"))
                 : const SizedBox(),
           ),
         ];

@@ -324,27 +324,29 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                   margin: defaultPadding10,
                                 ),
                               // if (viewModel.isInprogress == false)
-                              CommonStatusChip(
-                                text: "Completed",
-                                imagePath:
-                                    "assets/images/complete-pending-list.svg",
-                                textStyle: viewModel.isChipSelected == 4
-                                    ? fontFamilySemiBold.size14.white
-                                    : fontFamilySemiBold.size14.black,
-                                bgColor: viewModel.isChipSelected == 4
-                                    ? appGreen400
-                                    : white,
-                                imageColor: viewModel.isChipSelected == 4
-                                    ? white
-                                    : null,
-                                onTap: () {
-                                  print("Completed");
-                                  viewModel.setChipSelected(4);
-                                },
-                                margin: defaultPadding10,
-                              ),
+                              if (viewModel.isInprogress == true)
+                                CommonStatusChip(
+                                  text: "Completed",
+                                  imagePath:
+                                      "assets/images/complete-pending-list.svg",
+                                  textStyle: viewModel.isChipSelected == 4
+                                      ? fontFamilySemiBold.size14.white
+                                      : fontFamilySemiBold.size14.black,
+                                  bgColor: viewModel.isChipSelected == 4
+                                      ? appGreen400
+                                      : white,
+                                  imageColor: viewModel.isChipSelected == 4
+                                      ? white
+                                      : null,
+                                  onTap: () {
+                                    print("Completed");
+                                    viewModel.setChipSelected(4);
+                                  },
+                                  margin: defaultPadding10,
+                                ),
                               if (PermissionHelper.instance
-                                  .has('company_payment_approval'))
+                                      .has('company_payment_approval') &&
+                                  (viewModel.isInprogress == true))
                                 CommonStatusChip(
                                   text: "Company Payment Verified",
                                   imagePath: "assets/images/verified.svg",
@@ -363,43 +365,45 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                   },
                                   margin: defaultPadding10,
                                 ),
-                              CommonStatusChip(
-                                text: "Rejected",
-                                imagePath: "assets/images/rejected.svg",
-                                textStyle: viewModel.isChipSelected == 3
-                                    ? fontFamilySemiBold.size14.white
-                                    : fontFamilySemiBold.size14.black,
-                                bgColor: viewModel.isChipSelected == 3
-                                    ? appGreen400
-                                    : white,
-                                imageColor: viewModel.isChipSelected == 3
-                                    ? white
-                                    : null,
-                                onTap: () {
-                                  print("Rejected");
-                                  viewModel.setChipSelected(3);
-                                },
-                                margin: defaultPadding10,
-                              ),
+                              if (viewModel.isInprogress == true)
+                                CommonStatusChip(
+                                  text: "Rejected",
+                                  imagePath: "assets/images/rejected.svg",
+                                  textStyle: viewModel.isChipSelected == 3
+                                      ? fontFamilySemiBold.size14.white
+                                      : fontFamilySemiBold.size14.black,
+                                  bgColor: viewModel.isChipSelected == 3
+                                      ? appGreen400
+                                      : white,
+                                  imageColor: viewModel.isChipSelected == 3
+                                      ? white
+                                      : null,
+                                  onTap: () {
+                                    print("Rejected");
+                                    viewModel.setChipSelected(3);
+                                  },
+                                  margin: defaultPadding10,
+                                ),
                               // if (viewModel.isInprogress == false)
-                              CommonStatusChip(
-                                text: "Promote Verified",
-                                imagePath: "assets/images/verified.svg",
-                                textStyle: viewModel.isChipSelected == 5
-                                    ? fontFamilySemiBold.size14.white
-                                    : fontFamilySemiBold.size14.black,
-                                bgColor: viewModel.isChipSelected == 5
-                                    ? appGreen400
-                                    : white,
-                                imageColor: viewModel.isChipSelected == 5
-                                    ? white
-                                    : null,
-                                onTap: () {
-                                  print("Completed");
-                                  viewModel.setChipSelected(5);
-                                },
-                                margin: defaultPadding10,
-                              ),
+                              if (viewModel.isInprogress == true)
+                                CommonStatusChip(
+                                  text: "Promote Verified",
+                                  imagePath: "assets/images/verified.svg",
+                                  textStyle: viewModel.isChipSelected == 5
+                                      ? fontFamilySemiBold.size14.white
+                                      : fontFamilySemiBold.size14.black,
+                                  bgColor: viewModel.isChipSelected == 5
+                                      ? appGreen400
+                                      : white,
+                                  imageColor: viewModel.isChipSelected == 5
+                                      ? white
+                                      : null,
+                                  onTap: () {
+                                    print("Completed");
+                                    viewModel.setChipSelected(5);
+                                  },
+                                  margin: defaultPadding10,
+                                ),
                               CommonStatusChip(
                                 text: "Promote Pay",
                                 imagePath: "assets/images/pay.svg",

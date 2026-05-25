@@ -62,7 +62,7 @@ class Data {
         name: json["name"],
         email: json["email"],
         mobileNumber: json["mobile_number"],
-        profilePic: json["profile_pic"],
+        profilePic: json["profile_img"],
         createdAt: json["created_at"] == null
             ? null
             : DateTime.parse(json["created_at"]),
@@ -77,7 +77,7 @@ class Data {
         "name": name,
         "email": email,
         "mobile_number": mobileNumber,
-        "profile_pic": profilePic,
+        "profile_img": profilePic,
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
       };

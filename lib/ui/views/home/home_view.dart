@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +7,7 @@ import 'package:stacked/stacked.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/widgets/web_image_loading.dart';
 import 'home_viewmodel.dart';
 
 class HomeView extends StackedView<HomeViewModel> {
@@ -118,29 +120,106 @@ class HomeView extends StackedView<HomeViewModel> {
                                 // ),
                                 Tooltip(
                                   message: viewModel.railLabel[index],
-                                  child: SvgPicture.asset(
-                                    viewModel.railIcon[index],
-                                    height: isExtended ? 24.h : 34.h,
-                                    width: isExtended ? 24.w : 34.w,
-                                    color: selected
-                                        ? Colors.white
-                                        : Colors.black87,
+                                  child: Builder(
+                                    builder: (context) {
+                                      final isNotification =
+                                          viewModel.railLabel[index] ==
+                                              'Notifications';
+                                      final isClientRequests =
+                                          viewModel.railLabel[index] ==
+                                              'Client Requests';
+                                      Widget icon = SvgPicture.asset(
+                                        viewModel.railIcon[index],
+                                        height: isExtended ? 24.h : 34.h,
+                                        width: isExtended ? 24.w : 34.w,
+                                        color: selected
+                                            ? Colors.white
+                                            : Colors.black87,
+                                      );
+
+                                      if (isNotification &&
+                                          viewModel.unreadNotificationsCount >
+                                              0 &&
+                                          !isExtended) {
+                                        return Stack(
+                                          clipBehavior: Clip.none,
+                                          children: [
+                                            icon,
+                                            Positioned(
+                                              right: -6,
+                                              top: -6,
+                                              child: _buildNotificationBadge(
+                                                viewModel
+                                                    .unreadNotificationsCount,
+                                                selected,
+                                                isMini: true,
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      }
+
+                                      if (isClientRequests &&
+                                          viewModel.pendingRequestsCount > 0 &&
+                                          !isExtended) {
+                                        return Stack(
+                                          clipBehavior: Clip.none,
+                                          children: [
+                                            icon,
+                                            Positioned(
+                                              right: -6,
+                                              top: -6,
+                                              child: _buildNotificationBadge(
+                                                viewModel.pendingRequestsCount,
+                                                selected,
+                                                isMini: true,
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                      return icon;
+                                    },
                                   ),
                                 ),
                                 if (isExtended) ...[
                                   const SizedBox(width: 12),
-                                  Text(
-                                    viewModel.railLabel[index],
-                                    style: TextStyle(
-                                      color: selected
-                                          ? Colors.white
-                                          : Colors.black,
-                                      fontSize: 15,
-                                      fontWeight: selected
-                                          ? FontWeight.bold
-                                          : FontWeight.w500,
+                                  Expanded(
+                                    child: Text(
+                                      viewModel.railLabel[index],
+                                      style: TextStyle(
+                                        color: selected
+                                            ? Colors.white
+                                            : Colors.black,
+                                        fontSize: 15,
+                                        fontWeight: selected
+                                            ? FontWeight.bold
+                                            : FontWeight.w500,
+                                      ),
                                     ),
                                   ),
+                                  if (viewModel.railLabel[index] ==
+                                          'Notifications' &&
+                                      viewModel.unreadNotificationsCount > 0)
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
+                                      child: _buildNotificationBadge(
+                                        viewModel.unreadNotificationsCount,
+                                        selected,
+                                        isMini: false,
+                                      ),
+                                    ),
+                                  if (viewModel.railLabel[index] ==
+                                          'Client Requests' &&
+                                      viewModel.pendingRequestsCount > 0)
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
+                                      child: _buildNotificationBadge(
+                                        viewModel.pendingRequestsCount,
+                                        selected,
+                                        isMini: false,
+                                      ),
+                                    ),
                                 ],
                               ],
                             ),
@@ -163,33 +242,66 @@ class HomeView extends StackedView<HomeViewModel> {
                       children: [
                         Container(
                           color: white,
-                          child: CachedNetworkImage(
-                            imageUrl: viewModel.profileImage ??
-                                "https://tse4.mm.bing.net/th/id/OIP.K_MocKRlIvuJ7ryQAtlErwHaIS?w=559&h=626&rs=1&pid=ImgDetMain&o=7&rm=3",
-                            imageBuilder: (context, imageProvider) =>
-                                CircleAvatar(
-                              radius: 22,
-                              backgroundImage: imageProvider,
-                            ),
-                            placeholder: (context, url) => CircleAvatar(
-                              radius: 22,
-                              backgroundImage: const AssetImage(
-                                  "assets/images/logo.png",
-                                  package: null),
-                              child: SvgPicture.asset(
-                                "assets/images/logo.svg",
-                                color: Colors.black,
-                                height: 24,
-                                width: 24,
-                                package: null,
-                              ),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                const CircleAvatar(
-                              radius: 22,
-                              child: Icon(Icons.error),
-                            ),
-                          ),
+                          child: kIsWeb
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(22),
+                                  child: WebImage(
+                                    imageUrl: (viewModel.profileImage != null &&
+                                            viewModel.profileImage!.isNotEmpty)
+                                        ? (viewModel.profileImage!
+                                                .startsWith('http')
+                                            ? viewModel.profileImage!
+                                            : viewModel.profileImage!
+                                                    .startsWith('storage/')
+                                                ? "https://admin.promoteapp.in/${viewModel.profileImage}"
+                                                : "https://admin.promoteapp.in/storage/${viewModel.profileImage}")
+                                        : "https://tse4.mm.bing.net/th/id/OIP.K_MocKRlIvuJ7ryQAtlErwHaIS?w=559&h=626&rs=1&pid=ImgDetMain&o=7&rm=3",
+                                    width: 44,
+                                    height: 44,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : CachedNetworkImage(
+                                  imageUrl: (viewModel.profileImage != null &&
+                                          viewModel.profileImage!.isNotEmpty)
+                                      ? (viewModel.profileImage!
+                                              .startsWith('http')
+                                          ? viewModel.profileImage!
+                                          : viewModel.profileImage!
+                                                  .startsWith('storage/')
+                                              ? "https://admin.promoteapp.in/${viewModel.profileImage}"
+                                              : "https://admin.promoteapp.in/storage/${viewModel.profileImage}")
+                                      : "https://tse4.mm.bing.net/th/id/OIP.K_MocKRlIvuJ7ryQAtlErwHaIS?w=559&h=626&rs=1&pid=ImgDetMain&o=7&rm=3",
+                                  imageBuilder: (context, imageProvider) =>
+                                      CircleAvatar(
+                                    radius: 22,
+                                    backgroundImage: imageProvider,
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      const CircleAvatar(
+                                    radius: 22,
+                                    backgroundImage: NetworkImage(
+                                        "https://tse4.mm.bing.net/th/id/OIP.K_MocKRlIvuJ7ryQAtlErwHaIS?w=559&h=626&rs=1&pid=ImgDetMain&o=7&rm=3"),
+                                  ),
+                                  placeholder: (context, url) => CircleAvatar(
+                                    radius: 22,
+                                    backgroundImage: const AssetImage(
+                                        "assets/images/logo.png",
+                                        package: null),
+                                    child: SvgPicture.asset(
+                                      "assets/images/logo.svg",
+                                      color: Colors.black,
+                                      height: 24,
+                                      width: 24,
+                                      package: null,
+                                    ),
+                                  ),
+                                  // errorWidget: (context, url, error) =>
+                                  //     const CircleAvatar(
+                                  //   radius: 22,
+                                  //   child: Icon(Icons.error),
+                                  // ),
+                                ),
                         ),
                         if (isExtended) ...[
                           const SizedBox(width: 10),
@@ -244,6 +356,40 @@ class HomeView extends StackedView<HomeViewModel> {
 
   @override
   HomeViewModel viewModelBuilder(BuildContext context) => HomeViewModel();
+
+  Widget _buildNotificationBadge(int count, bool selected,
+      {required bool isMini}) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: isMini ? 4.w : 8.w,
+        vertical: isMini ? 2.h : 4.h,
+      ),
+      decoration: BoxDecoration(
+        color: selected ? Colors.white : Colors.red,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.red.withValues(alpha: 0.2),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      constraints: BoxConstraints(
+        minWidth: isMini ? 12.w : 20.w,
+        minHeight: isMini ? 12.h : 20.h,
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        '$count',
+        style: TextStyle(
+          color: selected ? const Color(0xFF1DA1F2) : Colors.white,
+          fontSize: isMini ? 8.sp : 11.sp,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
 
   // @override
   // void onViewModelReady(HomeViewModel viewModel) {

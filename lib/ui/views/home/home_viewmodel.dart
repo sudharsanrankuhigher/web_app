@@ -13,10 +13,34 @@ import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/services/notification_service.dart';
 
 class HomeViewModel extends BaseViewModel with NavigationMixin {
   HomeViewModel() {
     getProfile();
+    fetchPendingRequestsCount();
+    NotificationService.instance.addListener(notifyListeners);
+  }
+
+  @override
+  void dispose() {
+    NotificationService.instance.removeListener(notifyListeners);
+    super.dispose();
+  }
+
+  int _pendingRequestsCount = 0;
+  int get pendingRequestsCount => _pendingRequestsCount;
+
+  int get unreadNotificationsCount => NotificationService.instance.unreadCount;
+
+  Future<void> fetchPendingRequestsCount() async {
+    try {
+      final res = await locator<ApiService>().getClientRequest(1);
+      _pendingRequestsCount = res.data?.length ?? 0;
+      notifyListeners();
+    } catch (e) {
+      log('Error fetching client request count: $e');
+    }
   }
 
   // void init(context) {
@@ -68,6 +92,7 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
     'Report',
     'Roles',
     'Permissions',
+    'Notifications',
   ];
 
   final List<String> railIcon = [
@@ -87,6 +112,7 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
     'assets/images/report.svg', // reports
     'assets/images/roles.svg', // roles
     'assets/images/permission.svg', // permissions
+    'assets/images/notification.svg', // client requests
   ];
 
   // ─── Bottom Labels ───
@@ -181,6 +207,10 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
         context.pushReplacementNamed('permissions');
         _selectedIndex = 14;
         break;
+      case 15:
+        context.pushReplacementNamed('notifications');
+        _selectedIndex = 15;
+        break;
     }
   }
 
@@ -236,6 +266,9 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
         break;
       case '/home/permissions':
         _selectedIndex = 14;
+        break;
+      case '/home/notifications':
+        _selectedIndex = 15;
         break;
       default:
         _selectedIndex = 0;
@@ -367,15 +400,34 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
   String? _role;
   String? get role => _role;
 
+  static bool _isProfileFetched = false;
+
   Future<void> getProfile() async {
+    // 1. Load from local storage first for instant UI render
+    _name = _sharedPreferences.getString('profile_name') ?? _name;
+    _email = _sharedPreferences.getString('profile_email') ?? _email;
+    _profileImage =
+        _sharedPreferences.getString('profile_image') ?? _profileImage;
+    notifyListeners();
+
+    // 2. Only fetch from API once per session to avoid redundant calls
+    if (_isProfileFetched) return;
+
     final res = await runBusyFuture(locator<ApiService>().getProfile());
 
     if (res.status == 200) {
+      _isProfileFetched = true;
       _name = res.data?.name;
       _email = res.data?.email;
       _profileImage = res.data?.profilePic;
+
+      await _sharedPreferences.setString('profile_name', _name ?? '');
+      await _sharedPreferences.setString('profile_email', _email ?? '');
+      await _sharedPreferences.setString('profile_image', _profileImage ?? '');
+
       res.data?.roleId;
       log('Profile fetched successfully: ${res.data?.name}');
+      notifyListeners();
     } else {
       log('Failed to fetch profile: ${res.message}');
     }

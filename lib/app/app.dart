@@ -29,6 +29,8 @@ import 'package:webapp/ui/views/banner/banner_view.dart';
 
 // part 'app.router.dart'; // <<– add this line
 
+import 'package:webapp/ui/views/notifications/notifications_view.dart';
+
 // @stacked-import
 @StackedApp(
   routes: [
@@ -57,6 +59,7 @@ import 'package:webapp/ui/views/banner/banner_view.dart';
     MaterialRoute(page: AddCompanyView),
     MaterialRoute(page: LocationContactView),
     MaterialRoute(page: BannerView),
+    MaterialRoute(page: NotificationsView),
 // @stacked-route
   ],
   dependencies: [
