@@ -4,7 +4,6 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webapp/core/model/cities_model.dart';
-import 'package:webapp/ui/common/shared/styles.dart';
 
 class StateCityDynamicDropdown extends StatefulWidget {
   final bool showCity;
@@ -149,7 +148,9 @@ class _StateCityDynamicDropdownState extends State<StateCityDynamicDropdown> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    fillColor: white.withOpacity(0.5),
+                    fillColor: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white.withOpacity(0.1)
+                        : Colors.white.withOpacity(0.5),
                     filled: true,
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 10),
@@ -200,7 +201,10 @@ class _StateCityDynamicDropdownState extends State<StateCityDynamicDropdown> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            fillColor: white.withOpacity(0.5),
+                            fillColor:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white.withOpacity(0.1)
+                                    : Colors.white.withOpacity(0.5),
                             filled: true,
                             contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 10),
@@ -219,7 +223,10 @@ class _StateCityDynamicDropdownState extends State<StateCityDynamicDropdown> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            fillColor: white.withOpacity(0.5),
+                            fillColor:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white.withOpacity(0.1)
+                                    : Colors.white.withOpacity(0.5),
                             filled: true,
                             contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 10),
@@ -266,7 +273,10 @@ class _StateCityDynamicDropdownState extends State<StateCityDynamicDropdown> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(6),
                               ),
-                              fillColor: white.withOpacity(0.7),
+                              fillColor: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white.withOpacity(0.1)
+                                  : Colors.white.withOpacity(0.7),
                               filled: true,
                               contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 10),
@@ -306,10 +316,16 @@ class _StateCityDynamicDropdownState extends State<StateCityDynamicDropdown> {
           decoration: InputDecoration(
             hintText: "",
             border: OutlineInputBorder(
-              borderSide: BorderSide(color: white.withOpacity(0.7)),
+              borderSide: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white.withOpacity(0.2)
+                    : Colors.white.withOpacity(0.7),
+              ),
               borderRadius: BorderRadius.circular(6),
             ),
-            fillColor: white.withOpacity(0.7),
+            fillColor: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white.withOpacity(0.1)
+                : Colors.white.withOpacity(0.7),
             filled: true,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 12, vertical: 10),

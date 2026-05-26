@@ -9,6 +9,7 @@ import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
 import 'package:webapp/widgets/month_year_picker.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
+import 'package:webapp/widgets/search_text_field.dart';
 import 'users_viewmodel.dart';
 
 class UsersView extends StackedView<UsersViewModel> {
@@ -25,7 +26,7 @@ class UsersView extends StackedView<UsersViewModel> {
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
-          backgroundColor: white,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           elevation: 0,
           title: Text(
             'User Management',
@@ -72,23 +73,11 @@ class UsersView extends StackedView<UsersViewModel> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          SizedBox(
+                           SizedBox(
                             height: 48.h,
                             width: isExtended ? 500 : 200,
-                            child: TextField(
-                              decoration: InputDecoration(
-                                isDense: true,
-                                hintText: "Search name, email, phone...",
-                                hintStyle: fontFamilyRegular.size13.grey,
-                                prefixIcon: const Icon(Icons.search),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                  horizontal: 12,
-                                ),
-                              ),
+                            child: SearchTextField(
+                              hintText: "Search name, email, phone...",
                               onChanged: viewModel.searchUser,
                             ),
                           ),

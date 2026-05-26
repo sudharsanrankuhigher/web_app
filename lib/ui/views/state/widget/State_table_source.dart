@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/views/state/model/state_model.dart' as state_model;
+import 'package:webapp/services/theme_service.dart';
 
 class StateTableSource extends DataTableSource {
   final List<state_model.Datum> states;
@@ -63,8 +64,13 @@ class StateTableSource extends DataTableSource {
     return DataRow(
         color: WidgetStateProperty.resolveWith<Color?>(
           (Set<WidgetState> states) {
-            if (index.isEven) return Colors.white;
-            return Colors.grey.shade100;
+            final isDark = ThemeService.instance.isDarkMode;
+            if (isDark) {
+              return index.isEven
+                  ? const Color(0xFF1E293B)
+                  : const Color(0xFF0F172A);
+            }
+            return index.isEven ? Colors.white : Colors.grey.shade100;
           },
         ),
         cells: [

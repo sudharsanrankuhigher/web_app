@@ -22,45 +22,78 @@ class DashBoardCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // Resolve custom text/icon colors to be accessible and vibrant in dark mode
+    Color? resolvedTextColor = textColor;
+    if (isDark && textColor != null) {
+      if (textColor == appGreen800) {
+        resolvedTextColor = appGreen300;
+      } else if (textColor == continueButton) {
+        resolvedTextColor = const Color(0xFF60A5FA);
+      }
+    }
+
     return SizedBox(
-      width: 308, //MediaQuery.of(context).size.width *
-      // .20, //305, // Adaptive width for Wrap
+      width: 308, // MediaQuery.of(context).size.width * .20
       child: Card(
-        color: white,
+        color: Theme.of(context).colorScheme.surface,
+        elevation: Theme.of(context).cardTheme.elevation ?? 2,
+        shape: Theme.of(context).cardTheme.shape,
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title!,
-                  style: textColor != null
-                      ? fontFamilyBold.size18.copyWith(color: textColor)
-                      : fontFamilyBold.size18.appGreen400),
+              Text(
+                title!,
+                style: resolvedTextColor != null
+                    ? fontFamilyBold.size18.copyWith(color: resolvedTextColor)
+                    : fontFamilyBold.size18.appGreen400,
+              ),
               verticalSpacing10,
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(count ?? '00', style: fontFamilySemiBold.size20.black),
+                  Text(
+                    count ?? '00',
+                    style: fontFamilySemiBold.size20.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
                   if (asset == null)
                     Icon(
                       icon,
-                      color: textColor ?? Colors.black,
-                    ),
-                  Container(
-                    height: 50,
-                    width: 50,
-                    decoration: BoxDecoration(
+                      color: resolvedTextColor ?? (isDark ? Colors.white70 : Colors.black87),
+                    )
+                  else
+                    Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
-                        color: cardColor.withOpacity(0.1)),
-                    padding: defaultPadding8,
-                    child: Center(child: SvgPicture.asset(asset!)),
-                  )
+                        color: (resolvedTextColor ?? cardColor).withOpacity(isDark ? 0.15 : 0.08),
+                      ),
+                      padding: defaultPadding8,
+                      child: Center(
+                        child: SvgPicture.asset(
+                          asset!,
+                          colorFilter: ColorFilter.mode(
+                            resolvedTextColor ?? (isDark ? Colors.white : cardColor),
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
               verticalSpacing10,
-              Text(subtitle!,
-                  style: fontFamilyMedium.size12
-                      .copyWith(color: subText.withOpacity(0.60))),
+              Text(
+                subtitle!,
+                style: fontFamilyMedium.size12.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                ),
+              ),
             ],
           ),
         ),

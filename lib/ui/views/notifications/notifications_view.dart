@@ -29,14 +29,16 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
         PermissionHelper.instance.userPermissions.isEmpty;
 
     if (!hasAccess) {
-      return const Scaffold(
-        backgroundColor: backgroundColor,
-        body: NoAccessWidget(),
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: const NoAccessWidget(),
       );
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -47,13 +49,13 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
               vertical: isExtended ? 24.h : 16.h,
               horizontal: 24.w,
             ),
-            decoration: const BoxDecoration(
-              color: white,
-              borderRadius: BorderRadius.only(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(16),
                 bottomRight: Radius.circular(16),
               ),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                   color: Color(0x05000000),
                   offset: Offset(0, 4),
@@ -105,14 +107,17 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                       ),
                   ],
                 ),
-                const Divider(
+                Divider(
                   height: 32,
-                  color: Color(0xFFF3F4F6),
+                  color: isDark
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFF3F4F6),
                   thickness: 1.5,
                 ),
                 Row(
                   children: [
                     _buildSectionTab(
+                      context,
                       viewModel,
                       sectionValue: 'inbox',
                       icon: Icons.inbox_rounded,
@@ -120,6 +125,7 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                     ),
                     horizontalSpacing16,
                     _buildSectionTab(
+                      context,
                       viewModel,
                       sectionValue: 'send',
                       icon: Icons.send_rounded,
@@ -164,7 +170,9 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
               child: Container(
                 height: 48,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF3F4F6),
+                  color: isDark
+                      ? const Color(0xFF1E293B)
+                      : const Color(0xFFF3F4F6),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
@@ -186,7 +194,7 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
             // ─── Notifications List ───
             Expanded(
               child: viewModel.filteredNotifications.isEmpty
-                  ? _buildEmptyState(viewModel.currentFilter)
+                  ? _buildEmptyState(context, viewModel.currentFilter)
                   : ListView.builder(
                       padding:
                           EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
@@ -235,6 +243,7 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
   }
 
   Widget _buildSectionTab(
+    BuildContext context,
     NotificationsViewModel viewModel, {
     required String sectionValue,
     required IconData icon,
@@ -263,14 +272,21 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
             Icon(
               icon,
               size: 16,
-              color: isActive ? continueButton : Colors.grey[500],
+              color: isActive
+                  ? continueButton
+                  : (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[400]
+                      : Colors.grey[500]),
             ),
             horizontalSpacing8,
             Text(
               label,
               style: isActive
                   ? fontFamilyBold.size14.copyWith(color: continueButton)
-                  : fontFamilySemiBold.size14.copyWith(color: Colors.grey[600]),
+                  : fontFamilySemiBold.size14.copyWith(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[300]
+                          : Colors.grey[600]),
             ),
           ],
         ),
@@ -282,6 +298,7 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
     BuildContext context,
     NotificationsViewModel viewModel,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final formKey = GlobalKey<FormState>();
     return Expanded(
       child: SingleChildScrollView(
@@ -290,7 +307,7 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 600),
             child: Card(
-              color: white,
+              color: Theme.of(context).colorScheme.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -368,9 +385,15 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                       // Scheduling Header Card & Toggle
                       Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF9FAFB),
+                          color: isDark
+                              ? const Color(0xFF0F172A)
+                              : const Color(0xFFF9FAFB),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFFE5E7EB)),
+                          border: Border.all(
+                            color: isDark
+                                ? const Color(0xFF334155)
+                                : const Color(0xFFE5E7EB),
+                          ),
                         ),
                         child: Column(
                           children: [
@@ -390,7 +413,9 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                                     style: fontFamilyBold.size13.copyWith(
                                       color: viewModel.isScheduled
                                           ? continueButton
-                                          : Colors.grey[800],
+                                          : (isDark
+                                              ? Colors.grey[400]
+                                              : Colors.grey[800]),
                                     ),
                                   ),
                                 ],
@@ -409,8 +434,11 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                                   horizontal: 16, vertical: 4),
                             ),
                             if (viewModel.isScheduled) ...[
-                              const Divider(
-                                  height: 1, color: Color(0xFFE5E7EB)),
+                              Divider(
+                                  height: 1,
+                                  color: isDark
+                                      ? const Color(0xFF334155)
+                                      : const Color(0xFFE5E7EB)),
                               Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Row(
@@ -430,11 +458,16 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                                                       null
                                                   ? continueButton.withValues(
                                                       alpha: 0.5)
-                                                  : const Color(0xFFD1D5DB),
+                                                  : (isDark
+                                                      ? const Color(0xFF475569)
+                                                      : const Color(
+                                                          0xFFD1D5DB)),
                                             ),
                                             borderRadius:
                                                 BorderRadius.circular(10),
-                                            color: white,
+                                            color: isDark
+                                                ? const Color(0xFF1E293B)
+                                                : white,
                                           ),
                                           child: Row(
                                             children: [
@@ -459,7 +492,9 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                                                     color: viewModel
                                                                 .scheduledDate !=
                                                             null
-                                                        ? Colors.black87
+                                                        ? (isDark
+                                                            ? Colors.white
+                                                            : Colors.black87)
                                                         : Colors.grey[500],
                                                   ),
                                                 ),
@@ -485,11 +520,16 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                                                       null
                                                   ? continueButton.withValues(
                                                       alpha: 0.5)
-                                                  : const Color(0xFFD1D5DB),
+                                                  : (isDark
+                                                      ? const Color(0xFF475569)
+                                                      : const Color(
+                                                          0xFFD1D5DB)),
                                             ),
                                             borderRadius:
                                                 BorderRadius.circular(10),
-                                            color: white,
+                                            color: isDark
+                                                ? const Color(0xFF1E293B)
+                                                : white,
                                           ),
                                           child: Row(
                                             children: [
@@ -515,7 +555,9 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                                                     color: viewModel
                                                                 .scheduledTime !=
                                                             null
-                                                        ? Colors.black87
+                                                        ? (isDark
+                                                            ? Colors.white
+                                                            : Colors.black87)
                                                         : Colors.grey[500],
                                                   ),
                                                 ),
@@ -827,7 +869,7 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
     );
   }
 
-  Widget _buildEmptyState(String filter) {
+  Widget _buildEmptyState(BuildContext context, String filter) {
     String message = 'You have no notifications yet.';
     if (filter == 'unread') {
       message = 'You have no unread notifications!';
@@ -841,10 +883,10 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
         children: [
           Container(
             padding: const EdgeInsets.all(24),
-            decoration: const BoxDecoration(
-              color: white,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
               shape: BoxShape.circle,
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                   color: Color(0x05000000),
                   offset: Offset(0, 10),
@@ -1146,4 +1188,10 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
     BuildContext context,
   ) =>
       NotificationsViewModel();
+
+  @override
+  void onViewModelReady(NotificationsViewModel viewModel) {
+    viewModel.fetchNotifications();
+    super.onViewModelReady(viewModel);
+  }
 }

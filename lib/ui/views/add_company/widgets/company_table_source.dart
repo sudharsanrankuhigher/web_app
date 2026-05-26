@@ -3,6 +3,7 @@ import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/views/add_company/model/company_model.dart'
     as company_model;
 import 'package:webapp/widgets/profile_image.dart';
+import 'package:webapp/services/theme_service.dart';
 
 class CompanyTableSource extends DataTableSource {
   final List<company_model.Datum> companies;
@@ -49,8 +50,13 @@ class CompanyTableSource extends DataTableSource {
     return DataRow(
         color: WidgetStateProperty.resolveWith<Color?>(
           (Set<WidgetState> states) {
-            if (index.isEven) return Colors.white;
-            return Colors.grey.shade100;
+            final isDark = ThemeService.instance.isDarkMode;
+            if (isDark) {
+              return index.isEven
+                  ? const Color(0xFF1E293B)
+                  : const Color(0xFF0F172A);
+            }
+            return index.isEven ? Colors.white : Colors.grey.shade100;
           },
         ),
         cells: [

@@ -11,6 +11,7 @@ import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
 
+import 'package:webapp/widgets/search_text_field.dart';
 import 'influencers_viewmodel.dart';
 
 class InfluencersView extends StackedView<InfluencersViewModel> {
@@ -34,9 +35,9 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                     Container(
                       width: double.infinity,
                       padding: defaultPadding16,
-                      decoration: const BoxDecoration(
-                        color: white,
-                        borderRadius: BorderRadius.only(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(12),
                             bottomRight: Radius.circular(12)),
                       ),
@@ -58,35 +59,15 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                             SizedBox(
                               height: 47.h,
                               width: isExtended ? 500 : 500.w,
-                              child: TextField(
+                              child: SearchTextField(
                                 controller: viewModel.searchController,
-                                decoration: InputDecoration(
-                                  hintText: "Search name, phone, city...",
-                                  hintStyle: fontFamilyRegular.size12.grey,
-                                  prefixIcon: const Icon(Icons.search),
-
-                                  /// 🔥 CLEAR BUTTON
-                                  suffixIcon: viewModel
-                                          .searchController.text.isNotEmpty
-                                      ? GestureDetector(
-                                          onTap: () {
-                                            viewModel.searchController.clear();
-                                            viewModel.searchInfluencer(
-                                                ""); // reset search
-                                          },
-                                          child: const Icon(Icons.close),
-                                        )
-                                      : null,
-
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
+                                hintText: "Search name, phone, city...",
                                 onChanged: (value) {
                                   viewModel.searchInfluencer(value);
-
-                                  /// 🔥 refresh UI to show/hide clear icon
                                   viewModel.notifyListeners();
+                                },
+                                onClear: () {
+                                  viewModel.searchInfluencer("");
                                 },
                               ),
                             ),

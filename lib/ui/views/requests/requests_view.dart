@@ -10,6 +10,7 @@ import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
 
+import 'package:webapp/widgets/search_text_field.dart';
 import 'requests_viewmodel.dart';
 
 class RequestsView extends StackedView<RequestsViewModel> {
@@ -45,9 +46,9 @@ class RequestsView extends StackedView<RequestsViewModel> {
                       Container(
                         width: double.infinity,
                         padding: defaultPadding16,
-                        decoration: const BoxDecoration(
-                          color: white,
-                          borderRadius: BorderRadius.only(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: const BorderRadius.only(
                               bottomLeft: Radius.circular(12),
                               bottomRight: Radius.circular(12)),
                         ),
@@ -275,15 +276,8 @@ class RequestsView extends StackedView<RequestsViewModel> {
                           SizedBox(
                             height: 45.h,
                             width: 500.w,
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: "Search service name...",
-                                hintStyle: fontFamilyRegular.size12.grey,
-                                prefixIcon: const Icon(Icons.search),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
+                            child: SearchTextField(
+                              hintText: "Search requests (service, client, phone, project)...",
                               onChanged: viewModel.searchRequests,
                             ),
                           ),

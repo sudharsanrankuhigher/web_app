@@ -30,8 +30,14 @@ class MonthYearPickerField extends StatelessWidget {
           padding: defaultPadding8 + rightPadding12,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade300),
-            color: Colors.white,
+            border: Border.all(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey.shade700
+                  : Colors.grey.shade300,
+            ),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF1E293B)
+                : Colors.white,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,

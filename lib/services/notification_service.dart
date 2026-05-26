@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:webapp/app/app.locator.dart';
+import 'package:webapp/services/api_service.dart';
 
 class NotificationItem {
   final String id;
@@ -25,108 +27,159 @@ class NotificationService extends ChangeNotifier {
 
   NotificationService._internal();
 
-  final List<NotificationItem> _notifications = [
-    NotificationItem(
-      id: '1',
-      title: 'New Client Request Approved',
-      message:
-          'Influencer marketing proposal for "FitLife Campaign" has been successfully approved by the client.',
-      timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
-      category: 'success',
-      isRead: false,
-    ),
-    NotificationItem(
-      id: '2',
-      title: 'Subscription Expiring Soon',
-      message:
-          'Company "GlobalTech Solutions" premium subscription plan is expiring in 3 days. Send renewal reminder.',
-      timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-      category: 'warning',
-      isRead: false,
-    ),
-    NotificationItem(
-      id: '3',
-      title: 'Failed Payout Alert',
-      message:
-          'Monthly payout transaction of \$1,250.00 failed for top influencer "@creative_mind". Retrying.',
-      timestamp: DateTime.now().subtract(const Duration(hours: 6)),
-      category: 'alert',
-      isRead: false,
-    ),
-    NotificationItem(
-      id: '4',
-      title: 'System Maintenance Scheduled',
-      message:
-          'Platform updates and server optimization will take place on Sunday at 02:00 AM. Expect brief downtime.',
-      timestamp: DateTime.now().subtract(const Duration(days: 1)),
-      category: 'info',
-      isRead: true,
-    ),
-    NotificationItem(
-      id: '5',
-      title: 'Campaign Milestones Achieved',
-      message:
-          'Promote Project "Summer Launch 2026" achieved its target of 500,000 views today.',
-      timestamp: DateTime.now().subtract(const Duration(days: 2)),
-      category: 'success',
-      isRead: true,
-    ),
-    NotificationItem(
-      id: '6',
-      title: 'New Ticket Support Request',
-      message:
-          'Influencer "@tech_geek" has submitted a critical ticket regarding payment processor delay.',
-      timestamp: DateTime.now().subtract(const Duration(days: 3)),
-      category: 'warning',
-      isRead: true,
-    ),
-    NotificationItem(
-      id: '7',
-      title: 'Security System Updated',
-      message:
-          'Role permissions policies and firewalls were updated to standard security compliance V3.',
-      timestamp: DateTime.now().subtract(const Duration(days: 4)),
-      category: 'info',
-      isRead: true,
-    ),
-  ];
+  final List<NotificationItem> _notifications = [];
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
+  Future<void> fetchNotifications() async {
+    _isLoading = true;
+    Future.microtask(() => notifyListeners());
+
+    try {
+      final data = await locator<ApiService>().getNotificationList();
+      if (data != null && data['notification_list'] != null) {
+        final List<dynamic> list = data['notification_list'];
+        _notifications.clear();
+        for (var item in list) {
+          _notifications.add(
+            NotificationItem(
+              id: item['id']?.toString() ?? '',
+              title: item['title'] ?? '',
+              message: item['message'] ?? '',
+              timestamp: item['created_at'] != null
+                  ? DateTime.tryParse(item['created_at'].toString()) ??
+                      DateTime.now()
+                  : DateTime.now(),
+              category: item['category'] ?? 'info',
+              isRead: (item['status'] ?? 0) !=
+                  0, // status: 0 is unread, others are read
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching notifications from backend: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
   List<NotificationItem> get notifications => _notifications;
 
   int get unreadCount => _notifications.where((n) => !n.isRead).length;
 
-  void markAsRead(String id) {
+  Future<void> markAsRead(String id) async {
     final index = _notifications.indexWhere((n) => n.id == id);
-    if (index != -1 && !_notifications[index].isRead) {
-      _notifications[index].isRead = true;
-      notifyListeners();
-    }
-  }
+    if (index == -1) return;
 
-  void toggleReadState(String id) {
-    final index = _notifications.indexWhere((n) => n.id == id);
-    if (index != -1) {
-      _notifications[index].isRead = !_notifications[index].isRead;
-      notifyListeners();
-    }
-  }
+    final wasRead = _notifications[index].isRead;
+    if (wasRead) return;
 
-  void markAllAsRead() {
-    bool updated = false;
-    for (var n in _notifications) {
-      if (!n.isRead) {
-        n.isRead = true;
-        updated = true;
+    // Optimistically update locally
+    _notifications[index].isRead = true;
+    notifyListeners();
+
+    try {
+      final intId = int.tryParse(id);
+      if (intId != null) {
+        await locator<ApiService>().readNotification(intId);
+      }
+    } catch (e) {
+      debugPrint('Error marking notification as read: $e');
+      // Rollback on error
+      final rollbackIndex = _notifications.indexWhere((n) => n.id == id);
+      if (rollbackIndex != -1) {
+        _notifications[rollbackIndex].isRead = wasRead;
+        notifyListeners();
       }
     }
-    if (updated) {
+  }
+
+  Future<void> toggleReadState(String id) async {
+    final index = _notifications.indexWhere((n) => n.id == id);
+    if (index == -1) return;
+
+    final wasRead = _notifications[index].isRead;
+    final targetRead = !wasRead;
+
+    // Optimistically update locally
+    _notifications[index].isRead = targetRead;
+    notifyListeners();
+
+    try {
+      final intId = int.tryParse(id);
+      if (intId != null) {
+        if (targetRead) {
+          await locator<ApiService>().readNotification(intId);
+        } else {
+          await locator<ApiService>().readNotification(intId);
+          // Backend doesn't support unread API, but we keep the local state change.
+          // We can optionally call an endpoint or just log.
+          debugPrint(
+              'Backend does not support unreading. Local toggle updated.');
+        }
+      }
+    } catch (e) {
+      debugPrint('Error toggling notification read state: $e');
+      // Rollback on error
+      final rollbackIndex = _notifications.indexWhere((n) => n.id == id);
+      if (rollbackIndex != -1) {
+        _notifications[rollbackIndex].isRead = wasRead;
+        notifyListeners();
+      }
+    }
+  }
+
+  Future<void> markAllAsRead() async {
+    final List<String> unreadIds =
+        _notifications.where((n) => !n.isRead).map((n) => n.id).toList();
+
+    if (unreadIds.isEmpty) return;
+
+    // Optimistically update all to read
+    for (var n in _notifications) {
+      n.isRead = true;
+    }
+    notifyListeners();
+
+    try {
+      await locator<ApiService>().readAllNotifications();
+    } catch (e) {
+      debugPrint('Error marking all notifications as read: $e');
+      // Rollback on error
+      for (var n in _notifications) {
+        if (unreadIds.contains(n.id)) {
+          n.isRead = false;
+        }
+      }
       notifyListeners();
     }
   }
 
-  void deleteNotification(String id) {
-    _notifications.removeWhere((n) => n.id == id);
+  Future<void> deleteNotification(String id) async {
+    final index = _notifications.indexWhere((n) => n.id == id);
+    if (index == -1) return;
+
+    final removedItem = _notifications[index];
+    final removedIndex = index;
+
+    // Optimistically delete locally
+    _notifications.removeAt(index);
     notifyListeners();
+
+    try {
+      final intId = int.tryParse(id);
+      if (intId != null) {
+        await locator<ApiService>().deleteNotification(intId);
+      }
+    } catch (e) {
+      debugPrint('Error deleting notification: $e');
+      // Rollback on error
+      _notifications.insert(removedIndex, removedItem);
+      notifyListeners();
+    }
   }
 
   void sendManualNotification({

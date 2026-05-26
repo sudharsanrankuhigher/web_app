@@ -8,6 +8,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/widgets/web_image_loading.dart';
+import 'package:webapp/services/floating_overlay_service.dart';
+import 'package:webapp/services/theme_service.dart';
 import 'home_viewmodel.dart';
 
 class HomeView extends StackedView<HomeViewModel> {
@@ -21,13 +23,24 @@ class HomeView extends StackedView<HomeViewModel> {
         GoRouter.of(context).routerDelegate.currentConfiguration.fullPath;
     viewModel.updateIndexFromRoute(currentLocation);
 
+    // Mount the premium global draggable notification overlay
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FloatingOverlayService.instance.show(
+        context,
+        onTap: () {
+          // Redirect to Notifications screen upon tap
+          viewModel.onMenuTap(15, context);
+        },
+      );
+    });
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Row(
         children: [
           Container(
             width: isExtended ? 230 : 80,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
             child: Column(
               crossAxisAlignment: isExtended
@@ -40,15 +53,15 @@ class HomeView extends StackedView<HomeViewModel> {
                   child: Row(
                     children: [
                       Container(
-                        color: white,
+                        color: Colors.transparent,
                         child: CircleAvatar(
-                          backgroundColor: white,
+                          backgroundColor: Colors.transparent,
                           radius: 22,
                           backgroundImage:
                               const AssetImage("assets/images/logo.png"),
                           child: SvgPicture.asset(
                             "assets/images/logo.svg",
-                            color: Colors.black,
+                            color: Theme.of(context).colorScheme.onSurface,
                             height: 24,
                             width: 24,
                             package: null,
@@ -58,17 +71,20 @@ class HomeView extends StackedView<HomeViewModel> {
                       if (isExtended) ...[
                         const SizedBox(width: 10),
                         RichText(
-                          text: const TextSpan(
+                          text: TextSpan(
                             children: [
                               TextSpan(
                                 text: "promote",
                                 style: TextStyle(
-                                  color: Color(0xff0B0952),
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : const Color(0xff0B0952),
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
                                 ),
                               ),
-                              TextSpan(
+                              const TextSpan(
                                 text: "app",
                                 style: TextStyle(
                                   color: Colors.blue,
@@ -134,7 +150,10 @@ class HomeView extends StackedView<HomeViewModel> {
                                         width: isExtended ? 24.w : 34.w,
                                         color: selected
                                             ? Colors.white
-                                            : Colors.black87,
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withValues(alpha: 0.8),
                                       );
 
                                       if (isNotification &&
@@ -190,7 +209,9 @@ class HomeView extends StackedView<HomeViewModel> {
                                       style: TextStyle(
                                         color: selected
                                             ? Colors.white
-                                            : Colors.black,
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .onSurface,
                                         fontSize: 15,
                                         fontWeight: selected
                                             ? FontWeight.bold
@@ -233,19 +254,39 @@ class HomeView extends StackedView<HomeViewModel> {
                 verticalSpacing12,
 
                 // Profile & Logout
-                Column(
-                  crossAxisAlignment: isExtended
-                      ? CrossAxisAlignment.start
-                      : CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          color: white,
-                          child: kIsWeb
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(22),
-                                  child: WebImage(
+                Padding(
+                  padding: leftPadding12,
+                  child: Column(
+                    crossAxisAlignment: isExtended
+                        ? CrossAxisAlignment.start
+                        : CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            color: Colors.transparent,
+                            child: kIsWeb
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(22),
+                                    child: WebImage(
+                                      imageUrl: (viewModel.profileImage !=
+                                                  null &&
+                                              viewModel
+                                                  .profileImage!.isNotEmpty)
+                                          ? (viewModel.profileImage!
+                                                  .startsWith('http')
+                                              ? viewModel.profileImage!
+                                              : viewModel.profileImage!
+                                                      .startsWith('storage/')
+                                                  ? "https://admin.promoteapp.in/${viewModel.profileImage}"
+                                                  : "https://admin.promoteapp.in/storage/${viewModel.profileImage}")
+                                          : "https://tse4.mm.bing.net/th/id/OIP.K_MocKRlIvuJ7ryQAtlErwHaIS?w=559&h=626&rs=1&pid=ImgDetMain&o=7&rm=3",
+                                      width: 44,
+                                      height: 44,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : CachedNetworkImage(
                                     imageUrl: (viewModel.profileImage != null &&
                                             viewModel.profileImage!.isNotEmpty)
                                         ? (viewModel.profileImage!
@@ -256,92 +297,124 @@ class HomeView extends StackedView<HomeViewModel> {
                                                 ? "https://admin.promoteapp.in/${viewModel.profileImage}"
                                                 : "https://admin.promoteapp.in/storage/${viewModel.profileImage}")
                                         : "https://tse4.mm.bing.net/th/id/OIP.K_MocKRlIvuJ7ryQAtlErwHaIS?w=559&h=626&rs=1&pid=ImgDetMain&o=7&rm=3",
-                                    width: 44,
-                                    height: 44,
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                              : CachedNetworkImage(
-                                  imageUrl: (viewModel.profileImage != null &&
-                                          viewModel.profileImage!.isNotEmpty)
-                                      ? (viewModel.profileImage!
-                                              .startsWith('http')
-                                          ? viewModel.profileImage!
-                                          : viewModel.profileImage!
-                                                  .startsWith('storage/')
-                                              ? "https://admin.promoteapp.in/${viewModel.profileImage}"
-                                              : "https://admin.promoteapp.in/storage/${viewModel.profileImage}")
-                                      : "https://tse4.mm.bing.net/th/id/OIP.K_MocKRlIvuJ7ryQAtlErwHaIS?w=559&h=626&rs=1&pid=ImgDetMain&o=7&rm=3",
-                                  imageBuilder: (context, imageProvider) =>
-                                      CircleAvatar(
-                                    radius: 22,
-                                    backgroundImage: imageProvider,
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      const CircleAvatar(
-                                    radius: 22,
-                                    backgroundImage: NetworkImage(
-                                        "https://tse4.mm.bing.net/th/id/OIP.K_MocKRlIvuJ7ryQAtlErwHaIS?w=559&h=626&rs=1&pid=ImgDetMain&o=7&rm=3"),
-                                  ),
-                                  placeholder: (context, url) => CircleAvatar(
-                                    radius: 22,
-                                    backgroundImage: const AssetImage(
-                                        "assets/images/logo.png",
-                                        package: null),
-                                    child: SvgPicture.asset(
-                                      "assets/images/logo.svg",
-                                      color: Colors.black,
-                                      height: 24,
-                                      width: 24,
-                                      package: null,
+                                    imageBuilder: (context, imageProvider) =>
+                                        CircleAvatar(
+                                      radius: 22,
+                                      backgroundImage: imageProvider,
                                     ),
+                                    errorWidget: (context, url, error) =>
+                                        const CircleAvatar(
+                                      radius: 22,
+                                      backgroundImage: NetworkImage(
+                                          "https://tse4.mm.bing.net/th/id/OIP.K_MocKRlIvuJ7ryQAtlErwHaIS?w=559&h=626&rs=1&pid=ImgDetMain&o=7&rm=3"),
+                                    ),
+                                    placeholder: (context, url) => CircleAvatar(
+                                      radius: 22,
+                                      backgroundImage: const AssetImage(
+                                          "assets/images/logo.png",
+                                          package: null),
+                                      child: SvgPicture.asset(
+                                        "assets/images/logo.svg",
+                                        color: Colors.black,
+                                        height: 24,
+                                        width: 24,
+                                        package: null,
+                                      ),
+                                    ),
+                                    // errorWidget: (context, url, error) =>
+                                    //     const CircleAvatar(
+                                    //   radius: 22,
+                                    //   child: Icon(Icons.error),
+                                    // ),
                                   ),
-                                  // errorWidget: (context, url, error) =>
-                                  //     const CircleAvatar(
-                                  //   radius: 22,
-                                  //   child: Icon(Icons.error),
-                                  // ),
-                                ),
-                        ),
-                        if (isExtended) ...[
-                          const SizedBox(width: 10),
-                          Text(
-                            viewModel.name ?? "Admin Name",
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                overflow: TextOverflow.ellipsis),
                           ),
-                        ],
-                      ],
-                    ),
-                    if (isExtended)
-                      Text(
-                        viewModel.role ?? "Administrator",
-                        style: const TextStyle(color: Colors.grey),
-                      ),
-                    verticalSpacing16,
-                    GestureDetector(
-                      onTap: () {
-                        viewModel.logOut(context);
-                      },
-                      child: Row(
-                        mainAxisAlignment: isExtended
-                            ? MainAxisAlignment.start
-                            : MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.logout, color: Colors.red),
-                          if (isExtended) const SizedBox(width: 10),
-                          if (isExtended)
-                            const Text(
-                              "Logout",
-                              style: TextStyle(color: Colors.red),
+                          if (isExtended) ...[
+                            const SizedBox(width: 10),
+                            Text(
+                              viewModel.name ?? "Admin Name",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  overflow: TextOverflow.ellipsis),
                             ),
+                          ],
                         ],
                       ),
-                    ),
-                  ],
+                      if (isExtended)
+                        Text(
+                          viewModel.role ?? "Administrator",
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      verticalSpacing16,
+                      ListenableBuilder(
+                        listenable: ThemeService.instance,
+                        builder: (context, _) {
+                          final isDark = ThemeService.instance.isDarkMode;
+                          return InkWell(
+                            onTap: () => ThemeService.instance.toggleTheme(),
+                            borderRadius: BorderRadius.circular(10),
+                            child: Container(
+                              height: 48.h,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 0),
+                              child: Row(
+                                mainAxisAlignment: isExtended
+                                    ? MainAxisAlignment.start
+                                    : MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isDark
+                                        ? Icons.light_mode_rounded
+                                        : Icons.dark_mode_rounded,
+                                    color: isDark
+                                        ? Colors.amber
+                                        : Colors.indigo[800],
+                                    size: isExtended ? 22 : 28,
+                                  ),
+                                  if (isExtended) ...[
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        isDark ? "Light Mode" : "Dark Mode",
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      verticalSpacing12,
+                      GestureDetector(
+                        onTap: () {
+                          viewModel.logOut(context);
+                        },
+                        child: Row(
+                          mainAxisAlignment: isExtended
+                              ? MainAxisAlignment.start
+                              : MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.logout, color: Colors.red),
+                            if (isExtended) const SizedBox(width: 10),
+                            if (isExtended)
+                              const Text(
+                                "Logout",
+                                style: TextStyle(color: Colors.red),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

@@ -26,7 +26,9 @@ class DOBField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       readOnly: true,
-      style: const TextStyle(fontSize: 12),
+      style: fontFamilyRegular.size12.copyWith(
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
       controller: TextEditingController(
         text: selectedDate == null
             ? ""
@@ -39,12 +41,18 @@ class DOBField extends StatelessWidget {
         labelStyle: fontFamilyMedium.size12.greyColor,
         suffixIcon: const Icon(Icons.calendar_today, size: 20),
         isDense: true,
-        fillColor: backgroundColor,
+        fillColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF334155)
+            : backgroundColor,
         filled: true,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(
-            color: isError ? Colors.red : disableColor,
+            color: isError
+                ? Colors.red
+                : (Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[700]!
+                    : disableColor),
           ),
         ),
         focusedBorder: OutlineInputBorder(

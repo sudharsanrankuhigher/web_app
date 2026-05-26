@@ -9,6 +9,7 @@ import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
 
+import 'package:webapp/widgets/search_text_field.dart';
 import 'add_company_viewmodel.dart';
 
 class AddCompanyView extends StackedView<AddCompanyViewModel> {
@@ -32,9 +33,9 @@ class AddCompanyView extends StackedView<AddCompanyViewModel> {
                     Container(
                       width: double.infinity,
                       padding: defaultPadding16,
-                      decoration: const BoxDecoration(
-                        color: white,
-                        borderRadius: BorderRadius.only(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(12),
                             bottomRight: Radius.circular(12)),
                       ),
@@ -52,15 +53,8 @@ class AddCompanyView extends StackedView<AddCompanyViewModel> {
                           width: isExtended
                               ? 500
                               : 500.w, // search field fixed width (responsive)
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: "Search plan name...",
-                              hintStyle: fontFamilyRegular.size14.grey,
-                              prefixIcon: const Icon(Icons.search),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
+                          child: SearchTextField(
+                            hintText: "Search company details (name, city, GST, phone)...",
                             onChanged: viewModel.applySearch,
                           ),
                         ),

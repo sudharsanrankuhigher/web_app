@@ -24,18 +24,27 @@ class IconTextLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveIconColor = iconColor == Colors.black
+        ? Theme.of(context).colorScheme.onSurface
+        : iconColor;
+    final effectiveTextColor = textColor == Colors.black
+        ? Theme.of(context).colorScheme.onSurface
+        : textColor;
+
     return RichText(
       text: TextSpan(
         children: [
-          WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: Icon(icon, size: iconSize, color: iconColor),
-          ),
-          WidgetSpan(child: SizedBox(width: spacing)),
+          if (icon != null) ...[
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: Icon(icon, size: iconSize, color: effectiveIconColor),
+            ),
+            WidgetSpan(child: SizedBox(width: spacing)),
+          ],
           TextSpan(
             text: text,
             style: TextStyle(
-              color: textColor,
+              color: effectiveTextColor,
               fontSize: fontSize,
               fontWeight: fontWeight,
             ),

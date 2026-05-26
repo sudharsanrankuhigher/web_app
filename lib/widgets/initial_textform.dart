@@ -69,7 +69,9 @@ class InitialTextForm extends StatelessWidget {
         validator: validator,
         readOnly: readOnly,
         onChanged: onChanged,
-        style: textStyle ?? fontFamilyRegular.size12,
+        style: (textStyle ?? fontFamilyRegular.size12).copyWith(
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         inputFormatters: inputFormatters,
         decoration: InputDecoration(
           hintText: hintText ?? "Enter name",
@@ -77,18 +79,30 @@ class InitialTextForm extends StatelessWidget {
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           filled: true,
-          fillColor: fillColor ?? backgroundColor,
+          fillColor: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF334155)
+              : (fillColor ?? backgroundColor),
           suffixIcon: suffixIcon,
           prefixIcon: preffixIcon,
           prefix: preffix,
           errorStyle: fontFamilyMedium.size10.red,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(radius ?? 30),
-            borderSide: BorderSide(color: borderColor ?? disableColor),
+            borderSide: BorderSide(
+              color: borderColor ??
+                  (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[700]!
+                      : disableColor),
+            ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(radius ?? 30),
-            borderSide: BorderSide(color: borderColor ?? disableColor),
+            borderSide: BorderSide(
+              color: borderColor ??
+                  (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[700]!
+                      : disableColor),
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(radius ?? 30),

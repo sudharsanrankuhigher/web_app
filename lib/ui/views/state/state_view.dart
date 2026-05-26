@@ -7,6 +7,7 @@ import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
 
+import 'package:webapp/widgets/search_text_field.dart';
 import 'state_viewmodel.dart';
 
 class StateView extends StackedView<StateViewModel> {
@@ -30,9 +31,9 @@ class StateView extends StackedView<StateViewModel> {
             Container(
               width: double.infinity,
               padding: defaultPadding16,
-              decoration: const BoxDecoration(
-                color: white,
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(12),
                     bottomRight: Radius.circular(12)),
               ),
@@ -52,15 +53,8 @@ class StateView extends StackedView<StateViewModel> {
                 SizedBox(
                   height: 45.h,
                   width: isExtended ? 500 : 200,
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Search state name...",
-                      hintStyle: fontFamilyRegular.size14.grey,
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
+                  child: SearchTextField(
+                    hintText: "Search state name...",
                     onChanged: (value) => viewModel.applySearch(value),
                   ),
                 ),

@@ -3,6 +3,7 @@ import 'package:webapp/ui/views/promote_projects/model/promote_project_model.dar
     as project_model;
 import 'package:webapp/ui/views/promote_projects/promote_projects_viewmodel.dart';
 import 'package:webapp/widgets/over_lapping_avatar.dart';
+import 'package:webapp/services/theme_service.dart';
 
 class PromoteProjectsTableSource extends DataTableSource {
   List<project_model.Message> data;
@@ -46,8 +47,16 @@ class PromoteProjectsTableSource extends DataTableSource {
 
     return DataRow.byIndex(
       index: index,
-      color: WidgetStateProperty.resolveWith(
-        (states) => index.isEven ? Colors.white : Colors.grey.shade100,
+      color: WidgetStateProperty.resolveWith<Color?>(
+        (states) {
+          final isDark = ThemeService.instance.isDarkMode;
+          if (isDark) {
+            return index.isEven
+                ? const Color(0xFF1E293B)
+                : const Color(0xFF0F172A);
+          }
+          return index.isEven ? Colors.white : Colors.grey.shade100;
+        },
       ),
       onSelectChanged: (value) {
         vm.onRowSelected(item.id!);

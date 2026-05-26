@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/core/model/get_user_model.dart' as user_model;
 import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/services/theme_service.dart';
 
 class UserTableSource extends DataTableSource {
   final List<user_model.Datum> originalList;
@@ -71,8 +72,13 @@ class UserTableSource extends DataTableSource {
     return DataRow(
       color: WidgetStateProperty.resolveWith<Color?>(
         (Set<WidgetState> states) {
-          if (index.isEven) return Colors.white;
-          return Colors.grey.shade100;
+          final isDark = ThemeService.instance.isDarkMode;
+          if (isDark) {
+            return index.isEven
+                ? const Color(0xFF1E293B)
+                : const Color(0xFF0F172A);
+          }
+          return index.isEven ? Colors.white : Colors.grey.shade100;
         },
       ),
       cells: [

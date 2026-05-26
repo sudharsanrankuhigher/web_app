@@ -246,6 +246,9 @@ class _AddressDialogState extends State<AddressDialog> {
                     controller: _phoneController,
                     keyboardType: TextInputType.phone,
                     maxLength: 10,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                     validator: (v) {
                       if (v == null || v.isEmpty) {
                         return "Phone number required";
@@ -257,10 +260,24 @@ class _AddressDialogState extends State<AddressDialog> {
                     },
                     decoration: InputDecoration(
                       labelText: "Phone Number",
-                      prefixIcon: const Icon(Icons.phone),
+                      labelStyle: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
+                      ),
+                      prefixIcon: Icon(
+                        Icons.phone,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
+                      ),
                       counterText: "",
                       filled: true,
-                      fillColor: Colors.grey.shade100,
+                      fillColor: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF334155)
+                          : Colors.grey.shade100,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,

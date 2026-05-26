@@ -11,6 +11,12 @@ class NotificationsViewModel extends BaseViewModel {
     NotificationService.instance.addListener(notifyListeners);
   }
 
+  Future<void> fetchNotifications() async {
+    setBusy(true);
+    await NotificationService.instance.fetchNotifications();
+    setBusy(false);
+  }
+
   @override
   void dispose() {
     titleController.dispose();
@@ -53,20 +59,20 @@ class NotificationsViewModel extends BaseViewModel {
   }
 
   // Inbox Actions
-  void markAsRead(String id) {
-    NotificationService.instance.markAsRead(id);
+  Future<void> markAsRead(String id) async {
+    await NotificationService.instance.markAsRead(id);
   }
 
-  void toggleReadState(String id) {
-    NotificationService.instance.toggleReadState(id);
+  Future<void> toggleReadState(String id) async {
+    await NotificationService.instance.toggleReadState(id);
   }
 
-  void markAllAsRead() {
-    NotificationService.instance.markAllAsRead();
+  Future<void> markAllAsRead() async {
+    await NotificationService.instance.markAllAsRead();
   }
 
-  void deleteNotification(String id) {
-    NotificationService.instance.deleteNotification(id);
+  Future<void> deleteNotification(String id) async {
+    await NotificationService.instance.deleteNotification(id);
   }
 
   // Compose Broadcast Form State

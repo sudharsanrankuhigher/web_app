@@ -11,6 +11,7 @@ import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
 
+import 'package:webapp/widgets/search_text_field.dart';
 import 'plans_viewmodel.dart';
 
 class PlansView extends StackedView<PlansViewModel> {
@@ -35,9 +36,9 @@ class PlansView extends StackedView<PlansViewModel> {
                     Container(
                       width: double.infinity,
                       padding: defaultPadding16,
-                      decoration: const BoxDecoration(
-                        color: white,
-                        borderRadius: BorderRadius.only(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(12),
                             bottomRight: Radius.circular(12)),
                       ),
@@ -55,15 +56,8 @@ class PlansView extends StackedView<PlansViewModel> {
                           width: isExtended
                               ? 500
                               : 450.w, // search field fixed width (responsive)
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: "Search plan name...",
-                              hintStyle: fontFamilyRegular.size14.grey,
-                              prefixIcon: const Icon(Icons.search),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
+                          child: SearchTextField(
+                            hintText: "Search plan name...",
                             onChanged: viewModel.searchPlans,
                           ),
                         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/services/theme_service.dart';
 
 extension TextStyleHelpers on TextStyle {
   TextStyle get size8 => copyWith(fontSize: 8 * scale);
@@ -28,10 +29,19 @@ extension TextStyleHelpers on TextStyle {
       copyWith(color: const Color(0xFFE2E2E2));
   TextStyle get backwhite => copyWith(color: const Color(0xFFFFFFFF));
   TextStyle get grey => copyWith(color: Colors.grey);
-  TextStyle get greyColor => copyWith(color: const Color(0xFF6D6D6D));
+  TextStyle get greyColor => copyWith(
+      color: ThemeService.instance.isDarkMode
+          ? const Color(0xFF94A3B8)
+          : const Color(0xFF6D6D6D));
   TextStyle get red => copyWith(color: Colors.red);
-  TextStyle get black => copyWith(color: Colors.black);
-  TextStyle get black45 => copyWith(color: Colors.black45);
+  TextStyle get black => copyWith(
+      color: ThemeService.instance.isDarkMode
+          ? const Color(0xFFE2E8F0)
+          : Colors.black);
+  TextStyle get black45 => copyWith(
+      color: ThemeService.instance.isDarkMode
+          ? const Color(0xFF94A3B8)
+          : Colors.black45);
   TextStyle get textBlue => copyWith(color: const Color(0xFF007DAA));
   TextStyle get backGroundColor => copyWith(color: const Color(0xFFF5FFFA));
   TextStyle get disableColorText => copyWith(color: const Color(0xFFD9D9D9));
@@ -42,7 +52,10 @@ extension TextStyleHelpers on TextStyle {
   TextStyle get greenShade => copyWith(color: const Color(0xFFD3FFC7));
   TextStyle get blueText => copyWith(color: const Color(0xFF00A3DD));
   TextStyle get greyText => copyWith(color: const Color(0xFF716F6F));
-  TextStyle get lightText => copyWith(color: const Color(0xFF545454));
+  TextStyle get lightText => copyWith(
+      color: ThemeService.instance.isDarkMode
+          ? const Color(0xFFCBD5E1)
+          : const Color(0xFF545454));
   TextStyle get promoCodeText => copyWith(color: const Color(0xFF005C7D));
   TextStyle get continueButton => copyWith(color: const Color(0xFF2563EB));
   TextStyle get pendingColor => copyWith(color: const Color(0xFFD3600D));

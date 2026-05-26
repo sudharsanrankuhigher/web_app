@@ -11,6 +11,7 @@ import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
 
+import 'package:webapp/widgets/search_text_field.dart';
 import 'services_viewmodel.dart';
 
 class ServicesView extends StackedView<ServicesViewModel> {
@@ -35,9 +36,9 @@ class ServicesView extends StackedView<ServicesViewModel> {
                   Container(
                     width: double.infinity,
                     padding: defaultPadding16,
-                    decoration: const BoxDecoration(
-                      color: white,
-                      borderRadius: BorderRadius.only(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(12),
                           bottomRight: Radius.circular(12)),
                     ),
@@ -53,15 +54,8 @@ class ServicesView extends StackedView<ServicesViewModel> {
                       SizedBox(
                         height: 55.h,
                         width: isExtended ? 500 : 500.w,
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: "Search service name...",
-                            hintStyle: fontFamilyRegular.size12.grey,
-                            prefixIcon: const Icon(Icons.search),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
+                        child: SearchTextField(
+                          hintText: "Search service name...",
                           onChanged: viewModel.applySearch,
                         ),
                       ),

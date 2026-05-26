@@ -35,9 +35,9 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                       Container(
                         width: double.infinity,
                         padding: defaultPadding16,
-                        decoration: const BoxDecoration(
-                          color: white,
-                          borderRadius: BorderRadius.only(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: const BorderRadius.only(
                               bottomLeft: Radius.circular(12),
                               bottomRight: Radius.circular(12)),
                         ),
@@ -99,9 +99,15 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                 padding: defaultPadding12,
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(12),
-                                    color: white,
-                                    boxShadow: const [
-                                      BoxShadow(color: disableColor)
+                                    color:
+                                        Theme.of(context).colorScheme.surface,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.transparent
+                                            : disableColor,
+                                      )
                                     ]),
                                 child: Column(
                                   children: [
@@ -172,9 +178,14 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                 padding: defaultPadding12,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
-                                  color: white,
-                                  boxShadow: const [
-                                    BoxShadow(color: disableColor)
+                                  color: Theme.of(context).colorScheme.surface,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.transparent
+                                          : disableColor,
+                                    )
                                   ],
                                 ),
                                 child: Column(

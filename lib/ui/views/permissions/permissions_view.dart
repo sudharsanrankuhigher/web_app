@@ -35,9 +35,9 @@ class PermissionsView extends StackedView<PermissionsViewModel> {
                               Container(
                                 width: double.infinity,
                                 padding: defaultPadding16,
-                                decoration: const BoxDecoration(
-                                  color: white,
-                                  borderRadius: BorderRadius.only(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.surface,
+                                  borderRadius: const BorderRadius.only(
                                       bottomLeft: Radius.circular(12),
                                       bottomRight: Radius.circular(12)),
                                 ),
@@ -92,7 +92,9 @@ class PermissionsView extends StackedView<PermissionsViewModel> {
                                             ? Container(
                                                 padding: defaultPadding12,
                                                 decoration: BoxDecoration(
-                                                  color: white,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .surface,
                                                   borderRadius:
                                                       BorderRadius.circular(12),
                                                 ),

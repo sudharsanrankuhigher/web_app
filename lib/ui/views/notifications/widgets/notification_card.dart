@@ -93,13 +93,13 @@ class _NotificationCardState extends State<NotificationCard> {
                 duration: const Duration(milliseconds: 200),
                 transform: Matrix4.translationValues(leftShift, 0, 0),
                 decoration: BoxDecoration(
-                  color: widget.item.isRead
-                      ? white
-                      : white, // Clean white card layout
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: widget.item.isRead
-                        ? const Color(0xFFE5E7EB)
+                        ? (Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF334155)
+                            : const Color(0xFFE5E7EB))
                         : categoryColor.withValues(alpha: 0.25),
                     width: widget.item.isRead ? 1 : 1.5,
                   ),
@@ -146,14 +146,20 @@ class _NotificationCardState extends State<NotificationCard> {
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: widget.item.isRead
-                                    ? Colors.grey[100]
+                                    ? (Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? const Color(0xFF334155)
+                                        : Colors.grey[100])
                                     : categoryColor.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 categoryIcon,
                                 color: widget.item.isRead
-                                    ? Colors.grey
+                                    ? (Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.grey[400]
+                                        : Colors.grey)
                                     : categoryColor,
                                 size: 20,
                               ),

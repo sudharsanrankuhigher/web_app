@@ -3,6 +3,7 @@ import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/views/roles/model/roles_model.dart' as role_model;
+import 'package:webapp/services/theme_service.dart';
 
 class RolesTableSource extends DataTableSource {
   final List<role_model.Datum> roles;
@@ -34,7 +35,15 @@ class RolesTableSource extends DataTableSource {
 
     return DataRow(
       color: WidgetStateProperty.resolveWith<Color?>(
-        (states) => index.isEven ? Colors.white : Colors.grey.shade100,
+        (states) {
+          final isDark = ThemeService.instance.isDarkMode;
+          if (isDark) {
+            return index.isEven
+                ? const Color(0xFF1E293B)
+                : const Color(0xFF0F172A);
+          }
+          return index.isEven ? Colors.white : Colors.grey.shade100;
+        },
       ),
       cells: [
         DataCell(Text("${index + 1}")), // S.No

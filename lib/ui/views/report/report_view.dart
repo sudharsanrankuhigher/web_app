@@ -37,11 +37,12 @@ class ReportView extends StackedView<ReportViewModel> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         title: Text(
           'Reports',
-          style: fontFamilyBold.size20.black,
+          style: fontFamilyBold.size20
+              .copyWith(color: Theme.of(context).colorScheme.onSurface),
         ),
         actions: [
           Padding(
@@ -87,46 +88,65 @@ class ReportView extends StackedView<ReportViewModel> {
 
                         /// 🔹 RIGHT → Buttons (only if selected)
                         if (viewModel.selectedReportType != null) ...[
-                          Row(
-                            children: [
-                              ElevatedButton.icon(
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      WidgetStateProperty.all<Color>(redShade),
-                                ),
-                                onPressed: () {
-                                  viewModel.exportPdfWeb();
+                              Builder(
+                                builder: (context) {
+                                  final isDark = Theme.of(context).brightness == Brightness.dark;
+                                  
+                                  // Dynamic colors for Preview PDF button
+                                  final pdfBg = isDark ? const Color(0x29EF4444) : redShade; // 16% opacity red in dark mode
+                                  final pdfFg = isDark ? const Color(0xFFFCA5A5) : Colors.black87; // sleek light red vs dark red/black
+                                  
+                                  // Dynamic colors for Excel button
+                                  final excelBg = isDark ? const Color(0x2910B981) : appGreen400; // 16% opacity green in dark mode
+                                  final excelFg = isDark ? const Color(0xFFA7F3D0) : white; // sleek light green vs white
+
+                                  return Row(
+                                    children: [
+                                      ElevatedButton.icon(
+                                        style: ButtonStyle(
+                                          backgroundColor: WidgetStateProperty.all<Color>(pdfBg),
+                                          elevation: WidgetStateProperty.all<double>(0),
+                                          shape: WidgetStateProperty.all<OutlinedBorder>(
+                                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          viewModel.exportPdfWeb();
+                                        },
+                                        icon: Icon(
+                                          Icons.picture_as_pdf,
+                                          color: pdfFg,
+                                        ),
+                                        label: Text(
+                                          "Preview PDF",
+                                          style: fontFamilySemiBold.size13.copyWith(color: pdfFg),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      ElevatedButton.icon(
+                                        style: ButtonStyle(
+                                          backgroundColor: WidgetStateProperty.all<Color>(excelBg),
+                                          elevation: WidgetStateProperty.all<double>(0),
+                                          shape: WidgetStateProperty.all<OutlinedBorder>(
+                                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          viewModel.exportCsv();
+                                        },
+                                        icon: Icon(
+                                          Icons.download,
+                                          color: excelFg,
+                                        ),
+                                        label: Text(
+                                          "Excel",
+                                          style: fontFamilySemiBold.size13.copyWith(color: excelFg),
+                                        ),
+                                      ),
+                                    ],
+                                  );
                                 },
-                                icon: const Icon(
-                                  Icons.picture_as_pdf,
-                                  color: Colors.black,
-                                ),
-                                label: Text(
-                                  "Preview PDF",
-                                  style: fontFamilySemiBold.size13.black,
-                                ),
                               ),
-                              const SizedBox(width: 10),
-                              ElevatedButton.icon(
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      WidgetStateProperty.all<Color>(
-                                          appGreen400),
-                                ),
-                                onPressed: () {
-                                  viewModel.exportCsv();
-                                },
-                                icon: const Icon(
-                                  Icons.download,
-                                  color: white,
-                                ),
-                                label: Text(
-                                  "Excel",
-                                  style: fontFamilySemiBold.size13.white,
-                                ),
-                              ),
-                            ],
-                          ),
                         ],
                       ],
                     ),
@@ -135,7 +155,8 @@ class ReportView extends StackedView<ReportViewModel> {
                         "Subscription Plans Report") ...{
                       Text(
                         'Subscription Plans Report',
-                        style: fontFamilySemiBold.size16.black,
+                        style: fontFamilySemiBold.size16.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface),
                       ),
                       verticalSpacing12,
                       SizedBox(
@@ -163,7 +184,8 @@ class ReportView extends StackedView<ReportViewModel> {
                         "Influencer HighLight Report") ...{
                       Text(
                         'Influencer HighLight Report',
-                        style: fontFamilySemiBold.size16.black,
+                        style: fontFamilySemiBold.size16.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface),
                       ),
                       verticalSpacing12,
                       SizedBox(
@@ -203,7 +225,8 @@ class ReportView extends StackedView<ReportViewModel> {
                         "Influencer Project Report") ...{
                       Text(
                         "Influencer Project Report",
-                        style: fontFamilySemiBold.size16.black,
+                        style: fontFamilySemiBold.size16.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface),
                       ),
                       verticalSpacing10,
                       SizedBox(
@@ -243,7 +266,8 @@ class ReportView extends StackedView<ReportViewModel> {
                         children: [
                           Text(
                             "Company Wise Project Report",
-                            style: fontFamilySemiBold.size16.black,
+                            style: fontFamilySemiBold.size16.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface),
                           ),
                           verticalSpacing10,
                           SizedBox(
@@ -284,7 +308,8 @@ class ReportView extends StackedView<ReportViewModel> {
                     if (viewModel.selectedReportType?.title ==
                         "Client Project Detailed Report") ...{
                       Text('Client Project Detailed Report',
-                          style: fontFamilySemiBold.size16.black),
+                          style: fontFamilySemiBold.size16.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface)),
                       verticalSpacing12,
                       SizedBox(
                         // height:
@@ -316,7 +341,8 @@ class ReportView extends StackedView<ReportViewModel> {
                     if (viewModel.selectedReportType?.title ==
                         "Promote Projectes Detailed Report") ...{
                       Text('Promote Projectes Detailed Report',
-                          style: fontFamilySemiBold.size16.black),
+                          style: fontFamilySemiBold.size16.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface)),
                       verticalSpacing12,
                       SizedBox(
                         height:
@@ -349,7 +375,8 @@ class ReportView extends StackedView<ReportViewModel> {
                       ),
                     },
                     Text('Total Monthly Income Report',
-                        style: fontFamilySemiBold.size16.black),
+                        style: fontFamilySemiBold.size16.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface)),
                     verticalSpacing12,
                     GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

@@ -392,17 +392,22 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final dialogBg = isDark
+        ? Theme.of(context).colorScheme.surface
+        : const Color(0xFFF1F5F9);
+
     return Dialog(
       insetPadding: const EdgeInsets.all(16),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          color: disableColor,
+          color: dialogBg,
           width: 700,
           height: 650,
           child: Stack(
             children: [
-              const Positioned.fill(child: ColoredBox(color: disableColor)),
+              Positioned.fill(child: ColoredBox(color: dialogBg)),
               // WebImage(
               //   imageUrl: "https://dummyimage.com/600x400/eeeeee/eeeeee.png",
               //   height: MediaQuery.of(context).size.height * 0.9,
@@ -1246,13 +1251,23 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
   }
 
   Widget _buildField({required String label, required Widget child}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-        const SizedBox(height: 4),
-        child,
-      ],
+    return Builder(
+      builder: (context) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 4),
+            child,
+          ],
+        );
+      },
     );
   }
 

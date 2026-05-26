@@ -45,9 +45,10 @@ class ApiService {
     final dio = Dio(
       BaseOptions(
         baseUrl: 'https://admin.promoteapp.in/',
-        // baseUrl: 'http://172.20.25.23:8003/',
+        // baseUrl: 'http://172.20.25.23:8003/',saran
+        // baseUrl: 'http://172.20.25.55:3002/',shy
         // baseUrl: 'http://172.20.25.23:8002/',
-        // baseUrl: 'http://172.20.25.54:8005/',
+        // baseUrl: 'http://172.20.25.54:8005/',deepak
         followRedirects: true,
         validateStatus: (status) => status != null && status < 500,
       ),
@@ -1718,6 +1719,54 @@ class ApiService {
           webPosition: "center",
           webShowClose: true,
           msg: message);
+      throw Exception(message);
+    }
+  }
+
+  /// GET: /api/admin/notification-list
+  Future<dynamic> getNotificationList() async {
+    final response = await _dio.get('api/admin/notification-list');
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      final message = response.data?['message'] ?? 'Server error';
+      throw Exception(message);
+    }
+  }
+
+  /// POST: /api/admin/notification-delete
+  Future<dynamic> deleteNotification(int id) async {
+    final response = await _dio
+        .delete('api/admin/notification-delete', queryParameters: {'id': id});
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      final message = response.data?['message'] ?? 'Server error';
+      throw Exception(message);
+    }
+  }
+
+  /// POST: /api/admin/notification-read
+  Future<dynamic> readNotification(int id) async {
+    final response = await _dio.post('api/admin/notification-read', data: {
+      'id': id,
+      // 'notification_ids': id,
+    });
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      final message = response.data?['message'] ?? 'Server error';
+      throw Exception(message);
+    }
+  }
+
+  /// POST: /api/admin/notification-read-all
+  Future<dynamic> readAllNotifications() async {
+    final response = await _dio.post('api/admin/notification-read-all');
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      final message = response.data?['message'] ?? 'Server error';
       throw Exception(message);
     }
   }

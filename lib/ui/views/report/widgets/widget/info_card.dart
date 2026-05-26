@@ -23,10 +23,24 @@ class InfoSalesProjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Resolve themed colors
+    final resolvedBgColor = isDark ? Theme.of(context).colorScheme.surface : white;
+    final resolvedTitleStyle = fontFamilySemiBold.size16.copyWith(
+      color: Theme.of(context).colorScheme.onSurface,
+    );
+    final resolvedIconColor = isDark ? appGreen400 : appGreen600;
+    
+    // Smooth translucent or themed background for the icon container
+    final resolvedIconBgColor = isDark 
+        ? resolvedIconColor.withOpacity(0.15) 
+        : iconBgColor;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: white,
+        color: resolvedBgColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -36,7 +50,7 @@ class InfoSalesProjectCard extends StatelessWidget {
             height: 50,
             width: 50,
             decoration: BoxDecoration(
-              color: iconBgColor,
+              color: resolvedIconBgColor,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Center(
@@ -44,18 +58,18 @@ class InfoSalesProjectCard extends StatelessWidget {
                 iconPath,
                 height: 26,
                 width: 26,
-                color: appGreen600,
+                color: resolvedIconColor,
               ),
             ),
           ),
           horizontalSpacing10,
           Column(
-            mainAxisSize: MainAxisSize.min, // ADD THIS
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
-                style: fontFamilySemiBold.size16.black,
+                style: resolvedTitleStyle,
               ),
               verticalSpacing16,
               RichText(

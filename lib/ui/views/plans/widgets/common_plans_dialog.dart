@@ -55,7 +55,9 @@ class CommonPlanDialog {
     /// ---------------- INPUT DECORATION ----------------
     InputDecoration decoration(String label) => InputDecoration(
           labelText: label,
-          fillColor: Colors.white,
+          fillColor: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF334155)
+              : Colors.white,
           filled: true,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
@@ -78,6 +80,10 @@ class CommonPlanDialog {
                     : initial == null
                         ? "Add Plan"
                         : "Edit Plan",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               content: SizedBox(
                 width: 400,
@@ -90,7 +96,13 @@ class CommonPlanDialog {
                       Container(
                           padding: leftPadding20,
                           alignment: Alignment.centerLeft,
-                          child: const Text('Selected Plan Category')),
+                          child: Text(
+                            'Selected Plan Category',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          )),
                       verticalSpacing8,
                       IgnorePointer(
                         ignoring: isView,

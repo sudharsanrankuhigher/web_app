@@ -29,9 +29,18 @@ class CommonPaginatedTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final resolvedHeaderColor = isDark
+        ? const Color(0xFF334155) // Premium slate header in dark mode
+        : (heddingRowColor ?? appGreen400);
+
+    final resolvedHeaderTextStyle = isDark
+        ? fontFamilyBold.size12.copyWith(color: Colors.white)
+        : (headingTextStyle ?? fontFamilyBold.size14.white);
+
     return PaginatedDataTable2(
       columns: columns,
-      hidePaginator: hidePaginator ?? false,
+      hidePaginator: hidePaginator,
       source: source,
       columnSpacing: 10,
       minWidth: minWidth,
@@ -40,17 +49,18 @@ class CommonPaginatedTable extends StatelessWidget {
       showFirstLastButtons: true,
       headingRowHeight: 48,
       dataRowHeight: dataRowHeight,
-      headingRowColor: WidgetStateProperty.all(appGreen400),
+      headingRowColor: WidgetStateProperty.all(resolvedHeaderColor),
       headingRowDecoration: BoxDecoration(
-        color: heddingRowColor ?? appGreen400,
+        color: resolvedHeaderColor,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(12),
           topRight: Radius.circular(12),
         ),
       ),
-      headingTextStyle:
-          headingTextStyle ?? fontFamilyBold.size14.white, // custom typography
-      dataTextStyle: fontFamilyRegular.size12.black,
+      headingTextStyle: resolvedHeaderTextStyle,
+      dataTextStyle: fontFamilyRegular.size12.copyWith(
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
       showCheckboxColumn: enableCheckBox,
     );
   }

@@ -35,6 +35,23 @@ class CommonButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Resolve themed defaults if not custom specified
+    final defaultBg = isDark ? const Color(0xFF1E293B) : backgroundColor;
+    final resolvedBgColor = buttonColor ?? defaultBg;
+    
+    final resolvedBorderColor = borderColor ?? (isDark ? Colors.grey.withOpacity(0.2) : disableColor);
+
+    TextStyle resolvedTextStyle = textStyle ?? 
+        fontFamilyMedium.size14.black.copyWith(overflow: TextOverflow.ellipsis);
+    if (isDark && textStyle == null) {
+      resolvedTextStyle = fontFamilyMedium.size14.copyWith(
+        color: Theme.of(context).colorScheme.onSurface,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -44,9 +61,10 @@ class CommonButton extends StatelessWidget {
         padding: padding,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-            color: buttonColor ?? backgroundColor,
-            borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(color: borderColor ?? disableColor)),
+          color: resolvedBgColor,
+          borderRadius: BorderRadius.circular(borderRadius),
+          border: Border.all(color: resolvedBorderColor),
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -60,9 +78,7 @@ class CommonButton extends StatelessWidget {
               Text(
                 overflow: TextOverflow.ellipsis,
                 text,
-                style: textStyle ??
-                    fontFamilyMedium.size14.black
-                        .copyWith(overflow: TextOverflow.ellipsis),
+                style: resolvedTextStyle,
               ),
             if (icon1 != null) ...[
               horizontalSpacing10,

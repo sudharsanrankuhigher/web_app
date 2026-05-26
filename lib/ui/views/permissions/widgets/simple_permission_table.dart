@@ -5,14 +5,14 @@ import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/permissions/permissions_viewmodel.dart';
 
 Widget simplePermissionTable(PermissionsViewModel vm) {
-  final bool isWide =
-      MediaQuery.of(StackedService.navigatorKey!.currentContext!).size.width >
-          1440;
+  final context = StackedService.navigatorKey!.currentContext!;
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final bool isWide = MediaQuery.of(context).size.width > 1440;
 
   return Container(
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: white,
+      color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(8),
     ),
     child: Column(
@@ -21,9 +21,13 @@ Widget simplePermissionTable(PermissionsViewModel vm) {
         // Header Row with "Select All"
         Row(
           children: [
-            const Text(
+            Text(
               'Special Permission',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
             const Spacer(),
             Checkbox(
@@ -37,7 +41,7 @@ Widget simplePermissionTable(PermissionsViewModel vm) {
 
         // Table Header (optional, could just be a line)
         Container(
-          color: Colors.grey.shade300,
+          color: isDark ? const Color(0xFF334155) : Colors.grey.shade300,
           padding: const EdgeInsets.symmetric(vertical: 10) + leftPadding8,
           child: Row(
             children: [
@@ -61,9 +65,11 @@ Widget simplePermissionTable(PermissionsViewModel vm) {
         ...vm.specialPermissons.map((row) {
           return Container(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: Colors.grey),
+                bottom: BorderSide(
+                  color: isDark ? const Color(0xFF334155) : Colors.grey,
+                ),
               ),
             ),
             child: Row(

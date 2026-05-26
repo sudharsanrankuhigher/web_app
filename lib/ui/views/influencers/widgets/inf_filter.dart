@@ -29,9 +29,15 @@ class InfFilter extends StatelessWidget {
     int? selectedCategory;
     int? selectedService;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final dialogBg =
+        isDark ? Theme.of(context).colorScheme.surface : Colors.white;
+    final fieldBg = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+    final borderCol = isDark ? const Color(0xFF475569) : disableColor;
+
     return Dialog(
       constraints: const BoxConstraints(maxWidth: 400),
-      backgroundColor: Colors.white,
+      backgroundColor: dialogBg,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: StatefulBuilder(
         builder: (context, setState) {
@@ -41,41 +47,60 @@ class InfFilter extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "Filters & Sorting",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
 
                 const SizedBox(height: 12),
 
                 /// ✅ CATEGORY DROPDOWN
-                const Text("Category",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  "Category",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
                 const SizedBox(height: 6),
                 DropdownButtonFormField<int>(
+                  dropdownColor: dialogBg,
                   initialValue: selectedCategory,
-                  hint: const Text("Select Category"),
+                  hint: Text(
+                    "Select Category",
+                    style: TextStyle(
+                        color: isDark ? Colors.grey[400] : Colors.grey),
+                  ),
                   items: categoryList.map((cat) {
                     return DropdownMenuItem<int>(
                       value: cat['id'],
-                      child: Text(cat['name']),
+                      child: Text(
+                        cat['name'],
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface),
+                      ),
                     );
                   }).toList(),
                   onChanged: (val) => setState(() => selectedCategory = val),
                   decoration: InputDecoration(
                     hintText: "Select Category",
-                    hintStyle: const TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(
+                        color: isDark ? Colors.grey[400] : Colors.grey),
                     contentPadding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     filled: true,
-                    fillColor: backgroundColor,
+                    fillColor: fieldBg,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: disableColor),
+                      borderSide: BorderSide(color: borderCol),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: disableColor),
+                      borderSide: BorderSide(color: borderCol),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -87,33 +112,48 @@ class InfFilter extends StatelessWidget {
                 const SizedBox(height: 12),
 
                 /// ✅ SERVICE DROPDOWN
-                const Text("Service",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  "Service",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
                 const SizedBox(height: 6),
                 DropdownButtonFormField<int>(
+                  dropdownColor: dialogBg,
                   initialValue: selectedService,
-                  hint: const Text("Select Service"),
+                  hint: Text(
+                    "Select Service",
+                    style: TextStyle(
+                        color: isDark ? Colors.grey[400] : Colors.grey),
+                  ),
                   items: services.map<DropdownMenuItem<int>>((srv) {
                     return DropdownMenuItem<int>(
                       value: srv.id,
-                      child: Text(srv.name ?? ''),
+                      child: Text(
+                        srv.name ?? '',
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface),
+                      ),
                     );
                   }).toList(),
                   onChanged: (val) => setState(() => selectedService = val),
                   decoration: InputDecoration(
                     hintText: "Select Category",
-                    hintStyle: const TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(
+                        color: isDark ? Colors.grey[400] : Colors.grey),
                     contentPadding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     filled: true,
-                    fillColor: backgroundColor,
+                    fillColor: fieldBg,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: disableColor),
+                      borderSide: BorderSide(color: borderCol),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: disableColor),
+                      borderSide: BorderSide(color: borderCol),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -125,22 +165,39 @@ class InfFilter extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 /// ✅ SORT
-                const Text("Sort By",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  "Sort By",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
                 RadioListTile(
                     value: "A-Z",
                     groupValue: selectedSort,
-                    title: const Text("A - Z"),
+                    title: Text(
+                      "A - Z",
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface),
+                    ),
                     onChanged: (v) => setState(() => selectedSort = v!)),
                 RadioListTile(
                     value: "newer",
                     groupValue: selectedSort,
-                    title: const Text("Newer First"),
+                    title: Text(
+                      "Newer First",
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface),
+                    ),
                     onChanged: (v) => setState(() => selectedSort = v!)),
                 RadioListTile(
                     value: "older",
                     groupValue: selectedSort,
-                    title: const Text("Older First"),
+                    title: Text(
+                      "Older First",
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface),
+                    ),
                     onChanged: (v) => setState(() => selectedSort = v!)),
 
                 const SizedBox(height: 16),

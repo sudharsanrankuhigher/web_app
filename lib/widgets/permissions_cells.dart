@@ -15,7 +15,10 @@ class HeaderCell extends StatelessWidget {
       flex: flex,
       child: Text(
         text,
-        style: const TextStyle(fontWeight: FontWeight.bold),
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         textAlign: align ?? TextAlign.center,
       ),
     );

@@ -7,6 +7,7 @@ import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
 import 'package:webapp/ui/views/services/model/service_model.dart'
     as service_model;
 import 'package:webapp/widgets/profile_image.dart';
+import 'package:webapp/services/theme_service.dart';
 
 class InfluencerTableSource extends DataTableSource {
   final List<influencer_model.Datum> influencers;
@@ -123,8 +124,13 @@ class InfluencerTableSource extends DataTableSource {
     return DataRow(
       color: WidgetStateProperty.resolveWith<Color?>(
         (Set<WidgetState> states) {
-          if (index.isEven) return Colors.white;
-          return Colors.grey.shade100;
+          final isDark = ThemeService.instance.isDarkMode;
+          if (isDark) {
+            return index.isEven
+                ? const Color(0xFF1E293B)
+                : const Color(0xFF0F172A);
+          }
+          return index.isEven ? Colors.white : Colors.grey.shade100;
         },
       ),
       cells: [

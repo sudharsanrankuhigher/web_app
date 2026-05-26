@@ -2116,4 +2116,44 @@ class MockApiService extends _i1.Mock implements _i27.ApiService {
         returnValue: _i25.Future<void>.value(),
         returnValueForMissingStub: _i25.Future<void>.value(),
       ) as _i25.Future<void>);
+
+  @override
+  _i25.Future<dynamic> getNotificationList() => (super.noSuchMethod(
+        Invocation.method(
+          #getNotificationList,
+          [],
+        ),
+        returnValue: _i25.Future<dynamic>.value(),
+        returnValueForMissingStub: _i25.Future<dynamic>.value(),
+      ) as _i25.Future<dynamic>);
+
+  @override
+  _i25.Future<dynamic> deleteNotification(int? id) => (super.noSuchMethod(
+        Invocation.method(
+          #deleteNotification,
+          [id],
+        ),
+        returnValue: _i25.Future<dynamic>.value(),
+        returnValueForMissingStub: _i25.Future<dynamic>.value(),
+      ) as _i25.Future<dynamic>);
+
+  @override
+  _i25.Future<dynamic> readNotification(int? id) => (super.noSuchMethod(
+        Invocation.method(
+          #readNotification,
+          [id],
+        ),
+        returnValue: _i25.Future<dynamic>.value(),
+        returnValueForMissingStub: _i25.Future<dynamic>.value(),
+      ) as _i25.Future<dynamic>);
+
+  @override
+  _i25.Future<dynamic> readAllNotifications() => (super.noSuchMethod(
+        Invocation.method(
+          #readAllNotifications,
+          [],
+        ),
+        returnValue: _i25.Future<dynamic>.value(),
+        returnValueForMissingStub: _i25.Future<dynamic>.value(),
+      ) as _i25.Future<dynamic>);
 }

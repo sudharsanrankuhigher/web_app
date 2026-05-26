@@ -131,12 +131,18 @@ class DynamicMultiSearchDropdown extends StatelessWidget {
         decoration: InputDecoration(
           labelText: "Select $label",
           labelStyle: fontFamilyMedium.size12.greyColor,
-          fillColor: backgroundColor,
+          fillColor: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF334155)
+              : backgroundColor,
           filled: true,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
-              color: isError == true ? Colors.red : disableColor,
+              color: isError == true
+                  ? Colors.red
+                  : (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[700]!
+                      : disableColor),
             ),
           ),
           focusedBorder: OutlineInputBorder(

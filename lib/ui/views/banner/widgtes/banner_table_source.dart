@@ -8,6 +8,7 @@ import 'package:webapp/ui/views/banner/model/all_banner_model.dart'
 import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
     as influencer_model;
 import 'package:webapp/widgets/web_image_loading.dart';
+import 'package:webapp/services/theme_service.dart';
 
 class BannerTableSource extends DataTableSource {
   final List<banner_model.Datum> data;
@@ -48,7 +49,15 @@ class BannerTableSource extends DataTableSource {
 
     return DataRow(
       color: WidgetStateProperty.resolveWith<Color?>(
-        (states) => index.isEven ? Colors.white : Colors.grey.shade100,
+        (states) {
+          final isDark = ThemeService.instance.isDarkMode;
+          if (isDark) {
+            return index.isEven
+                ? const Color(0xFF1E293B)
+                : const Color(0xFF0F172A);
+          }
+          return index.isEven ? Colors.white : Colors.grey.shade100;
+        },
       ),
       cells: [
         DataCell(Text(

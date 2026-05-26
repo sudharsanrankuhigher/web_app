@@ -8,6 +8,7 @@ import 'package:webapp/ui/views/sub_admin/model/sub_admin_model.dart'
     as sub_admin_model;
 import 'package:webapp/widgets/profile_image.dart';
 import 'package:webapp/ui/views/roles/model/roles_model.dart' as roles_model;
+import 'package:webapp/services/theme_service.dart';
 
 class SubAdminTableSource extends DataTableSource {
   final List<sub_admin_model.Datum> data;
@@ -128,6 +129,12 @@ class SubAdminTableSource extends DataTableSource {
     return DataRow(
       color: WidgetStateProperty.resolveWith<Color?>(
         (Set<WidgetState> states) {
+          final isDark = ThemeService.instance.isDarkMode;
+          if (isDark) {
+            return index.isEven
+                ? const Color(0xFF1E293B)
+                : const Color(0xFF0F172A);
+          }
           return index.isEven ? Colors.white : Colors.grey.shade100;
         },
       ),

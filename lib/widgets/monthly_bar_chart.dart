@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 
 class MonthlyBarChart extends StatelessWidget {
   final List<double> ongoing;
@@ -21,10 +22,22 @@ class MonthlyBarChart extends StatelessWidget {
     // Get max value
     final maxValue = [...og, ...cm].reduce((a, b) => a > b ? a : b);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Premium, non-generic bar colors harmonized for light & dark mode
+    final completedColor = isDark ? const Color(0xFF34D399) : appGreen500;
+    final ongoingColor = isDark ? const Color(0xFF60A5FA) : continueButton;
+
+    // Subtly styled axis text and line borders
+    final axisTitleStyle = fontFamilyMedium.size10.copyWith(
+      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+    );
+    final gridLineColor = isDark ? Colors.grey.withOpacity(0.2) : Colors.grey.withOpacity(0.4);
+
     return Expanded(
       child: Container(
         padding: defaultPadding12,
-        color: white,
+        color: Colors.transparent, // Seamlessly blend with the parent themed container
         child: BarChart(
           BarChartData(
             maxY: maxValue == 0 ? 10000 : maxValue + 10000,
@@ -35,12 +48,12 @@ class MonthlyBarChart extends StatelessWidget {
                 barRods: [
                   BarChartRodData(
                     toY: cm[index],
-                    color: Colors.green,
+                    color: completedColor,
                     width: 8,
                   ),
                   BarChartRodData(
                     toY: og[index],
-                    color: Colors.blue,
+                    color: ongoingColor,
                     width: 8,
                   ),
                 ],
@@ -62,7 +75,10 @@ class MonthlyBarChart extends StatelessWidget {
                   reservedSize: 40,
                   getTitlesWidget: (value, meta) {
                     if (value % 20000 != 0) return const SizedBox.shrink();
-                    return Text("${value ~/ 1000}k");
+                    return Text(
+                      "${value ~/ 1000}k",
+                      style: axisTitleStyle,
+                    );
                   },
                 ),
               ),
@@ -85,7 +101,10 @@ class MonthlyBarChart extends StatelessWidget {
                       "Dec"
                     ];
                     if (value < 0 || value > 11) return const SizedBox.shrink();
-                    return Text(months[value.toInt()]);
+                    return Text(
+                      months[value.toInt()],
+                      style: axisTitleStyle,
+                    );
                   },
                 ),
               ),
@@ -93,11 +112,11 @@ class MonthlyBarChart extends StatelessWidget {
 
             borderData: FlBorderData(
               show: true,
-              border: const Border(
-                left: BorderSide(color: Colors.grey),
-                bottom: BorderSide(color: Colors.grey),
-                top: BorderSide(color: Colors.transparent),
-                right: BorderSide(color: Colors.transparent),
+              border: Border(
+                left: BorderSide(color: gridLineColor),
+                bottom: BorderSide(color: gridLineColor),
+                top: const BorderSide(color: Colors.transparent),
+                right: const BorderSide(color: Colors.transparent),
               ),
             ),
 
@@ -106,8 +125,8 @@ class MonthlyBarChart extends StatelessWidget {
               drawHorizontalLine: true,
               drawVerticalLine: false,
               horizontalInterval: 20000,
-              getDrawingHorizontalLine: (value) => const FlLine(
-                color: Colors.grey,
+              getDrawingHorizontalLine: (value) => FlLine(
+                color: gridLineColor,
                 strokeWidth: 0.3,
               ),
             ),

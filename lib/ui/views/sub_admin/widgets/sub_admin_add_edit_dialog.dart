@@ -324,8 +324,16 @@ class CommonSubAdminDialog {
                               width: double.infinity,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.grey),
-                                color: Colors.grey.shade100,
+                                border: Border.all(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.grey.shade700
+                                      : Colors.grey,
+                                ),
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? const Color(0xFF1E293B)
+                                    : Colors.grey.shade100,
                               ),
                               child: idProofBytes == null && idProofPath == null
                                   ? uploadPlaceholder()

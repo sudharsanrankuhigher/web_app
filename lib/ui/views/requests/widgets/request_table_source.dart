@@ -4,6 +4,7 @@ import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/requests/model/request_model.dart'
     as request_model;
+import 'package:webapp/services/theme_service.dart';
 import 'package:webapp/widgets/common_chips.dart';
 import 'package:webapp/widgets/view_link.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
@@ -84,7 +85,15 @@ class RequestTableSource extends DataTableSource {
 
     return DataRow.byIndex(
       color: WidgetStateProperty.resolveWith<Color?>(
-        (states) => index.isEven ? Colors.white : Colors.grey.shade100,
+        (states) {
+          final isDark = ThemeService.instance.isDarkMode;
+          if (isDark) {
+            return index.isEven
+                ? const Color(0xFF1E293B)
+                : const Color(0xFF0F172A);
+          }
+          return index.isEven ? Colors.white : Colors.grey.shade100;
+        },
       ),
       index: index,
       cells: getCellsByStatus(model, status, index),

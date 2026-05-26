@@ -462,12 +462,22 @@ class AddEditCompanyPage {
 }
 
 Widget buildField({required String label, required Widget child}) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-      const SizedBox(height: 4),
-      child,
-    ],
+  return Builder(
+    builder: (context) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 4),
+          child,
+        ],
+      );
+    },
   );
 }

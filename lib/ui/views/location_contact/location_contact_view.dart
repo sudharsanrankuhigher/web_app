@@ -33,9 +33,9 @@ class LocationContactView extends StackedView<LocationContactViewModel> {
                     Container(
                       width: double.infinity,
                       padding: defaultPadding16,
-                      decoration: const BoxDecoration(
-                        color: white,
-                        borderRadius: BorderRadius.only(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(12),
                             bottomRight: Radius.circular(12)),
                       ),

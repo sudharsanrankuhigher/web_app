@@ -130,7 +130,9 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                 ),
                 decoratorProps: DropDownDecoratorProps(
                   decoration: InputDecoration(
-                    fillColor: backgroundColor,
+                    fillColor: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF334155)
+                        : backgroundColor,
                     filled: true,
                     labelText: "State",
                     labelStyle: fontFamilyMedium.size12.greyColor,
@@ -139,7 +141,9 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                       borderSide: BorderSide(
                         color: widget.isStateError == true
                             ? Colors.red
-                            : disableColor,
+                            : (Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey[700]!
+                                : disableColor),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
@@ -201,7 +205,9 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                   ),
                   decoratorProps: DropDownDecoratorProps(
                     decoration: InputDecoration(
-                      fillColor: backgroundColor,
+                      fillColor: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF334155)
+                          : backgroundColor,
                       filled: true,
                       labelText: "City",
                       labelStyle: fontFamilyMedium.size12.greyColor,
@@ -210,7 +216,9 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                         borderSide: BorderSide(
                           color: widget.isCityError == true
                               ? Colors.red
-                              : disableColor,
+                              : (Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.grey[700]!
+                                  : disableColor),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -291,10 +299,14 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                         borderSide: BorderSide(
                           color: widget.isStateError == true
                               ? Colors.red
-                              : disableColor,
+                              : (Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.grey[700]!
+                                  : disableColor),
                         ),
                       ),
-                      fillColor: backgroundColor,
+                      fillColor: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF334155)
+                          : backgroundColor,
                       filled: true,
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -365,10 +377,16 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                           borderSide: BorderSide(
                             color: widget.isCityError == true
                                 ? Colors.red
-                                : disableColor,
+                                : (Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.grey[700]!
+                                    : disableColor),
                           ),
                         ),
-                        fillColor: backgroundColor,
+                        fillColor:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF334155)
+                                : backgroundColor,
                         filled: true,
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),

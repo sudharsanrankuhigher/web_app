@@ -3,6 +3,7 @@ import 'package:webapp/core/helper/date_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/report/model/report_model.dart';
+import 'package:webapp/services/theme_service.dart';
 
 class ReportTableSource extends DataTableSource {
   final List<SubscriptionPlan> data;
@@ -19,7 +20,11 @@ class ReportTableSource extends DataTableSource {
   DataRow? getRow(int index) {
     if (index == data.length && data.isNotEmpty) {
       return DataRow(
-          color: WidgetStateProperty.all(Colors.grey.shade300),
+          color: WidgetStateProperty.all(
+            ThemeService.instance.isDarkMode
+                ? const Color(0xFF334155) // slate-700
+                : Colors.grey.shade300,
+          ),
           cells: [
             const DataCell(Text("")),
             const DataCell(Text("")),
@@ -59,7 +64,15 @@ class ReportTableSource extends DataTableSource {
 
     return DataRow(
       color: WidgetStateProperty.resolveWith<Color?>(
-        (states) => index.isEven ? Colors.white : Colors.grey.shade100,
+        (states) {
+          final isDark = ThemeService.instance.isDarkMode;
+          if (isDark) {
+            return index.isEven
+                ? const Color(0xFF1E293B)
+                : const Color(0xFF0F172A);
+          }
+          return index.isEven ? Colors.white : Colors.grey.shade100;
+        },
       ),
       cells: [
         DataCell(Text(

@@ -7,6 +7,7 @@ import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/contact_support/contact_support_viewmodel.dart';
 import 'package:webapp/ui/views/contact_support/model/client_model.dart'
     as client_model;
+import 'package:webapp/services/theme_service.dart';
 import 'package:webapp/ui/views/contact_support/widget/show_note_dialog.dart';
 
 class ClientTableSource extends DataTableSource {
@@ -65,8 +66,13 @@ class ClientTableSource extends DataTableSource {
     return DataRow.byIndex(
       color: WidgetStateProperty.resolveWith<Color?>(
         (Set<WidgetState> states) {
-          if (index.isEven) return Colors.white;
-          return Colors.grey.shade100;
+          final isDark = ThemeService.instance.isDarkMode;
+          if (isDark) {
+            return index.isEven
+                ? const Color(0xFF1E293B)
+                : const Color(0xFF0F172A);
+          }
+          return index.isEven ? Colors.white : Colors.grey.shade100;
         },
       ),
       index: index,

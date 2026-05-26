@@ -20,7 +20,7 @@ class CommonFilterDialog extends StatelessWidget {
 
     return Dialog(
       constraints: const BoxConstraints(maxWidth: 400),
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: StatefulBuilder(
         builder: (context, setState) {

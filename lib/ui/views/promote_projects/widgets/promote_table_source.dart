@@ -8,6 +8,7 @@ import 'package:webapp/ui/views/promote_projects/widgets/promote_status.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/view_link.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
+import 'package:webapp/services/theme_service.dart';
 
 class PromoteTableSource extends DataTableSource {
   List<promote_table_model.Datum> data;
@@ -66,10 +67,17 @@ class PromoteTableSource extends DataTableSource {
 
     final item = data[index];
 
-    return DataRow.byIndex(
-      index: index,
+    return DataRow(
       color: WidgetStateProperty.resolveWith<Color?>(
-        (states) => index.isEven ? Colors.white : Colors.grey.shade100,
+        (states) {
+          final isDark = ThemeService.instance.isDarkMode;
+          if (isDark) {
+            return index.isEven
+                ? const Color(0xFF1E293B)
+                : const Color(0xFF0F172A);
+          }
+          return index.isEven ? Colors.white : Colors.grey.shade100;
+        },
       ),
       cells: getCellsByStatus(item, status, index),
       onSelectChanged: (value) {},
@@ -426,7 +434,7 @@ class PromoteTableSource extends DataTableSource {
                           textAlign: TextAlign.center,
                         )),
                       )
-                    : Center(child: Text("Success"))
+                    : const Center(child: Text("Success"))
                 : const SizedBox(),
           ),
         ];

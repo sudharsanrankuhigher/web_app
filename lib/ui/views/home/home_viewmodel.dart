@@ -15,17 +15,29 @@ import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/services/notification_service.dart';
 
+import 'package:webapp/services/floating_overlay_service.dart';
+
 class HomeViewModel extends BaseViewModel with NavigationMixin {
   HomeViewModel() {
     getProfile();
     fetchPendingRequestsCount();
+    NotificationService.instance.fetchNotifications();
     NotificationService.instance.addListener(notifyListeners);
+    _syncFloatingOverlayCount();
   }
 
   @override
   void dispose() {
     NotificationService.instance.removeListener(notifyListeners);
     super.dispose();
+  }
+
+  void _syncFloatingOverlayCount() {
+    FloatingOverlayService.instance.updateBadgeCount(unreadNotificationsCount);
+    NotificationService.instance.addListener(() {
+      FloatingOverlayService.instance
+          .updateBadgeCount(unreadNotificationsCount);
+    });
   }
 
   int _pendingRequestsCount = 0;
