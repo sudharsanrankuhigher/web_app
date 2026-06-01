@@ -66,12 +66,14 @@ class CommonStatusChip extends StatelessWidget {
           imageColor == appSecond950 ||
           imageColor == appSecond900 ||
           imageColor == const Color(0xFF262626)) {
-        resolvedImageColor = Theme.of(context).colorScheme.onSurface.withOpacity(0.85);
+        resolvedImageColor =
+            Theme.of(context).colorScheme.onSurface.withOpacity(0.85);
       }
     }
 
     // 4. Resolve Shadow Color
-    final resolvedShadowColor = isDark ? Colors.black.withOpacity(0.3) : Colors.grey.withOpacity(0.2);
+    final resolvedShadowColor =
+        isDark ? Colors.black.withOpacity(0.3) : Colors.grey.withOpacity(0.2);
 
     return GestureDetector(
       onTap: onTap,

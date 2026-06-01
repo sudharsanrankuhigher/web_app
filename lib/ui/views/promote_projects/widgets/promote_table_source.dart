@@ -94,7 +94,7 @@ class PromoteTableSource extends DataTableSource {
         return [
           DataCell(Text('${index + 1}')),
           DataCell(Text(item.subId ?? "")),
-          DataCell(Text("${item.influencerName} / ${item.infId}")),
+          DataCell(Text("${item.influencerName} / ${item.influencerId}")),
           DataCell(Text(item.influencerPhone.toString() ?? "")),
           DataCell(Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -147,7 +147,7 @@ class PromoteTableSource extends DataTableSource {
         return [
           DataCell(Text('${index + 1}')),
           DataCell(Text(item.subId ?? "")),
-          DataCell(Text("${item.influencerName} / ${item.infId}")),
+          DataCell(Text("${item.influencerName} / ${item.influencerId}")),
           DataCell(Text(item.influencerPhone.toString() ?? "")),
           DataCell(Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -190,7 +190,7 @@ class PromoteTableSource extends DataTableSource {
         return [
           DataCell(Text('${index + 1}')),
           DataCell(Text(item.subId ?? "")),
-          DataCell(Text("${item.influencerName} / ${item.infId}")),
+          DataCell(Text("${item.influencerName} / ${item.influencerId}")),
           DataCell(Text(item.influencerPhone.toString() ?? "")),
           DataCell(Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -285,7 +285,7 @@ class PromoteTableSource extends DataTableSource {
       case PromoteStatus.adminVerified:
         return [
           DataCell(Text('${index + 1}')),
-          DataCell(Text(item.infId.toString() ?? "")),
+          DataCell(Text(item.influencerId.toString() ?? "")),
           DataCell(Text(item.influencerName ?? "")),
           DataCell(Text(
               DateFormatter.formatToDDMMMYYYY(item.createdAt.toString()) ??
@@ -419,22 +419,27 @@ class PromoteTableSource extends DataTableSource {
           DataCell(Text(item.amount.toString())),
           DataCell(
             PermissionHelper.instance.has('edit_promotion_projects')
-                ? (item.status == 7)
-                    ? ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: pendingColor,
-                          padding:
-                              defaultPadding4 + rightPadding4 + leftPadding4,
+                ? (item.status.toString() == "7")
+                    ? Padding(
+                        padding: defaultPadding4,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: pendingColor,
+                            padding:
+                                defaultPadding4 + rightPadding4 + leftPadding4,
+                          ),
+                          onPressed: () => onGotoPromoteCommission?.call(item),
+                          child: Center(
+                              child: Text(
+                            "promote Commission",
+                            style: fontFamilySemiBold.size12.white,
+                            textAlign: TextAlign.center,
+                          )),
                         ),
-                        onPressed: () => onGotoPromoteCommission?.call(item),
-                        child: Center(
-                            child: Text(
-                          "promote Commission",
-                          style: fontFamilySemiBold.size12.white,
-                          textAlign: TextAlign.center,
-                        )),
                       )
-                    : const Center(child: Text("Success"))
+                    : Center(
+                        child: Text(
+                            "Success / ${DateFormatter.formatToDDMMMYYYY(item.paymentAt.toString()) ?? "-"}"))
                 : const SizedBox(),
           ),
         ];
@@ -450,7 +455,7 @@ class PromoteTableSource extends DataTableSource {
               DateFormatter.formatToDDMMMYYYY(item.createdAt.toString()) ??
                   "")),
           DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(item.infCompleted.toString()) ??
+              DateFormatter.formatToDDMMMYYYY(item.paymentAt.toString()) ??
                   "")),
           DataCell(InkWell(
               onTap: () => showBankDetails?.call(item),
@@ -546,7 +551,7 @@ class PromoteTableSource extends DataTableSource {
           DataCell(Text('${index + 1}')),
           DataCell(Text(item.subId.toString() ?? "")),
           DataCell(Text(item.influencerName ?? "")),
-          DataCell(Text(item.infId.toString() ?? "")),
+          DataCell(Text(item.influencerId.toString() ?? "")),
           DataCell(Text(item.amount.toString())),
           DataCell(
               Text(item.refundStatus == 1 ? 'Refund Initiated' : 'Completed')),

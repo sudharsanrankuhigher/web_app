@@ -156,6 +156,11 @@ class RequestTableSource extends DataTableSource {
           DataCell(Text(m.projectId ?? "")),
           DataCell(Text(m.client!.name ?? "")),
           DataCell(Text(m.client!.mobileNumber ?? "")),
+          DataCell(
+            m.notes != null && m.notes!.isNotEmpty
+                ? Tooltip(message: m.notes!, child: Text(m.notes!))
+                : const Text("-"),
+          ),
           DataCell(Center(
               child: Center(
                   child: Text(
@@ -163,36 +168,40 @@ class RequestTableSource extends DataTableSource {
           DataCell(Text(DateFormatter.formatToDDMMMYYYY(
                   m.dates!.requestedAt.toString()) ??
               "")),
-          DataCell(Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              if (PermissionHelper.instance.has('edit_requests'))
-                CommonStatusChip(
-                  onTap: () => onReject(m),
-                  imageheight: 20,
-                  imagewidth: 20,
-                  margin: zeroPadding,
-                  text: 'Reject',
-                  imagePath: 'assets/images/rejected.svg',
-                  bgColor: red,
-                  imageColor: white,
-                  textStyle: fontFamilySemiBold.size10.white,
-                ),
-              horizontalSpacing10,
-              if (PermissionHelper.instance.has('edit_requests'))
-                CommonStatusChip(
-                  onTap: () => onProceed(m),
-                  imageheight: 20,
-                  imagewidth: 20,
-                  margin: zeroPadding,
-                  text: 'Proceed',
-                  imagePath: 'assets/images/complete-pending-list.svg',
-                  bgColor: greenShade1,
-                  imageColor: white,
-                  textStyle: fontFamilySemiBold.size10.white,
-                ),
-            ],
-          )),
+          DataCell(
+            PermissionHelper.instance.has('edit_requests')
+                ? Center(
+                    child: CommonStatusChip(
+                      onTap: () => onReject(m),
+                      imageheight: 20,
+                      imagewidth: 20,
+                      margin: zeroPadding,
+                      text: 'Reject',
+                      imagePath: 'assets/images/rejected.svg',
+                      bgColor: red,
+                      imageColor: white,
+                      textStyle: fontFamilySemiBold.size10.white,
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
+          DataCell(
+            PermissionHelper.instance.has('edit_requests')
+                ? Center(
+                    child: CommonStatusChip(
+                      onTap: () => onProceed(m),
+                      imageheight: 20,
+                      imagewidth: 20,
+                      margin: zeroPadding,
+                      text: 'Proceed',
+                      imagePath: 'assets/images/complete-pending-list.svg',
+                      bgColor: greenShade1,
+                      imageColor: white,
+                      textStyle: fontFamilySemiBold.size10.white,
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
         ];
 
       case "waiting_accept":
@@ -245,7 +254,7 @@ class RequestTableSource extends DataTableSource {
               onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
           DataCell(Text(m.client!.name ?? "")),
           DataCell(Text(m.client!.mobileNumber ?? "")),
-          DataCell(Text("${m.inf!.name ?? ""} / ${m.inf!.phone ?? ""}")),
+          DataCell(Text("${m.inf!.infId ?? ""} / ${m.inf!.phone ?? ""}")),
           DataCell(Text(DateFormatter.formatToDDMMMYYYY(
                   m.dates!.requestedAt.toString()) ??
               "")),
@@ -357,14 +366,7 @@ class RequestTableSource extends DataTableSource {
           DataCell(Center(
             child: PermissionHelper.instance.has('delete_requests')
                 ? CommonStatusChip(
-                    onTap: () => (m.promotion?.youtube != null &&
-                                m.promotion!.youtube!.isNotEmpty) ||
-                            (m.promotion?.instagram != null &&
-                                m.promotion!.instagram!.isNotEmpty) ||
-                            (m.promotion?.facebook != null &&
-                                m.promotion!.facebook!.isNotEmpty)
-                        ? null
-                        : infReject(m),
+                    onTap: () => infReject(m),
                     imageheight: 20,
                     imagewidth: 20,
                     margin: zeroPadding,
@@ -717,6 +719,7 @@ class RequestTableSource extends DataTableSource {
               onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
           DataCell(Text("${m.client!.name ?? ""} ")),
           DataCell(Text(m.client!.mobileNumber ?? "")),
+          DataCell(Text("${m.payment!.totalAmount ?? 0}")),
           DataCell(Text(
               m.payment!.amount != null ? m.payment!.amount.toString() : "")),
           DataCell(Text("${m.payment!.commission ?? 0}")),

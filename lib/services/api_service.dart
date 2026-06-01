@@ -44,11 +44,11 @@ class ApiService {
   static ApiService init() {
     final dio = Dio(
       BaseOptions(
-        baseUrl: 'https://admin.promoteapp.in/',
-        // baseUrl: 'http://172.20.25.23:8003/',saran
-        // baseUrl: 'http://172.20.25.55:3002/',shy
+        // baseUrl: 'https://admin.promoteapp.in/',
+        baseUrl: 'http://172.20.25.23:8003/', //saran
+        // baseUrl: 'http://172.20.25.55:8888/', //shy
         // baseUrl: 'http://172.20.25.23:8002/',
-        // baseUrl: 'http://172.20.25.54:8005/',deepak
+        // baseUrl: 'http://172.20.25.54:8005/',//deepak
         followRedirects: true,
         validateStatus: (status) => status != null && status < 500,
       ),

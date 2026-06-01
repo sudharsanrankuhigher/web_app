@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:http_parser/http_parser.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/app.locator.dart' show locator;
@@ -177,6 +178,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           "total_amount": request['total_amount'],
           "commission_percent": request['commission_percent'],
           "gst_amount": request['tax_amount'],
+          "valid_date": request['valid_date'],
         }
       ],
       "description": request["note"],
@@ -240,6 +242,9 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           );
           formData.fields.add(
             MapEntry("payment[$i][gst_amount]", item["gst_amount"].toString()),
+          );
+          formData.fields.add(
+            MapEntry("payment[$i][valid_date]", item["valid_date"]),
           );
         }
       }
@@ -367,6 +372,10 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     loadCompanies();
   }
 
+  String? _roleId;
+  String? get roleId => _roleId;
+  final _sharedPreferences = locator<SharedPreferences>();
+
   Future<void> loadProjects() async {
     setProjectLoading(true);
 
@@ -466,6 +475,11 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     DataColumn(label: Text("Project Title")),
     DataColumn(label: Text("Project Count")),
     DataColumn(label: Text("Note")),
+    DataColumn(label: Text("Valid Date")),
+    DataColumn(
+        label: Text("Total Amount"),
+        tooltip: "Total Amount",
+        headingRowAlignment: MainAxisAlignment.end),
     DataColumn(
         label: Text("Total promote pay"),
         tooltip: "Total promote pay",
@@ -487,7 +501,8 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     DataColumn(label: Text("Client Name")),
     DataColumn(label: Text("Project Title")),
     DataColumn(label: Text("Notes")),
-    DataColumn(label: Text("Project Count")),
+    DataColumn(label: Text("Valid date")),
+    DataColumn(label: Text("Total Amount")),
     DataColumn(label: Text("Total promotepay")),
     DataColumn(label: Text("Total commission")),
     DataColumn(label: Text("Payment")),
@@ -882,6 +897,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       }).toList();
 
       _totalSplitAmount = (res.totalAmount ?? "0").toString();
+      _roleId = (res.id.toString() ?? "0").toString();
 
       assignedInfluencerIds = dataLists
           .map((e) => int.tryParse(e["inf_id"].toString()) ?? 0)

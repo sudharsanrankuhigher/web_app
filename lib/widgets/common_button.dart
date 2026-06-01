@@ -40,10 +40,11 @@ class CommonButton extends StatelessWidget {
     // Resolve themed defaults if not custom specified
     final defaultBg = isDark ? const Color(0xFF1E293B) : backgroundColor;
     final resolvedBgColor = buttonColor ?? defaultBg;
-    
-    final resolvedBorderColor = borderColor ?? (isDark ? Colors.grey.withOpacity(0.2) : disableColor);
 
-    TextStyle resolvedTextStyle = textStyle ?? 
+    final resolvedBorderColor =
+        borderColor ?? (isDark ? Colors.grey.withOpacity(0.2) : disableColor);
+
+    TextStyle resolvedTextStyle = textStyle ??
         fontFamilyMedium.size14.black.copyWith(overflow: TextOverflow.ellipsis);
     if (isDark && textStyle == null) {
       resolvedTextStyle = fontFamilyMedium.size14.copyWith(

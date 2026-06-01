@@ -31,10 +31,10 @@ class AddEditBannerDialog {
     String? title;
     String? amount;
 
-    DateTime? startDate;
+    DateTime? startDate = DateTime.now();
     String? startDateString;
     bool? startDateError = false;
-    DateTime? endDate;
+    DateTime? endDate = DateTime.now().add(const Duration(days: 20));
     String? endDateString;
     bool? endDateError = false;
 

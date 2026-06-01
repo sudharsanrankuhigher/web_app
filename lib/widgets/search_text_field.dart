@@ -60,7 +60,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
         isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9);
     final hintColor =
         isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-    final focusColor = const Color(0xFF00BE93); // Beautiful brand green
+    const focusColor = Color(0xFF00BE93); // Beautiful brand green
 
     return TextField(
       controller: _controller,
@@ -107,7 +107,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: focusColor, width: 1.5),
+          borderSide: const BorderSide(color: focusColor, width: 1.5),
         ),
       ),
     );

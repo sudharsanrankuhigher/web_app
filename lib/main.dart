@@ -46,14 +46,17 @@ class MainApp extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12)),
                   ),
                   checkboxTheme: CheckboxThemeData(
-                    fillColor: WidgetStateProperty.resolveWith<Color?>((states) {
+                    fillColor:
+                        WidgetStateProperty.resolveWith<Color?>((states) {
                       if (states.contains(WidgetState.selected)) {
-                        return const Color(0xFF00BE93); // Sleek brand green when checked
+                        return const Color(
+                            0xFF00BE93); // Sleek brand green when checked
                       }
                       return null;
                     }),
                     checkColor: WidgetStateProperty.all(Colors.white),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4)),
                   ),
                 ),
                 darkTheme: ThemeData(
@@ -72,20 +75,25 @@ class MainApp extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12)),
                   ),
                   checkboxTheme: CheckboxThemeData(
-                    fillColor: WidgetStateProperty.resolveWith<Color?>((states) {
+                    fillColor:
+                        WidgetStateProperty.resolveWith<Color?>((states) {
                       if (states.contains(WidgetState.selected)) {
-                        return const Color(0xFF00BE93); // Sleek brand green when checked
+                        return const Color(
+                            0xFF00BE93); // Sleek brand green when checked
                       }
                       return null;
                     }),
                     side: WidgetStateBorderSide.resolveWith((states) {
                       if (!states.contains(WidgetState.selected)) {
-                        return const BorderSide(color: Colors.white54, width: 1.5); // high contrast border in dark mode
+                        return const BorderSide(
+                            color: Colors.white54,
+                            width: 1.5); // high contrast border in dark mode
                       }
                       return null;
                     }),
                     checkColor: WidgetStateProperty.all(Colors.white),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4)),
                   ),
                 ),
                 builder: (context, child) {

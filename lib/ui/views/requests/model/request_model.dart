@@ -44,6 +44,7 @@ class ProjectRequestModel {
 class Datum {
   int? id;
   String? projectId;
+  String? remark;
   Client? client;
   Inf? inf;
   Dates? dates;
@@ -52,12 +53,14 @@ class Datum {
   int? status;
   int? refundStatus;
   String? category;
+  String? notes;
   DateTime? createdAt;
   DateTime? updatedAt;
 
   Datum({
     this.id,
     this.projectId,
+    this.remark,
     this.client,
     this.inf,
     this.dates,
@@ -66,6 +69,7 @@ class Datum {
     this.status,
     this.refundStatus,
     this.category,
+    this.notes,
     this.createdAt,
     this.updatedAt,
   });
@@ -73,6 +77,7 @@ class Datum {
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         id: json["id"],
         projectId: json["project_id"],
+        remark: json["remark"]?.toString(),
         client: json["client"] == null ? null : Client.fromJson(json["client"]),
         inf: json["inf"] == null ? null : Inf.fromJson(json["inf"]),
         dates: json["dates"] == null ? null : Dates.fromJson(json["dates"]),
@@ -83,6 +88,7 @@ class Datum {
             ? int.tryParse(json["status"].toString())
             : null,
         category: json["category_id"],
+        notes: json["remark"],
         refundStatus: json["refund_status"] != null
             ? int.tryParse(json["refund_status"].toString())
             : null,
@@ -97,6 +103,7 @@ class Datum {
   Map<String, dynamic> toJson() => {
         "id": id,
         "project_id": projectId,
+        "remark": remark,
         "client": client?.toJson(),
         "inf": inf?.toJson(),
         "dates": dates?.toJson(),
@@ -105,6 +112,7 @@ class Datum {
         "status": status,
         "refund_status": refundStatus,
         "category_id": category,
+        "notes": remark,
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
       };
@@ -272,6 +280,7 @@ class Inf {
 
 class Payment {
   int? amount;
+  int? totalAmount;
   String? status;
   String? note;
   DateTime? paidDate;
@@ -285,6 +294,7 @@ class Payment {
     this.paidDate,
     this.commission,
     this.bankDetails,
+    this.totalAmount,
   });
 
   factory Payment.fromJson(Map<String, dynamic> json) => Payment(
@@ -298,6 +308,9 @@ class Payment {
             ? null
             : int.tryParse(json["commission"].toString()),
         bankDetails: json["bank_details"]?.toString(),
+        totalAmount: json["total_amount"] == null
+            ? null
+            : int.tryParse(json["total_amount"].toString()),
       );
 
   Map<String, dynamic> toJson() => {
@@ -307,6 +320,7 @@ class Payment {
         "commission": commission,
         "bank_details": bankDetails,
         "note": note,
+        "total_amount": totalAmount,
       };
 }
 

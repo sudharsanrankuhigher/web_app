@@ -10,11 +10,13 @@ class PaymentSplitModel {
   int? status;
   List<Datum>? data;
   String? totalAmount; // numeric is better
+  int? id;
 
   PaymentSplitModel({
     this.status,
     this.data,
     this.totalAmount,
+    this.id,
   });
 
   factory PaymentSplitModel.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,7 @@ class PaymentSplitModel {
           : List<Datum>.from(
               (json["data"] as List).map((x) => Datum.fromJson(x))),
       totalAmount: json["total_amount"]?.toString(), // 🔥 FIX
+      id: _toInt(json["id"]),
     );
   }
 
@@ -34,6 +37,7 @@ class PaymentSplitModel {
             ? []
             : List<dynamic>.from(data!.map((x) => x.toJson())),
         "total_amount": totalAmount,
+        "id": id,
       };
 }
 

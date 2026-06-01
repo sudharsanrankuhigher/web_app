@@ -103,38 +103,41 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
 
     gender = inf?.gender?.capitalizeFirst() ?? "";
 
-    nameController = TextEditingController(text: inf?.name ?? '');
-    emailController = TextEditingController(text: inf?.email ?? '');
-    phoneController = TextEditingController(text: inf?.phone ?? '');
-    dobController = TextEditingController(text: inf?.dob.toString() ?? '');
-    altPhoneController = TextEditingController(text: inf?.altPhone ?? '');
-    idController = TextEditingController(text: inf?.infId.toString() ?? '');
-    stateController = TextEditingController(text: inf?.state ?? '');
+    nameController = TextEditingController(text: _safeString(inf?.name));
+    emailController = TextEditingController(text: _safeString(inf?.email));
+    phoneController = TextEditingController(text: _safeString(inf?.phone));
+    dobController = TextEditingController(text: _safeString(inf?.dob));
+    altPhoneController =
+        TextEditingController(text: _safeString(inf?.altPhone));
+    idController = TextEditingController(text: _safeString(inf?.infId));
+    stateController = TextEditingController(text: _safeString(inf?.state));
     passwordController = TextEditingController(text: '');
-    serviceController =
-        TextEditingController(text: inf?.service.toString() ?? '');
-    cityController = TextEditingController(text: inf?.city ?? '');
+    serviceController = TextEditingController(text: _safeString(inf?.service));
+    cityController = TextEditingController(text: _safeString(inf?.city));
     instagramLinkController =
-        TextEditingController(text: inf?.instagramLink ?? '');
+        TextEditingController(text: _safeString(inf?.instagramLink));
     instagramFollowersController =
-        TextEditingController(text: inf?.instagramFollowers.toString() ?? '');
+        TextEditingController(text: _safeString(inf?.instagramFollowers));
     instagramDescController = facebookLinkController =
-        TextEditingController(text: inf?.facebookLink ?? '');
+        TextEditingController(text: _safeString(inf?.facebookLink));
     facebookFollowersController =
-        TextEditingController(text: inf?.facebookFollowers.toString() ?? '');
-    youtubeLinkController = TextEditingController(text: inf?.youtubeLink ?? '');
+        TextEditingController(text: _safeString(inf?.facebookFollowers));
+    youtubeLinkController =
+        TextEditingController(text: _safeString(inf?.youtubeLink));
     youtubeFollowersController =
-        TextEditingController(text: inf?.youtubeFollowers.toString() ?? '');
-    bankAccountController = TextEditingController(text: inf?.accountNo ?? '');
+        TextEditingController(text: _safeString(inf?.youtubeFollowers));
+    bankAccountController =
+        TextEditingController(text: _safeString(inf?.accountNo));
     bankHolderController =
-        TextEditingController(text: inf?.accountHolderName ?? '');
-    ifscController = TextEditingController(text: inf?.ifscCode ?? '');
-    upiController = TextEditingController(text: inf?.upiId ?? '');
+        TextEditingController(text: _safeString(inf?.accountHolderName));
+    ifscController = TextEditingController(text: _safeString(inf?.ifscCode));
+    upiController = TextEditingController(text: _safeString(inf?.upiId));
     instagramNameController =
-        TextEditingController(text: inf?.instagramName ?? '');
-    youtubeNameController = TextEditingController(text: inf?.youtubeName ?? '');
+        TextEditingController(text: _safeString(inf?.instagramName));
+    youtubeNameController =
+        TextEditingController(text: _safeString(inf?.youtubeName));
     facebookNameController =
-        TextEditingController(text: inf?.facebookName ?? '');
+        TextEditingController(text: _safeString(inf?.facebookName));
     descriptionController = TextEditingController();
     isCategoryError = false;
 
@@ -173,10 +176,17 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
     }
 
     dob = inf?.dob;
-    dobString = inf?.dob.toString();
+    dobString = _safeString(inf?.dob);
     dobError = false;
 
     _isView = widget.isView;
+  }
+
+  String _safeString(dynamic value) {
+    if (value == null) return '';
+    final str = value.toString().trim();
+    if (str == 'null' || str == 'NULL' || str == '0') return '';
+    return str;
   }
 
   @override

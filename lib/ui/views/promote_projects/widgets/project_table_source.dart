@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:webapp/core/helper/date_helper.dart';
 import 'package:webapp/ui/views/promote_projects/model/promote_project_model.dart'
     as project_model;
 import 'package:webapp/ui/views/promote_projects/promote_projects_viewmodel.dart';
@@ -25,20 +26,15 @@ class PromoteProjectsTableSource extends DataTableSource {
   @override
   DataRow? getRow(int index) {
     if (data.isEmpty) {
+      final columnsCount = vm.isInprogress ? 12 : 11;
       return DataRow.byIndex(
         index: index,
-        cells: const [
-          DataCell.empty,
-          DataCell.empty,
-          DataCell.empty,
-          DataCell.empty,
-          DataCell(Text('No data available')),
-          DataCell.empty,
-          DataCell.empty,
-          DataCell.empty,
-          DataCell.empty,
-          DataCell.empty,
-        ],
+        cells: List<DataCell>.generate(
+          columnsCount,
+          (i) => i == (columnsCount ~/ 2)
+              ? const DataCell(Text('No data available'))
+              : DataCell.empty,
+        ),
       );
     }
     final item = data[index];
@@ -93,6 +89,11 @@ class PromoteProjectsTableSource extends DataTableSource {
             message: item.description ?? '',
             child: Text(item.description ?? '')),
       ),
+      DataCell(Text(
+          DateFormatter.formatToDDMMMYYYY(item.payment?.validDate ?? '-'))),
+      DataCell(Container(
+          alignment: Alignment.centerRight,
+          child: Text('₹${pay?.totalAmount ?? 0}'))),
       DataCell(Container(
           alignment: Alignment.centerRight,
           child: Text('₹${pay?.payment ?? 0}'))),
@@ -131,7 +132,11 @@ class PromoteProjectsTableSource extends DataTableSource {
       DataCell(Text(item.companyName ?? '')),
       DataCell(Text(item.projectName ?? '')),
       DataCell(Text(item.description ?? '')),
-      const DataCell(Text('10')),
+      DataCell(Text(
+          DateFormatter.formatToDDMMMYYYY(item.payment?.validDate ?? '-'))),
+      DataCell(Container(
+          alignment: Alignment.centerRight,
+          child: Text('₹${pay?.totalAmount ?? 0}'))),
       DataCell(Text('₹${pay?.payment ?? "0"}')),
       DataCell(Text('₹${pay?.commission ?? "0"}')),
       const DataCell(Text('Paid')),

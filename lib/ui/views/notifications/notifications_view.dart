@@ -25,15 +25,16 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
     final bool isExtended = MediaQuery.of(context).size.width > 900;
 
     // Fallback: If permissions is not empty, respect canView('notifications'), otherwise allow in debug/development.
-    final bool hasAccess = PermissionHelper.instance.canView('permissions') ||
-        PermissionHelper.instance.userPermissions.isEmpty;
+    final bool hasAccess =
+        PermissionHelper.instance.canView('send_notifications ') ||
+            PermissionHelper.instance.userPermissions.isEmpty;
 
-    if (!hasAccess) {
-      return Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: const NoAccessWidget(),
-      );
-    }
+    // if (!hasAccess) {
+    //   return Scaffold(
+    //     backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+    //     body: const NoAccessWidget(),
+    //   );
+    // }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -124,13 +125,14 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                       label: 'Inbox',
                     ),
                     horizontalSpacing16,
-                    _buildSectionTab(
-                      context,
-                      viewModel,
-                      sectionValue: 'send',
-                      icon: Icons.send_rounded,
-                      label: 'Send Broadcast',
-                    ),
+                    if (hasAccess)
+                      _buildSectionTab(
+                        context,
+                        viewModel,
+                        sectionValue: 'send',
+                        icon: Icons.send_rounded,
+                        label: 'Send Broadcast',
+                      ),
                   ],
                 ),
               ],
@@ -138,105 +140,119 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
           ),
 
           // ─── Main Content Toggled Views ───
-          if (viewModel.activeSection == 'inbox') ...[
-            // ─── Sub Header / Stats Panel ───
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-              child: Row(
-                children: [
-                  _buildStatChip(
-                    context,
-                    title: 'Total',
-                    count: viewModel.notifications.length,
-                    color: continueButton,
-                    icon: Icons.notifications_none_rounded,
-                  ),
-                  horizontalSpacing12,
-                  _buildStatChip(
-                    context,
-                    title: 'Unread',
-                    count: viewModel.unreadCount,
-                    color: red,
-                    icon: Icons.mark_chat_unread_outlined,
-                    isActive: viewModel.unreadCount > 0,
-                  ),
-                ],
-              ),
-            ),
-
-            // ─── Filter Tabs Section ───
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Container(
-                height: 48,
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF1E293B)
-                      : const Color(0xFFF3F4F6),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
+          Expanded(
+            child: IndexedStack(
+              index: viewModel.activeSection == 'inbox' ? 0 : 1,
+              children: [
+                // Section 0: Inbox View
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildTabButton(viewModel, 'all', 'All Notifications'),
-                    _buildTabButton(
-                      viewModel,
-                      'unread',
-                      'Unread (${viewModel.unreadCount})',
+                    // Sub Header / Stats Panel
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 24.w, vertical: 16.h),
+                      child: Row(
+                        children: [
+                          _buildStatChip(
+                            context,
+                            title: 'Total',
+                            count: viewModel.notifications.length,
+                            color: continueButton,
+                            icon: Icons.notifications_none_rounded,
+                          ),
+                          horizontalSpacing12,
+                          _buildStatChip(
+                            context,
+                            title: 'Unread',
+                            count: viewModel.unreadCount,
+                            color: red,
+                            icon: Icons.mark_chat_unread_outlined,
+                            isActive: viewModel.unreadCount > 0,
+                          ),
+                        ],
+                      ),
                     ),
-                    _buildTabButton(viewModel, 'read', 'Read'),
+
+                    // Filter Tabs Section
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24.w),
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF1E293B)
+                              : const Color(0xFFF3F4F6),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            _buildTabButton(
+                                viewModel, 'all', 'All Notifications'),
+                            _buildTabButton(
+                              viewModel,
+                              'unread',
+                              'Unread (${viewModel.unreadCount})',
+                            ),
+                            _buildTabButton(viewModel, 'read', 'Read'),
+                          ],
+                        ),
+                      ),
+                    ),
+                    verticalSpacing12,
+                    // Notifications List
+                    Expanded(
+                      child: viewModel.filteredNotifications.isEmpty
+                          ? _buildEmptyState(context, viewModel.currentFilter)
+                          : ListView.builder(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 24.w, vertical: 8.h),
+                              itemCount: viewModel.filteredNotifications.length,
+                              itemBuilder: (context, index) {
+                                final item =
+                                    viewModel.filteredNotifications[index];
+                                // Smooth slide-in staggering effect using TweenAnimationBuilder
+                                return TweenAnimationBuilder<double>(
+                                  tween: Tween(begin: 0.0, end: 1.0),
+                                  duration: Duration(
+                                      milliseconds: 300 + (index * 50)),
+                                  curve: Curves.easeOutCubic,
+                                  builder: (context, value, child) {
+                                    return Opacity(
+                                      opacity: value,
+                                      child: Transform.translate(
+                                        offset: Offset(0, 30 * (1.0 - value)),
+                                        child: Padding(
+                                          padding:
+                                              EdgeInsets.only(bottom: 12.h),
+                                          child: NotificationCard(
+                                            item: item,
+                                            index: index,
+                                            onTap: () {
+                                              viewModel.markAsRead(item.id);
+                                              _showNotificationDetails(
+                                                  context, item);
+                                            },
+                                            onToggleRead: () => viewModel
+                                                .toggleReadState(item.id),
+                                            onDelete: () => viewModel
+                                                .deleteNotification(item.id),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                    ),
                   ],
                 ),
-              ),
+                // Section 1: Compose Form View
+                _buildBroadcastForm(context, viewModel),
+              ],
             ),
-
-            verticalSpacing12,
-
-            // ─── Notifications List ───
-            Expanded(
-              child: viewModel.filteredNotifications.isEmpty
-                  ? _buildEmptyState(context, viewModel.currentFilter)
-                  : ListView.builder(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
-                      itemCount: viewModel.filteredNotifications.length,
-                      itemBuilder: (context, index) {
-                        final item = viewModel.filteredNotifications[index];
-                        // Smooth slide-in staggering effect using TweenAnimationBuilder
-                        return TweenAnimationBuilder<double>(
-                          tween: Tween(begin: 0.0, end: 1.0),
-                          duration: Duration(milliseconds: 300 + (index * 50)),
-                          curve: Curves.easeOutCubic,
-                          builder: (context, value, child) {
-                            return Opacity(
-                              opacity: value,
-                              child: Transform.translate(
-                                offset: Offset(0, 30 * (1.0 - value)),
-                                child: Padding(
-                                  padding: EdgeInsets.only(bottom: 12.h),
-                                  child: NotificationCard(
-                                    item: item,
-                                    index: index,
-                                    onTap: () {
-                                      viewModel.markAsRead(item.id);
-                                      _showNotificationDetails(context, item);
-                                    },
-                                    onToggleRead: () =>
-                                        viewModel.toggleReadState(item.id),
-                                    onDelete: () =>
-                                        viewModel.deleteNotification(item.id),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
-            ),
-          ] else ...[
-            // ─── Compose Manual Broadcast Form Section ───
-            _buildBroadcastForm(context, viewModel),
-          ],
+          ),
         ],
       ),
     );
@@ -300,344 +316,396 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final formKey = GlobalKey<FormState>();
-    return Expanded(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: Card(
-              color: Theme.of(context).colorScheme.surface,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              elevation: 0,
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Compose Manual Broadcast',
-                        style: fontFamilyBold.size18.black,
-                      ),
-                      verticalSpacing4,
-                      Text(
-                        'Dispatch a system notification dynamically to a targeted user group.',
-                        style: fontFamilyMedium.size12.greyColor,
-                      ),
-                      const SizedBox(height: 24),
-                      // Title Field
-                      Text(
-                        'Broadcast Title',
-                        style: fontFamilySemiBold.size13.black,
-                      ),
-                      verticalSpacing8,
-                      InitialTextForm(
-                        key: const ValueKey('title_field'),
-                        radius: 12,
-                        hintText: 'Enter a concise notification title...',
-                        controller: viewModel.titleController,
-                        validator: (v) => v == null || v.trim().isEmpty
-                            ? 'Title is required'
-                            : null,
-                      ),
-                      const SizedBox(height: 20),
-                      // Message Field
-                      Text(
-                        'Detailed Message',
-                        style: fontFamilySemiBold.size13.black,
-                      ),
-                      verticalSpacing8,
-                      InitialTextForm(
-                        key: const ValueKey('message_field'),
-                        radius: 12,
-                        maxLines: 4,
-                        hintText:
-                            'Write the complete announcement content here...',
-                        controller: viewModel.messageController,
-                        validator: (v) => v == null || v.trim().isEmpty
-                            ? 'Message content is required'
-                            : null,
-                      ),
-                      const SizedBox(height: 20),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Card(
+            color: Theme.of(context).colorScheme.surface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 0,
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Compose Manual Broadcast',
+                      style: fontFamilyBold.size18.black,
+                    ),
+                    verticalSpacing4,
+                    Text(
+                      'Dispatch a system notification dynamically to a targeted user group.',
+                      style: fontFamilyMedium.size12.greyColor,
+                    ),
+                    const SizedBox(height: 24),
+                    // Title Field
+                    Text(
+                      'Broadcast Title',
+                      style: fontFamilySemiBold.size13.black,
+                    ),
+                    verticalSpacing8,
+                    InitialTextForm(
+                      key: const ValueKey('title_field'),
+                      radius: 12,
+                      hintText: 'Enter a concise notification title...',
+                      controller: viewModel.titleController,
+                      validator: (v) => v == null || v.trim().isEmpty
+                          ? 'Title is required'
+                          : null,
+                    ),
+                    const SizedBox(height: 20),
+                    // Message Field
+                    Text(
+                      'Detailed Message',
+                      style: fontFamilySemiBold.size13.black,
+                    ),
+                    verticalSpacing8,
+                    InitialTextForm(
+                      key: const ValueKey('message_field'),
+                      radius: 12,
+                      maxLines: 4,
+                      hintText:
+                          'Write the complete announcement content here...',
+                      controller: viewModel.messageController,
+                      validator: (v) => v == null || v.trim().isEmpty
+                          ? 'Message content is required'
+                          : null,
+                    ),
+                    const SizedBox(height: 20),
 
-                      // Category Selector
+                    // Category Selector
+                    Text(
+                      'Notification Category',
+                      style: fontFamilySemiBold.size13.black,
+                    ),
+                    verticalSpacing8,
+                    _buildCategorySelector(viewModel),
+                    const SizedBox(height: 20),
+
+                    // Target Audience Selector
+                    Text(
+                      'Target Audience Group',
+                      style: fontFamilySemiBold.size13.black,
+                    ),
+                    verticalSpacing8,
+                    _buildAudienceSelector(viewModel),
+                    const SizedBox(height: 20),
+
+                    // Broadcast Option Selector
+                    Text(
+                      'Broadcast Option',
+                      style: fontFamilySemiBold.size13.black,
+                    ),
+                    verticalSpacing8,
+                    _buildBroadcastTypeSelector(viewModel),
+                    const SizedBox(height: 20),
+
+                    // If Separately selected, show custom selector
+                    if (viewModel.broadcastType == 'separately') ...[
                       Text(
-                        'Notification Category',
+                        'Select Recipients (${viewModel.formTargetAudience})',
                         style: fontFamilySemiBold.size13.black,
                       ),
                       verticalSpacing8,
-                      _buildCategorySelector(viewModel),
-                      const SizedBox(height: 20),
-
-                      // Target Audience Selector
-                      Text(
-                        'Target Audience Group',
-                        style: fontFamilySemiBold.size13.black,
-                      ),
-                      verticalSpacing8,
-                      _buildAudienceSelector(viewModel),
-                      const SizedBox(height: 20),
-
-                      // Scheduling Header Card & Toggle
-                      Container(
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF0F172A)
-                              : const Color(0xFFF9FAFB),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isDark
-                                ? const Color(0xFF334155)
-                                : const Color(0xFFE5E7EB),
+                      if (viewModel.isLoadingTargetOptions)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20.0),
+                          child: Center(
+                            child: CircularProgressIndicator(),
                           ),
+                        )
+                      else
+                        _buildCustomRecipientSelector(context, viewModel),
+                      const SizedBox(height: 20),
+                    ],
+
+                    // Scheduling Header Card & Toggle
+                    Container(
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF0F172A)
+                            : const Color(0xFFF9FAFB),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isDark
+                              ? const Color(0xFF334155)
+                              : const Color(0xFFE5E7EB),
                         ),
-                        child: Column(
-                          children: [
-                            SwitchListTile.adaptive(
-                              title: Row(
-                                children: [
-                                  Icon(
-                                    Icons.calendar_month_rounded,
-                                    size: 20,
+                      ),
+                      child: Column(
+                        children: [
+                          SwitchListTile.adaptive(
+                            title: Row(
+                              children: [
+                                Icon(
+                                  Icons.calendar_month_rounded,
+                                  size: 20,
+                                  color: viewModel.isScheduled
+                                      ? continueButton
+                                      : Colors.grey[600],
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  'Schedule for Later',
+                                  style: fontFamilyBold.size13.copyWith(
                                     color: viewModel.isScheduled
                                         ? continueButton
-                                        : Colors.grey[600],
+                                        : (isDark
+                                            ? Colors.grey[400]
+                                            : Colors.grey[800]),
                                   ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    'Schedule for Later',
-                                    style: fontFamilyBold.size13.copyWith(
-                                      color: viewModel.isScheduled
-                                          ? continueButton
-                                          : (isDark
-                                              ? Colors.grey[400]
-                                              : Colors.grey[800]),
+                                ),
+                              ],
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(left: 30.0),
+                              child: Text(
+                                'Set an optional custom date & time to dispatch',
+                                style: fontFamilyMedium.size11.greyColor,
+                              ),
+                            ),
+                            value: viewModel.isScheduled,
+                            activeColor: continueButton,
+                            onChanged: viewModel.toggleScheduled,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 4),
+                          ),
+                          if (viewModel.isScheduled) ...[
+                            Divider(
+                                height: 1,
+                                color: isDark
+                                    ? const Color(0xFF334155)
+                                    : const Color(0xFFE5E7EB)),
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Row(
+                                children: [
+                                  // Date Picker Button
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () =>
+                                          viewModel.selectDate(context),
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12, horizontal: 14),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: viewModel.scheduledDate !=
+                                                    null
+                                                ? continueButton.withValues(
+                                                    alpha: 0.5)
+                                                : (isDark
+                                                    ? const Color(0xFF475569)
+                                                    : const Color(0xFFD1D5DB)),
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: isDark
+                                              ? const Color(0xFF1E293B)
+                                              : white,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.date_range_rounded,
+                                              size: 16,
+                                              color: viewModel.scheduledDate !=
+                                                      null
+                                                  ? continueButton
+                                                  : Colors.grey[600],
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Text(
+                                                viewModel.scheduledDate != null
+                                                    ? "${viewModel.scheduledDate!.day}/${viewModel.scheduledDate!.month}/${viewModel.scheduledDate!.year}"
+                                                    : "Select Date",
+                                                style: fontFamilyMedium.size12
+                                                    .copyWith(
+                                                  color:
+                                                      viewModel.scheduledDate !=
+                                                              null
+                                                          ? (isDark
+                                                              ? Colors.white
+                                                              : Colors.black87)
+                                                          : Colors.grey[500],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  // Time Picker Button
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () =>
+                                          viewModel.selectTime(context),
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12, horizontal: 14),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: viewModel.scheduledTime !=
+                                                    null
+                                                ? continueButton.withValues(
+                                                    alpha: 0.5)
+                                                : (isDark
+                                                    ? const Color(0xFF475569)
+                                                    : const Color(0xFFD1D5DB)),
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: isDark
+                                              ? const Color(0xFF1E293B)
+                                              : white,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.access_time_rounded,
+                                              size: 16,
+                                              color: viewModel.scheduledTime !=
+                                                      null
+                                                  ? continueButton
+                                                  : Colors.grey[600],
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Text(
+                                                viewModel.scheduledTime != null
+                                                    ? viewModel.scheduledTime!
+                                                        .format(context)
+                                                    : "Select Time",
+                                                style: fontFamilyMedium.size12
+                                                    .copyWith(
+                                                  color:
+                                                      viewModel.scheduledTime !=
+                                                              null
+                                                          ? (isDark
+                                                              ? Colors.white
+                                                              : Colors.black87)
+                                                          : Colors.grey[500],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                              subtitle: Padding(
-                                padding: const EdgeInsets.only(left: 30.0),
-                                child: Text(
-                                  'Set an optional custom date & time to dispatch',
-                                  style: fontFamilyMedium.size11.greyColor,
-                                ),
-                              ),
-                              value: viewModel.isScheduled,
-                              activeColor: continueButton,
-                              onChanged: viewModel.toggleScheduled,
-                              contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 4),
                             ),
-                            if (viewModel.isScheduled) ...[
-                              Divider(
-                                  height: 1,
-                                  color: isDark
-                                      ? const Color(0xFF334155)
-                                      : const Color(0xFFE5E7EB)),
-                              Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Row(
-                                  children: [
-                                    // Date Picker Button
-                                    Expanded(
-                                      child: InkWell(
-                                        onTap: () =>
-                                            viewModel.selectDate(context),
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 12, horizontal: 14),
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: viewModel.scheduledDate !=
-                                                      null
-                                                  ? continueButton.withValues(
-                                                      alpha: 0.5)
-                                                  : (isDark
-                                                      ? const Color(0xFF475569)
-                                                      : const Color(
-                                                          0xFFD1D5DB)),
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: isDark
-                                                ? const Color(0xFF1E293B)
-                                                : white,
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                Icons.date_range_rounded,
-                                                size: 16,
-                                                color:
-                                                    viewModel.scheduledDate !=
-                                                            null
-                                                        ? continueButton
-                                                        : Colors.grey[600],
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Expanded(
-                                                child: Text(
-                                                  viewModel.scheduledDate !=
-                                                          null
-                                                      ? "${viewModel.scheduledDate!.day}/${viewModel.scheduledDate!.month}/${viewModel.scheduledDate!.year}"
-                                                      : "Select Date",
-                                                  style: fontFamilyMedium.size12
-                                                      .copyWith(
-                                                    color: viewModel
-                                                                .scheduledDate !=
-                                                            null
-                                                        ? (isDark
-                                                            ? Colors.white
-                                                            : Colors.black87)
-                                                        : Colors.grey[500],
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    // Time Picker Button
-                                    Expanded(
-                                      child: InkWell(
-                                        onTap: () =>
-                                            viewModel.selectTime(context),
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 12, horizontal: 14),
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: viewModel.scheduledTime !=
-                                                      null
-                                                  ? continueButton.withValues(
-                                                      alpha: 0.5)
-                                                  : (isDark
-                                                      ? const Color(0xFF475569)
-                                                      : const Color(
-                                                          0xFFD1D5DB)),
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: isDark
-                                                ? const Color(0xFF1E293B)
-                                                : white,
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                Icons.access_time_rounded,
-                                                size: 16,
-                                                color:
-                                                    viewModel.scheduledTime !=
-                                                            null
-                                                        ? continueButton
-                                                        : Colors.grey[600],
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Expanded(
-                                                child: Text(
-                                                  viewModel.scheduledTime !=
-                                                          null
-                                                      ? viewModel.scheduledTime!
-                                                          .format(context)
-                                                      : "Select Time",
-                                                  style: fontFamilyMedium.size12
-                                                      .copyWith(
-                                                    color: viewModel
-                                                                .scheduledTime !=
-                                                            null
-                                                        ? (isDark
-                                                            ? Colors.white
-                                                            : Colors.black87)
-                                                        : Colors.grey[500],
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
                           ],
-                        ),
+                        ],
                       ),
-                      const SizedBox(height: 32),
+                    ),
+                    const SizedBox(height: 32),
 
-                      // Action Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            if (formKey.currentState!.validate()) {
-                              formKey.currentState!.save();
+                    // Action Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          if (formKey.currentState!.validate()) {
+                            formKey.currentState!.save();
 
-                              if (viewModel.isScheduled &&
-                                  (viewModel.scheduledDate == null ||
-                                      viewModel.scheduledTime == null)) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.error_outline_rounded,
-                                          color: Colors.white,
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Text(
-                                          'Please select both date and time to schedule.',
-                                          style:
-                                              fontFamilySemiBold.size13.white,
-                                        ),
-                                      ],
-                                    ),
-                                    backgroundColor: red,
-                                    behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    margin: const EdgeInsets.all(24),
+                            if (viewModel.broadcastType == 'separately' &&
+                                viewModel.selectedTargets.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.error_outline_rounded,
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        'Please select at least one recipient.',
+                                        style: fontFamilySemiBold.size13.white,
+                                      ),
+                                    ],
                                   ),
-                                );
-                                return;
-                              }
-
-                              final requestPayload =
-                                  viewModel.lastGeneratedRequestBody;
-                              viewModel.sendBroadcast();
-                              _showRequestBodyDialog(context, requestPayload);
+                                  backgroundColor: red,
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  margin: const EdgeInsets.all(24),
+                                ),
+                              );
+                              return;
                             }
-                          },
-                          icon: const Icon(Icons.send_rounded, size: 18),
-                          label: Text(
-                            'Dispatch Broadcast Alert',
-                            style: fontFamilySemiBold.size14.white,
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: continueButton,
-                            foregroundColor: white,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+
+                            if (viewModel.isScheduled &&
+                                (viewModel.scheduledDate == null ||
+                                    viewModel.scheduledTime == null)) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.error_outline_rounded,
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        'Please select both date and time to schedule.',
+                                        style: fontFamilySemiBold.size13.white,
+                                      ),
+                                    ],
+                                  ),
+                                  backgroundColor: red,
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  margin: const EdgeInsets.all(24),
+                                ),
+                              );
+                              return;
+                            }
+
+                            final requestPayload =
+                                viewModel.lastGeneratedRequestBody;
+                            _showRequestBodyDialog(
+                              context,
+                              requestPayload,
+                              onAcknowledge: () {
+                                viewModel.sendBroadcast();
+                              },
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.send_rounded, size: 18),
+                        label: Text(
+                          'Dispatch Broadcast Alert',
+                          style: fontFamilySemiBold.size14.white,
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: continueButton,
+                          foregroundColor: white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -779,6 +847,305 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
           ),
         );
       }).toList(),
+    );
+  }
+
+  Widget _buildBroadcastTypeSelector(NotificationsViewModel viewModel) {
+    final types = [
+      {
+        'value': 'all',
+        'label': 'All Recipients',
+        'icon': Icons.all_inclusive_rounded
+      },
+      {
+        'value': 'separately',
+        'label': 'Select Separately',
+        'icon': Icons.checklist_rtl_rounded
+      },
+    ];
+
+    return Row(
+      children: types.map((type) {
+        final bool isSelected = viewModel.broadcastType == type['value'];
+        return Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: GestureDetector(
+              onTap: () {
+                viewModel.setBroadcastType(type['value'] as String);
+                viewModel.clearSelectedTargets();
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? continueButton.withValues(alpha: 0.08)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isSelected ? continueButton : Colors.grey[300]!,
+                    width: isSelected ? 1.5 : 1.0,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      type['icon'] as IconData,
+                      color: isSelected ? continueButton : Colors.grey[500],
+                      size: 16,
+                    ),
+                    horizontalSpacing8,
+                    Text(
+                      type['label'] as String,
+                      style: isSelected
+                          ? fontFamilyBold.size12
+                              .copyWith(color: continueButton)
+                          : fontFamilyMedium.size12
+                              .copyWith(color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildCustomRecipientSelector(
+    BuildContext context,
+    NotificationsViewModel viewModel,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final selectedCount = viewModel.selectedTargets.length;
+
+    return InkWell(
+      onTap: () => _showRecipientSelectionDialog(context, viewModel),
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E293B) : backgroundColor,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isDark ? Colors.grey[700]! : disableColor,
+          ),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: selectedCount == 0
+                  ? Text(
+                      'Tap to select ${viewModel.formTargetAudience}...',
+                      style: fontFamilyMedium.size12.greyColor,
+                    )
+                  : Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      children: viewModel.selectedTargets.take(3).map((item) {
+                        return Chip(
+                          label: Text(
+                            item['name'] ?? '',
+                            style: fontFamilyMedium.size11.black,
+                          ),
+                          visualDensity: VisualDensity.compact,
+                          backgroundColor:
+                              continueButton.withValues(alpha: 0.1),
+                          onDeleted: () {
+                            viewModel.toggleTargetSelection(item);
+                          },
+                        );
+                      }).toList(),
+                    ),
+            ),
+            if (selectedCount > 3) ...[
+              const SizedBox(width: 6),
+              Text(
+                '+${selectedCount - 3} more',
+                style: fontFamilyBold.size11.copyWith(color: continueButton),
+              ),
+            ],
+            const SizedBox(width: 8),
+            Icon(
+              Icons.arrow_drop_down_rounded,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showRecipientSelectionDialog(
+    BuildContext context,
+    NotificationsViewModel viewModel,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+            final searchController = TextEditingController();
+            List<dynamic> filteredOptions = viewModel.targetOptions;
+
+            void filterSearch(String query) {
+              setState(() {
+                filteredOptions = viewModel.targetOptions
+                    .where((option) => option['name']
+                        .toString()
+                        .toLowerCase()
+                        .contains(query.toLowerCase()))
+                    .toList();
+              });
+            }
+
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: ConstrainedBox(
+                constraints:
+                    const BoxConstraints(maxWidth: 500, maxHeight: 600),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Select ${viewModel.formTargetAudience}',
+                        style: fontFamilyBold.size16.black,
+                      ),
+                      verticalSpacing12,
+                      // Search Bar
+                      TextField(
+                        controller: searchController,
+                        onChanged: filterSearch,
+                        decoration: InputDecoration(
+                          hintText: 'Search by name...',
+                          prefixIcon: const Icon(Icons.search_rounded),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 12,
+                          ),
+                        ),
+                      ),
+                      verticalSpacing16,
+                      // Selected list count
+                      Text(
+                        '${viewModel.selectedTargets.length} selected',
+                        style: fontFamilySemiBold.size12
+                            .copyWith(color: continueButton),
+                      ),
+                      verticalSpacing8,
+                      // Scrollable List of options
+                      Expanded(
+                        child: filteredOptions.isEmpty
+                            ? Center(
+                                child: Text(
+                                  'No options found',
+                                  style: fontFamilyMedium.size12.greyColor,
+                                ),
+                              )
+                            : ListView.builder(
+                                itemCount: filteredOptions.length,
+                                itemBuilder: (context, index) {
+                                  final option = filteredOptions[index];
+                                  final bool isSelected = viewModel
+                                      .selectedTargets
+                                      .any((e) => e['id'] == option['id']);
+
+                                  final image = option['image'];
+                                  final hasImage =
+                                      image != null && image.isNotEmpty;
+
+                                  return ListTile(
+                                    contentPadding: EdgeInsets.zero,
+                                    leading: hasImage
+                                        ? ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            child: Image.network(
+                                              image,
+                                              height: 36,
+                                              width: 36,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (_, __, ___) =>
+                                                  CircleAvatar(
+                                                radius: 18,
+                                                child: Text(option['name'][0]
+                                                    .toUpperCase()),
+                                              ),
+                                            ),
+                                          )
+                                        : CircleAvatar(
+                                            radius: 18,
+                                            child: Text(option['name'][0]
+                                                .toUpperCase()),
+                                          ),
+                                    title: Text(
+                                      option['name'],
+                                      style: fontFamilyMedium.size13.black,
+                                    ),
+                                    trailing: Checkbox(
+                                      value: isSelected,
+                                      activeColor: continueButton,
+                                      onChanged: (bool? checked) {
+                                        setState(() {
+                                          viewModel
+                                              .toggleTargetSelection(option);
+                                        });
+                                      },
+                                    ),
+                                    onTap: () {
+                                      setState(() {
+                                        viewModel.toggleTargetSelection(option);
+                                      });
+                                    },
+                                  );
+                                },
+                              ),
+                      ),
+                      verticalSpacing16,
+                      // Done Button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: continueButton,
+                              foregroundColor: white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              'Done',
+                              style: fontFamilySemiBold.size13.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -1026,7 +1393,10 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
   }
 
   void _showRequestBodyDialog(
-      BuildContext context, Map<String, dynamic> requestBody) {
+    BuildContext context,
+    Map<String, dynamic> requestBody, {
+    required VoidCallback onAcknowledge,
+  }) {
     final String jsonString =
         const JsonEncoder.withIndent('  ').convert(requestBody);
 
@@ -1156,6 +1526,7 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                       ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop();
+                          onAcknowledge();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: continueButton,

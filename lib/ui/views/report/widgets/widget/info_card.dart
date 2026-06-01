@@ -26,16 +26,16 @@ class InfoSalesProjectCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Resolve themed colors
-    final resolvedBgColor = isDark ? Theme.of(context).colorScheme.surface : white;
+    final resolvedBgColor =
+        isDark ? Theme.of(context).colorScheme.surface : white;
     final resolvedTitleStyle = fontFamilySemiBold.size16.copyWith(
       color: Theme.of(context).colorScheme.onSurface,
     );
     final resolvedIconColor = isDark ? appGreen400 : appGreen600;
-    
+
     // Smooth translucent or themed background for the icon container
-    final resolvedIconBgColor = isDark 
-        ? resolvedIconColor.withOpacity(0.15) 
-        : iconBgColor;
+    final resolvedIconBgColor =
+        isDark ? resolvedIconColor.withOpacity(0.15) : iconBgColor;
 
     return Container(
       padding: const EdgeInsets.all(12),

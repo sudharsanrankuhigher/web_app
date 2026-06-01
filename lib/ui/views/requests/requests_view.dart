@@ -204,52 +204,58 @@ class RequestsView extends StackedView<RequestsViewModel> {
                           ),
 
                           /// 7 - Promote Verified
-                          CommonStatusChip(
-                            text: "Promote Verified",
-                            imagePath: "assets/images/verified.svg",
-                            textStyle: viewModel.isSelected == 7
-                                ? fontFamilySemiBold.size14.white
-                                : fontFamilySemiBold.size14.black,
-                            bgColor:
-                                viewModel.isSelected == 7 ? appGreen400 : white,
-                            imageColor: viewModel.isSelected == 7
-                                ? white
-                                : appSecond950,
-                            onTap: () => viewModel.setSelected(7),
-                            margin: defaultPadding10,
-                          ),
+                          if (PermissionHelper.instance.has('payment'))
+                            CommonStatusChip(
+                              text: "Promote Verified",
+                              imagePath: "assets/images/verified.svg",
+                              textStyle: viewModel.isSelected == 7
+                                  ? fontFamilySemiBold.size14.white
+                                  : fontFamilySemiBold.size14.black,
+                              bgColor: viewModel.isSelected == 7
+                                  ? appGreen400
+                                  : white,
+                              imageColor: viewModel.isSelected == 7
+                                  ? white
+                                  : appSecond950,
+                              onTap: () => viewModel.setSelected(7),
+                              margin: defaultPadding10,
+                            ),
 
                           /// 8 - Promote Pay
-                          CommonStatusChip(
-                            text: "Promote Pay",
-                            imagePath: "assets/images/pay.svg",
-                            textStyle: viewModel.isSelected == 8
-                                ? fontFamilySemiBold.size14.white
-                                : fontFamilySemiBold.size14.black,
-                            bgColor:
-                                viewModel.isSelected == 8 ? appGreen400 : white,
-                            imageColor: viewModel.isSelected == 8
-                                ? white
-                                : appSecond950,
-                            onTap: () => viewModel.setSelected(8),
-                            margin: defaultPadding10,
-                          ),
+                          if (PermissionHelper.instance.has('payment'))
+                            CommonStatusChip(
+                              text: "Promote Pay",
+                              imagePath: "assets/images/pay.svg",
+                              textStyle: viewModel.isSelected == 8
+                                  ? fontFamilySemiBold.size14.white
+                                  : fontFamilySemiBold.size14.black,
+                              bgColor: viewModel.isSelected == 8
+                                  ? appGreen400
+                                  : white,
+                              imageColor: viewModel.isSelected == 8
+                                  ? white
+                                  : appSecond950,
+                              onTap: () => viewModel.setSelected(8),
+                              margin: defaultPadding10,
+                            ),
 
                           /// 9 - Promote Commission
-                          CommonStatusChip(
-                            text: "Promote Commission",
-                            imagePath: "assets/images/comission.svg",
-                            textStyle: viewModel.isSelected == 9
-                                ? fontFamilySemiBold.size14.white
-                                : fontFamilySemiBold.size14.black,
-                            bgColor:
-                                viewModel.isSelected == 9 ? appGreen400 : white,
-                            imageColor: viewModel.isSelected == 9
-                                ? white
-                                : appSecond950,
-                            onTap: () => viewModel.setSelected(9),
-                            margin: defaultPadding10,
-                          ),
+                          if (PermissionHelper.instance.has('payment'))
+                            CommonStatusChip(
+                              text: "Promote Commission",
+                              imagePath: "assets/images/comission.svg",
+                              textStyle: viewModel.isSelected == 9
+                                  ? fontFamilySemiBold.size14.white
+                                  : fontFamilySemiBold.size14.black,
+                              bgColor: viewModel.isSelected == 9
+                                  ? appGreen400
+                                  : white,
+                              imageColor: viewModel.isSelected == 9
+                                  ? white
+                                  : appSecond950,
+                              onTap: () => viewModel.setSelected(9),
+                              margin: defaultPadding10,
+                            ),
                           if ((PermissionHelper.instance
                               .has('client_payment_approval')))
                             CommonStatusChip(
@@ -277,7 +283,8 @@ class RequestsView extends StackedView<RequestsViewModel> {
                             height: 45.h,
                             width: 500.w,
                             child: SearchTextField(
-                              hintText: "Search requests (service, client, phone, project)...",
+                              hintText:
+                                  "Search requests (service, client, phone, project)...",
                               onChanged: viewModel.searchRequests,
                             ),
                           ),

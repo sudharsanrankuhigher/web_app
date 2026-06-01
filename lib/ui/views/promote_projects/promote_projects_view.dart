@@ -233,23 +233,25 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                     ),
                                   ],
                                 ),
-                                InkWell(
-                                  onTap: () => viewModel.splitAmount(context),
-                                  child: RichText(
-                                      text: TextSpan(children: [
-                                    const WidgetSpan(
-                                        child: Icon(Icons.splitscreen)),
-                                    WidgetSpan(
-                                        child: Center(
-                                      child: Container(
-                                        child: Text(
-                                          'Split Amount',
-                                          style: fontFamilyMedium.size14.black,
+                                if (viewModel.roleId == "1")
+                                  InkWell(
+                                    onTap: () => viewModel.splitAmount(context),
+                                    child: RichText(
+                                        text: TextSpan(children: [
+                                      const WidgetSpan(
+                                          child: Icon(Icons.splitscreen)),
+                                      WidgetSpan(
+                                          child: Center(
+                                        child: Container(
+                                          child: Text(
+                                            'Split Amount',
+                                            style:
+                                                fontFamilyMedium.size14.black,
+                                          ),
                                         ),
-                                      ),
-                                    ))
-                                  ])),
-                                )
+                                      ))
+                                    ])),
+                                  )
                               ],
                             ),
                           ),
@@ -379,7 +381,8 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                   margin: defaultPadding10,
                                 ),
                               // if (viewModel.isInprogress == false)
-                              if (viewModel.isInprogress == true)
+                              if ((viewModel.isInprogress == true) && (PermissionHelper.instance
+                                      .has('payment')))
                                 CommonStatusChip(
                                   text: "Promote Verified",
                                   imagePath: "assets/images/verified.svg",
@@ -398,6 +401,8 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                   },
                                   margin: defaultPadding10,
                                 ),
+                                if(PermissionHelper.instance
+                                      .has('payment'))
                               CommonStatusChip(
                                 text: "Promote Pay",
                                 imagePath: "assets/images/pay.svg",
@@ -417,6 +422,8 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                 margin: defaultPadding10,
                               ),
                               // if (viewModel.isInprogress == false)
+                              if (PermissionHelper.instance
+                                      .has('payment'))
                               CommonStatusChip(
                                 text: "Promote Commission",
                                 imagePath: "assets/images/comission.svg",

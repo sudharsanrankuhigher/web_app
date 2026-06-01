@@ -5,7 +5,11 @@ class DateFormatter {
     if (isoDate == null) return '-';
 
     final value = isoDate.toString().trim();
-    if (value.isEmpty || value.toLowerCase() == 'null') return '-';
+    if (value.isEmpty ||
+        value.toLowerCase() == 'null' ||
+        !RegExp(r'^\d').hasMatch(value)) {
+      return '-';
+    }
 
     try {
       final dateTime = DateTime.parse(value).toLocal();
@@ -51,9 +55,13 @@ class DateFormatter {
   }
 
   String formatToYMD(String isoDate) {
-    final dateTime = DateTime.parse(isoDate);
-    return "${dateTime.year.toString().padLeft(4, '0')}-"
-        "${dateTime.month.toString().padLeft(2, '0')}-"
-        "${dateTime.day.toString().padLeft(2, '0')}";
+    try {
+      final dateTime = DateTime.parse(isoDate);
+      return "${dateTime.year.toString().padLeft(4, '0')}-"
+          "${dateTime.month.toString().padLeft(2, '0')}-"
+          "${dateTime.day.toString().padLeft(2, '0')}";
+    } catch (_) {
+      return '';
+    }
   }
 }

@@ -137,7 +137,8 @@ Future<void> showActionConfirmationDialog({
   required Color confirmColor,
   required IconData icon,
   String? image,
-  required VoidCallback onConfirm,
+  bool showNotesField = false,
+  required Function onConfirm,
 }) {
   return showGeneralDialog(
     context: context,
@@ -157,97 +158,189 @@ Future<void> showActionConfirmationDialog({
         child: ScaleTransition(
           scale: scale,
           child: Center(
-            child: Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 550, minWidth: 300),
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Icon
-                      Container(
-                        // height: image!.isNotEmpty ? 35 : null,
-                        // width: image.isNotEmpty ? 35 : null,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: confirmColor.withOpacity(0.12),
-                          shape: BoxShape.circle,
-                        ),
-                        child: (image != null && image.isNotEmpty)
-                            ? SvgPicture.asset(image)
-                            : Icon(icon, size: 36, color: confirmColor),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Title
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      // Message
-                      Text(
-                        message,
-                        textAlign: TextAlign.center,
-                        style: fontFamilyMedium.size14.grey,
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () => Navigator.pop(context),
-                              style: OutlinedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: const Text("Cancel"),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                onConfirm();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: confirmColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: Text(
-                                confirmText,
-                                style: fontFamilyMedium.size14.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+            child: _ActionConfirmationDialogContent(
+              title: title,
+              message: message,
+              confirmText: confirmText,
+              confirmColor: confirmColor,
+              icon: icon,
+              image: image,
+              showNotesField: showNotesField,
+              onConfirm: onConfirm,
             ),
           ),
         ),
       );
     },
   );
+}
+
+class _ActionConfirmationDialogContent extends StatefulWidget {
+  final String title;
+  final String message;
+  final String confirmText;
+  final Color confirmColor;
+  final IconData icon;
+  final String? image;
+  final bool showNotesField;
+  final Function onConfirm;
+
+  const _ActionConfirmationDialogContent({
+    required this.title,
+    required this.message,
+    required this.confirmText,
+    required this.confirmColor,
+    required this.icon,
+    this.image,
+    required this.showNotesField,
+    required this.onConfirm,
+  });
+
+  @override
+  State<_ActionConfirmationDialogContent> createState() =>
+      _ActionConfirmationDialogContentState();
+}
+
+class _ActionConfirmationDialogContentState
+    extends State<_ActionConfirmationDialogContent> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _notesController;
+
+  @override
+  void initState() {
+    super.initState();
+    _notesController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 550, minWidth: 300),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Icon
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: widget.confirmColor.withOpacity(0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: (widget.image != null && widget.image!.isNotEmpty)
+                      ? SvgPicture.asset(widget.image!)
+                      : Icon(widget.icon, size: 36, color: widget.confirmColor),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Title
+                Text(
+                  widget.title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                // Message or Notes
+                if (!widget.showNotesField) ...[
+                  Text(
+                    widget.message,
+                    textAlign: TextAlign.center,
+                    style: fontFamilyMedium.size14.grey,
+                  ),
+                  const SizedBox(height: 24),
+                ] else ...[
+                  TextFormField(
+                    controller: _notesController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: "Enter notes...",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      contentPadding: const EdgeInsets.all(12),
+                    ),
+                    validator: (val) {
+                      if (val == null || val.trim().isEmpty) {
+                        return "Please enter some notes";
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                ],
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text("Cancel"),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (widget.showNotesField) {
+                            if (_formKey.currentState!.validate()) {
+                              Navigator.pop(context);
+                              if (widget.onConfirm is Function(String)) {
+                                widget.onConfirm(_notesController.text.trim());
+                              } else {
+                                widget.onConfirm();
+                              }
+                            }
+                          } else {
+                            Navigator.pop(context);
+                            widget.onConfirm();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: widget.confirmColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          widget.confirmText,
+                          style: fontFamilyMedium.size14.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 void showBankDetailsDialog({
@@ -356,7 +449,7 @@ Future<void> showAdminPaymentConfigDialog({
     gstAmount = (payment * gstPercentage) / 100;
 
     // Total amount
-    totalAmount = payment + gstAmount;
+    totalAmount = payment + gstAmount + commission;
 
     setState(() {});
   }

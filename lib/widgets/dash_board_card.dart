@@ -23,7 +23,7 @@ class DashBoardCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     // Resolve custom text/icon colors to be accessible and vibrant in dark mode
     Color? resolvedTextColor = textColor;
     if (isDark && textColor != null) {
@@ -64,7 +64,8 @@ class DashBoardCard extends StatelessWidget {
                   if (asset == null)
                     Icon(
                       icon,
-                      color: resolvedTextColor ?? (isDark ? Colors.white70 : Colors.black87),
+                      color: resolvedTextColor ??
+                          (isDark ? Colors.white70 : Colors.black87),
                     )
                   else
                     Container(
@@ -72,14 +73,16 @@ class DashBoardCard extends StatelessWidget {
                       width: 50,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
-                        color: (resolvedTextColor ?? cardColor).withOpacity(isDark ? 0.15 : 0.08),
+                        color: (resolvedTextColor ?? cardColor)
+                            .withOpacity(isDark ? 0.15 : 0.08),
                       ),
                       padding: defaultPadding8,
                       child: Center(
                         child: SvgPicture.asset(
                           asset!,
                           colorFilter: ColorFilter.mode(
-                            resolvedTextColor ?? (isDark ? Colors.white : cardColor),
+                            resolvedTextColor ??
+                                (isDark ? Colors.white : cardColor),
                             BlendMode.srcIn,
                           ),
                         ),
@@ -91,7 +94,8 @@ class DashBoardCard extends StatelessWidget {
               Text(
                 subtitle!,
                 style: fontFamilyMedium.size12.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 ),
               ),
             ],

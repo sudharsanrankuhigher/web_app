@@ -32,12 +32,14 @@ class MonthlyBarChart extends StatelessWidget {
     final axisTitleStyle = fontFamilyMedium.size10.copyWith(
       color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
     );
-    final gridLineColor = isDark ? Colors.grey.withOpacity(0.2) : Colors.grey.withOpacity(0.4);
+    final gridLineColor =
+        isDark ? Colors.grey.withOpacity(0.2) : Colors.grey.withOpacity(0.4);
 
     return Expanded(
       child: Container(
         padding: defaultPadding12,
-        color: Colors.transparent, // Seamlessly blend with the parent themed container
+        color: Colors
+            .transparent, // Seamlessly blend with the parent themed container
         child: BarChart(
           BarChartData(
             maxY: maxValue == 0 ? 10000 : maxValue + 10000,

@@ -73,7 +73,7 @@ class UsersView extends StackedView<UsersViewModel> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                           SizedBox(
+                          SizedBox(
                             height: 48.h,
                             width: isExtended ? 500 : 200,
                             child: SearchTextField(

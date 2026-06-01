@@ -11,9 +11,11 @@ import 'package:webapp/ui/views/promote_projects/model/promote_project_model.dar
     as project_model;
 import 'package:webapp/ui/views/promote_projects/widgets/image_items.dart';
 import 'package:webapp/widgets/common_button.dart';
+import 'package:webapp/widgets/dob_field.dart';
 import 'package:webapp/widgets/drop_down_widget.dart';
 import 'package:webapp/widgets/image_picker.dart';
 import 'package:webapp/widgets/initial_textform.dart';
+import 'package:webapp/widgets/label_text.dart';
 import 'package:webapp/widgets/search_drop_down_widget.dart';
 import 'package:webapp/widgets/state_city_dynamic_dropdown.dart';
 import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
@@ -122,7 +124,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
 
   late List<ImageItem> images;
 
-  final List<String> genders = ['Male', 'Female', 'Other'];
+  final List<String> genders = ['Male', 'Female', 'both', 'Other'];
   final ScrollController thumbnailScrollController = ScrollController();
 
   List<dynamic> selectedInfluencers = [];
@@ -136,6 +138,10 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
 
   Map<String, dynamic>? selectedCompany;
   bool isCompanyError = false;
+
+  DateTime? dob;
+  bool dobError = false;
+  String? dobString;
 
   List<dynamic> selectedServices = [];
   List<dynamic> selectedService = [];
@@ -242,6 +248,8 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
         text: widget.model.payment?.totalAmount?.toString() ?? "0");
     commPercentCtrl = TextEditingController(
         text: widget.model.payment?.commissionPercent?.toString() ?? "0");
+    dobString = widget.model.validDate?.toIso8601String();
+    dob = widget.model.validDate;
 
     // Add listeners for automatic calculations
     paymentCtrl.addListener(_calculateValues);
@@ -894,7 +902,39 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                         ),
                                       ),
                                       horizontalSpacing12,
-                                      const Expanded(child: SizedBox()),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                          child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const IconTextLabel(
+                                            icon: Icons.calendar_month,
+                                            text: "Validity date",
+                                            iconColor: Colors.black,
+                                            textColor: Colors.black,
+                                            iconSize: 16,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          verticalSpacing10,
+                                          DOBField(
+                                            label: "Validity date",
+                                            selectedDate: dob ?? DateTime.now(),
+                                            lastdate: DateTime(2200),
+                                            isError: dobError,
+                                            onDateSelected: (date) {
+                                              setState(() {
+                                                dobString = "${date.year}-"
+                                                    "${date.month.toString().padLeft(2, '0')}-"
+                                                    "${date.day.toString().padLeft(2, '0')}";
+                                                dob = date;
+                                                dobError = false;
+                                              });
+                                            },
+                                          )
+                                        ],
+                                      )),
                                     ],
                                   ),
                                   verticalSpacing12,
@@ -1213,8 +1253,8 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
 
     double taxAmount = (payment * taxPercent) / 100;
     _taxAmount = taxAmount;
-    double totalAmount = payment + taxAmount;
     double commissionAmount = (payment * commPercent) / 100;
+    double totalAmount = payment + taxAmount + commissionAmount;
 
     // Use a flag to prevent recursive listener calls if necessary,
     // but since we only update total and commission (which don't have listeners), it's fine.
@@ -1465,6 +1505,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
       "gender": gender,
       "state": state,
       // "city": city,
+      "valid_date": dobString,
       "cities": selectedCities, // 🔥 multi select
       "influencers": selectedInfluencerIds,
       "companyId": selectedCompany!['id'],

@@ -27,9 +27,9 @@ class HomeView extends StackedView<HomeViewModel> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FloatingOverlayService.instance.show(
         context,
-        onTap: () {
+        onTap: (clickContext) {
           // Redirect to Notifications screen upon tap
-          viewModel.onMenuTap(15, context);
+          viewModel.onMenuTap(15, clickContext);
         },
       );
     });

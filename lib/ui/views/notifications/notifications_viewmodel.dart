@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:webapp/services/notification_service.dart';
+import 'package:webapp/app/app.locator.dart';
+import 'package:webapp/services/api_service.dart';
 
 class NotificationsViewModel extends BaseViewModel {
   final formKey = GlobalKey<FormState>();
@@ -31,6 +33,9 @@ class NotificationsViewModel extends BaseViewModel {
 
   void setActiveSection(String section) {
     _activeSection = section;
+    if (_activeSection == 'send') {
+      fetchTargetOptions();
+    }
     notifyListeners();
   }
 
@@ -80,6 +85,113 @@ class NotificationsViewModel extends BaseViewModel {
   String _formTargetAudience =
       'Users'; // 'Users', 'Influencers', 'Admin / Sub Admin'
 
+  // Broadcast Type and targeting options
+  String _broadcastType = 'all'; // 'all', 'separately'
+  String get broadcastType => _broadcastType;
+
+  bool _isLoadingTargetOptions = false;
+  bool get isLoadingTargetOptions => _isLoadingTargetOptions;
+
+  List<dynamic> _usersList = [];
+  List<dynamic> _influencersList = [];
+  List<dynamic> _subAdminsList = [];
+
+  List<dynamic> _selectedTargets = [];
+  List<dynamic> get selectedTargets => _selectedTargets;
+
+  void setBroadcastType(String value) {
+    _broadcastType = value;
+    notifyListeners();
+  }
+
+  void clearSelectedTargets() {
+    _selectedTargets.clear();
+    notifyListeners();
+  }
+
+  void setSelectedTargets(List<dynamic> selected) {
+    _selectedTargets = selected;
+    notifyListeners();
+  }
+
+  void toggleTargetSelection(dynamic item) {
+    final index = _selectedTargets.indexWhere((element) => element['id'] == item['id']);
+    if (index != -1) {
+      _selectedTargets.removeAt(index);
+    } else {
+      _selectedTargets.add(item);
+    }
+    notifyListeners();
+  }
+
+  List<dynamic> get targetOptions {
+    if (_formTargetAudience == 'Users') {
+      return _usersList
+          .map((user) => {
+                'id': user.id,
+                'name': user.name ?? '',
+                'image': '',
+              })
+          .toList();
+    } else if (_formTargetAudience == 'Influencers') {
+      return _influencersList
+          .map((influencer) => {
+                'id': influencer.id,
+                'name': influencer.name ?? '',
+                'image': influencer.image ?? '',
+              })
+          .toList();
+    } else if (_formTargetAudience == 'Admin / Sub Admin') {
+      return _subAdminsList
+          .map((subAdmin) => {
+                'id': subAdmin.id,
+                'name': subAdmin.name ?? '',
+                'image': subAdmin.profileImage ?? '',
+              })
+          .toList();
+    }
+    return [];
+  }
+
+  Future<void> fetchTargetOptions() async {
+    _isLoadingTargetOptions = true;
+    notifyListeners();
+
+    // Fetch users
+    try {
+      final now = DateTime.now();
+      final formattedDate =
+          "${now.year}-${now.month.toString().padLeft(2, '0')}";
+      final res =
+          await locator<ApiService>().getUsers({"month": formattedDate});
+      _usersList = res.data ?? [];
+    } catch (e) {
+      _usersList = [];
+      debugPrint('Error fetching users: $e');
+    }
+
+    // Fetch influencers
+    try {
+      final res = await locator<ApiService>().getAllInfluencer();
+      _influencersList = res.data ?? [];
+    } catch (e) {
+      _influencersList = [];
+      debugPrint('Error fetching influencers: $e');
+    }
+
+    // Fetch sub-admins
+    try {
+      final res = await locator<ApiService>().getAllSubAdmin();
+      _subAdminsList = res;
+    } catch (e) {
+      _subAdminsList = [];
+      debugPrint('Error fetching sub admins: $e');
+    }
+
+    _isLoadingTargetOptions = false;
+    notifyListeners();
+  }
+
   // Scheduling State
   bool _isScheduled = false;
   bool get isScheduled => _isScheduled;
@@ -102,6 +214,7 @@ class NotificationsViewModel extends BaseViewModel {
 
   void setFormTargetAudience(String value) {
     _formTargetAudience = value;
+    _selectedTargets.clear(); // Reset selections when audience group changes
     notifyListeners();
   }
 
@@ -190,6 +303,14 @@ class NotificationsViewModel extends BaseViewModel {
       'message': formMessage.trim(),
       'category': _formCategory,
       'targetAudience': _formTargetAudience,
+      'broadcastType': _broadcastType,
+      if (_broadcastType == 'separately')
+        'selectedTargets': _selectedTargets
+            .map((item) => {
+                  'id': item['id'],
+                  'name': item['name'],
+                })
+            .toList(),
       'isRead': false,
       if (datetime != null) 'scheduledAt': datetime.toIso8601String(),
     };
@@ -216,6 +337,8 @@ class NotificationsViewModel extends BaseViewModel {
     messageController.clear();
     _formCategory = 'info';
     _formTargetAudience = 'Users';
+    _broadcastType = 'all';
+    _selectedTargets.clear();
     _isScheduled = false;
     _scheduledDate = null;
     _scheduledTime = null;

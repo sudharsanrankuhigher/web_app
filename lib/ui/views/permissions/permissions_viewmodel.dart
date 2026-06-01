@@ -264,6 +264,7 @@ class PermissionsViewModel extends BaseViewModel with NavigationMixin {
     SpecialPermissionRow(name: 'add_project'),
     SpecialPermissionRow(name: 'client_payment_approval'),
     SpecialPermissionRow(name: 'company_payment_approval'),
+    SpecialPermissionRow(name: 'send_notifications'),
   ];
 
   bool selectAllSpecial = false;

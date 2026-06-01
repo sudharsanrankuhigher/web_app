@@ -54,7 +54,8 @@ class AddCompanyView extends StackedView<AddCompanyViewModel> {
                               ? 500
                               : 500.w, // search field fixed width (responsive)
                           child: SearchTextField(
-                            hintText: "Search company details (name, city, GST, phone)...",
+                            hintText:
+                                "Search company details (name, city, GST, phone)...",
                             onChanged: viewModel.applySearch,
                           ),
                         ),

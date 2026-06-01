@@ -55,7 +55,8 @@ class BannerView extends StackedView<BannerViewModel> {
                             ? 500
                             : 500.w, // search field fixed width (responsive)
                         child: SearchTextField(
-                          hintText: "Search banners (influencer, amount, priority)...",
+                          hintText:
+                              "Search banners (influencer, amount, priority)...",
                           onChanged: (value) {
                             viewModel.applySearch(value);
                           },

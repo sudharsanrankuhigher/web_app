@@ -52,6 +52,7 @@ class Message {
   String? gender;
   LinkElement? link;
   int? isEditable;
+  DateTime? validDate;
 
   Message(
       {this.id,
@@ -71,7 +72,8 @@ class Message {
       this.service,
       this.gender,
       this.isEditable,
-      this.link});
+      this.link,
+      this.validDate});
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
         id: _toInt(json["id"]),
@@ -115,6 +117,9 @@ class Message {
         gender: json["gender"],
         link: _parseLink(json["link"]),
         isEditable: _toInt(json["is_editable"]) ?? 0,
+        validDate: json["valid_date"] == null
+            ? null
+            : DateTime.parse(json["valid_date"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -140,6 +145,7 @@ class Message {
         "gender": gender,
         "link": link == null ? [] : [link!.toJson()],
         "is_editable": isEditable,
+        "valid_date": validDate?.toIso8601String(),
       };
 
   /// ✅ Handles object OR list OR null
@@ -219,12 +225,14 @@ class PaymentElement {
   int? gst;
   int? totalAmount;
   int? commissionPercent;
+  DateTime? validDate;
 
   PaymentElement(
       {this.payment,
       this.commission,
       this.gst,
       this.totalAmount,
+      this.validDate,
       this.commissionPercent});
 
   factory PaymentElement.fromJson(Map<String, dynamic> json) => PaymentElement(
@@ -232,6 +240,9 @@ class PaymentElement {
         commission: int.tryParse(json["commission"].toString()),
         gst: int.tryParse(json["gst"].toString()),
         totalAmount: int.tryParse(json["total_amount"].toString()),
+        validDate: json["valid_date"] == null
+            ? null
+            : DateTime.parse(json["valid_date"]),
         commissionPercent: int.tryParse(json["commission_percent"].toString()),
       );
 
@@ -240,6 +251,7 @@ class PaymentElement {
         "commission": commission,
         "gst": gst,
         "total_amount": totalAmount,
+        "valid_date": validDate?.toIso8601String(),
         "commission_percent": commissionPercent,
       };
 }

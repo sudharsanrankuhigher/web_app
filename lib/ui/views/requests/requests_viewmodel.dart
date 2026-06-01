@@ -309,12 +309,16 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Project Code")),
           DataColumn(label: Text("Client")),
           DataColumn(label: Text("Client Phone")),
+          DataColumn(label: Text("Client request")),
           DataColumn(
               label: Text("Inf_ID / Inf_No"),
               headingRowAlignment: MainAxisAlignment.center),
           DataColumn(label: Text("Requested Date")),
           DataColumn(
-              label: Text("Action"),
+              label: Text("Reject"),
+              headingRowAlignment: MainAxisAlignment.center),
+          DataColumn(
+              label: Text("Proceed"),
               headingRowAlignment: MainAxisAlignment.center),
         ];
 
@@ -465,6 +469,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Project Code")),
           DataColumn(label: Text("client_name")),
           DataColumn(label: Text("client_Phone")),
+          DataColumn(label: Text("Total amount")),
           DataColumn(label: Text("Payment amount")),
           DataColumn(label: Text("Commission Amount")),
           DataColumn(
@@ -503,6 +508,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       "client_id": data["client_id"],
       "category_id": data["category_id"],
       "link": data["link"] ?? "",
+      "remark": data["remark"] ?? "",
     };
 
     try {
@@ -594,16 +600,18 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       context: StackedService.navigatorKey!.currentContext!,
       title: 'Move to Waiting',
       confirmText: "Move",
+      showNotesField: true,
       message:
           "Are you sure you want to move the ${model.projectId} to the waiting section?",
       icon: Icons.hourglass_top,
       confirmColor: Colors.green,
-      onConfirm: () {
+      onConfirm: (notes) {
         final data = {
           "id": model.id,
           // "status": 12,
           "status": 2,
           "client_id": model.client!.id,
+          "remark": notes,
         };
         statusChange(data);
       },

@@ -16,7 +16,7 @@ class FloatingOverlayService {
 
   /// Shows the floating notification widget on the current screen overlay.
   /// Needs a valid [BuildContext] to access the Overlay.
-  void show(BuildContext context, {VoidCallback? onTap}) {
+  void show(BuildContext context, {void Function(BuildContext context)? onTap}) {
     if (_overlayEntry != null) {
       // Already shown, do not create duplicate entries
       return;

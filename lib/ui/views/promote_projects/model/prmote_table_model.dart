@@ -80,6 +80,7 @@ class Datum {
   String? amount;
   String? commisionAmount;
   DateTime? createdAt;
+  DateTime? paymentAt;
   dynamic completedAt;
   dynamic infAcceptedDate;
   dynamic infCompleted;
@@ -106,6 +107,7 @@ class Datum {
     this.amount,
     this.commisionAmount,
     this.createdAt,
+    this.paymentAt,
     this.completedAt,
     this.infAcceptedDate,
     this.infCompleted,
@@ -122,9 +124,9 @@ class Datum {
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         id: _toInt(json["id"]),
-        influencerId: getFormattedId(
-            _toInt(json['influencer_category_id']), _toInt(json['inf_id'])),
-        infId: _toInt(json["inf_id"]),
+        influencerId: getFormattedId(_toInt(json['influencer_category_id']),
+            _toInt(json['influencer_id'])),
+        infId: _toInt(json["influencer_id"]),
         influencerName: json["influencer_name"],
         influencerPhone: json["influencer_phone"],
         subId: json["sub_id"],
@@ -134,6 +136,7 @@ class Datum {
         commisionAmount: json["commission"]?.toString(),
         paymentNotes: json["payment_notes"]?.toString(),
         createdAt: parseDate(json["created_at"]),
+        paymentAt: parseDate(json["payment_at"]),
         completedAt: parseDate(json["completed_at"]),
         infAcceptedDate: parseDate(json["inf_accepted_date"]),
         infCompleted: parseDate(json["inf_completed"]),
@@ -161,6 +164,7 @@ class Datum {
         "amount": amount,
         "commission": commisionAmount,
         "created_at": createdAt?.toIso8601String(),
+        "payment_at": paymentAt?.toIso8601String(),
         "completed_at": completedAt,
         "inf_accepted_date": infAcceptedDate,
         "inf_completed": infCompleted,

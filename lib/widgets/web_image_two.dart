@@ -12,17 +12,17 @@ class WebImageTwo extends StatelessWidget {
 
   WebImageTwo({
     super.key,
-    required this.imageUrl,
+    required String imageUrl,
     this.width = double.infinity,
     this.height = double.infinity,
     this.fit = BoxFit.cover,
-  }) {
+  }) : imageUrl = _sanitizeUrl(imageUrl) {
     // ignore: undefined_prefixed_name
     ui.platformViewRegistry.registerViewFactory(
-      imageUrl,
+      this.imageUrl,
       (int viewId) {
         final img = html.ImageElement()
-          ..src = imageUrl
+          ..src = this.imageUrl
           ..style.width = '100%'
           ..style.height = '100%'
           ..style.objectFit = fit.name
@@ -41,5 +41,13 @@ class WebImageTwo extends StatelessWidget {
       height: height,
       child: HtmlElementView(viewType: imageUrl),
     );
+  }
+
+  static String _sanitizeUrl(String url) {
+    if (html.window.location.protocol == 'https:' &&
+        url.startsWith('http://')) {
+      return url.replaceFirst('http://', 'https://');
+    }
+    return url;
   }
 }

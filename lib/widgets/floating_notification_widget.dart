@@ -5,7 +5,7 @@ import 'package:webapp/ui/common/shared/styles.dart';
 
 class FloatingNotificationWidget extends StatefulWidget {
   final ValueNotifier<int> badgeCountNotifier;
-  final VoidCallback? onTap;
+  final void Function(BuildContext context)? onTap;
 
   const FloatingNotificationWidget({
     Key? key,
@@ -177,7 +177,7 @@ class _FloatingNotificationWidgetState extends State<FloatingNotificationWidget>
         onPanEnd: (DragEndDetails details) {
           _snapToEdge(screenWidth);
         },
-        onTap: widget.onTap,
+        onTap: widget.onTap != null ? () => widget.onTap!(context) : null,
         child: ValueListenableBuilder<int>(
           valueListenable: widget.badgeCountNotifier,
           builder: (context, badgeCount, _) {

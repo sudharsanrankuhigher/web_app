@@ -88,65 +88,88 @@ class ReportView extends StackedView<ReportViewModel> {
 
                         /// 🔹 RIGHT → Buttons (only if selected)
                         if (viewModel.selectedReportType != null) ...[
-                              Builder(
-                                builder: (context) {
-                                  final isDark = Theme.of(context).brightness == Brightness.dark;
-                                  
-                                  // Dynamic colors for Preview PDF button
-                                  final pdfBg = isDark ? const Color(0x29EF4444) : redShade; // 16% opacity red in dark mode
-                                  final pdfFg = isDark ? const Color(0xFFFCA5A5) : Colors.black87; // sleek light red vs dark red/black
-                                  
-                                  // Dynamic colors for Excel button
-                                  final excelBg = isDark ? const Color(0x2910B981) : appGreen400; // 16% opacity green in dark mode
-                                  final excelFg = isDark ? const Color(0xFFA7F3D0) : white; // sleek light green vs white
+                          Builder(
+                            builder: (context) {
+                              final isDark = Theme.of(context).brightness ==
+                                  Brightness.dark;
 
-                                  return Row(
-                                    children: [
-                                      ElevatedButton.icon(
-                                        style: ButtonStyle(
-                                          backgroundColor: WidgetStateProperty.all<Color>(pdfBg),
-                                          elevation: WidgetStateProperty.all<double>(0),
-                                          shape: WidgetStateProperty.all<OutlinedBorder>(
-                                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          viewModel.exportPdfWeb();
-                                        },
-                                        icon: Icon(
-                                          Icons.picture_as_pdf,
-                                          color: pdfFg,
-                                        ),
-                                        label: Text(
-                                          "Preview PDF",
-                                          style: fontFamilySemiBold.size13.copyWith(color: pdfFg),
-                                        ),
+                              // Dynamic colors for Preview PDF button
+                              final pdfBg = isDark
+                                  ? const Color(0x29EF4444)
+                                  : redShade; // 16% opacity red in dark mode
+                              final pdfFg = isDark
+                                  ? const Color(0xFFFCA5A5)
+                                  : Colors
+                                      .black87; // sleek light red vs dark red/black
+
+                              // Dynamic colors for Excel button
+                              final excelBg = isDark
+                                  ? const Color(0x2910B981)
+                                  : appGreen400; // 16% opacity green in dark mode
+                              final excelFg = isDark
+                                  ? const Color(0xFFA7F3D0)
+                                  : white; // sleek light green vs white
+
+                              return Row(
+                                children: [
+                                  ElevatedButton.icon(
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          WidgetStateProperty.all<Color>(pdfBg),
+                                      elevation:
+                                          WidgetStateProperty.all<double>(0),
+                                      shape: WidgetStateProperty.all<
+                                          OutlinedBorder>(
+                                        RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8)),
                                       ),
-                                      const SizedBox(width: 10),
-                                      ElevatedButton.icon(
-                                        style: ButtonStyle(
-                                          backgroundColor: WidgetStateProperty.all<Color>(excelBg),
-                                          elevation: WidgetStateProperty.all<double>(0),
-                                          shape: WidgetStateProperty.all<OutlinedBorder>(
-                                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          viewModel.exportCsv();
-                                        },
-                                        icon: Icon(
-                                          Icons.download,
-                                          color: excelFg,
-                                        ),
-                                        label: Text(
-                                          "Excel",
-                                          style: fontFamilySemiBold.size13.copyWith(color: excelFg),
-                                        ),
+                                    ),
+                                    onPressed: () {
+                                      viewModel.exportPdfWeb();
+                                    },
+                                    icon: Icon(
+                                      Icons.picture_as_pdf,
+                                      color: pdfFg,
+                                    ),
+                                    label: Text(
+                                      "Preview PDF",
+                                      style: fontFamilySemiBold.size13
+                                          .copyWith(color: pdfFg),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  ElevatedButton.icon(
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          WidgetStateProperty.all<Color>(
+                                              excelBg),
+                                      elevation:
+                                          WidgetStateProperty.all<double>(0),
+                                      shape: WidgetStateProperty.all<
+                                          OutlinedBorder>(
+                                        RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8)),
                                       ),
-                                    ],
-                                  );
-                                },
-                              ),
+                                    ),
+                                    onPressed: () {
+                                      viewModel.exportCsv();
+                                    },
+                                    icon: Icon(
+                                      Icons.download,
+                                      color: excelFg,
+                                    ),
+                                    label: Text(
+                                      "Excel",
+                                      style: fontFamilySemiBold.size13
+                                          .copyWith(color: excelFg),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
                         ],
                       ],
                     ),
