@@ -376,7 +376,8 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () async {
-                            FloatingOverlayService.instance.remove(); // 🧹 remove overlay
+                            FloatingOverlayService.instance
+                                .remove(); // 🧹 remove overlay
                             await clearUserData(); // 🧹 clear storage
                             Navigator.pop(context); // ❌ close dialog
                             rootContext
@@ -442,7 +443,7 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
       await _sharedPreferences.setString('profile_name', _name ?? '');
       await _sharedPreferences.setString('profile_email', _email ?? '');
       await _sharedPreferences.setString('profile_image', _profileImage ?? '');
-      await _sharedPreferences.setString('role_id', _roleId  ?? '');
+      await _sharedPreferences.setString('role_id', _roleId ?? '');
 
       res.data?.roleId;
       log('Profile fetched successfully: ${res.data?.name}');

@@ -93,14 +93,20 @@ class LocationContactViewModel extends BaseViewModel with NavigationMixin {
           required String state,
           required CityModel city,
           required String phone,
+          required bool isHeadoffice,
           String? code,
         }) {
           final newContact = {
             "state": state,
-            "city": city.name,
-            "code": city.id,
-            "mobile_number": phone
+            "city": isHeadoffice
+                ? []
+                : [
+                    {"id": city.id, "name": city.name}
+                  ],
+            "mobile_number": phone,
+            "is_head_office": isHeadoffice,
           };
+          _saveOrUpdate(newContact);
         },
 
         /// 🔥 MULTI
@@ -108,16 +114,20 @@ class LocationContactViewModel extends BaseViewModel with NavigationMixin {
           required String state,
           required List<CityModel> cities,
           required String phone,
+          required bool isHeadoffice,
         }) {
           final newContact = {
             "state": state,
-            "city": cities
-                .map((e) => {
-                      "id": e.id,
-                      "name": e.name,
-                    })
-                .toList(),
+            "city": isHeadoffice
+                ? []
+                : cities
+                    .map((e) => {
+                          "id": e.id,
+                          "name": e.name,
+                        })
+                    .toList(),
             "mobile_number": phone,
+            "is_head_office": isHeadoffice,
           };
 
           print("ADD MULTI: $newContact");
@@ -151,13 +161,16 @@ class LocationContactViewModel extends BaseViewModel with NavigationMixin {
         //   required String state,
         //   required CityModel city,
         //   required String phone,
+        //   required bool isHeadoffice,
         // }) {
         //   final updatedContact = {
         //     "state": state,
-        //     "city": city.name,
-        //     "code": city.id,
+        //     "city": isHeadoffice ? [] : [
+        //       {"id": city.id, "name": city.name}
+        //     ],
         //     "mobile_number": phone,
         //     "id": contact.id,
+        //     "isheadoffice": isHeadoffice,
         //   };
 
         //   _saveOrUpdate(updatedContact);
@@ -168,17 +181,21 @@ class LocationContactViewModel extends BaseViewModel with NavigationMixin {
           required String state,
           required List<CityModel> cities,
           required String phone,
+          required bool isHeadoffice,
         }) {
           final newContact = {
             "id": contact.id,
             "state": state,
-            "city": cities
-                .map((e) => {
-                      "id": e.id,
-                      "name": e.name,
-                    })
-                .toList(),
+            "city": isHeadoffice
+                ? []
+                : cities
+                    .map((e) => {
+                          "id": e.id,
+                          "name": e.name,
+                        })
+                    .toList(),
             "mobile_number": phone,
+            "is_head_office": isHeadoffice,
           };
 
           print("ADD MULTI: $newContact");
@@ -212,6 +229,7 @@ class LocationContactViewModel extends BaseViewModel with NavigationMixin {
           required String state,
           required CityModel city,
           required String phone,
+          required bool isHeadoffice,
         }) {},
       ),
     );

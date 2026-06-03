@@ -32,6 +32,7 @@ class BannerTableSource extends DataTableSource {
           DataCell(Text("")),
           DataCell(Text("")),
           DataCell(Text("")),
+          DataCell(Text("")),
           DataCell(Center(child: Text("No data found"))),
           DataCell(Text("")),
           DataCell(Text("")),
@@ -91,6 +92,12 @@ class BannerTableSource extends DataTableSource {
         DataCell(Text(
           DateFormatter.formatToDDMMMYYYY(item.endDate) ?? '-',
           style: fontFamilySemiBold.size13.black,
+        )),
+        DataCell(Text(
+          item.status.toString() == "true" ? "Active" : "Deactive",
+          style: item.status.toString() == "true"
+              ? fontFamilySemiBold.size13.appGreen400
+              : fontFamilySemiBold.size13.red,
         )),
         DataCell(Row(
           crossAxisAlignment: CrossAxisAlignment.center,

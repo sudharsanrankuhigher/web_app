@@ -50,7 +50,7 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
 
     try {
       final data = {"month": formattedDate};
-      final res = await _apiService.getUsers(data);
+      final res = await _apiService.getUsers(data: data);
       users = res.data ?? [];
     } catch (e) {
       users = [];

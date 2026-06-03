@@ -45,6 +45,7 @@ class Datum {
   String? state;
   String? mobileNumber;
   DateTime? createdAt;
+  bool? isHeadoffice;
 
   Datum({
     this.id,
@@ -52,6 +53,7 @@ class Datum {
     this.state,
     this.mobileNumber,
     this.createdAt,
+    this.isHeadoffice,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -71,6 +73,20 @@ class Datum {
         createdAt: json["created_at"] == null
             ? null
             : DateTime.parse(json["created_at"]),
+        isHeadoffice: json["isheadoffice"] == null
+            ? (json["is_headoffice"] == null
+                ? false
+                : (json["is_headoffice"] is bool
+                    ? json["is_headoffice"]
+                    : (json["is_headoffice"] == 1 ||
+                        json["is_headoffice"] == '1' ||
+                        json["is_headoffice"].toString().toLowerCase() ==
+                            'true')))
+            : (json["isheadoffice"] is bool
+                ? json["isheadoffice"]
+                : (json["isheadoffice"] == 1 ||
+                    json["isheadoffice"] == '1' ||
+                    json["isheadoffice"].toString().toLowerCase() == 'true')),
       );
 
   Map<String, dynamic> toJson() => {
@@ -81,6 +97,7 @@ class Datum {
         "state": state,
         "mobile_number": mobileNumber,
         "created_at": createdAt?.toIso8601String(),
+        "isheadoffice": isHeadoffice,
       };
 }
 

@@ -1505,7 +1505,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
       "gender": gender,
       "state": state,
       // "city": city,
-      "valid_date": dobString,
+      "valid_date": dobString ?? DateTime.now().toIso8601String(),
       "cities": selectedCities, // 🔥 multi select
       "influencers": selectedInfluencerIds,
       "companyId": selectedCompany!['id'],

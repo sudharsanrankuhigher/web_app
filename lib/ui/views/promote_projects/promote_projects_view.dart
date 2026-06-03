@@ -381,8 +381,8 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                   margin: defaultPadding10,
                                 ),
                               // if (viewModel.isInprogress == false)
-                              if ((viewModel.isInprogress == true) && (PermissionHelper.instance
-                                      .has('payment')))
+                              if ((viewModel.isInprogress == true) &&
+                                  (PermissionHelper.instance.has('payment')))
                                 CommonStatusChip(
                                   text: "Promote Verified",
                                   imagePath: "assets/images/verified.svg",
@@ -401,47 +401,45 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                   },
                                   margin: defaultPadding10,
                                 ),
-                                if(PermissionHelper.instance
-                                      .has('payment'))
-                              CommonStatusChip(
-                                text: "Promote Pay",
-                                imagePath: "assets/images/pay.svg",
-                                textStyle: viewModel.isChipSelected == 6
-                                    ? fontFamilySemiBold.size14.white
-                                    : fontFamilySemiBold.size14.black,
-                                bgColor: viewModel.isChipSelected == 6
-                                    ? appGreen400
-                                    : white,
-                                imageColor: viewModel.isChipSelected == 6
-                                    ? white
-                                    : null,
-                                onTap: () {
-                                  print("Completed");
-                                  viewModel.setChipSelected(6);
-                                },
-                                margin: defaultPadding10,
-                              ),
+                              if (PermissionHelper.instance.has('payment'))
+                                CommonStatusChip(
+                                  text: "Promote Pay",
+                                  imagePath: "assets/images/pay.svg",
+                                  textStyle: viewModel.isChipSelected == 6
+                                      ? fontFamilySemiBold.size14.white
+                                      : fontFamilySemiBold.size14.black,
+                                  bgColor: viewModel.isChipSelected == 6
+                                      ? appGreen400
+                                      : white,
+                                  imageColor: viewModel.isChipSelected == 6
+                                      ? white
+                                      : null,
+                                  onTap: () {
+                                    print("Completed");
+                                    viewModel.setChipSelected(6);
+                                  },
+                                  margin: defaultPadding10,
+                                ),
                               // if (viewModel.isInprogress == false)
-                              if (PermissionHelper.instance
-                                      .has('payment'))
-                              CommonStatusChip(
-                                text: "Promote Commission",
-                                imagePath: "assets/images/comission.svg",
-                                textStyle: viewModel.isChipSelected == 7
-                                    ? fontFamilySemiBold.size14.white
-                                    : fontFamilySemiBold.size14.black,
-                                bgColor: viewModel.isChipSelected == 7
-                                    ? appGreen400
-                                    : white,
-                                imageColor: viewModel.isChipSelected == 7
-                                    ? white
-                                    : null,
-                                onTap: () {
-                                  print("Completed");
-                                  viewModel.setChipSelected(7);
-                                },
-                                margin: defaultPadding10,
-                              ),
+                              if (PermissionHelper.instance.has('payment'))
+                                CommonStatusChip(
+                                  text: "Promote Commission",
+                                  imagePath: "assets/images/comission.svg",
+                                  textStyle: viewModel.isChipSelected == 7
+                                      ? fontFamilySemiBold.size14.white
+                                      : fontFamilySemiBold.size14.black,
+                                  bgColor: viewModel.isChipSelected == 7
+                                      ? appGreen400
+                                      : white,
+                                  imageColor: viewModel.isChipSelected == 7
+                                      ? white
+                                      : null,
+                                  onTap: () {
+                                    print("Completed");
+                                    viewModel.setChipSelected(7);
+                                  },
+                                  margin: defaultPadding10,
+                                ),
                               if (PermissionHelper.instance
                                   .has('company_payment_approval'))
                                 CommonStatusChip(

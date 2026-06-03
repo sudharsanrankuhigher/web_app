@@ -1,16 +1,232 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webapp/services/notification_service.dart';
 import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/services/api_service.dart';
+
+class NotificationTemplate {
+  final String id;
+  final String title;
+  final String message;
+  final String category;
+
+  NotificationTemplate({
+    required this.id,
+    required this.title,
+    required this.message,
+    required this.category,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'message': message,
+        'category': category,
+      };
+
+  factory NotificationTemplate.fromJson(Map<String, dynamic> json) =>
+      NotificationTemplate(
+        id: json['id'] ?? '',
+        title: json['title'] ?? '',
+        message: json['message'] ?? '',
+        category: json['category'] ?? 'info',
+      );
+}
 
 class NotificationsViewModel extends BaseViewModel {
   final formKey = GlobalKey<FormState>();
   final titleController = TextEditingController();
   final messageController = TextEditingController();
+  final templateTitleController = TextEditingController();
+  final templateMessageController = TextEditingController();
+
+  List<NotificationTemplate> _templates = [];
+  List<NotificationTemplate> get templates => _templates;
+
+  String _templateCategory = 'info';
+  String get templateCategory => _templateCategory;
+
+  void setTemplateCategory(String value) {
+    _templateCategory = value;
+    notifyListeners();
+  }
+
+  NotificationTemplate? _selectedTemplate;
+  NotificationTemplate? get selectedTemplate => _selectedTemplate;
+
+  void selectTemplate(NotificationTemplate? template) {
+    _selectedTemplate = template;
+    if (template != null) {
+      titleController.text = template.title;
+      messageController.text = template.message;
+      _formCategory = template.category;
+    } else {
+      titleController.clear();
+      messageController.clear();
+      _formCategory = 'info';
+    }
+    notifyListeners();
+  }
 
   NotificationsViewModel() {
     NotificationService.instance.addListener(notifyListeners);
+    loadTemplates();
+  }
+
+  Future<void> loadTemplates() async {
+    setBusy(true);
+    try {
+      final res = await locator<ApiService>().getTemplateList();
+      List<dynamic> list = [];
+      if (res is List) {
+        list = res;
+      } else if (res is Map) {
+        list = res['data'] ?? res['template_list'] ?? res['templates'] ?? [];
+      }
+
+      _templates = list.map((item) {
+        final String id = (item['id'] ?? '').toString();
+        final String title = item['title'] ?? '';
+        final String message = item['description'] ?? item['message'] ?? '';
+        final String category = item['category'] ?? 'info';
+        return NotificationTemplate(
+          id: id,
+          title: title,
+          message: message,
+          category: category,
+        );
+      }).toList();
+    } catch (e) {
+      debugPrint('Error loading templates from backend: $e');
+      await _loadTemplatesFromPrefs();
+    } finally {
+      setBusy(false);
+      notifyListeners();
+    }
+  }
+
+  Future<void> _loadTemplatesFromPrefs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? templatesJson = prefs.getString('notification_templates');
+      if (templatesJson != null) {
+        final List<dynamic> decoded = jsonDecode(templatesJson);
+        _templates =
+            decoded.map((item) => NotificationTemplate.fromJson(item)).toList();
+      }
+    } catch (e) {
+      debugPrint('Error loading templates from prefs: $e');
+    }
+  }
+
+  NotificationTemplate? _editingTemplate;
+  NotificationTemplate? get editingTemplate => _editingTemplate;
+  bool get isEditingTemplate => _editingTemplate != null;
+
+  void startEditingTemplate(NotificationTemplate template) {
+    _editingTemplate = template;
+    templateTitleController.text = template.title;
+    templateMessageController.text = template.message;
+    _templateCategory = template.category;
+    notifyListeners();
+  }
+
+  void cancelEditingTemplate() {
+    _editingTemplate = null;
+    templateTitleController.clear();
+    templateMessageController.clear();
+    _templateCategory = 'info';
+    notifyListeners();
+  }
+
+  Future<void> saveTemplate() async {
+    final title = templateTitleController.text.trim();
+    final message = templateMessageController.text.trim();
+    if (title.isEmpty || message.isEmpty) return;
+
+    setBusy(true);
+    try {
+      final Map<String, dynamic> requestData = {
+        'title': title,
+        'description': message,
+      };
+
+      if (_editingTemplate != null) {
+        requestData['id'] = _editingTemplate!.id;
+      }
+
+      final response = await locator<ApiService>().storeTemplate(requestData);
+
+      _editingTemplate = null;
+      templateTitleController.clear();
+      templateMessageController.clear();
+      _templateCategory = 'info';
+
+      // Fetch fresh list from backend
+      final res = await locator<ApiService>().getTemplateList();
+      List<dynamic> list = [];
+      if (res is List) {
+        list = res;
+      } else if (res is Map) {
+        list = res['data'] ?? res['template_list'] ?? res['templates'] ?? [];
+      }
+
+      _templates = list.map((item) {
+        final String id = (item['id'] ?? '').toString();
+        final String title = item['title'] ?? '';
+        final String message = item['description'] ?? item['message'] ?? '';
+        final String category = item['category'] ?? 'info';
+        return NotificationTemplate(
+          id: id,
+          title: title,
+          message: message,
+          category: category,
+        );
+      }).toList();
+
+      await _saveTemplatesToPrefs();
+    } catch (e) {
+      debugPrint('Error saving template to backend: $e');
+    } finally {
+      setBusy(false);
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteTemplate(String id) async {
+    final intId = int.tryParse(id);
+    if (intId == null) return;
+
+    setBusy(true);
+    try {
+      await locator<ApiService>().deleteTemplate(intId);
+      _templates.removeWhere((t) => t.id == id);
+      if (_selectedTemplate?.id == id) {
+        _selectedTemplate = null;
+      }
+      if (_editingTemplate?.id == id) {
+        cancelEditingTemplate();
+      }
+      await _saveTemplatesToPrefs();
+    } catch (e) {
+      debugPrint('Error deleting template from backend: $e');
+    } finally {
+      setBusy(false);
+      notifyListeners();
+    }
+  }
+
+  Future<void> _saveTemplatesToPrefs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String encoded =
+          jsonEncode(_templates.map((t) => t.toJson()).toList());
+      await prefs.setString('notification_templates', encoded);
+    } catch (e) {
+      debugPrint('Error saving templates: $e');
+    }
   }
 
   Future<void> fetchNotifications() async {
@@ -23,6 +239,8 @@ class NotificationsViewModel extends BaseViewModel {
   void dispose() {
     titleController.dispose();
     messageController.dispose();
+    templateTitleController.dispose();
+    templateMessageController.dispose();
     NotificationService.instance.removeListener(notifyListeners);
     super.dispose();
   }
@@ -115,7 +333,8 @@ class NotificationsViewModel extends BaseViewModel {
   }
 
   void toggleTargetSelection(dynamic item) {
-    final index = _selectedTargets.indexWhere((element) => element['id'] == item['id']);
+    final index =
+        _selectedTargets.indexWhere((element) => element['id'] == item['id']);
     if (index != -1) {
       _selectedTargets.removeAt(index);
     } else {
@@ -126,21 +345,35 @@ class NotificationsViewModel extends BaseViewModel {
 
   List<dynamic> get targetOptions {
     if (_formTargetAudience == 'Users') {
-      return _usersList
-          .map((user) => {
-                'id': user.id,
-                'name': user.name ?? '',
-                'image': '',
-              })
-          .toList();
+      return _usersList.map((user) {
+        if (user is Map) {
+          return {
+            'id': user['id'],
+            'name': user['name'] ?? '',
+            'image': '',
+          };
+        }
+        return {
+          'id': user.id,
+          'name': user.name ?? '',
+          'image': '',
+        };
+      }).toList();
     } else if (_formTargetAudience == 'Influencers') {
-      return _influencersList
-          .map((influencer) => {
-                'id': influencer.id,
-                'name': influencer.name ?? '',
-                'image': influencer.image ?? '',
-              })
-          .toList();
+      return _influencersList.map((influencer) {
+        if (influencer is Map) {
+          return {
+            'id': influencer['id'],
+            'name': influencer['name'] ?? '',
+            'image': influencer['image'] ?? influencer['profile_image'] ?? '',
+          };
+        }
+        return {
+          'id': influencer.id,
+          'name': influencer.name ?? '',
+          'image': influencer.image ?? '',
+        };
+      }).toList();
     } else if (_formTargetAudience == 'Admin / Sub Admin') {
       return _subAdminsList
           .map((subAdmin) => {
@@ -157,14 +390,15 @@ class NotificationsViewModel extends BaseViewModel {
     _isLoadingTargetOptions = true;
     notifyListeners();
 
-    // Fetch users
+    // Fetch users (clients)
     try {
-      final now = DateTime.now();
-      final formattedDate =
-          "${now.year}-${now.month.toString().padLeft(2, '0')}";
-      final res =
-          await locator<ApiService>().getUsers({"month": formattedDate});
-      _usersList = res.data ?? [];
+      final res = await locator<ApiService>().getAdminUserList({
+        'user': 'client',
+        'fcm_token': 1,
+      });
+      _usersList = (res is Map && res['data'] != null)
+          ? res['data']
+          : (res is List ? res : []);
     } catch (e) {
       _usersList = [];
       debugPrint('Error fetching users: $e');
@@ -172,8 +406,13 @@ class NotificationsViewModel extends BaseViewModel {
 
     // Fetch influencers
     try {
-      final res = await locator<ApiService>().getAllInfluencer();
-      _influencersList = res.data ?? [];
+      final res = await locator<ApiService>().getAdminUserList({
+        'user': 'influencer',
+        'fcm_token': 1,
+      });
+      _influencersList = (res is Map && res['data'] != null)
+          ? res['data']
+          : (res is List ? res : []);
     } catch (e) {
       _influencersList = [];
       debugPrint('Error fetching influencers: $e');
@@ -317,34 +556,47 @@ class NotificationsViewModel extends BaseViewModel {
   }
 
   // Submit Compose Form
-  void sendBroadcast() {
+  Future<void> sendBroadcast() async {
     if (formTitle.trim().isEmpty || formMessage.trim().isEmpty) return;
 
     // Output Request Body in developer logs
     debugPrint('Generated Request Body: $lastGeneratedRequestBody');
 
-    NotificationService.instance.sendManualNotification(
-      title: formTitle.trim(),
-      message: formMessage.trim(),
-      category: _formCategory,
-      targetAudience: _formTargetAudience,
-      customTimestamp: combinedScheduledDateTime,
-    );
+    setBusy(true);
+    try {
+      // 1. Send the broadcast payload to the PHP backend API
+      // await _apiService.sendBroadcastNotification(lastGeneratedRequestBody);
 
-    // Reset composer state
-    formKey.currentState?.reset();
-    titleController.clear();
-    messageController.clear();
-    _formCategory = 'info';
-    _formTargetAudience = 'Users';
-    _broadcastType = 'all';
-    _selectedTargets.clear();
-    _isScheduled = false;
-    _scheduledDate = null;
-    _scheduledTime = null;
-    _activeSection =
-        'inbox'; // Back to inbox to see the sent notification at top!
+      // 2. Add to local notifications list on success
+      NotificationService.instance.sendManualNotification(
+        title: formTitle.trim(),
+        message: formMessage.trim(),
+        category: _formCategory,
+        targetAudience: _formTargetAudience,
+        customTimestamp: combinedScheduledDateTime,
+      );
 
-    notifyListeners();
+      // Reset composer state
+      formKey.currentState?.reset();
+      titleController.clear();
+      messageController.clear();
+      _formCategory = 'info';
+      _formTargetAudience = 'Users';
+      _broadcastType = 'all';
+      _selectedTargets.clear();
+      _isScheduled = false;
+      _scheduledDate = null;
+      _scheduledTime = null;
+      _activeSection =
+          'inbox'; // Back to inbox to see the sent notification at top!
+
+      // 3. Refresh notifications list
+      await fetchNotifications();
+    } catch (e) {
+      debugPrint('Error sending broadcast notification: $e');
+    } finally {
+      setBusy(false);
+      notifyListeners();
+    }
   }
 }

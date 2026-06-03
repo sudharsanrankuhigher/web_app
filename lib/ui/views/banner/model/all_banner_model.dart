@@ -43,6 +43,7 @@ class Datum {
   String? image;
   int? infId;
   String? amount;
+  String? status;
   DateTime? startDate;
   DateTime? endDate;
   DateTime? createdAt;
@@ -54,6 +55,7 @@ class Datum {
     this.image,
     this.infId,
     this.amount,
+    this.status,
     this.createdAt,
     this.updatedAt,
     this.startDate,
@@ -65,7 +67,8 @@ class Datum {
         priority: json["priority"],
         image: json["image"],
         infId: json["inf_id"],
-        amount: json["amount"],
+        amount: json["amount"]?.toString(),
+        status: json["status"]?.toString(),
         startDate: json["start_date"] == null
             ? null
             : DateTime.tryParse(json["start_date"].toString()),
@@ -82,6 +85,7 @@ class Datum {
         "image": image,
         "inf_id": infId,
         "amount": amount,
+        "status": status,
         "start_date": startDate?.toIso8601String(),
         "end_date": endDate?.toIso8601String(),
         "created_at": createdAt?.toIso8601String(),

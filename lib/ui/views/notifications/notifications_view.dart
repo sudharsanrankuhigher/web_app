@@ -6,7 +6,6 @@ import 'package:stacked/stacked.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
-import 'package:webapp/widgets/no_access_widget.dart';
 import 'package:webapp/widgets/initial_textform.dart';
 
 import 'notifications_viewmodel.dart';
@@ -26,7 +25,7 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
 
     // Fallback: If permissions is not empty, respect canView('notifications'), otherwise allow in debug/development.
     final bool hasAccess =
-        PermissionHelper.instance.canView('send_notifications ') ||
+        PermissionHelper.instance.has('send_notifications') ||
             PermissionHelper.instance.userPermissions.isEmpty;
 
     // if (!hasAccess) {
@@ -124,8 +123,16 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                       icon: Icons.inbox_rounded,
                       label: 'Inbox',
                     ),
-                    horizontalSpacing16,
-                    if (hasAccess)
+                    if (hasAccess) ...[
+                      horizontalSpacing16,
+                      _buildSectionTab(
+                        context,
+                        viewModel,
+                        sectionValue: 'create_template',
+                        icon: Icons.dashboard_customize_rounded,
+                        label: 'Create Template',
+                      ),
+                      horizontalSpacing16,
                       _buildSectionTab(
                         context,
                         viewModel,
@@ -133,6 +140,7 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                         icon: Icons.send_rounded,
                         label: 'Send Broadcast',
                       ),
+                    ],
                   ],
                 ),
               ],
@@ -142,7 +150,9 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
           // ─── Main Content Toggled Views ───
           Expanded(
             child: IndexedStack(
-              index: viewModel.activeSection == 'inbox' ? 0 : 1,
+              index: viewModel.activeSection == 'inbox'
+                  ? 0
+                  : (viewModel.activeSection == 'send' ? 1 : 2),
               children: [
                 // Section 0: Inbox View
                 Column(
@@ -250,6 +260,8 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                 ),
                 // Section 1: Compose Form View
                 _buildBroadcastForm(context, viewModel),
+                // Section 2: Create Template View
+                _buildCreateTemplateForm(context, viewModel),
               ],
             ),
           ),
@@ -344,6 +356,58 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                       style: fontFamilyMedium.size12.greyColor,
                     ),
                     const SizedBox(height: 24),
+                    // Template Dropdown
+                    Text(
+                      'Select Notification Template (Optional)',
+                      style: fontFamilySemiBold.size13.black,
+                    ),
+                    verticalSpacing8,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color:
+                            isDark ? const Color(0xFF1E293B) : Colors.grey[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                          width: 1,
+                        ),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<NotificationTemplate>(
+                          value: viewModel.selectedTemplate,
+                          hint: Text(
+                            'Choose a template to pre-fill...',
+                            style: fontFamilyMedium.size12.greyColor,
+                          ),
+                          isExpanded: true,
+                          dropdownColor: Theme.of(context).colorScheme.surface,
+                          items: [
+                            DropdownMenuItem<NotificationTemplate>(
+                              value: null,
+                              child: Text(
+                                '-- Clear Selection / Custom Message --',
+                                style: fontFamilyMedium.size12
+                                    .copyWith(color: Colors.red),
+                              ),
+                            ),
+                            ...viewModel.templates.map((t) {
+                              return DropdownMenuItem<NotificationTemplate>(
+                                value: t,
+                                child: Text(
+                                  t.title,
+                                  style: fontFamilyMedium.size12.black,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              );
+                            }).toList(),
+                          ],
+                          onChanged: viewModel.selectTemplate,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
                     // Title Field
                     Text(
                       'Broadcast Title',
@@ -377,15 +441,6 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                           ? 'Message content is required'
                           : null,
                     ),
-                    const SizedBox(height: 20),
-
-                    // Category Selector
-                    Text(
-                      'Notification Category',
-                      style: fontFamilySemiBold.size13.black,
-                    ),
-                    verticalSpacing8,
-                    _buildCategorySelector(viewModel),
                     const SizedBox(height: 20),
 
                     // Target Audience Selector
@@ -426,191 +481,191 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                     ],
 
                     // Scheduling Header Card & Toggle
-                    Container(
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF0F172A)
-                            : const Color(0xFFF9FAFB),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isDark
-                              ? const Color(0xFF334155)
-                              : const Color(0xFFE5E7EB),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          SwitchListTile.adaptive(
-                            title: Row(
-                              children: [
-                                Icon(
-                                  Icons.calendar_month_rounded,
-                                  size: 20,
-                                  color: viewModel.isScheduled
-                                      ? continueButton
-                                      : Colors.grey[600],
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  'Schedule for Later',
-                                  style: fontFamilyBold.size13.copyWith(
-                                    color: viewModel.isScheduled
-                                        ? continueButton
-                                        : (isDark
-                                            ? Colors.grey[400]
-                                            : Colors.grey[800]),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            subtitle: Padding(
-                              padding: const EdgeInsets.only(left: 30.0),
-                              child: Text(
-                                'Set an optional custom date & time to dispatch',
-                                style: fontFamilyMedium.size11.greyColor,
-                              ),
-                            ),
-                            value: viewModel.isScheduled,
-                            activeColor: continueButton,
-                            onChanged: viewModel.toggleScheduled,
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 4),
-                          ),
-                          if (viewModel.isScheduled) ...[
-                            Divider(
-                                height: 1,
-                                color: isDark
-                                    ? const Color(0xFF334155)
-                                    : const Color(0xFFE5E7EB)),
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Row(
-                                children: [
-                                  // Date Picker Button
-                                  Expanded(
-                                    child: InkWell(
-                                      onTap: () =>
-                                          viewModel.selectDate(context),
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 12, horizontal: 14),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: viewModel.scheduledDate !=
-                                                    null
-                                                ? continueButton.withValues(
-                                                    alpha: 0.5)
-                                                : (isDark
-                                                    ? const Color(0xFF475569)
-                                                    : const Color(0xFFD1D5DB)),
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: isDark
-                                              ? const Color(0xFF1E293B)
-                                              : white,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              Icons.date_range_rounded,
-                                              size: 16,
-                                              color: viewModel.scheduledDate !=
-                                                      null
-                                                  ? continueButton
-                                                  : Colors.grey[600],
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: Text(
-                                                viewModel.scheduledDate != null
-                                                    ? "${viewModel.scheduledDate!.day}/${viewModel.scheduledDate!.month}/${viewModel.scheduledDate!.year}"
-                                                    : "Select Date",
-                                                style: fontFamilyMedium.size12
-                                                    .copyWith(
-                                                  color:
-                                                      viewModel.scheduledDate !=
-                                                              null
-                                                          ? (isDark
-                                                              ? Colors.white
-                                                              : Colors.black87)
-                                                          : Colors.grey[500],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  // Time Picker Button
-                                  Expanded(
-                                    child: InkWell(
-                                      onTap: () =>
-                                          viewModel.selectTime(context),
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 12, horizontal: 14),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: viewModel.scheduledTime !=
-                                                    null
-                                                ? continueButton.withValues(
-                                                    alpha: 0.5)
-                                                : (isDark
-                                                    ? const Color(0xFF475569)
-                                                    : const Color(0xFFD1D5DB)),
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: isDark
-                                              ? const Color(0xFF1E293B)
-                                              : white,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              Icons.access_time_rounded,
-                                              size: 16,
-                                              color: viewModel.scheduledTime !=
-                                                      null
-                                                  ? continueButton
-                                                  : Colors.grey[600],
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: Text(
-                                                viewModel.scheduledTime != null
-                                                    ? viewModel.scheduledTime!
-                                                        .format(context)
-                                                    : "Select Time",
-                                                style: fontFamilyMedium.size12
-                                                    .copyWith(
-                                                  color:
-                                                      viewModel.scheduledTime !=
-                                                              null
-                                                          ? (isDark
-                                                              ? Colors.white
-                                                              : Colors.black87)
-                                                          : Colors.grey[500],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
+                    // Container(
+                    //   decoration: BoxDecoration(
+                    //     color: isDark
+                    //         ? const Color(0xFF0F172A)
+                    //         : const Color(0xFFF9FAFB),
+                    //     borderRadius: BorderRadius.circular(12),
+                    //     border: Border.all(
+                    //       color: isDark
+                    //           ? const Color(0xFF334155)
+                    //           : const Color(0xFFE5E7EB),
+                    //     ),
+                    //   ),
+                    //   child: Column(
+                    //     children: [
+                    //       SwitchListTile.adaptive(
+                    //         title: Row(
+                    //           children: [
+                    //             Icon(
+                    //               Icons.calendar_month_rounded,
+                    //               size: 20,
+                    //               color: viewModel.isScheduled
+                    //                   ? continueButton
+                    //                   : Colors.grey[600],
+                    //             ),
+                    //             const SizedBox(width: 10),
+                    //             Text(
+                    //               'Schedule for Later',
+                    //               style: fontFamilyBold.size13.copyWith(
+                    //                 color: viewModel.isScheduled
+                    //                     ? continueButton
+                    //                     : (isDark
+                    //                         ? Colors.grey[400]
+                    //                         : Colors.grey[800]),
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //         subtitle: Padding(
+                    //           padding: const EdgeInsets.only(left: 30.0),
+                    //           child: Text(
+                    //             'Set an optional custom date & time to dispatch',
+                    //             style: fontFamilyMedium.size11.greyColor,
+                    //           ),
+                    //         ),
+                    //         value: viewModel.isScheduled,
+                    //         activeColor: continueButton,
+                    //         onChanged: viewModel.toggleScheduled,
+                    //         contentPadding: const EdgeInsets.symmetric(
+                    //             horizontal: 16, vertical: 4),
+                    //       ),
+                    //       if (viewModel.isScheduled) ...[
+                    //         Divider(
+                    //             height: 1,
+                    //             color: isDark
+                    //                 ? const Color(0xFF334155)
+                    //                 : const Color(0xFFE5E7EB)),
+                    //         Padding(
+                    //           padding: const EdgeInsets.all(16.0),
+                    //           child: Row(
+                    //             children: [
+                    //               // Date Picker Button
+                    //               Expanded(
+                    //                 child: InkWell(
+                    //                   onTap: () =>
+                    //                       viewModel.selectDate(context),
+                    //                   borderRadius: BorderRadius.circular(10),
+                    //                   child: Container(
+                    //                     padding: const EdgeInsets.symmetric(
+                    //                         vertical: 12, horizontal: 14),
+                    //                     decoration: BoxDecoration(
+                    //                       border: Border.all(
+                    //                         color: viewModel.scheduledDate !=
+                    //                                 null
+                    //                             ? continueButton.withValues(
+                    //                                 alpha: 0.5)
+                    //                             : (isDark
+                    //                                 ? const Color(0xFF475569)
+                    //                                 : const Color(0xFFD1D5DB)),
+                    //                       ),
+                    //                       borderRadius:
+                    //                           BorderRadius.circular(10),
+                    //                       color: isDark
+                    //                           ? const Color(0xFF1E293B)
+                    //                           : white,
+                    //                     ),
+                    //                     child: Row(
+                    //                       children: [
+                    //                         Icon(
+                    //                           Icons.date_range_rounded,
+                    //                           size: 16,
+                    //                           color: viewModel.scheduledDate !=
+                    //                                   null
+                    //                               ? continueButton
+                    //                               : Colors.grey[600],
+                    //                         ),
+                    //                         const SizedBox(width: 8),
+                    //                         Expanded(
+                    //                           child: Text(
+                    //                             viewModel.scheduledDate != null
+                    //                                 ? "${viewModel.scheduledDate!.day}/${viewModel.scheduledDate!.month}/${viewModel.scheduledDate!.year}"
+                    //                                 : "Select Date",
+                    //                             style: fontFamilyMedium.size12
+                    //                                 .copyWith(
+                    //                               color:
+                    //                                   viewModel.scheduledDate !=
+                    //                                           null
+                    //                                       ? (isDark
+                    //                                           ? Colors.white
+                    //                                           : Colors.black87)
+                    //                                       : Colors.grey[500],
+                    //                             ),
+                    //                           ),
+                    //                         ),
+                    //                       ],
+                    //                     ),
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //               const SizedBox(width: 12),
+                    //               // Time Picker Button
+                    //               Expanded(
+                    //                 child: InkWell(
+                    //                   onTap: () =>
+                    //                       viewModel.selectTime(context),
+                    //                   borderRadius: BorderRadius.circular(10),
+                    //                   child: Container(
+                    //                     padding: const EdgeInsets.symmetric(
+                    //                         vertical: 12, horizontal: 14),
+                    //                     decoration: BoxDecoration(
+                    //                       border: Border.all(
+                    //                         color: viewModel.scheduledTime !=
+                    //                                 null
+                    //                             ? continueButton.withValues(
+                    //                                 alpha: 0.5)
+                    //                             : (isDark
+                    //                                 ? const Color(0xFF475569)
+                    //                                 : const Color(0xFFD1D5DB)),
+                    //                       ),
+                    //                       borderRadius:
+                    //                           BorderRadius.circular(10),
+                    //                       color: isDark
+                    //                           ? const Color(0xFF1E293B)
+                    //                           : white,
+                    //                     ),
+                    //                     child: Row(
+                    //                       children: [
+                    //                         Icon(
+                    //                           Icons.access_time_rounded,
+                    //                           size: 16,
+                    //                           color: viewModel.scheduledTime !=
+                    //                                   null
+                    //                               ? continueButton
+                    //                               : Colors.grey[600],
+                    //                         ),
+                    //                         const SizedBox(width: 8),
+                    //                         Expanded(
+                    //                           child: Text(
+                    //                             viewModel.scheduledTime != null
+                    //                                 ? viewModel.scheduledTime!
+                    //                                     .format(context)
+                    //                                 : "Select Time",
+                    //                             style: fontFamilyMedium.size12
+                    //                                 .copyWith(
+                    //                               color:
+                    //                                   viewModel.scheduledTime !=
+                    //                                           null
+                    //                                       ? (isDark
+                    //                                           ? Colors.white
+                    //                                           : Colors.black87)
+                    //                                       : Colors.grey[500],
+                    //                             ),
+                    //                           ),
+                    //                         ),
+                    //                       ],
+                    //                     ),
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     ],
+                    //   ),
+                    // ),
                     const SizedBox(height: 32),
 
                     // Action Button
@@ -715,7 +770,10 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
     );
   }
 
-  Widget _buildCategorySelector(NotificationsViewModel viewModel) {
+  Widget _buildCategorySelector({
+    required String selectedCategory,
+    required ValueChanged<String> onCategorySelected,
+  }) {
     final categories = [
       {
         'value': 'info',
@@ -745,13 +803,13 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
 
     return Row(
       children: categories.map((cat) {
-        final bool isSelected = viewModel.formCategory == cat['value'];
+        final bool isSelected = selectedCategory == cat['value'];
         final Color catColor = cat['color'] as Color;
         return Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: GestureDetector(
-              onTap: () => viewModel.setFormCategory(cat['value'] as String),
+              onTap: () => onCategorySelected(cat['value'] as String),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(vertical: 12),
@@ -1554,6 +1612,339 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
     );
   }
 
+  Widget _buildCreateTemplateForm(
+    BuildContext context,
+    NotificationsViewModel viewModel,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final formKey = GlobalKey<FormState>();
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1000),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Left side: Create form
+              Expanded(
+                flex: 4,
+                child: Card(
+                  color: Theme.of(context).colorScheme.surface,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.all(28),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            viewModel.isEditingTemplate
+                                ? 'Edit Template'
+                                : 'Create Template',
+                            style: fontFamilyBold.size18.black,
+                          ),
+                          verticalSpacing4,
+                          Text(
+                            viewModel.isEditingTemplate
+                                ? 'Modify the selected message template.'
+                                : 'Define reusable message templates for future broadcasts.',
+                            style: fontFamilyMedium.size12.greyColor,
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            'Template Title',
+                            style: fontFamilySemiBold.size13.black,
+                          ),
+                          verticalSpacing8,
+                          InitialTextForm(
+                            key: const ValueKey('tmpl_title_field'),
+                            radius: 12,
+                            hintText:
+                                'e.g., Welcome Message, Action Required...',
+                            controller: viewModel.templateTitleController,
+                            validator: (v) => v == null || v.trim().isEmpty
+                                ? 'Template title is required'
+                                : null,
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            'Notification Category',
+                            style: fontFamilySemiBold.size13.black,
+                          ),
+                          verticalSpacing8,
+                          _buildCategorySelector(
+                            selectedCategory: viewModel.templateCategory,
+                            onCategorySelected: viewModel.setTemplateCategory,
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            'Template Message',
+                            style: fontFamilySemiBold.size13.black,
+                          ),
+                          verticalSpacing8,
+                          InitialTextForm(
+                            key: const ValueKey('tmpl_msg_field'),
+                            radius: 12,
+                            maxLines: 5,
+                            hintText: 'Write the template message content...',
+                            controller: viewModel.templateMessageController,
+                            validator: (v) => v == null || v.trim().isEmpty
+                                ? 'Template message is required'
+                                : null,
+                          ),
+                          const SizedBox(height: 28),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  height: 48,
+                                  child: ElevatedButton(
+                                    onPressed: viewModel.isBusy
+                                        ? null
+                                        : () async {
+                                            if (formKey.currentState!
+                                                .validate()) {
+                                              final wasEditing =
+                                                  viewModel.isEditingTemplate;
+                                              await viewModel.saveTemplate();
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    wasEditing
+                                                        ? 'Template updated successfully!'
+                                                        : 'Template saved successfully!',
+                                                    style: fontFamilySemiBold
+                                                        .size12.white,
+                                                  ),
+                                                  backgroundColor: appGreen500,
+                                                  behavior:
+                                                      SnackBarBehavior.floating,
+                                                  margin:
+                                                      const EdgeInsets.all(24),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                    child: viewModel.isBusy
+                                        ? const SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                viewModel.isEditingTemplate
+                                                    ? Icons.update_rounded
+                                                    : Icons.save_rounded,
+                                                size: 18,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                viewModel.isEditingTemplate
+                                                    ? 'Update Template'
+                                                    : 'Save Template',
+                                                style: fontFamilySemiBold
+                                                    .size14.white,
+                                              ),
+                                            ],
+                                          ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: continueButton,
+                                      foregroundColor: white,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              if (viewModel.isEditingTemplate) ...[
+                                const SizedBox(width: 12),
+                                SizedBox(
+                                  height: 48,
+                                  child: OutlinedButton(
+                                    onPressed: viewModel.cancelEditingTemplate,
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor:
+                                          Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.grey[300]
+                                              : Colors.grey[700],
+                                      side: BorderSide(
+                                        color: Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.grey[700]!
+                                            : Colors.grey[300]!,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Cancel',
+                                      style: fontFamilySemiBold.size14,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 24),
+              // Right side: Templates List
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0, bottom: 12.0),
+                      child: Text(
+                        'Saved Templates (${viewModel.templates.length})',
+                        style: fontFamilyBold.size14.black,
+                      ),
+                    ),
+                    if (viewModel.templates.isEmpty)
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                Icon(Icons.analytics_outlined,
+                                    size: 36, color: Colors.grey[300]),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'No templates saved yet.',
+                                  style: fontFamilyMedium.size12.greyColor,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      SizedBox(
+                        height: 500,
+                        child: ListView.builder(
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: viewModel.templates.length,
+                          itemBuilder: (context, index) {
+                            final t = viewModel.templates[index];
+                            return Card(
+                              color: Theme.of(context).colorScheme.surface,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                              margin: const EdgeInsets.only(bottom: 12),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Row(
+                                            children: [
+                                              _buildCategoryIcon(t.category),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Text(
+                                                  t.title,
+                                                  style: fontFamilyBold
+                                                      .size13.black,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              icon: Icon(
+                                                Icons.edit_rounded,
+                                                color: continueButton,
+                                                size: 16,
+                                              ),
+                                              onPressed: () {
+                                                viewModel
+                                                    .startEditingTemplate(t);
+                                              },
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.delete_outline_rounded,
+                                                color: Colors.red,
+                                                size: 16,
+                                              ),
+                                              onPressed: () {
+                                                _confirmDeleteTemplate(
+                                                  context,
+                                                  viewModel,
+                                                  t.id,
+                                                  t.title,
+                                                );
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      t.message,
+                                      style: fontFamilyMedium.size12.greyColor,
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   NotificationsViewModel viewModelBuilder(
     BuildContext context,
@@ -1564,5 +1955,74 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
   void onViewModelReady(NotificationsViewModel viewModel) {
     viewModel.fetchNotifications();
     super.onViewModelReady(viewModel);
+  }
+
+  void _confirmDeleteTemplate(
+    BuildContext context,
+    NotificationsViewModel viewModel,
+    String templateId,
+    String title,
+  ) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text("Confirm Delete"),
+          content: Text(
+              "Are you sure you want to delete the template '$title'? This action cannot be undone."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () async {
+                Navigator.pop(dialogContext);
+                await viewModel.deleteTemplate(templateId);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Template deleted.',
+                        style: fontFamilySemiBold.size12.white,
+                      ),
+                      backgroundColor: Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                      margin: const EdgeInsets.all(24),
+                    ),
+                  );
+                }
+              },
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildCategoryIcon(String category) {
+    IconData iconData = Icons.info_outline_rounded;
+    Color color = continueButton;
+    switch (category) {
+      case 'success':
+        iconData = Icons.check_circle_outline_rounded;
+        color = appGreen500;
+        break;
+      case 'warning':
+        iconData = Icons.warning_amber_rounded;
+        color = pendingColor;
+        break;
+      case 'alert':
+        iconData = Icons.error_outline_rounded;
+        color = red;
+        break;
+    }
+    return Icon(iconData, size: 14, color: color);
   }
 }

@@ -15,12 +15,14 @@ class AddressDialog extends StatefulWidget {
     required String state,
     required CityModel city,
     required String phone,
+    required bool isHeadoffice,
   })? onSave;
 
   final void Function({
     required String state,
     required List<CityModel> cities,
     required String phone,
+    required bool isHeadoffice,
   })? onSaveMulti; // 🔥 NEW
 
   const AddressDialog({
@@ -45,6 +47,7 @@ class _AddressDialogState extends State<AddressDialog> {
   String? selectedState;
   String? selectedCity;
   List<String> selectedCities = []; // 🔥 NEW
+  bool isHeadoffice = false; // 🔥 NEW
 
   String? selectedId;
 
@@ -64,18 +67,22 @@ class _AddressDialogState extends State<AddressDialog> {
       isStateError = selectedState == null;
 
       // 🔥 handle both cases
-      isCityError =
-          widget.multi ? selectedCities.isEmpty : selectedCity == null;
+      isCityError = isHeadoffice
+          ? false
+          : (widget.multi ? selectedCities.isEmpty : selectedCity == null);
     });
 
-    if (!_formKey.currentState!.validate() || selectedState == null) {
+    if (!_formKey.currentState!.validate() ||
+        selectedState == null ||
+        (!isHeadoffice && isCityError)) {
       return;
     }
 
     /// ================= MULTI SELECT =================
     if (widget.multi) {
-      final selectedCityModels =
-          cities.where((c) => selectedCities.contains(c.name)).toList();
+      final selectedCityModels = isHeadoffice
+          ? <CityModel>[]
+          : cities.where((c) => selectedCities.contains(c.name)).toList();
 
       /// 🔥 DEBUG PRINT
       print("Selected Cities:");
@@ -88,6 +95,7 @@ class _AddressDialogState extends State<AddressDialog> {
         "state": selectedState,
         "city_ids": selectedCityModels.map((e) => e.id).toList(),
         "phone": _phoneController.text.trim(),
+        "isheadoffice": isHeadoffice,
       };
 
       print("API BODY (MULTI): $body");
@@ -97,34 +105,25 @@ class _AddressDialogState extends State<AddressDialog> {
         state: selectedState!,
         cities: selectedCityModels,
         phone: _phoneController.text.trim(),
+        isHeadoffice: isHeadoffice,
       );
     }
 
     /// ================= SINGLE SELECT =================
     else {
-      if (selectedCity == null) return;
-
-      final cityModel = cities.firstWhere(
-        (c) => c.name == selectedCity,
-      );
-
-      /// 🔥 DEBUG PRINT
-      print("Selected City: ${cityModel.id} - ${cityModel.name}");
-
-      /// 🔥 API FORMAT
-      final body = {
-        "state": selectedState,
-        "city_id": cityModel.id,
-        "phone": _phoneController.text.trim(),
-      };
-
-      print("API BODY (SINGLE): $body");
+      final cityModel = isHeadoffice
+          ? null
+          : cities.firstWhere(
+              (c) => c.name == selectedCity,
+              orElse: () => CityModel(id: '', name: '', state: ''),
+            );
 
       /// 🔥 CALLBACK
       widget.onSave!(
         state: selectedState!,
-        city: cityModel,
+        city: cityModel ?? CityModel(id: '', name: '', state: ''),
         phone: _phoneController.text.trim(),
+        isHeadoffice: isHeadoffice,
       );
     }
 
@@ -135,6 +134,7 @@ class _AddressDialogState extends State<AddressDialog> {
   void initState() {
     if (widget.initialData != null) {
       selectedState = widget.initialData!['state'];
+      isHeadoffice = widget.initialData!['isheadoffice'] ?? false;
 
       /// 🔥 FIX CITY LIST
       final cityData = widget.initialData!['city'];
@@ -186,13 +186,40 @@ class _AddressDialogState extends State<AddressDialog> {
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
+
+                /// TOGGLE HEAD OFFICE
+                SwitchListTile(
+                  title: Text(
+                    "Is Head Office",
+                    style: fontFamilyMedium.size13.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  value: isHeadoffice,
+                  activeColor: continueButton,
+                  contentPadding: EdgeInsets.zero,
+                  onChanged: widget.isView
+                      ? null
+                      : (val) {
+                          setState(() {
+                            isHeadoffice = val;
+                            if (isHeadoffice) {
+                              selectedCity = null;
+                              selectedCities = [];
+                              isCityError = false;
+                            }
+                          });
+                        },
+                ),
+
+                const SizedBox(height: 10),
 
                 /// STATE & CITY
                 IgnorePointer(
                     ignoring: widget.isView == true ? true : false,
                     child: StateCityDynamicDropdown(
-                      showCity: true,
+                      showCity: !isHeadoffice,
                       multi: widget.multi,
                       initialCities: selectedCities,
                       states: widget.states,

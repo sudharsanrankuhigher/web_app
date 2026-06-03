@@ -51,6 +51,7 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
     const DataColumn(label: Text("Priority")),
     const DataColumn(label: Text("Start Date")),
     const DataColumn(label: Text("End Date")),
+    const DataColumn(label: Text("status")),
     const DataColumn(
         label: Text('Action'), headingRowAlignment: MainAxisAlignment.center)
   ];

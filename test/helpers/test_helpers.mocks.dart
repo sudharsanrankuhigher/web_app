@@ -978,18 +978,20 @@ class MockApiService extends _i1.Mock implements _i27.ApiService {
       ) as _i25.Future<_i3.GetAdminProfileResponse>);
 
   @override
-  _i25.Future<_i4.GetUsersResponse> getUsers(dynamic data) =>
+  _i25.Future<_i4.GetUsersResponse> getUsers({dynamic data}) =>
       (super.noSuchMethod(
         Invocation.method(
           #getUsers,
-          [data],
+          [],
+          {#data: data},
         ),
         returnValue:
             _i25.Future<_i4.GetUsersResponse>.value(_FakeGetUsersResponse_2(
           this,
           Invocation.method(
             #getUsers,
-            [data],
+            [],
+            {#data: data},
           ),
         )),
         returnValueForMissingStub:
@@ -997,7 +999,8 @@ class MockApiService extends _i1.Mock implements _i27.ApiService {
           this,
           Invocation.method(
             #getUsers,
-            [data],
+            [],
+            {#data: data},
           ),
         )),
       ) as _i25.Future<_i4.GetUsersResponse>);
@@ -2152,6 +2155,60 @@ class MockApiService extends _i1.Mock implements _i27.ApiService {
         Invocation.method(
           #readAllNotifications,
           [],
+        ),
+        returnValue: _i25.Future<dynamic>.value(),
+        returnValueForMissingStub: _i25.Future<dynamic>.value(),
+      ) as _i25.Future<dynamic>);
+
+  @override
+  _i25.Future<dynamic> sendBroadcastNotification(
+          Map<String, dynamic>? request) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #sendBroadcastNotification,
+          [request],
+        ),
+        returnValue: _i25.Future<dynamic>.value(),
+        returnValueForMissingStub: _i25.Future<dynamic>.value(),
+      ) as _i25.Future<dynamic>);
+
+  @override
+  _i25.Future<dynamic> getAdminUserList(Map<String, dynamic>? request) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getAdminUserList,
+          [request],
+        ),
+        returnValue: _i25.Future<dynamic>.value(),
+        returnValueForMissingStub: _i25.Future<dynamic>.value(),
+      ) as _i25.Future<dynamic>);
+
+  @override
+  _i25.Future<dynamic> storeTemplate(Map<String, dynamic>? request) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #storeTemplate,
+          [request],
+        ),
+        returnValue: _i25.Future<dynamic>.value(),
+        returnValueForMissingStub: _i25.Future<dynamic>.value(),
+      ) as _i25.Future<dynamic>);
+
+  @override
+  _i25.Future<dynamic> getTemplateList() => (super.noSuchMethod(
+        Invocation.method(
+          #getTemplateList,
+          [],
+        ),
+        returnValue: _i25.Future<dynamic>.value(),
+        returnValueForMissingStub: _i25.Future<dynamic>.value(),
+      ) as _i25.Future<dynamic>);
+
+  @override
+  _i25.Future<dynamic> deleteTemplate(int? id) => (super.noSuchMethod(
+        Invocation.method(
+          #deleteTemplate,
+          [id],
         ),
         returnValue: _i25.Future<dynamic>.value(),
         returnValueForMissingStub: _i25.Future<dynamic>.value(),

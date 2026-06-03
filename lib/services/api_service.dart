@@ -44,8 +44,8 @@ class ApiService {
   static ApiService init() {
     final dio = Dio(
       BaseOptions(
-        // baseUrl: 'https://admin.promoteapp.in/',
-        baseUrl: 'http://172.20.25.23:8003/', //saran
+        baseUrl: 'https://admin.promoteapp.in/',
+        // baseUrl: 'http://172.20.25.23:8003/', //saran
         // baseUrl: 'http://172.20.25.55:8888/', //shy
         // baseUrl: 'http://172.20.25.23:8002/',
         // baseUrl: 'http://172.20.25.54:8005/',//deepak
@@ -144,7 +144,7 @@ class ApiService {
   }
 
   /// Get : /api/admin/get-users
-  Future<GetUsersResponse> getUsers(data) async {
+  Future<GetUsersResponse> getUsers({data}) async {
     final response = await _dio.post('api/admin/get-users', data: data);
     if (response.statusCode == 200) {
       // Fluttertoast.showToast(msg: response.data["message"].toString());
@@ -1763,6 +1763,92 @@ class ApiService {
   /// POST: /api/admin/notification-read-all
   Future<dynamic> readAllNotifications() async {
     final response = await _dio.post('api/admin/notification-read-all');
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      final message = response.data?['message'] ?? 'Server error';
+      throw Exception(message);
+    }
+  }
+
+  /// POST: /api/admin/notification-send
+  Future<dynamic> sendBroadcastNotification(
+      Map<String, dynamic> request) async {
+    final response = await _dio.post(
+      'api/admin/notification-send',
+      data: request,
+      options: Options(
+        validateStatus: (status) => status != null && status < 500,
+      ),
+    );
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      final message = response.data?['message'] ?? 'Server error';
+      throw Exception(message);
+    }
+  }
+
+  /// POST: /api/admin/user-list
+  Future<dynamic> getAdminUserList(Map<String, dynamic> request) async {
+    final response = await _dio.post(
+      'api/admin/user-list',
+      data: request,
+      options: Options(
+        validateStatus: (status) => status != null && status < 500,
+      ),
+    );
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      final message = response.data?['message'] ?? 'Server error';
+      throw Exception(message);
+    }
+  }
+
+  /// POST: /api/admin/template-store
+  Future<dynamic> storeTemplate(Map<String, dynamic> request) async {
+    final response = await _dio.post(
+      'api/admin/template-store',
+      data: request,
+      options: Options(
+        validateStatus: (status) => status != null && status < 500,
+      ),
+    );
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      final message = response.data?['message'] ?? 'Server error';
+      throw Exception(message);
+    }
+  }
+
+  /// GET: /api/admin/template-list
+  Future<dynamic> getTemplateList() async {
+    final response = await _dio.get(
+      'api/admin/template-list',
+      options: Options(
+        validateStatus: (status) => status != null && status < 500,
+      ),
+    );
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      final message = response.data?['message'] ?? 'Server error';
+      throw Exception(message);
+    }
+  }
+
+  /// DELETE: /api/admin/template-delete
+  Future<dynamic> deleteTemplate(int id) async {
+    final response = await _dio.delete(
+      'api/admin/template-delete',
+      data: {'id': id},
+      queryParameters: {'id': id},
+      options: Options(
+        validateStatus: (status) => status != null && status < 500,
+      ),
+    );
     if (response.statusCode == 200) {
       return response.data;
     } else {
