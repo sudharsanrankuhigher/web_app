@@ -1251,9 +1251,9 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
     double taxPercent = double.tryParse(taxPercentCtrl.text) ?? 0;
     double commPercent = double.tryParse(commPercentCtrl.text) ?? 0;
 
-    double taxAmount = (payment * taxPercent) / 100;
-    _taxAmount = taxAmount;
     double commissionAmount = (payment * commPercent) / 100;
+    double taxAmount = ((payment + commissionAmount) * taxPercent) / 100;
+    _taxAmount = taxAmount;
     double totalAmount = payment + taxAmount + commissionAmount;
 
     // Use a flag to prevent recursive listener calls if necessary,

@@ -197,7 +197,7 @@ class _AddressDialogState extends State<AddressDialog> {
                     ),
                   ),
                   value: isHeadoffice,
-                  activeColor: continueButton,
+                  activeThumbColor: continueButton,
                   contentPadding: EdgeInsets.zero,
                   onChanged: widget.isView
                       ? null

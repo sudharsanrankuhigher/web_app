@@ -358,7 +358,7 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                     const SizedBox(height: 24),
                     // Template Dropdown
                     Text(
-                      'Select Notification Template (Optional)',
+                      'Select Notification Template',
                       style: fontFamilySemiBold.size13.black,
                     ),
                     verticalSpacing8,
@@ -677,6 +677,33 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                           if (formKey.currentState!.validate()) {
                             formKey.currentState!.save();
 
+                            if (viewModel.selectedTemplate == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.error_outline_rounded,
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        'Please select a notification template.',
+                                        style: fontFamilySemiBold.size13.white,
+                                      ),
+                                    ],
+                                  ),
+                                  backgroundColor: red,
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  margin: const EdgeInsets.all(24),
+                                ),
+                              );
+                              return;
+                            }
+
                             if (viewModel.broadcastType == 'separately' &&
                                 viewModel.selectedTargets.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -739,8 +766,59 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                             _showRequestBodyDialog(
                               context,
                               requestPayload,
-                              onAcknowledge: () {
-                                viewModel.sendBroadcast();
+                              onAcknowledge: () async {
+                                try {
+                                  await viewModel.sendBroadcast();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.check_circle_outline_rounded,
+                                            color: Colors.white,
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Text(
+                                            'Broadcast sent successfully!',
+                                            style: fontFamilySemiBold.size13.white,
+                                          ),
+                                        ],
+                                      ),
+                                      backgroundColor: appGreen500,
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      margin: const EdgeInsets.all(24),
+                                    ),
+                                  );
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.error_outline_rounded,
+                                            color: Colors.white,
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Text(
+                                              'Failed to send broadcast: $e',
+                                              style: fontFamilySemiBold.size13.white,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      backgroundColor: red,
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      margin: const EdgeInsets.all(24),
+                                    ),
+                                  );
+                                }
                               },
                             );
                           }
@@ -853,10 +931,6 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
     final audiences = [
       {'value': 'Users', 'icon': Icons.people_outline_rounded},
       {'value': 'Influencers', 'icon': Icons.campaign_outlined},
-      {
-        'value': 'Admin / Sub Admin',
-        'icon': Icons.admin_panel_settings_outlined
-      },
     ];
 
     return Row(
@@ -1455,9 +1529,6 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
     Map<String, dynamic> requestBody, {
     required VoidCallback onAcknowledge,
   }) {
-    final String jsonString =
-        const JsonEncoder.withIndent('  ').convert(requestBody);
-
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1475,18 +1546,18 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Success Header
+                  // Confirmation Header
                   Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: appGreen500.withValues(alpha: 0.1),
+                          color: continueButton.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
-                          Icons.check_circle_outline_rounded,
-                          color: appGreen500,
+                          Icons.help_outline_rounded,
+                          color: continueButton,
                           size: 28,
                         ),
                       ),
@@ -1496,12 +1567,12 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Broadcast Dispatched!',
+                              'Confirm Broadcast Dispatch',
                               style: fontFamilyBold.size18.black,
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Notification successfully added and sent.',
+                              'Are you sure you want to dispatch this broadcast notification?',
                               style: fontFamilyMedium.size12.greyColor,
                             ),
                           ],
@@ -1511,69 +1582,35 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Request Body Label & Copy Button
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'API HTTP Request Body',
-                        style: fontFamilyBold.size13
-                            .copyWith(color: Colors.grey[700]),
-                      ),
-                      TextButton.icon(
-                        onPressed: () {
-                          Clipboard.setData(ClipboardData(text: jsonString));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Request payload copied to clipboard!',
-                                style: fontFamilySemiBold.size12.white,
-                              ),
-                              backgroundColor: Colors.grey[900],
-                              duration: const Duration(seconds: 2),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.copy_rounded,
-                            size: 14, color: continueButton),
-                        label: Text(
-                          'Copy Payload',
-                          style: fontFamilySemiBold.size12
-                              .copyWith(color: continueButton),
-                        ),
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 6),
-                          visualDensity: VisualDensity.compact,
-                        ),
-                      ),
-                    ],
+                  // Message Details
+                  Text(
+                    'Title:',
+                    style: fontFamilyBold.size12.copyWith(color: Colors.grey[700]),
                   ),
-                  const SizedBox(height: 8),
-
-                  // Dark Code Editor Container
-                  Container(
-                    width: double.infinity,
-                    height: 250,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E1E2E), // Premium dark theme
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xFF313244)),
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: SelectableText(
-                        jsonString,
-                        style: const TextStyle(
-                          fontFamily: 'monospace',
-                          fontSize: 13,
-                          height: 1.4,
-                          color: Color(0xFFCDD6F4), // Premium text color
-                        ),
-                      ),
-                    ),
+                  const SizedBox(height: 4),
+                  Text(
+                    requestBody['title'] ?? '',
+                    style: fontFamilyMedium.size14.black,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Message / Description:',
+                    style: fontFamilyBold.size12.copyWith(color: Colors.grey[700]),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    requestBody['description'] ?? '',
+                    style: fontFamilyMedium.size14.black,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Target Audience:',
+                    style: fontFamilyBold.size12.copyWith(color: Colors.grey[700]),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    requestBody['type'] == 'client' ? 'Users (Clients)' : 'Influencers',
+                    style: fontFamilyMedium.size14.black,
                   ),
                   const SizedBox(height: 24),
 
@@ -1581,6 +1618,24 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      OutlinedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.grey),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: fontFamilySemiBold.size13.greyColor,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
                       ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop();
@@ -1597,7 +1652,7 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                           ),
                         ),
                         child: Text(
-                          'Acknowledge',
+                          'Confirm & Send',
                           style: fontFamilySemiBold.size13.white,
                         ),
                       ),
@@ -1732,6 +1787,14 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                                               );
                                             }
                                           },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: continueButton,
+                                      foregroundColor: white,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
                                     child: viewModel.isBusy
                                         ? const SizedBox(
                                             height: 20,
@@ -1761,14 +1824,6 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                                               ),
                                             ],
                                           ),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: continueButton,
-                                      foregroundColor: white,
-                                      elevation: 0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
                                   ),
                                 ),
                               ),
@@ -1892,7 +1947,7 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             IconButton(
-                                              icon: Icon(
+                                              icon: const Icon(
                                                 Icons.edit_rounded,
                                                 color: continueButton,
                                                 size: 16,

@@ -445,8 +445,8 @@ Future<void> showAdminPaymentConfigDialog({
 
     commissionCtrl.text = commission == 0 ? "" : commission.toStringAsFixed(0);
 
-    // GST calculation
-    gstAmount = (payment * gstPercentage) / 100;
+    // GST calculation on total of payment + commission
+    gstAmount = ((payment + commission) * gstPercentage) / 100;
 
     // Total amount
     totalAmount = payment + gstAmount + commission;

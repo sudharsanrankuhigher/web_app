@@ -151,6 +151,7 @@ class NotificationsViewModel extends BaseViewModel {
       final Map<String, dynamic> requestData = {
         'title': title,
         'description': message,
+        'category': _templateCategory,
       };
 
       if (_editingTemplate != null) {
@@ -300,8 +301,7 @@ class NotificationsViewModel extends BaseViewModel {
 
   // Compose Broadcast Form State
   String _formCategory = 'info'; // 'info', 'success', 'warning', 'alert'
-  String _formTargetAudience =
-      'Users'; // 'Users', 'Influencers', 'Admin / Sub Admin'
+  String _formTargetAudience = 'Users'; // 'Users', 'Influencers'
 
   // Broadcast Type and targeting options
   String _broadcastType = 'all'; // 'all', 'separately'
@@ -312,7 +312,6 @@ class NotificationsViewModel extends BaseViewModel {
 
   List<dynamic> _usersList = [];
   List<dynamic> _influencersList = [];
-  List<dynamic> _subAdminsList = [];
 
   List<dynamic> _selectedTargets = [];
   List<dynamic> get selectedTargets => _selectedTargets;
@@ -374,14 +373,6 @@ class NotificationsViewModel extends BaseViewModel {
           'image': influencer.image ?? '',
         };
       }).toList();
-    } else if (_formTargetAudience == 'Admin / Sub Admin') {
-      return _subAdminsList
-          .map((subAdmin) => {
-                'id': subAdmin.id,
-                'name': subAdmin.name ?? '',
-                'image': subAdmin.profileImage ?? '',
-              })
-          .toList();
     }
     return [];
   }
@@ -416,15 +407,6 @@ class NotificationsViewModel extends BaseViewModel {
     } catch (e) {
       _influencersList = [];
       debugPrint('Error fetching influencers: $e');
-    }
-
-    // Fetch sub-admins
-    try {
-      final res = await locator<ApiService>().getAllSubAdmin();
-      _subAdminsList = res;
-    } catch (e) {
-      _subAdminsList = [];
-      debugPrint('Error fetching sub admins: $e');
     }
 
     _isLoadingTargetOptions = false;
@@ -534,30 +516,32 @@ class NotificationsViewModel extends BaseViewModel {
     );
   }
 
-  // Get generated Request Body Map (with isRead: false)
+  // Get generated Request Body Map matching PHP requirements
   Map<String, dynamic> get lastGeneratedRequestBody {
-    final datetime = combinedScheduledDateTime;
+    final String targetType =
+        _formTargetAudience == 'Users' ? 'client' : 'influencer';
+    final bool isAllUser = _broadcastType == 'all';
+    final List<int> selectedUserIds = _broadcastType == 'separately'
+        ? _selectedTargets
+            .map<int>((item) => int.tryParse(item['id'].toString()) ?? 0)
+            .toList()
+        : [];
+
     return {
-      'title': formTitle.trim(),
-      'message': formMessage.trim(),
+      'type': targetType,
+      'title': titleController.text.trim(),
+      'description': messageController.text.trim(),
+      'id': int.tryParse(_selectedTemplate?.id ?? '') ?? 0,
+      'user': selectedUserIds,
+      'all_user': isAllUser,
       'category': _formCategory,
-      'targetAudience': _formTargetAudience,
-      'broadcastType': _broadcastType,
-      if (_broadcastType == 'separately')
-        'selectedTargets': _selectedTargets
-            .map((item) => {
-                  'id': item['id'],
-                  'name': item['name'],
-                })
-            .toList(),
-      'isRead': false,
-      if (datetime != null) 'scheduledAt': datetime.toIso8601String(),
     };
   }
 
   // Submit Compose Form
   Future<void> sendBroadcast() async {
-    if (formTitle.trim().isEmpty || formMessage.trim().isEmpty) return;
+    if (titleController.text.trim().isEmpty ||
+        messageController.text.trim().isEmpty) return;
 
     // Output Request Body in developer logs
     debugPrint('Generated Request Body: $lastGeneratedRequestBody');
@@ -565,12 +549,13 @@ class NotificationsViewModel extends BaseViewModel {
     setBusy(true);
     try {
       // 1. Send the broadcast payload to the PHP backend API
-      // await _apiService.sendBroadcastNotification(lastGeneratedRequestBody);
+      await locator<ApiService>()
+          .sendBroadcastNotification(lastGeneratedRequestBody);
 
       // 2. Add to local notifications list on success
       NotificationService.instance.sendManualNotification(
-        title: formTitle.trim(),
-        message: formMessage.trim(),
+        title: titleController.text.trim(),
+        message: messageController.text.trim(),
         category: _formCategory,
         targetAudience: _formTargetAudience,
         customTimestamp: combinedScheduledDateTime,
@@ -580,6 +565,7 @@ class NotificationsViewModel extends BaseViewModel {
       formKey.currentState?.reset();
       titleController.clear();
       messageController.clear();
+      _selectedTemplate = null;
       _formCategory = 'info';
       _formTargetAudience = 'Users';
       _broadcastType = 'all';
@@ -594,6 +580,7 @@ class NotificationsViewModel extends BaseViewModel {
       await fetchNotifications();
     } catch (e) {
       debugPrint('Error sending broadcast notification: $e');
+      rethrow;
     } finally {
       setBusy(false);
       notifyListeners();

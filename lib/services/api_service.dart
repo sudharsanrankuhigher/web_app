@@ -44,8 +44,8 @@ class ApiService {
   static ApiService init() {
     final dio = Dio(
       BaseOptions(
-        baseUrl: 'https://admin.promoteapp.in/',
-        // baseUrl: 'http://172.20.25.23:8003/', //saran
+        // baseUrl: 'https://admin.promoteapp.in/',
+        baseUrl: 'http://172.20.25.23:8003/', //saran
         // baseUrl: 'http://172.20.25.55:8888/', //shy
         // baseUrl: 'http://172.20.25.23:8002/',
         // baseUrl: 'http://172.20.25.54:8005/',//deepak
@@ -1771,11 +1771,11 @@ class ApiService {
     }
   }
 
-  /// POST: /api/admin/notification-send
+  /// POST: /api/admin/notification-temp
   Future<dynamic> sendBroadcastNotification(
       Map<String, dynamic> request) async {
     final response = await _dio.post(
-      'api/admin/notification-send',
+      'api/admin/notification-temp',
       data: request,
       options: Options(
         validateStatus: (status) => status != null && status < 500,
