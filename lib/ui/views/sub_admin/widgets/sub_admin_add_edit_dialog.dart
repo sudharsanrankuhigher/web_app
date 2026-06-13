@@ -233,7 +233,7 @@ class CommonSubAdminDialog {
                         "Others",
                       ],
                       selectedItem: gender,
-                      onChanged: (v) => gender = v,
+                      onChanged: (v) => gender = v!,
                       label: "Gender",
                       isError: false,
                       nameKey: "name",
@@ -371,7 +371,7 @@ class CommonSubAdminDialog {
                       items: rolesModel ?? [],
                       selectedItem: selectedRole,
                       onChanged: (v) {
-                        role = v['id']; // update the roleId
+                        role = v?['id']; // update the roleId
                         selectedRole = v; // update the selected map
                       },
                       isError: isRoleError,

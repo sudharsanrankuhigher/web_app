@@ -954,67 +954,22 @@ Future<influencer_model.Datum?> showReassignInfluencerDialog({
                   ),
                   const SizedBox(height: 8),
 
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: isError ? Colors.red : Colors.grey.shade400,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<influencer_model.Datum>(
-                        isExpanded: true,
-                        value: selectedInfluencer,
-                        hint: const Text("Choose Influencer"),
-                        items: filteredInfluencers.map((inf) {
-                          return DropdownMenuItem(
-                            value: inf,
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 16,
-                                  child: (inf.image != null &&
-                                          inf.image!.isNotEmpty)
-                                      ? ClipRRect(
-                                          borderRadius:
-                                              const BorderRadiusGeometry.all(
-                                                  Radius.circular(25)),
-                                          child: WebImage(imageUrl: inf.image!))
-                                      : (inf.image == null ||
-                                              inf.image!.isEmpty)
-                                          ? const Icon(Icons.person, size: 16)
-                                          : null,
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(
-                                    inf.name ?? "",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedInfluencer = value;
-                            isError = false;
-                          });
-                        },
-                      ),
-                    ),
+                  DynamicSingleSearchDropdown<influencer_model.Datum>(
+                    label: "Influencer",
+                    items: filteredInfluencers,
+                    selectedItem: selectedInfluencer,
+                    isError: isError,
+                    errorText: "Please select an influencer",
+                    itemLabelMapper: (inf) => inf.name ?? "",
+                    itemImageMapper: (inf) => inf.image,
+                    compareFn: (a, b) => a.id == b.id,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedInfluencer = value;
+                        isError = false;
+                      });
+                    },
                   ),
-
-                  if (isError)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 6),
-                      child: Text(
-                        "Please select an influencer",
-                        style: TextStyle(color: Colors.red, fontSize: 12),
-                      ),
-                    ),
                 ],
               ),
             ),

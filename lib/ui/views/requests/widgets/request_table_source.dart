@@ -743,8 +743,9 @@ class RequestTableSource extends DataTableSource {
               onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
           DataCell(Text(m.client!.name ?? "")),
           DataCell(Text(m.client!.mobileNumber ?? "")),
-          DataCell(Text(
-              m.payment!.amount != null ? m.payment!.amount.toString() : "")),
+          DataCell(Text(m.payment!.totalAmount != null
+              ? m.payment!.totalAmount.toString()
+              : m.payment!.amount.toString())),
           DataCell(Text(
               DateFormatter.formatToDDMMMYYYY(m.dates!.refund.toString()))),
           DataCell(Text(DateFormatter.formatToDDMMMYYYY(

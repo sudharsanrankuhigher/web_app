@@ -52,7 +52,7 @@ class NotificationService extends ChangeNotifier {
                       DateTime.now()
                   : DateTime.now(),
               category: item['category'] ?? 'info',
-              isRead: (item['status'] ?? 0) !=
+              isRead: (item['admin_status'] ?? 0) !=
                   0, // status: 0 is unread, others are read
             ),
           );

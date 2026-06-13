@@ -44,8 +44,8 @@ class ApiService {
   static ApiService init() {
     final dio = Dio(
       BaseOptions(
-        // baseUrl: 'https://admin.promoteapp.in/',
-        baseUrl: 'http://172.20.25.23:8003/', //saran
+        baseUrl: 'https://admin.promoteapp.in/',
+        // baseUrl: 'http://172.20.25.23:8003/', //saran
         // baseUrl: 'http://172.20.25.55:8888/', //shy
         // baseUrl: 'http://172.20.25.23:8002/',
         // baseUrl: 'http://172.20.25.54:8005/',//deepak
@@ -1114,8 +1114,12 @@ class ApiService {
   ///////////////////// client request ////////////////////////
   ///POST: /api/admin/client/request
 
-  Future<request_model.ProjectRequestModel> getClientRequest(request) async {
-    final req = {"status": request};
+  Future<request_model.ProjectRequestModel> getClientRequest(request,
+      {String? month}) async {
+    final req = {
+      "status": request,
+      if (month != null) "month": month,
+    };
     final response = await _dio.post('api/admin/client/request',
         data: req,
         options: Options(

@@ -711,7 +711,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                         onChanged: (v) {
                                           setState(() {
                                             selectedCompany = v;
-                                            companyId = v['id'];
+                                            companyId = v!['id'];
                                             isCompanyError = false;
                                           });
                                         },
@@ -1037,7 +1037,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                               ],
                                               selectedItem: gender,
                                               onChanged: (v) {
-                                                gender = v;
+                                                gender = v!;
                                               },
                                               label: "Gender",
                                               isError: isGenderError,

@@ -1697,11 +1697,15 @@ class MockApiService extends _i1.Mock implements _i27.ApiService {
       ) as _i25.Future<_i14.ClientModel>);
 
   @override
-  _i25.Future<_i15.ProjectRequestModel> getClientRequest(dynamic request) =>
+  _i25.Future<_i15.ProjectRequestModel> getClientRequest(
+    dynamic request, {
+    String? month,
+  }) =>
       (super.noSuchMethod(
         Invocation.method(
           #getClientRequest,
           [request],
+          {#month: month},
         ),
         returnValue: _i25.Future<_i15.ProjectRequestModel>.value(
             _FakeProjectRequestModel_13(
@@ -1709,6 +1713,7 @@ class MockApiService extends _i1.Mock implements _i27.ApiService {
           Invocation.method(
             #getClientRequest,
             [request],
+            {#month: month},
           ),
         )),
         returnValueForMissingStub: _i25.Future<_i15.ProjectRequestModel>.value(
@@ -1717,6 +1722,7 @@ class MockApiService extends _i1.Mock implements _i27.ApiService {
           Invocation.method(
             #getClientRequest,
             [request],
+            {#month: month},
           ),
         )),
       ) as _i25.Future<_i15.ProjectRequestModel>);

@@ -20,6 +20,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
   RequestsViewModel() {
     // Moved to onViewModelReady in RequestsView
   }
+  DateTime selectedMonth = DateTime.now();
   String? _selectedString;
   int _isSelected = 0;
   int get isSelected => _isSelected;
@@ -85,7 +86,9 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     _selectedString = tabStatus.value;
 
     try {
-      final res = await _apiService.getClientRequest(tabStatus.apiCode);
+      final formattedMonth = DateFormat('yyyy-MM').format(selectedMonth);
+      final res = await _apiService.getClientRequest(tabStatus.apiCode,
+          month: formattedMonth);
       requests = res.data ?? [];
       print("Total requests fetched: ${requests.length}");
       filteredData = requests.where((e) {

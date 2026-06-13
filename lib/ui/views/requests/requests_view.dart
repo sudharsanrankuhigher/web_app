@@ -9,6 +9,7 @@ import 'package:webapp/widgets/common_chips.dart';
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
+import 'package:webapp/widgets/month_year_picker.dart';
 
 import 'package:webapp/widgets/search_text_field.dart';
 import 'requests_viewmodel.dart';
@@ -59,10 +60,22 @@ class RequestsView extends StackedView<RequestsViewModel> {
                               'Connection Requests',
                               style: fontFamilyBold.size26.black,
                             ),
-                            IconButton(
-                              tooltip: 'Refresh',
-                              icon: const Icon(Icons.refresh),
-                              onPressed: () => viewModel.onRefresh(),
+                            Row(
+                              children: [
+                                MonthYearPickerField(
+                                  selectedDate: viewModel.selectedMonth,
+                                  onChanged: (viewDate) {
+                                    viewModel.selectedMonth = viewDate;
+                                    viewModel.setSelected(viewModel.isSelected);
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                                IconButton(
+                                  tooltip: 'Refresh',
+                                  icon: const Icon(Icons.refresh),
+                                  onPressed: () => viewModel.onRefresh(),
+                                ),
+                              ],
                             ),
                           ],
                         ),

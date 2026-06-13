@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stacked/stacked.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
@@ -780,7 +778,8 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                                           const SizedBox(width: 12),
                                           Text(
                                             'Broadcast sent successfully!',
-                                            style: fontFamilySemiBold.size13.white,
+                                            style:
+                                                fontFamilySemiBold.size13.white,
                                           ),
                                         ],
                                       ),
@@ -805,7 +804,8 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                                           Expanded(
                                             child: Text(
                                               'Failed to send broadcast: $e',
-                                              style: fontFamilySemiBold.size13.white,
+                                              style: fontFamilySemiBold
+                                                  .size13.white,
                                             ),
                                           ),
                                         ],
@@ -1585,7 +1585,8 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                   // Message Details
                   Text(
                     'Title:',
-                    style: fontFamilyBold.size12.copyWith(color: Colors.grey[700]),
+                    style:
+                        fontFamilyBold.size12.copyWith(color: Colors.grey[700]),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -1595,7 +1596,8 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                   const SizedBox(height: 16),
                   Text(
                     'Message / Description:',
-                    style: fontFamilyBold.size12.copyWith(color: Colors.grey[700]),
+                    style:
+                        fontFamilyBold.size12.copyWith(color: Colors.grey[700]),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -1605,11 +1607,14 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                   const SizedBox(height: 16),
                   Text(
                     'Target Audience:',
-                    style: fontFamilyBold.size12.copyWith(color: Colors.grey[700]),
+                    style:
+                        fontFamilyBold.size12.copyWith(color: Colors.grey[700]),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    requestBody['type'] == 'client' ? 'Users (Clients)' : 'Influencers',
+                    requestBody['type'] == 'client'
+                        ? 'Users (Clients)'
+                        : 'Influencers',
                     style: fontFamilyMedium.size14.black,
                   ),
                   const SizedBox(height: 24),

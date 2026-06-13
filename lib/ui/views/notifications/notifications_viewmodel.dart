@@ -541,7 +541,9 @@ class NotificationsViewModel extends BaseViewModel {
   // Submit Compose Form
   Future<void> sendBroadcast() async {
     if (titleController.text.trim().isEmpty ||
-        messageController.text.trim().isEmpty) return;
+        messageController.text.trim().isEmpty) {
+      return;
+    }
 
     // Output Request Body in developer logs
     debugPrint('Generated Request Body: $lastGeneratedRequestBody');

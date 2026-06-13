@@ -4,14 +4,17 @@ import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/widgets/web_image_loading.dart';
 
-class DynamicSingleSearchDropdown extends StatelessWidget {
+class DynamicSingleSearchDropdown<T> extends StatelessWidget {
   final String label;
-  final List<dynamic> items;
-  final dynamic selectedItem;
+  final List<T> items;
+  final T? selectedItem;
   final String nameKey;
   final bool? isError;
   final String? errorText;
-  final void Function(dynamic) onChanged;
+  final void Function(T?) onChanged;
+  final String Function(T)? itemLabelMapper;
+  final String? Function(T)? itemImageMapper;
+  final bool Function(T, T)? compareFn;
 
   const DynamicSingleSearchDropdown({
     super.key,
@@ -22,9 +25,14 @@ class DynamicSingleSearchDropdown extends StatelessWidget {
     this.nameKey = "name",
     this.isError,
     this.errorText,
+    this.itemLabelMapper,
+    this.itemImageMapper,
+    this.compareFn,
   });
 
-  String getLabel(dynamic item) {
+  String getLabel(T? item) {
+    if (item == null) return "";
+    if (itemLabelMapper != null) return itemLabelMapper!(item);
     if (item is String) return item;
     if (item is Map && item.containsKey(nameKey)) {
       return item[nameKey].toString();
@@ -32,7 +40,9 @@ class DynamicSingleSearchDropdown extends StatelessWidget {
     return item.toString();
   }
 
-  String? getImage(dynamic item) {
+  String? getImage(T? item) {
+    if (item == null) return null;
+    if (itemImageMapper != null) return itemImageMapper!(item);
     if (item is Map && item.containsKey("image")) {
       return item["image"];
     }
@@ -41,19 +51,21 @@ class DynamicSingleSearchDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownSearch<dynamic>(
+    return DropdownSearch<T>(
       selectedItem: selectedItem,
+      itemAsString: (item) => getLabel(item),
 
       /// 🔹 Compare safely using id if exists
-      compareFn: (a, b) {
-        if (a is Map &&
-            b is Map &&
-            a.containsKey('id') &&
-            b.containsKey('id')) {
-          return a['id'] == b['id'];
-        }
-        return getLabel(a) == getLabel(b);
-      },
+      compareFn: compareFn ??
+          (a, b) {
+            if (a is Map &&
+                b is Map &&
+                a.containsKey('id') &&
+                b.containsKey('id')) {
+              return a['id'] == b['id'];
+            }
+            return getLabel(a) == getLabel(b);
+          },
 
       /// 🔹 Search filter
       items: (filter, props) {
