@@ -953,29 +953,14 @@ class MockApiService extends _i1.Mock implements _i27.ApiService {
       ) as _i25.Future<_i2.LoginResponse>);
 
   @override
-  _i25.Future<_i3.GetAdminProfileResponse> getProfile() => (super.noSuchMethod(
+  _i25.Future<dynamic> getProfile() => (super.noSuchMethod(
         Invocation.method(
           #getProfile,
           [],
         ),
-        returnValue: _i25.Future<_i3.GetAdminProfileResponse>.value(
-            _FakeGetAdminProfileResponse_1(
-          this,
-          Invocation.method(
-            #getProfile,
-            [],
-          ),
-        )),
-        returnValueForMissingStub:
-            _i25.Future<_i3.GetAdminProfileResponse>.value(
-                _FakeGetAdminProfileResponse_1(
-          this,
-          Invocation.method(
-            #getProfile,
-            [],
-          ),
-        )),
-      ) as _i25.Future<_i3.GetAdminProfileResponse>);
+        returnValue: _i25.Future<dynamic>.value(),
+        returnValueForMissingStub: _i25.Future<dynamic>.value(),
+      ) as _i25.Future<dynamic>);
 
   @override
   _i25.Future<_i4.GetUsersResponse> getUsers({dynamic data}) =>

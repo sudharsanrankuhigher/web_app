@@ -269,34 +269,14 @@ class HomeView extends StackedView<HomeViewModel> {
                                 ? ClipRRect(
                                     borderRadius: BorderRadius.circular(22),
                                     child: WebImage(
-                                      imageUrl: (viewModel.profileImage !=
-                                                  null &&
-                                              viewModel
-                                                  .profileImage!.isNotEmpty)
-                                          ? (viewModel.profileImage!
-                                                  .startsWith('http')
-                                              ? viewModel.profileImage!
-                                              : viewModel.profileImage!
-                                                      .startsWith('storage/')
-                                                  ? "https://admin.promoteapp.in/${viewModel.profileImage}"
-                                                  : "https://admin.promoteapp.in/storage/${viewModel.profileImage}")
-                                          : "https://tse4.mm.bing.net/th/id/OIP.K_MocKRlIvuJ7ryQAtlErwHaIS?w=559&h=626&rs=1&pid=ImgDetMain&o=7&rm=3",
+                                      imageUrl: viewModel.profileImageUrl,
                                       width: 44,
                                       height: 44,
                                       fit: BoxFit.cover,
                                     ),
                                   )
                                 : CachedNetworkImage(
-                                    imageUrl: (viewModel.profileImage != null &&
-                                            viewModel.profileImage!.isNotEmpty)
-                                        ? (viewModel.profileImage!
-                                                .startsWith('http')
-                                            ? viewModel.profileImage!
-                                            : viewModel.profileImage!
-                                                    .startsWith('storage/')
-                                                ? "https://admin.promoteapp.in/${viewModel.profileImage}"
-                                                : "https://admin.promoteapp.in/storage/${viewModel.profileImage}")
-                                        : "https://tse4.mm.bing.net/th/id/OIP.K_MocKRlIvuJ7ryQAtlErwHaIS?w=559&h=626&rs=1&pid=ImgDetMain&o=7&rm=3",
+                                    imageUrl: viewModel.profileImageUrl,
                                     imageBuilder: (context, imageProvider) =>
                                         CircleAvatar(
                                       radius: 22,
@@ -321,11 +301,6 @@ class HomeView extends StackedView<HomeViewModel> {
                                         package: null,
                                       ),
                                     ),
-                                    // errorWidget: (context, url, error) =>
-                                    //     const CircleAvatar(
-                                    //   radius: 22,
-                                    //   child: Icon(Icons.error),
-                                    // ),
                                   ),
                           ),
                           if (isExtended) ...[

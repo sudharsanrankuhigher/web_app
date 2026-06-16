@@ -14,12 +14,14 @@ import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/services/notification_service.dart';
+import 'package:webapp/services/profile_service.dart';
 
 import 'package:webapp/services/floating_overlay_service.dart';
 
 class HomeViewModel extends BaseViewModel with NavigationMixin {
   HomeViewModel() {
-    getProfile();
+    ProfileService.instance.fetchProfile();
+    ProfileService.instance.addListener(notifyListeners);
     fetchPendingRequestsCount();
     NotificationService.instance.fetchNotifications();
     NotificationService.instance.addListener(notifyListeners);
@@ -28,6 +30,7 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
 
   @override
   void dispose() {
+    ProfileService.instance.removeListener(notifyListeners);
     FloatingOverlayService.instance.remove();
     NotificationService.instance.removeListener(notifyListeners);
     super.dispose();
@@ -73,6 +76,7 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
       GlobalKey<NavigatorState>();
 
   Future<void> clearUserData() async {
+    await ProfileService.instance.clearProfile();
     await _sharedPreferences.clear();
   }
 
@@ -406,50 +410,30 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
     );
   }
 
-  String? _name;
-  String? get name => _name;
-  String? _email;
-  String? get email => _email;
-  String? _profileImage;
-  String? get profileImage => _profileImage;
-  String? _role;
-  String? get role => _role;
-  String? _roleId;
-  String? get roleId => _roleId;
+  String? get name => ProfileService.instance.name;
+  String? get email => ProfileService.instance.email;
+  String? get profileImage => ProfileService.instance.profileImage;
+  String? get role => ProfileService.instance.roleId == '1' ? 'Super Admin' : 'Admin';
+  String? get roleId => ProfileService.instance.roleId;
 
-  static bool _isProfileFetched = false;
-
-  Future<void> getProfile() async {
-    // 1. Load from local storage first for instant UI render
-    _name = _sharedPreferences.getString('profile_name') ?? _name;
-    _email = _sharedPreferences.getString('profile_email') ?? _email;
-    _profileImage =
-        _sharedPreferences.getString('profile_image') ?? _profileImage;
-    notifyListeners();
-
-    // 2. Only fetch from API once per session to avoid redundant calls
-    if (_isProfileFetched) return;
-
-    final res = await runBusyFuture(locator<ApiService>().getProfile());
-
-    if (res.status == 200) {
-      _isProfileFetched = true;
-      _name = res.data?.name;
-      _email = res.data?.email;
-      _profileImage = res.data?.profilePic;
-      _roleId = res.data?.roleId.toString();
-      log('Role ID: $_roleId');
-
-      await _sharedPreferences.setString('profile_name', _name ?? '');
-      await _sharedPreferences.setString('profile_email', _email ?? '');
-      await _sharedPreferences.setString('profile_image', _profileImage ?? '');
-      await _sharedPreferences.setString('role_id', _roleId ?? '');
-
-      res.data?.roleId;
-      log('Profile fetched successfully: ${res.data?.name}');
-      notifyListeners();
-    } else {
-      log('Failed to fetch profile: ${res.message}');
+  String get profileImageUrl {
+    final image = profileImage;
+    if (image == null || image.isEmpty) {
+      return "https://tse4.mm.bing.net/th/id/OIP.K_MocKRlIvuJ7ryQAtlErwHaIS?w=559&h=626&rs=1&pid=ImgDetMain&o=7&rm=3";
     }
+    if (image.startsWith('http')) {
+      return image;
+    }
+    
+    // Clean leading slash if any
+    String cleanPath = image;
+    if (cleanPath.startsWith('/')) {
+      cleanPath = cleanPath.substring(1);
+    }
+    
+    if (cleanPath.startsWith('storage/')) {
+      return "https://admin.promoteapp.in/$cleanPath";
+    }
+    return "https://admin.promoteapp.in/storage/$cleanPath";
   }
 }

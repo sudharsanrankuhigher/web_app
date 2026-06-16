@@ -79,7 +79,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
   List<request_model.Datum> filteredData = [];
 
   // 1:Request, 2:Request-Waiting, 3:Waiting-Accept, 4:Completed-Pending, 5:Rework, 6:Completed, 7:inf-cancelled, 8:Admin-Rejected, 9:Promote-Verified, 10:Promote-Pay, 11:Promote-Commission,
-  Future<void> loadTable(RequestStatus tabStatus) async {
+  Future<void> loadTable(RequestStatus tabStatus, {bool getAll = false}) async {
     _isRequest = true;
     print(tabStatus.value);
     setBusy(true);
@@ -88,7 +88,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     try {
       final formattedMonth = DateFormat('yyyy-MM').format(selectedMonth);
       final res = await _apiService.getClientRequest(tabStatus.apiCode,
-          month: formattedMonth);
+          month: getAll ? null : formattedMonth);
       requests = res.data ?? [];
       print("Total requests fetched: ${requests.length}");
       filteredData = requests.where((e) {
@@ -965,8 +965,8 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     );
   }
 
-  Future<void> onRefresh() async {
-    setSelected(_isSelected);
+  Future<void> onRefresh({bool getAll = false}) async {
+    loadTable(_tabs[_isSelected], getAll: getAll);
   }
 }
 

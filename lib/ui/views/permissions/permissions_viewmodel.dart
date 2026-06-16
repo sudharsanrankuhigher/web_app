@@ -130,7 +130,7 @@ class PermissionsViewModel extends BaseViewModel with NavigationMixin {
         PermissionType.view,
         PermissionType.add,
         PermissionType.edit,
-        PermissionType.delete
+        // PermissionType.delete
       },
     ),
     PermissionRow(name: 'services', allowed: {
@@ -159,20 +159,22 @@ class PermissionsViewModel extends BaseViewModel with NavigationMixin {
     }),
     PermissionRow(name: 'requests', allowed: {
       PermissionType.view,
-      PermissionType.edit,
-      PermissionType.add,
-      PermissionType.delete
+      // PermissionType.edit,
+      // PermissionType.add,
+      // PermissionType.delete
     }),
     PermissionRow(name: 'promotion_projects', allowed: {
       PermissionType.add,
       PermissionType.view,
       PermissionType.edit
     }),
-    PermissionRow(name: 'contact_supports', allowed: {PermissionType.delete}),
+    // PermissionRow(name: 'contact_supports', allowed: {
+    //   // PermissionType.delete
+    // }),
     PermissionRow(name: 'company', allowed: {
       PermissionType.view,
       PermissionType.edit,
-      PermissionType.delete,
+      // PermissionType.delete,
       PermissionType.add
     }),
     PermissionRow(name: 'sub_admin', allowed: {
@@ -261,7 +263,7 @@ class PermissionsViewModel extends BaseViewModel with NavigationMixin {
   List<SpecialPermissionRow> specialPermissons = [
     SpecialPermissionRow(name: 'payment'),
     SpecialPermissionRow(name: 'add_call'),
-    SpecialPermissionRow(name: 'add_project'),
+    // SpecialPermissionRow(name: 'add_project'),
     SpecialPermissionRow(name: 'client_payment_approval'),
     SpecialPermissionRow(name: 'company_payment_approval'),
     SpecialPermissionRow(name: 'send_notifications'),

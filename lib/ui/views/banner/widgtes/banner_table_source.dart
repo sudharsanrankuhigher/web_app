@@ -111,7 +111,7 @@ class BannerTableSource extends DataTableSource {
                 ),
                 onPressed: () => onView(item)),
             IgnorePointer(
-              ignoring: PermissionHelper.instance.canView('delete_banner')
+              ignoring: PermissionHelper.instance.canDelete('banner')
                   ? false
                   : true,
               child: IconButton(

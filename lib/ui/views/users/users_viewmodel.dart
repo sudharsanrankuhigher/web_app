@@ -44,21 +44,26 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
   }
 
   // ---------------- Load Users ----------------
-  Future<void> loadUsers() async {
+  Future<void> loadUsers({bool getAll = false}) async {
     setBusy(true);
-    String formattedDate = DateFormat('yyyy-MM').format(selectedMonth);
 
     try {
-      final data = {"month": formattedDate};
+      final data = {
+        "month": getAll ? null : DateFormat('yyyy-MM').format(selectedMonth),
+      };
+
       final res = await _apiService.getUsers(data: data);
       users = res.data ?? [];
     } catch (e) {
       users = [];
       log('Error loading users: $e');
     } finally {
-      // Update tableSource after fetching data
       tableSource = UserTableSource(
-          users: users, onAdd: () {}, onNotesEdit: (user) => onNoteEdit(user));
+        users: users,
+        onAdd: () {},
+        onNotesEdit: (user) => onNoteEdit(user),
+      );
+
       setBusy(false);
       notifyListeners();
     }

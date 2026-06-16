@@ -23,7 +23,7 @@ class ContactSupportView extends StackedView<ContactSupportViewModel> {
 
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        body: PermissionHelper.instance.has('contact_support')
+        body: PermissionHelper.instance.has('add_call')
             ? Container(
                 padding: defaultPadding20 - topPadding20,
                 child: Column(

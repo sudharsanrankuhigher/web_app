@@ -35,6 +35,26 @@ class UsersView extends StackedView<UsersViewModel> {
           actions: [
             Padding(
               padding: defaultPadding12,
+              child: InkWell(
+                onTap: () {
+                  viewModel.loadUsers(getAll: true);
+                },
+                child: Container(
+                    padding: defaultPadding8,
+                    decoration: BoxDecoration(
+                      border:
+                          Border.all(color: Colors.grey.shade300, width: 2.w),
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.grey.shade50,
+                    ),
+                    child: Text(
+                      'Get All Users',
+                      style: fontFamilySemiBold.size11.black,
+                    )),
+              ),
+            ),
+            Padding(
+              padding: defaultPadding12,
               child: MonthYearPickerField(
                 selectedDate: viewModel.selectedMonth,
                 onChanged: (viewDate) {

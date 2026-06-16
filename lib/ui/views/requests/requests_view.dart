@@ -62,6 +62,30 @@ class RequestsView extends StackedView<RequestsViewModel> {
                             ),
                             Row(
                               children: [
+                                Padding(
+                                  padding: defaultPadding12,
+                                  child: InkWell(
+                                    onTap: () {
+                                      viewModel.onRefresh(getAll: true);
+                                    },
+                                    child: Container(
+                                        padding: defaultPadding8,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                              color: Colors.grey.shade300,
+                                              width: 2.w),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.grey.shade50,
+                                        ),
+                                        child: Text(
+                                          'Get All Requests',
+                                          style:
+                                              fontFamilySemiBold.size11.black,
+                                        )),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
                                 MonthYearPickerField(
                                   selectedDate: viewModel.selectedMonth,
                                   onChanged: (viewDate) {

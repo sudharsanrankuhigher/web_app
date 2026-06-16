@@ -62,7 +62,7 @@ class Data {
         name: json["name"],
         email: json["email"],
         mobileNumber: json["mobile_number"],
-        profilePic: json["profile_img"],
+        profilePic: json["profile_img"] ?? json["profile_image"] ?? json["profile_pic"],
         createdAt: json["created_at"] == null
             ? null
             : DateTime.parse(json["created_at"]),

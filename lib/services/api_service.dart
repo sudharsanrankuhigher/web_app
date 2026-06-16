@@ -124,21 +124,13 @@ class ApiService {
     }
   }
 
-  /// GET: /api/paidpromo/country/getAllCountry
-  Future<GetAdminProfileResponse> getProfile() async {
+  /// GET: /api/admin/profile
+  Future<dynamic> getProfile() async {
     final response = await _dio.get('api/admin/profile');
     if (response.statusCode == 200) {
-      // Fluttertoast.showToast(msg: response.data["message"].toString());
-      return GetAdminProfileResponse.fromJson(response.data);
+      return response.data;
     } else {
       final message = response.data?['message'] ?? 'Server error';
-      Fluttertoast.showToast(
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 2,
-          webBgColor: "linear-gradient(to right, #EF5350, #000000)",
-          webPosition: "center",
-          webShowClose: true,
-          msg: message);
       throw Exception(message);
     }
   }
