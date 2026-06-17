@@ -2,8 +2,10 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webapp/app/app.locator.dart';
+import 'package:webapp/app/router.dart';
 import 'package:webapp/core/model/get_profile_model.dart';
 import 'package:webapp/core/model/get_user_model.dart';
 import 'package:webapp/core/model/login_model.dart';
@@ -45,7 +47,7 @@ class ApiService {
     final dio = Dio(
       BaseOptions(
         baseUrl: 'https://admin.promoteapp.in/',
-        // baseUrl: 'http://172.20.25.23:8003/', //saran
+        // baseUrl: 'http://172.20.25.23:8001/', //saran
         // baseUrl: 'http://172.20.25.55:8888/', //shy
         // baseUrl: 'http://172.20.25.23:8002/',
         // baseUrl: 'http://172.20.25.54:8005/',//deepak
@@ -77,6 +79,9 @@ class ApiService {
           if (error.response?.statusCode == 401) {
             final prefs = locator<SharedPreferences>();
             await prefs.remove('accessToken');
+            if (goRouterKey.currentContext != null) {
+              goRouterKey.currentContext!.go('/login');
+            }
           }
 
           return handler.next(error);

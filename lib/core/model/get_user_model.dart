@@ -120,13 +120,14 @@ class Plan {
   String? subName;
   String? totalConnection;
   int? connection;
+  DateTime? createdAt;
 
-  Plan({
-    this.categoryName,
-    this.subName,
-    this.totalConnection,
-    this.connection,
-  });
+  Plan(
+      {this.categoryName,
+      this.subName,
+      this.totalConnection,
+      this.connection,
+      this.createdAt});
 
   factory Plan.fromJson(Map<String, dynamic> json) => Plan(
         categoryName: json["category_name"]?.toString(),
@@ -135,6 +136,7 @@ class Plan {
         connection: json["connection"] is int
             ? json["connection"]
             : int.tryParse(json["connection"]?.toString() ?? ""),
+        createdAt: DateTime.parse(json["created_at"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -142,5 +144,6 @@ class Plan {
         "sub_name": subName,
         "total_connection": totalConnection,
         "connection": connection,
+        "created_at": createdAt,
       };
 }

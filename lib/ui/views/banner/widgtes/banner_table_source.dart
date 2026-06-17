@@ -111,9 +111,8 @@ class BannerTableSource extends DataTableSource {
                 ),
                 onPressed: () => onView(item)),
             IgnorePointer(
-              ignoring: PermissionHelper.instance.canDelete('banner')
-                  ? false
-                  : true,
+              ignoring:
+                  PermissionHelper.instance.canDelete('banner') ? false : true,
               child: IconButton(
                   icon: const Icon(Icons.delete, size: 16, color: red),
                   onPressed: () => onDelete(item, influencer.name ?? '')),

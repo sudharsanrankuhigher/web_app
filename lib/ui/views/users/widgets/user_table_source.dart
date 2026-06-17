@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:webapp/core/helper/date_helper.dart';
 import 'package:webapp/core/model/get_user_model.dart' as user_model;
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/services/theme_service.dart';
@@ -173,8 +174,8 @@ class UserTableSource extends DataTableSource {
             constraints: const BoxConstraints(
               minHeight: 100,
               maxHeight: 400,
-              minWidth: 350,
-              maxWidth: 550,
+              minWidth: 400,
+              maxWidth: 600,
             ),
             child: user.plans == null || user.plans!.isEmpty
                 ? const Center(child: Text("No Plans Available"))
@@ -201,6 +202,7 @@ class UserTableSource extends DataTableSource {
                               DataColumn(label: Text("Sub Plan")),
                               DataColumn(label: Text("Total")),
                               DataColumn(label: Text("Used")),
+                              DataColumn(label: Text("Plan Created")),
                             ],
                             rows: user.plans!.map((plan) {
                               return DataRow(
@@ -209,6 +211,11 @@ class UserTableSource extends DataTableSource {
                                   DataCell(Text(plan.subName ?? "")),
                                   DataCell(Text(plan.totalConnection ?? "")),
                                   DataCell(Text("${plan.connection ?? 0}")),
+                                  DataCell(
+                                    Text(
+                                      "${DateFormatter.formatToDDMMMYYYY(plan.createdAt!)}",
+                                    ),
+                                  ),
                                 ],
                               );
                             }).toList(),

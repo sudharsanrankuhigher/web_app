@@ -413,7 +413,8 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
   String? get name => ProfileService.instance.name;
   String? get email => ProfileService.instance.email;
   String? get profileImage => ProfileService.instance.profileImage;
-  String? get role => ProfileService.instance.roleId == '1' ? 'Super Admin' : 'Admin';
+  String? get role =>
+      ProfileService.instance.roleId == '1' ? 'Super Admin' : 'Admin';
   String? get roleId => ProfileService.instance.roleId;
 
   String get profileImageUrl {
@@ -424,13 +425,13 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
     if (image.startsWith('http')) {
       return image;
     }
-    
+
     // Clean leading slash if any
     String cleanPath = image;
     if (cleanPath.startsWith('/')) {
       cleanPath = cleanPath.substring(1);
     }
-    
+
     if (cleanPath.startsWith('storage/')) {
       return "https://admin.promoteapp.in/$cleanPath";
     }
