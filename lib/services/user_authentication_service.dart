@@ -76,4 +76,10 @@ class UserAuthenticationService extends BaseViewModel with NavigationMixin {
     return _loginResponse?.response?.token ??
         _sharedPreference.getString('accessToken');
   }
+
+  void logout() {
+    _loginResponse = null;
+    PermissionHelper.init({});
+    notifyListeners();
+  }
 }

@@ -16,12 +16,13 @@ class SubAdminTableSource extends DataTableSource {
   late List<sub_admin_model.Datum> filteredList;
   final Function(sub_admin_model.Datum) onToggle;
   final Function(String) viewDoc;
+  final Function(String) viewHistory;
 
   final void Function(sub_admin_model.Datum) onEdit;
   final void Function(sub_admin_model.Datum) onDelete;
 
   SubAdminTableSource(this.data, this.onEdit, this.onDelete, this.roles,
-      this.onToggle, this.viewDoc) {
+      this.onToggle, this.viewDoc, this.viewHistory) {
     filteredList = List.from(data);
     print('object$onToggle');
   }
@@ -73,6 +74,9 @@ class SubAdminTableSource extends DataTableSource {
         return '-';
       }
 
+      // Add +05:30 offset
+      // dateTime = dateTime.add(const Duration(hours: 5, minutes: 30));
+
       int hour = dateTime.hour;
       final minute = dateTime.minute.toString().padLeft(2, '0');
 
@@ -115,6 +119,7 @@ class SubAdminTableSource extends DataTableSource {
           DataCell(Text("")),
           DataCell(Text("")),
           DataCell(Text("No data found")),
+          DataCell(Text("")),
           DataCell(Text("")),
           DataCell(Text("")),
           DataCell(Text("")),
@@ -175,6 +180,17 @@ class SubAdminTableSource extends DataTableSource {
           Text(row.logoutTime != null
               ? formatTimeToDotAMPM(row.logoutTime.toString())
               : '-'),
+        ),
+        // Attendance history
+        DataCell(
+          IconButton(
+            icon: const Icon(
+              Icons.visibility,
+              color: Colors.blue,
+              size: 18,
+            ),
+            onPressed: () => viewHistory(row.id.toString()),
+          ),
         ),
 
         // Online Status

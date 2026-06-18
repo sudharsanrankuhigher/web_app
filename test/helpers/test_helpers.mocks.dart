@@ -2189,4 +2189,29 @@ class MockApiService extends _i1.Mock implements _i26.ApiService {
         returnValue: _i24.Future<dynamic>.value(),
         returnValueForMissingStub: _i24.Future<dynamic>.value(),
       ) as _i24.Future<dynamic>);
+
+  @override
+  _i24.Future<dynamic> logout() => (super.noSuchMethod(
+        Invocation.method(
+          #logout,
+          [],
+        ),
+        returnValue: _i24.Future<dynamic>.value(),
+        returnValueForMissingStub: _i24.Future<dynamic>.value(),
+      ) as _i24.Future<dynamic>);
+
+  @override
+  _i24.Future<dynamic> getAttendance(
+    String? month, {
+    dynamic id,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getAttendance,
+          [month],
+          {#id: id},
+        ),
+        returnValue: _i24.Future<dynamic>.value(),
+        returnValueForMissingStub: _i24.Future<dynamic>.value(),
+      ) as _i24.Future<dynamic>);
 }

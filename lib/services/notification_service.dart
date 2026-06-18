@@ -201,4 +201,10 @@ class NotificationService extends ChangeNotifier {
     _notifications.insert(0, newItem);
     notifyListeners();
   }
+
+  void clear() {
+    _notifications.clear();
+    _isLoading = false;
+    notifyListeners();
+  }
 }

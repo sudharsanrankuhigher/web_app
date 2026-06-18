@@ -285,8 +285,214 @@ class SubAdminViewModel extends BaseViewModel with NavigationMixin {
         confirmDelete,
         roles,
         toggleInfluencerStatus,
-        viewDoc);
+        viewDoc,
+        viewHistory);
     notifyListeners();
+  }
+
+  // ─── Profile Panel State for Sub-Admin ───
+  bool _showProfilePanel = false;
+  bool get showProfilePanel => _showProfilePanel;
+
+  bool _isHistoryLoading = false;
+  bool get isHistoryLoading => _isHistoryLoading;
+
+  String? _historyUserId;
+  String? get historyUserId => _historyUserId;
+
+  final List<String> months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
+
+  final List<int> years = [2024, 2025, 2026, 2027];
+
+  String _selectedMonth = 'June';
+  String get selectedMonth => _selectedMonth;
+
+  int _selectedYear = 2026;
+  int get selectedYear => _selectedYear;
+
+  List<Map<String, String>> _loginLogoutHistory = [];
+  List<Map<String, String>> get loginLogoutHistory => _loginLogoutHistory;
+
+  // Sub-admin details fetched from API
+  String? _historyName;
+  String? get historyName => _historyName;
+
+  String? _historyEmail;
+  String? get historyEmail => _historyEmail;
+
+  String? _historyRole;
+  String? get historyRole => _historyRole;
+
+  String? _historyProfileImg;
+  String? get historyProfileImg => _historyProfileImg;
+
+  void toggleProfilePanel() {
+    _showProfilePanel = !_showProfilePanel;
+    notifyListeners();
+  }
+
+  void closeProfilePanel() {
+    _showProfilePanel = false;
+    notifyListeners();
+  }
+
+  void initMonthYear() {
+    final now = DateTime.now();
+    _selectedMonth = months[now.month - 1];
+    _selectedYear = now.year;
+  }
+
+  void setSelectedMonth(String month) {
+    _selectedMonth = month;
+    if (_historyUserId != null) {
+      fetchAttendanceHistory(_historyUserId!);
+    }
+    notifyListeners();
+  }
+
+  void setSelectedYear(int year) {
+    _selectedYear = year;
+    if (_historyUserId != null) {
+      fetchAttendanceHistory(_historyUserId!);
+    }
+    notifyListeners();
+  }
+
+  Future<void> selectYearFromCalendar(BuildContext context) async {
+    final DateTime? picked = await showDialog<DateTime>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Select Year"),
+          content: SizedBox(
+            width: 300,
+            height: 300,
+            child: YearPicker(
+              firstDate: DateTime(2020),
+              lastDate: DateTime(2030),
+              initialDate: DateTime(_selectedYear, 1),
+              selectedDate: DateTime(_selectedYear, 1),
+              onChanged: (DateTime dateTime) {
+                Navigator.pop(context, dateTime);
+              },
+            ),
+          ),
+        );
+      },
+    );
+    if (picked != null) {
+      setSelectedYear(picked.year);
+    }
+  }
+
+  Future<void> viewHistory(String id) async {
+    debugPrint("View history clicked for user ID: $id");
+    _historyUserId = id;
+    _showProfilePanel = true;
+    initMonthYear();
+    fetchAttendanceHistory(id);
+    notifyListeners();
+  }
+
+  Future<void> fetchAttendanceHistory(String id) async {
+    _isHistoryLoading = true;
+    notifyListeners();
+
+    try {
+      final monthIndex = months.indexOf(_selectedMonth) + 1;
+      final monthStr = monthIndex.toString().padLeft(2, '0');
+      final queryMonth = '$monthStr-$_selectedYear';
+
+      final res = await locator<ApiService>().getAttendance(queryMonth, id: id);
+      if (res != null && res['data'] != null) {
+        final data = res['data'] as Map<String, dynamic>;
+
+        // Extract sub-admin profile details
+        _historyName = data['name'] as String?;
+        _historyEmail = data['email'] as String?;
+        _historyRole = data['role_id'] as String?;
+        _historyProfileImg = data['profile_img'] as String?;
+
+        if (data['attendance'] != null) {
+          final attendanceList = data['attendance'] as List<dynamic>;
+          _loginLogoutHistory = attendanceList.map((x) {
+            final item = x as Map<String, dynamic>;
+
+            final loginDateStr = item['login_date'] as String?;
+            final loginTimeStr = item['login_time'] as String?;
+            final logoutTimeStr = item['logout_time'] as String?;
+
+            String formattedDate = '-';
+            if (loginDateStr != null) {
+              try {
+                final parsedDate = DateTime.parse(loginDateStr);
+                final monthShort = _selectedMonth.substring(0, 3);
+                formattedDate =
+                    '${parsedDate.day.toString().padLeft(2, '0')} $monthShort ${parsedDate.year}';
+              } catch (_) {
+                formattedDate = loginDateStr;
+              }
+            }
+
+            String formattedLogin = '-';
+            if (loginTimeStr != null) {
+              formattedLogin = _formatTimeString(loginTimeStr);
+            }
+
+            String formattedLogout = '-';
+            if (logoutTimeStr != null) {
+              formattedLogout = _formatTimeString(logoutTimeStr);
+            }
+
+            return {
+              'date': formattedDate,
+              'login': formattedLogin,
+              'logout': formattedLogout,
+            };
+          }).toList();
+        } else {
+          _loginLogoutHistory = [];
+        }
+      } else {
+        _loginLogoutHistory = [];
+      }
+    } catch (e) {
+      debugPrint('Error fetching attendance history: $e');
+      _loginLogoutHistory = [];
+    } finally {
+      _isHistoryLoading = false;
+      notifyListeners();
+    }
+  }
+
+  String _formatTimeString(String timeStr) {
+    try {
+      final parts = timeStr.split(':');
+      int hour = int.parse(parts[0]);
+      int minute = int.parse(parts[1]);
+
+      final isAM = hour < 12;
+      hour = hour % 12;
+      if (hour == 0) hour = 12;
+
+      final minuteStr = minute.toString().padLeft(2, '0');
+      return '$hour.$minuteStr ${isAM ? 'AM' : 'PM'}';
+    } catch (_) {
+      return timeStr;
+    }
   }
 
   Future<void> toggleInfluencerStatus(item) async {
@@ -446,7 +652,7 @@ class SubAdminViewModel extends BaseViewModel with NavigationMixin {
     }).toList();
 
     tableSource = SubAdminTableSource(filtered, onEdit, confirmDelete, roles,
-        toggleInfluencerStatus, viewDoc);
+        toggleInfluencerStatus, viewDoc, viewHistory);
 
     notifyListeners();
   }

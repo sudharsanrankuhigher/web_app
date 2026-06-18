@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/app/router.dart';
-import 'package:webapp/core/model/get_profile_model.dart';
 import 'package:webapp/core/model/get_user_model.dart';
 import 'package:webapp/core/model/login_model.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -37,6 +36,10 @@ import 'package:webapp/ui/views/requests/model/request_model.dart'
 import 'package:webapp/ui/views/promote_projects/model/promote_project_model.dart'
     as project_model;
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:webapp/services/profile_service.dart';
+import 'package:webapp/services/floating_overlay_service.dart';
+import 'package:webapp/services/notification_service.dart';
+import 'package:webapp/services/user_authentication_service.dart';
 
 class ApiService {
   final Dio _dio;
@@ -44,6 +47,35 @@ class ApiService {
   ApiService._internal(this._dio);
 
   static ApiService init() {
+    bool isRedirecting = false;
+
+    Future<void> handleUnauthorized() async {
+      if (isRedirecting) return;
+      isRedirecting = true;
+
+      try {
+        log('Unauthorized (401) detected. Clearing local and in-memory data and redirecting.');
+        final prefs = locator<SharedPreferences>();
+        await prefs.clear();
+
+        await ProfileService.instance.clearProfile();
+        FloatingOverlayService.instance.remove();
+        NotificationService.instance.clear();
+
+        if (locator.isRegistered<UserAuthenticationService>()) {
+          locator<UserAuthenticationService>().logout();
+        }
+      } catch (e) {
+        log('Error clearing local data on 401: $e');
+      } finally {
+        isRedirecting = false;
+      }
+
+      if (goRouterKey.currentContext != null) {
+        goRouterKey.currentContext!.go('/login');
+      }
+    }
+
     final dio = Dio(
       BaseOptions(
         baseUrl: 'https://admin.promoteapp.in/',
@@ -75,15 +107,24 @@ class ApiService {
     // 🔹 Handle 401
     dio.interceptors.add(
       InterceptorsWrapper(
+        onResponse: (response, handler) async {
+          if (response.statusCode == 401) {
+            await handleUnauthorized();
+            return handler.reject(
+              DioException(
+                requestOptions: response.requestOptions,
+                response: response,
+                type: DioExceptionType.badResponse,
+                error: 'Unauthorized',
+              ),
+            );
+          }
+          return handler.next(response);
+        },
         onError: (DioException error, handler) async {
           if (error.response?.statusCode == 401) {
-            final prefs = locator<SharedPreferences>();
-            await prefs.remove('accessToken');
-            if (goRouterKey.currentContext != null) {
-              goRouterKey.currentContext!.go('/login');
-            }
+            await handleUnauthorized();
           }
-
           return handler.next(error);
         },
       ),
@@ -1849,6 +1890,35 @@ class ApiService {
       options: Options(
         validateStatus: (status) => status != null && status < 500,
       ),
+    );
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      final message = response.data?['message'] ?? 'Server error';
+      throw Exception(message);
+    }
+  }
+
+  /// POST: /api/admin/logout
+  Future<dynamic> logout() async {
+    final response = await _dio.post('api/admin/logout');
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      final message = response.data?['message'] ?? 'Server error';
+      throw Exception(message);
+    }
+  }
+
+  /// POST: /api/admin/attendance
+  Future<dynamic> getAttendance(String month, {dynamic id}) async {
+    final Map<String, dynamic> requestData = {'month': month};
+    if (id != null) {
+      requestData['id'] = id;
+    }
+    final response = await _dio.post(
+      'api/admin/attendance',
+      data: requestData,
     );
     if (response.statusCode == 200) {
       return response.data;

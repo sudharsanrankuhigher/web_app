@@ -26,6 +26,176 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
     NotificationService.instance.fetchNotifications();
     NotificationService.instance.addListener(notifyListeners);
     _syncFloatingOverlayCount();
+    initMonthYear();
+  }
+
+  // ─── Profile Panel State ───
+  bool _showProfilePanel = false;
+  bool get showProfilePanel => _showProfilePanel;
+
+  bool _isHistoryLoading = false;
+  bool get isHistoryLoading => _isHistoryLoading;
+
+  void toggleProfilePanel() {
+    _showProfilePanel = !_showProfilePanel;
+    if (_showProfilePanel) {
+      fetchAttendanceHistory();
+    }
+    notifyListeners();
+  }
+
+  void closeProfilePanel() {
+    _showProfilePanel = false;
+    notifyListeners();
+  }
+
+  final List<String> months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
+
+  final List<int> years = [2024, 2025, 2026, 2027];
+
+  String _selectedMonth = 'June';
+  String get selectedMonth => _selectedMonth;
+
+  int _selectedYear = 2026;
+  int get selectedYear => _selectedYear;
+
+  List<Map<String, String>> _loginLogoutHistory = [];
+  List<Map<String, String>> get loginLogoutHistory => _loginLogoutHistory;
+
+  void initMonthYear() {
+    final now = DateTime.now();
+    _selectedMonth = months[now.month - 1];
+    _selectedYear = now.year;
+  }
+
+  void setSelectedMonth(String month) {
+    _selectedMonth = month;
+    fetchAttendanceHistory();
+    notifyListeners();
+  }
+
+  void setSelectedYear(int year) {
+    _selectedYear = year;
+    fetchAttendanceHistory();
+    notifyListeners();
+  }
+
+  Future<void> selectYearFromCalendar(BuildContext context) async {
+    final DateTime? picked = await showDialog<DateTime>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Select Year"),
+          content: SizedBox(
+            width: 300,
+            height: 300,
+            child: YearPicker(
+              firstDate: DateTime(2020),
+              lastDate: DateTime(2030),
+              initialDate: DateTime(_selectedYear, 1),
+              selectedDate: DateTime(_selectedYear, 1),
+              onChanged: (DateTime dateTime) {
+                Navigator.pop(context, dateTime);
+              },
+            ),
+          ),
+        );
+      },
+    );
+    if (picked != null) {
+      setSelectedYear(picked.year);
+    }
+  }
+
+  Future<void> fetchAttendanceHistory() async {
+    _isHistoryLoading = true;
+    notifyListeners();
+
+    try {
+      final monthIndex = months.indexOf(_selectedMonth) + 1;
+      final monthStr = monthIndex.toString().padLeft(2, '0');
+      final queryMonth = '$monthStr-$_selectedYear';
+
+      final res = await locator<ApiService>().getAttendance(queryMonth);
+      if (res != null &&
+          res['data'] != null &&
+          res['data']['attendance'] != null) {
+        final attendanceList = res['data']['attendance'] as List<dynamic>;
+        _loginLogoutHistory = attendanceList.map((x) {
+          final item = x as Map<String, dynamic>;
+
+          final loginDateStr = item['login_date'] as String?;
+          final loginTimeStr = item['login_time'] as String?;
+          final logoutTimeStr = item['logout_time'] as String?;
+
+          String formattedDate = '-';
+          if (loginDateStr != null) {
+            try {
+              final parsedDate = DateTime.parse(loginDateStr);
+              final monthShort = _selectedMonth.substring(0, 3);
+              formattedDate =
+                  '${parsedDate.day.toString().padLeft(2, '0')} $monthShort ${parsedDate.year}';
+            } catch (_) {
+              formattedDate = loginDateStr;
+            }
+          }
+
+          String formattedLogin = '-';
+          if (loginTimeStr != null) {
+            formattedLogin = _formatTimeString(loginTimeStr);
+          }
+
+          String formattedLogout = '-';
+          if (logoutTimeStr != null) {
+            formattedLogout = _formatTimeString(logoutTimeStr);
+          }
+
+          return {
+            'date': formattedDate,
+            'login': formattedLogin,
+            'logout': formattedLogout,
+          };
+        }).toList();
+      } else {
+        _loginLogoutHistory = [];
+      }
+    } catch (e) {
+      log('Error fetching attendance history: $e');
+      _loginLogoutHistory = [];
+    } finally {
+      _isHistoryLoading = false;
+      notifyListeners();
+    }
+  }
+
+  String _formatTimeString(String timeStr) {
+    try {
+      final parts = timeStr.split(':');
+      int hour = int.parse(parts[0]);
+      int minute = int.parse(parts[1]);
+
+      final isAM = hour < 12;
+      hour = hour % 12;
+      if (hour == 0) hour = 12;
+
+      final minuteStr = minute.toString().padLeft(2, '0');
+      return '$hour.$minuteStr ${isAM ? 'AM' : 'PM'}';
+    } catch (_) {
+      return timeStr;
+    }
   }
 
   @override
@@ -380,12 +550,17 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () async {
-                            FloatingOverlayService.instance
-                                .remove(); // 🧹 remove overlay
-                            await clearUserData(); // 🧹 clear storage
-                            Navigator.pop(context); // ❌ close dialog
-                            rootContext
-                                .pushReplacementNamed('login'); // 🔁 redirect
+                            try {
+                              await locator<ApiService>().logout();
+                              FloatingOverlayService.instance
+                                  .remove(); // 🧹 remove overlay
+                              await clearUserData(); // 🧹 clear storage
+                              Navigator.pop(context); // ❌ close dialog
+                              rootContext
+                                  .pushReplacementNamed('login'); // 🔁 redirect
+                            } catch (e) {
+                              log('Error calling logout API: $e');
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
