@@ -24,7 +24,7 @@ class CommonPlanDialog {
 
     /// ---------------- CATEGORY DROPDOWN DATA ----------------
     dynamic selectedCategory;
-    dynamic selectedPlan;
+    dynamic selectedPlan = initial?.selectedPlan;
     bool isCategoryError = false;
     bool isPlanError = false;
 
@@ -111,9 +111,9 @@ class CommonPlanDialog {
                           child: DynamicSingleSearchDropdown(
                             label: "plan category",
                             items: planNames,
-                            selectedItem: selectedPlan ?? initial?.selectedPlan,
+                            selectedItem: selectedPlan,
                             isError: isPlanError,
-                            errorText: "PleaseselectedPlan select a plans",
+                            errorText: "Please select a plan",
                             onChanged: (value) {
                               setState(() {
                                 selectedPlan = value;
@@ -198,7 +198,10 @@ class CommonPlanDialog {
                           'connections': int.tryParse(conn ?? "0") ?? 0,
                           'regular_price': amt,
                           'sale_price': saleAmt,
-                          'gst': int.tryParse(gst ?? "0") ?? initial!.gst,
+                          'gst': int.tryParse(gst ?? "0") ??
+                              (initial != null
+                                  ? int.tryParse(initial.gst ?? "0") ?? 0
+                                  : 0),
                           'badge': badge ?? "",
                           'category_id': selectedCategory['id'], // ✅ numeric
                         },

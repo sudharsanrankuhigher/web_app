@@ -26,12 +26,16 @@ class UserTableSource extends DataTableSource {
 
   // ---------------------- SEARCH + FILTER ----------------------
   void applySearch(String query, String type) {
-    query = query.toLowerCase();
+    query = query.toLowerCase().trim();
 
     filteredList = originalList.where((user) {
-      final matchSearch = user.name!.toLowerCase().contains(query) ||
-          user.email!.toLowerCase().contains(query) ||
-          user.mobileNumber!.contains(query);
+      final name = user.name?.toLowerCase() ?? '';
+      final email = user.email?.toLowerCase() ?? '';
+      final mobile = user.mobileNumber?.toLowerCase() ?? '';
+
+      final matchSearch = name.contains(query) ||
+          email.contains(query) ||
+          mobile.contains(query);
 
       final matchType = type == "All" || user.type == type;
 

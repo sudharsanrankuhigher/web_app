@@ -35,9 +35,13 @@ class SubAdminTableSource extends DataTableSource {
     query = query.toLowerCase().trim();
 
     filteredList = data.where((user) {
-      return user.name!.toLowerCase().contains(query) ||
-          user.city!.toLowerCase().contains(query) ||
-          user.state!.toLowerCase().contains(query);
+      final name = user.name?.toLowerCase() ?? '';
+      final city = user.city?.toLowerCase() ?? '';
+      final state = user.state?.toLowerCase() ?? '';
+
+      return name.contains(query) ||
+          city.contains(query) ||
+          state.contains(query);
     }).toList();
 
     notifyListeners();
