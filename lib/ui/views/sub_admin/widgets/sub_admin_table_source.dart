@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
+import 'package:webapp/services/profile_service.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/views/sub_admin/model/sub_admin_model.dart'
     as sub_admin_model;
@@ -185,7 +186,7 @@ class SubAdminTableSource extends DataTableSource {
         DataCell(
           IconButton(
             icon: const Icon(
-              Icons.visibility,
+              Icons.history,
               color: Colors.blue,
               size: 18,
             ),
@@ -241,21 +242,22 @@ class SubAdminTableSource extends DataTableSource {
         )),
 
         // Status Switch
-        DataCell(
-          Transform.scale(
-            scale: 0.7,
-            child: Switch(
-              value: row.status == 1,
-              onChanged: (_) => (PermissionHelper.instance.canEdit('sub_admin'))
-                  ? onToggle(row)
-                  : _dialogService.showDialog(
-                      title: "Warning",
-                      description:
-                          "Locked 🔒 – You need special permission to access this.",
-                      buttonTitle: 'ok'),
-            ),
-          ),
-        ),
+        DataCell(row.roleId.toString() != '1'
+            ? Transform.scale(
+                scale: 0.7,
+                child: Switch(
+                  value: row.status == 1,
+                  onChanged: (_) => (PermissionHelper.instance
+                          .canEdit('sub_admin'))
+                      ? onToggle(row)
+                      : _dialogService.showDialog(
+                          title: "Warning",
+                          description:
+                              "Locked 🔒 – You need special permission to access this.",
+                          buttonTitle: 'ok'),
+                ),
+              )
+            : Container()),
       ],
     );
   }
