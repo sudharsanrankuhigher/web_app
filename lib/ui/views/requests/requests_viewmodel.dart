@@ -7,6 +7,7 @@ import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/core/enum/requested_status.dart';
 import 'package:webapp/core/navigation/navigation_mixin.dart';
 import 'package:webapp/services/api_service.dart';
+import 'dart:typed_data';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/requests/model/request_model.dart'
@@ -116,6 +117,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         onRefund,
         onRefundDialog,
         showNote,
+        onWaitingNotesEdit: onWaitingNotesEdit,
       );
 
       _isRequest = false;
@@ -140,6 +142,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         onRefund,
         onRefundDialog,
         showNote,
+        onWaitingNotesEdit: onWaitingNotesEdit,
       );
 
       _isRequest = false;
@@ -154,17 +157,19 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       filteredData = List.from(requests);
     } else {
       filteredData = requests.where((e) {
-        final service = (e.client ?? "").toString().toLowerCase();
-        final client = (e.inf?.name ?? "").toLowerCase();
+        final clientName = (e.client?.name ?? "").toLowerCase();
+        final clientPhone = (e.client?.mobileNumber ?? "").toLowerCase();
+        final infName = (e.inf?.name ?? "").toLowerCase();
         final infId = (e.inf?.infId ?? "").toString().toLowerCase();
-        final phone = (e.inf?.phone ?? "").toString().toLowerCase();
+        final infPhone = (e.inf?.phone ?? "").toString().toLowerCase();
         final projectId = (e.projectId ?? "").toString().toLowerCase();
         final search = value.toLowerCase();
 
-        return service.contains(search) ||
-            client.contains(search) ||
+        return clientName.contains(search) ||
+            clientPhone.contains(search) ||
+            infName.contains(search) ||
             infId.contains(search) ||
-            phone.contains(search) ||
+            infPhone.contains(search) ||
             projectId.contains(search);
       }).toList();
     }
@@ -188,16 +193,19 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       onRefund,
       onRefundDialog,
       showNote,
+      onWaitingNotesEdit: onWaitingNotesEdit,
     );
     notifyListeners();
   }
 
   void applySort(bool specialFilter, String sortType) {
     if (sortType == "A-Z") {
-      filteredData.sort((a, b) =>
-          (a.client ?? "").toString().compareTo((b.client ?? "").toString()));
-      requests.sort((a, b) =>
-          (a.client ?? "").toString().compareTo((b.client ?? "").toString()));
+      filteredData.sort((a, b) => (a.client?.name ?? "")
+          .toLowerCase()
+          .compareTo((b.client?.name ?? "").toLowerCase()));
+      requests.sort((a, b) => (a.client?.name ?? "")
+          .toLowerCase()
+          .compareTo((b.client?.name ?? "").toLowerCase()));
     } else if (sortType == "clientAsc") {
       filteredData.sort((a, b) => (a.id ?? 0).compareTo(b.id ?? 0));
       requests.sort((a, b) => (a.id ?? 0).compareTo(b.id ?? 0));
@@ -267,6 +275,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       onRefund,
       onRefundDialog,
       showNote,
+      onWaitingNotesEdit: onWaitingNotesEdit,
     );
 
     // 🔥 notify UI
@@ -335,11 +344,17 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Influencer")),
           DataColumn(label: Text("Inf_No")),
           DataColumn(label: Text("Requested Date")),
+          DataColumn(label: Text("Notes")),
           DataColumn(
-              label: Text(
+            headingRowAlignment: MainAxisAlignment.center,
+            label: SizedBox(
+              width: 120,
+              child: Text(
                 "Action",
+                textAlign: TextAlign.center,
               ),
-              headingRowAlignment: MainAxisAlignment.center),
+            ),
+          ),
           DataColumn(label: Text("Inf Reject")),
         ];
 
@@ -354,9 +369,17 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Requested Date")),
           DataColumn(label: Text("accepted Date")),
           DataColumn(label: Text("link")),
+          DataColumn(label: Text("Notes")),
           DataColumn(
-              label: Text("Action"),
-              headingRowAlignment: MainAxisAlignment.center),
+            headingRowAlignment: MainAxisAlignment.center,
+            label: SizedBox(
+              width: 150,
+              child: Text(
+                "Action",
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
           DataColumn(
               label: Text("Cancel"),
               headingRowAlignment: MainAxisAlignment.center),
@@ -372,9 +395,17 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Inf_Id / inf_phone")),
           DataColumn(label: Text("Requested Date")),
           DataColumn(label: Text("Completed Date")),
+          DataColumn(label: Text("Notes")),
           DataColumn(
-              label: Text("Action"),
-              headingRowAlignment: MainAxisAlignment.center),
+            headingRowAlignment: MainAxisAlignment.center,
+            label: SizedBox(
+              width: 150,
+              child: Text(
+                "Action",
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
         ];
 
       // 6. Influencer Cancelled
@@ -387,6 +418,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Client Phone")),
           DataColumn(label: Text("Influencer Phone")),
           DataColumn(label: Text("Requested Date")),
+          DataColumn(label: Text("Notes")),
           DataColumn(
               label: Text("Revoke"),
               headingRowAlignment: MainAxisAlignment.center),
@@ -404,20 +436,21 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("S.No")),
           DataColumn(label: Text("Project Code")),
           DataColumn(label: Text("Client")),
-          DataColumn(label: Text("Influencer")),
           DataColumn(label: Text("Client Phone")),
+          DataColumn(label: Text("Influencer")),
           DataColumn(label: Text("Influencer Phone")),
           DataColumn(label: Text("Requested Date")),
           DataColumn(label: Text("Rejected Date")),
+          DataColumn(label: Text("Notes")),
           DataColumn(
               label: Text("Revoke"),
               headingRowAlignment: MainAxisAlignment.center),
           DataColumn(
               label: Text("Reassign"),
               headingRowAlignment: MainAxisAlignment.center),
-          DataColumn(
-              label: Text("Refunded"),
-              headingRowAlignment: MainAxisAlignment.center),
+          // DataColumn(
+          //     label: Text("Refunded"),
+          //     headingRowAlignment: MainAxisAlignment.center),
         ];
 
       // 8. Promote Verified
@@ -432,9 +465,20 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Assigned Date")),
           DataColumn(label: Text("link")),
           DataColumn(label: Text("Completed Date")),
+          DataColumn(label: Text("Notes")),
           DataColumn(
-              label: Text("Action"),
+              label: Text("Doc"),
               headingRowAlignment: MainAxisAlignment.center),
+          DataColumn(
+            headingRowAlignment: MainAxisAlignment.center,
+            label: SizedBox(
+              width: 180,
+              child: Text(
+                "Action",
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
         ];
 
       // 9. Promote Pay
@@ -448,7 +492,20 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Bank Details")),
           DataColumn(label: Text("Payment Amount")),
           DataColumn(label: Text("Commision Amount")),
-          DataColumn(label: Text("Action")),
+          DataColumn(label: Text("Notes")),
+          DataColumn(
+              label: Text("Doc"),
+              headingRowAlignment: MainAxisAlignment.center),
+          DataColumn(
+            headingRowAlignment: MainAxisAlignment.center,
+            label: SizedBox(
+              width: 180,
+              child: Text(
+                "Action",
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
         ];
 
       // 10. Promote Commission
@@ -460,9 +517,20 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Inf_Phone")),
           DataColumn(label: Text("Inf_Payment date")),
           DataColumn(label: Text("Commission Amount")),
+          DataColumn(label: Text("Notes")),
           DataColumn(
-              label: Text("Action"),
+              label: Text("Doc"),
               headingRowAlignment: MainAxisAlignment.center),
+          DataColumn(
+            headingRowAlignment: MainAxisAlignment.center,
+            label: SizedBox(
+              width: 180,
+              child: Text(
+                "Action",
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
         ];
 
       // 11. Client Payment Verified
@@ -475,9 +543,20 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Total amount")),
           DataColumn(label: Text("Payment amount")),
           DataColumn(label: Text("Commission Amount")),
+          DataColumn(label: Text("Notes")),
           DataColumn(
-              label: Text("Action"),
+              label: Text("Doc"),
               headingRowAlignment: MainAxisAlignment.center),
+          DataColumn(
+            headingRowAlignment: MainAxisAlignment.center,
+            label: SizedBox(
+              width: 180,
+              child: Text(
+                "Action",
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
         ];
 
       //13: Refund
@@ -494,7 +573,17 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
             label: Text("status"),
             // headingRowAlignment: MainAxisAlignment.center
           ),
-          DataColumn(label: Text("Action")),
+          DataColumn(label: Text("Notes")),
+          DataColumn(
+            headingRowAlignment: MainAxisAlignment.center,
+            label: SizedBox(
+              width: 150,
+              child: Text(
+                "Action",
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
         ];
 
       default:
@@ -512,7 +601,10 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       "category_id": data["category_id"],
       "link": data["link"] ?? "",
       "remark": data["remark"] ?? "",
+      if (data["image"] != null) "image": data["image"],
     };
+
+    print("data request ${req}");
 
     try {
       final res = await _apiService.statusChange(req);
@@ -621,6 +713,66 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     );
   }
 
+  Future<void> onWaitingNotesEdit(request_model.Datum model) async {
+    final result = await showWaitingNotesDialog(model);
+    if (result != null) {
+      final data = {
+        "id": model.id,
+        "status": 2,
+        "client_id": model.client!.id,
+        "remark": result,
+      };
+      await statusChange(data);
+    }
+  }
+
+  Future<String?> showWaitingNotesDialog(request_model.Datum model) {
+    final context = StackedService.navigatorKey!.currentContext!;
+    final controller = TextEditingController(text: model.notes ?? "");
+
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text("Edit Remark for Project ${model.projectId}"),
+          content: SizedBox(
+            width: 400,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: controller,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    hintText: "Enter remark...",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: publisButtonColor,
+              ),
+              onPressed: () {
+                Navigator.pop(dialogContext, controller.text);
+              },
+              child: const Text("Save"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   //reFunded
 
   onRefund(request_model.Datum model) {
@@ -628,15 +780,17 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       context: StackedService.navigatorKey!.currentContext!,
       title: 'Refunded',
       confirmText: "Refund",
+      showNotesField: true,
       message:
           "Are you sure you want to move the ${model.projectId} to the refunded section?",
       icon: Icons.hourglass_top,
       confirmColor: Colors.green,
-      onConfirm: () {
+      onConfirm: (notes) {
         final data = {
           "id": model.id,
           "status": 13,
           "client_id": model.client!.id,
+          "remark": notes,
         };
         statusChange(data);
       },
@@ -833,7 +987,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       onConfirm: () {
         final data = {
           "id": model.id,
-          "status": 2,
+          "status": 3,
           "client_id": model.client!.id,
         };
         statusChange(data);
@@ -853,7 +1007,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       final data = {
         "client_project_id": model.id,
         "inf_id": selected.id,
-        "status": 2
+        "status": 3
       };
       await assignInfluencer(data);
       print(data);
@@ -935,12 +1089,13 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           "Are you sure you want to move the ${model.projectId} to the waiting accept section?",
       icon: Icons.free_cancellation,
       confirmColor: publisButtonColor,
-      onConfirm: () {
+      previewImage: true,
+      onConfirm: (Uint8List? bytes, String? path) {
         final data = {
           "id": model.id,
           "status": 3,
-          // "status": 9,
           "client_id": model.client!.id,
+          if (bytes != null || path != null) "image": bytes ?? path,
         };
         print("data client id $data");
         statusChange(data);

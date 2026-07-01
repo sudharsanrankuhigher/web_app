@@ -57,7 +57,7 @@ class RequestsView extends StackedView<RequestsViewModel> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Connection Requests',
+                              'Client Projects',
                               style: fontFamilyBold.size26.black,
                             ),
                             Row(

@@ -7,6 +7,9 @@ import 'package:webapp/widgets/search_drop_down_widget.dart';
 import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
     as influencer_model;
 import 'package:webapp/widgets/web_image_loading.dart';
+import 'package:webapp/widgets/image_picker.dart';
+import 'package:flutter/foundation.dart';
+import 'dart:typed_data';
 
 Future<void> showRejectConfirmationDialog({
   required BuildContext context,
@@ -138,6 +141,7 @@ Future<void> showActionConfirmationDialog({
   required IconData icon,
   String? image,
   bool showNotesField = false,
+  bool previewImage = false,
   required Function onConfirm,
 }) {
   return showGeneralDialog(
@@ -166,6 +170,7 @@ Future<void> showActionConfirmationDialog({
               icon: icon,
               image: image,
               showNotesField: showNotesField,
+              previewImage: previewImage,
               onConfirm: onConfirm,
             ),
           ),
@@ -183,6 +188,7 @@ class _ActionConfirmationDialogContent extends StatefulWidget {
   final IconData icon;
   final String? image;
   final bool showNotesField;
+  final bool previewImage;
   final Function onConfirm;
 
   const _ActionConfirmationDialogContent({
@@ -193,6 +199,7 @@ class _ActionConfirmationDialogContent extends StatefulWidget {
     required this.icon,
     this.image,
     required this.showNotesField,
+    this.previewImage = false,
     required this.onConfirm,
   });
 
@@ -205,6 +212,9 @@ class _ActionConfirmationDialogContentState
     extends State<_ActionConfirmationDialogContent> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _notesController;
+  Uint8List? _pickedBytes;
+  String? _pickedPath;
+  String? _imageError;
 
   @override
   void initState() {
@@ -287,6 +297,126 @@ class _ActionConfirmationDialogContentState
                   const SizedBox(height: 24),
                 ],
 
+                // Image Upload and Preview
+                if (widget.previewImage) ...[
+                  GestureDetector(
+                    onTap: () async {
+                      final result = await UniversalImagePicker.pickImage();
+                      if (result != null) {
+                        setState(() {
+                          _pickedBytes = result['bytes'] as Uint8List?;
+                          _pickedPath = result['path'] as String?;
+                          _imageError = null;
+                        });
+                      }
+                    },
+                    child: Container(
+                      height: 140,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _imageError != null
+                              ? Colors.red
+                              : (Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.grey.shade700
+                                  : Colors.grey.shade300),
+                          width: 1.5,
+                        ),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF1E293B)
+                            : Colors.grey.shade50,
+                      ),
+                      child: _pickedBytes == null
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.cloud_upload_outlined,
+                                  size: 40,
+                                  color: widget.confirmColor,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  "Upload Screenshot / Payment Proof",
+                                  style: fontFamilySemiBold.size12.black,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  "PNG, JPG formats supported",
+                                  style: fontFamilyRegular.size10.greyColor,
+                                ),
+                              ],
+                            )
+                          : Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(11),
+                                  child: Image.memory(
+                                    _pickedBytes!,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(11),
+                                    color: Colors.black.withOpacity(0.3),
+                                  ),
+                                ),
+                                Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16),
+                                    child: Text(
+                                      _pickedPath != null
+                                          ? _pickedPath!.split('/').last
+                                          : "payment_proof.png",
+                                      textAlign: TextAlign.center,
+                                      style: fontFamilySemiBold.size13.white,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _pickedBytes = null;
+                                        _pickedPath = null;
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.black54,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.close,
+                                        size: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                    ),
+                  ),
+                  if (_imageError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(
+                        _imageError!,
+                        style: const TextStyle(color: Colors.red, fontSize: 12),
+                      ),
+                    ),
+                  const SizedBox(height: 24),
+                ],
+
                 Row(
                   children: [
                     Expanded(
@@ -306,10 +436,24 @@ class _ActionConfirmationDialogContentState
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
+                          if (widget.previewImage && _pickedBytes == null) {
+                            setState(() {
+                              _imageError = "Please select/upload an image";
+                            });
+                            return;
+                          }
+
                           if (widget.showNotesField) {
                             if (_formKey.currentState!.validate()) {
                               Navigator.pop(context);
-                              if (widget.onConfirm is Function(String)) {
+                              if (widget.onConfirm is Function(
+                                  Uint8List?, String?, String)) {
+                                (widget.onConfirm as Function(
+                                        Uint8List?, String?, String))(
+                                    _pickedBytes,
+                                    _pickedPath,
+                                    _notesController.text.trim());
+                              } else if (widget.onConfirm is Function(String)) {
                                 widget.onConfirm(_notesController.text.trim());
                               } else {
                                 widget.onConfirm();
@@ -317,7 +461,13 @@ class _ActionConfirmationDialogContentState
                             }
                           } else {
                             Navigator.pop(context);
-                            widget.onConfirm();
+                            if (widget.onConfirm is Function(
+                                Uint8List?, String?)) {
+                              (widget.onConfirm as Function(Uint8List?,
+                                  String?))(_pickedBytes, _pickedPath);
+                            } else {
+                              widget.onConfirm();
+                            }
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -1383,6 +1533,57 @@ Future<void> showAPaymentConfigDialog({
             ),
           );
         },
+      );
+    },
+  );
+}
+
+void showImagePreviewDialog({
+  required BuildContext context,
+  required String imageUrl,
+}) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600, maxHeight: 600),
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Center(
+                  child: InteractiveViewer(
+                    maxScale: 4.0,
+                    minScale: 0.5,
+                    child: WebImage(
+                      imageUrl: imageUrl,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.05),
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.close, color: Colors.black54),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       );
     },
   );

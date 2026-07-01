@@ -270,7 +270,7 @@ class HomeViewModel extends BaseViewModel with NavigationMixin {
     // 'State',
     'Plans',
     "Banner",
-    'Client Requests',
+    'Client Projects',
     'Promotion Projects',
     'Ticket Support',
     "Contact",

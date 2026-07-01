@@ -8,6 +8,8 @@ import 'package:webapp/services/theme_service.dart';
 import 'package:webapp/widgets/common_chips.dart';
 import 'package:webapp/widgets/view_link.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
+import 'package:webapp/ui/views/requests/widgets/confirmation_dialog.dart';
+import 'package:stacked_services/stacked_services.dart';
 
 class RequestTableSource extends DataTableSource {
   final List<request_model.Datum> data;
@@ -27,6 +29,7 @@ class RequestTableSource extends DataTableSource {
   final void Function(request_model.Datum)? showNote;
   final void Function(request_model.Datum) onRefund;
   final void Function(request_model.Datum) onRefundDialog;
+  final void Function(request_model.Datum)? onWaitingNotesEdit;
 
   final String status;
 
@@ -48,7 +51,8 @@ class RequestTableSource extends DataTableSource {
       this.infReject,
       this.onRefund,
       this.onRefundDialog,
-      this.showNote);
+      this.showNote,
+      {this.onWaitingNotesEdit});
 
   String getFormattedId(int? categoryId, int? id) {
     if (categoryId == null || id == null) return "UNKNOWN";
@@ -105,15 +109,14 @@ class RequestTableSource extends DataTableSource {
     switch (status) {
       case "requested":
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(Text(m.projectId ?? "")),
-          DataCell(Text(m.client!.name ?? "")),
-          DataCell(Text(m.client!.mobileNumber ?? "")),
-          DataCell(Center(
-              child: Text(
-                  "${m.inf!.name ?? "-"} \n ${m.inf!.infId ?? "-"} / ${m.inf!.phone ?? "-"}"))),
-          DataCell(Text(DateFormatter.formatToDDMMMYYYY(
-              m.dates!.requestedAt.toString()))),
+          _textCell('${index + 1}'),
+          _textCell(m.projectId),
+          _textCell(m.client?.name),
+          _textCell(m.client?.mobileNumber),
+          _textCell(
+              "${m.inf?.name ?? "-"} \n ${m.inf?.infId ?? "-"} / ${m.inf?.phone ?? "-"}",
+              center: true),
+          _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.requestedAt)),
           DataCell(
             SizedBox(
               width: 250, // 👈 bigger width
@@ -152,22 +155,45 @@ class RequestTableSource extends DataTableSource {
 
       case "waiting":
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(Text(m.projectId ?? "")),
-          DataCell(Text(m.client!.name ?? "")),
-          DataCell(Text(m.client!.mobileNumber ?? "")),
+          _textCell('${index + 1}'),
+          _textCell(m.projectId),
+          _textCell(m.client?.name),
+          _textCell(m.client?.mobileNumber),
           DataCell(
-            m.notes != null && m.notes!.isNotEmpty
-                ? Tooltip(message: m.notes!, child: Text(m.notes!))
-                : const Text("-"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                if (PermissionHelper.instance.has('edit_requests'))
+                  IconButton(
+                    icon: const Icon(
+                      Icons.edit,
+                      color: Colors.blue,
+                      size: 15,
+                    ),
+                    onPressed: () => onWaitingNotesEdit != null
+                        ? onWaitingNotesEdit!(m)
+                        : null,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                horizontalSpacing4,
+                Expanded(
+                  child: m.notes != null && m.notes!.isNotEmpty
+                      ? Tooltip(
+                          message: m.notes!,
+                          child: Text(
+                            m.notes!,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ))
+                      : const Text("-"),
+                ),
+              ],
+            ),
           ),
-          DataCell(Center(
-              child: Center(
-                  child: Text(
-                      "${m.inf!.infId ?? ""} / ${(m.inf!.phone ?? "")}")))),
-          DataCell(Text(DateFormatter.formatToDDMMMYYYY(
-                  m.dates!.requestedAt.toString()) ??
-              "")),
+          _textCell("${m.inf?.infId ?? ""} / ${(m.inf?.phone ?? "")}",
+              center: true),
+          _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.requestedAt)),
           DataCell(
             PermissionHelper.instance.has('edit_requests')
                 ? Center(
@@ -206,16 +232,14 @@ class RequestTableSource extends DataTableSource {
 
       case "waiting_accept":
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(InkWell(
-              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
-          DataCell(Text(m.client!.name ?? "")),
-          DataCell(Text(m.client!.mobileNumber ?? "")),
-          DataCell(Text(m.inf!.name ?? "")),
-          DataCell(Text(m.inf!.phone ?? "")),
-          DataCell(Text(DateFormatter.formatToDDMMMYYYY(
-                  m.dates!.requestedAt.toString()) ??
-              "")),
+          _textCell('${index + 1}'),
+          _clickableTextCell(m.projectId, () => showNote!(m)),
+          _textCell(m.client?.name),
+          _textCell(m.client?.mobileNumber),
+          _textCell(m.inf?.name),
+          _textCell(m.inf?.phone),
+          _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.requestedAt)),
+          _buildNotesCell(m),
           DataCell(
             Center(
               child: CommonStatusChip(
@@ -249,18 +273,13 @@ class RequestTableSource extends DataTableSource {
 
       case "completed_pending":
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(InkWell(
-              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
-          DataCell(Text(m.client!.name ?? "")),
-          DataCell(Text(m.client!.mobileNumber ?? "")),
-          DataCell(Text("${m.inf!.infId ?? ""} / ${m.inf!.phone ?? ""}")),
-          DataCell(Text(DateFormatter.formatToDDMMMYYYY(
-                  m.dates!.requestedAt.toString()) ??
-              "")),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(m.dates!.assignedAt.toString()) ??
-                  "")),
+          _textCell('${index + 1}'),
+          _clickableTextCell(m.projectId, () => showNote!(m)),
+          _textCell(m.client?.name),
+          _textCell(m.client?.mobileNumber),
+          _textCell("${m.inf?.infId ?? ""} / ${m.inf?.phone ?? ""}"),
+          _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.requestedAt)),
+          _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.assignedAt)),
           // DataCell(
           //   (m.promotion!.youtube != null)
           //       ? ViewLink(
@@ -328,7 +347,7 @@ class RequestTableSource extends DataTableSource {
               },
             ),
           ),
-
+          _buildNotesCell(m),
           DataCell(Center(
             child: PermissionHelper.instance.has('edit_requests')
                 ? CommonStatusChip(
@@ -383,18 +402,14 @@ class RequestTableSource extends DataTableSource {
 
       case "completed":
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(InkWell(
-              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
-          DataCell(Text(m.client!.name ?? "")),
-          DataCell(Text(m.client!.mobileNumber ?? "")),
-          DataCell(Text("${m.inf!.name ?? ""} / ${m.inf!.phone ?? ""}")),
-          DataCell(Text(DateFormatter.formatToDDMMMYYYY(
-                  m.dates!.requestedAt.toString()) ??
-              "")),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(m.dates!.completed.toString()) ??
-                  "")),
+          _textCell('${index + 1}'),
+          _clickableTextCell(m.projectId, () => showNote!(m)),
+          _textCell(m.client?.name),
+          _textCell(m.client?.mobileNumber),
+          _textCell("${m.inf?.name ?? ""} / ${m.inf?.phone ?? ""}"),
+          _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.requestedAt)),
+          _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.completed)),
+          _buildNotesCell(m),
           DataCell(
             Center(
               child: PermissionHelper.instance.has('edit_requests')
@@ -417,16 +432,14 @@ class RequestTableSource extends DataTableSource {
 
       case "influencer_cancelled":
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(InkWell(
-              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
-          DataCell(Text(m.client!.name ?? "")),
-          DataCell(Text(m.inf!.name ?? "")),
-          DataCell(Text(m.client!.mobileNumber ?? "")),
-          DataCell(Text(m.inf!.phone ?? "")),
-          DataCell(Text(DateFormatter.formatToDDMMMYYYY(
-                  m.dates!.requestedAt.toString()) ??
-              "")),
+          _textCell('${index + 1}'),
+          _clickableTextCell(m.projectId, () => showNote!(m)),
+          _textCell(m.client?.name),
+          _textCell(m.inf?.name),
+          _textCell(m.client?.mobileNumber),
+          _textCell(m.inf?.phone),
+          _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.requestedAt)),
+          _buildNotesCell(m),
           DataCell(
             Center(
               child: PermissionHelper.instance.has('edit_requests')
@@ -485,19 +498,15 @@ class RequestTableSource extends DataTableSource {
 
       case "rejected":
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(InkWell(
-              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
-          DataCell(Text(m.client!.name ?? "")),
-          DataCell(Text(m.inf!.name ?? "")),
-          DataCell(Text(m.client!.mobileNumber ?? "")),
-          DataCell(Text(m.inf!.phone ?? "")),
-          DataCell(Text(DateFormatter.formatToDDMMMYYYY(
-                  m.dates!.requestedAt.toString()) ??
-              "")),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(m.dates!.cancelled.toString()) ??
-                  "")),
+          _textCell('${index + 1}'),
+          _clickableTextCell(m.projectId, () => showNote!(m)),
+          _textCell(m.client?.name),
+          _textCell(m.client?.mobileNumber),
+          _textCell(m.inf?.name),
+          _textCell(m.inf?.phone),
+          _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.requestedAt)),
+          _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.cancelled)),
+          _buildNotesCell(m),
           DataCell(
             Center(
               child: PermissionHelper.instance.has('edit_requests')
@@ -534,38 +543,35 @@ class RequestTableSource extends DataTableSource {
                   : const SizedBox(),
             ),
           ),
-          DataCell(
-            Center(
-              child: PermissionHelper.instance.has('edit_requests')
-                  ? CommonStatusChip(
-                      onTap: () => onRefund(m),
-                      imageheight: 20,
-                      imagewidth: 20,
-                      margin: zeroPadding,
-                      text: 'Refunded',
-                      imagePath: 'assets/images/assigned.svg',
-                      bgColor: onGoing,
-                      imageColor: white,
-                      textStyle: fontFamilySemiBold.size10.white,
-                      padding: defaultPadding4 + rightPadding4,
-                    )
-                  : const SizedBox(),
-            ),
-          ),
+          // DataCell(
+          //   Center(
+          //     child: PermissionHelper.instance.has('edit_requests')
+          //         ? CommonStatusChip(
+          //             onTap: () => onRefund(m),
+          //             imageheight: 20,
+          //             imagewidth: 20,
+          //             margin: zeroPadding,
+          //             text: 'Refunded',
+          //             imagePath: 'assets/images/assigned.svg',
+          //             bgColor: onGoing,
+          //             imageColor: white,
+          //             textStyle: fontFamilySemiBold.size10.white,
+          //             padding: defaultPadding4 + rightPadding4,
+          //           )
+          //         : const SizedBox(),
+          //   ),
+          // ),
         ];
 
       case "promote_verified":
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(InkWell(
-              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
-          DataCell(Text(m.client!.name ?? "")),
-          DataCell(Text(m.client!.mobileNumber ?? "")),
-          DataCell(Text(m.inf!.name ?? "")),
-          DataCell(Text("${m.inf!.infId ?? ""} / ${m.inf!.phone ?? ""}")),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(m.dates!.assignedAt.toString()) ??
-                  "")),
+          _textCell('${index + 1}'),
+          _clickableTextCell(m.projectId, () => showNote!(m)),
+          _textCell(m.client?.name),
+          _textCell(m.client?.mobileNumber),
+          _textCell(m.inf?.name),
+          _textCell("${m.inf?.infId ?? ""} / ${m.inf?.phone ?? ""}"),
+          _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.assignedAt)),
           DataCell(
             Builder(
               builder: (_) {
@@ -613,9 +619,27 @@ class RequestTableSource extends DataTableSource {
               },
             ),
           ),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(m.dates!.completed.toString()) ??
-                  "")),
+          _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.completed)),
+          _buildNotesCell(m),
+          DataCell(
+            m.status != 12 && m.image != null && m.image!.isNotEmpty
+                ? InkWell(
+                    onTap: () {
+                      final url = _getImageUrl(m.image!);
+                      showImagePreviewDialog(
+                        context: StackedService.navigatorKey!.currentContext!,
+                        imageUrl: url,
+                      );
+                    },
+                    child: const Center(
+                      child: Icon(
+                        Icons.receipt_long,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  )
+                : const SizedBox(),
+          ),
           DataCell(Center(
               child: m.status == 9
                   ? InkWell(
@@ -632,133 +656,218 @@ class RequestTableSource extends DataTableSource {
                         ),
                       ),
                     )
-                  : Text("Pending client payment verification",
-                      textAlign: TextAlign.center,
-                      style: fontFamilySemiBold.size13.red))),
+                  : FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text("Pending client payment verification",
+                          textAlign: TextAlign.center,
+                          style: fontFamilySemiBold.size13.red)))),
         ];
 
       case "promote_pay":
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(InkWell(
-              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
-          DataCell(Text("${m.inf!.name ?? ""} / ${m.inf!.infId ?? ""}")),
-          DataCell(Text(m.inf!.phone ?? "")),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(m.dates!.completed.toString()) ??
-                  "")),
-          DataCell(InkWell(
-              onTap: () => onBankDetails(m), child: Text(m.inf!.upiId ?? ""))),
-          DataCell(Text("${m.payment!.amount ?? 0}")),
-          DataCell(Text("${m.payment!.commission ?? 0}")),
-          DataCell((m.payment!.status == '1')
-              ? InkWell(
-                  onTap: () => onPaymentDialog(m),
-                  child: Container(
-                    padding: defaultPadding4 + rightPadding4 + leftPadding4,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      color: pendingColorShade,
+          _textCell('${index + 1}'),
+          _clickableTextCell(m.projectId, () => showNote!(m)),
+          _textCell("${m.inf?.name ?? ""} / ${m.inf?.infId ?? ""}"),
+          _textCell(m.inf?.phone),
+          _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.completed)),
+          _clickableTextCell(m.inf?.upiId, () => onBankDetails(m)),
+          _textCell("${m.payment?.amount ?? 0}"),
+          _textCell("${m.payment?.commission ?? 0}"),
+          _buildNotesCell(m),
+          DataCell(
+            m.status != 12 && m.image != null && m.image!.isNotEmpty
+                ? InkWell(
+                    onTap: () {
+                      final url = _getImageUrl(m.image!);
+                      showImagePreviewDialog(
+                        context: StackedService.navigatorKey!.currentContext!,
+                        imageUrl: url,
+                      );
+                    },
+                    child: const Center(
+                      child: Icon(
+                        Icons.receipt_long,
+                        color: Colors.blue,
+                      ),
                     ),
-                    child: Text(
-                      'Payment',
-                      style: fontFamilyMedium.size10.black,
+                  )
+                : const SizedBox(),
+          ),
+          DataCell(Center(
+            child: (m.payment!.status == '1')
+                ? InkWell(
+                    onTap: () => onPaymentDialog(m),
+                    child: Container(
+                      padding: defaultPadding4 + rightPadding4 + leftPadding4,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        color: pendingColorShade,
+                      ),
+                      child: Text(
+                        'Payment',
+                        style: fontFamilyMedium.size10.black,
+                      ),
+                    ),
+                  )
+                : InkWell(
+                    onTap: () =>
+                        m.status == 11 ? null : onGotoPromoteCommission(m),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: (m.status == 10) ? 'Paid' : 'Success',
+                              style: fontFamilySemiBold.size13.continueButton,
+                            ),
+                            TextSpan(
+                              text:
+                                  " / ${DateFormatter.formatToDDMMMYYYY(m.dates!.payment.toString())}",
+                              style: fontFamilyRegular.size13.black,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                )
-              : InkWell(
-                  onTap: () =>
-                      m.status == 11 ? null : onGotoPromoteCommission(m),
-                  child: RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: (m.status == 10) ? 'Paid' : 'Success',
-                          style: fontFamilySemiBold.size13.continueButton,
-                        ),
-                        TextSpan(
-                          text:
-                              " / ${DateFormatter.formatToDDMMMYYYY(m.dates!.payment.toString())}",
-                          style: fontFamilyRegular
-                              .size13, // adjust style if needed
-                        ),
-                      ],
-                    ),
-                  ),
-                )),
+          )),
         ];
 
       case "promote_commission":
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(InkWell(
-              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
-          DataCell(Text("${m.inf!.name ?? ""} / ${m.inf!.infId ?? ""}")),
-          DataCell(Text(m.inf!.phone ?? "")),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(m.dates!.payment.toString()) ??
-                  "")),
-          DataCell(Text("${m.payment!.commission ?? 0}")),
-          DataCell(Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Success',
-                style: fontFamilySemiBold.size13.continueButton,
+          _textCell('${index + 1}'),
+          _clickableTextCell(m.projectId, () => showNote!(m)),
+          _textCell("${m.inf?.name ?? ""} / ${m.inf?.infId ?? ""}"),
+          _textCell(m.inf?.phone),
+          _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.payment)),
+          _textCell("${m.payment?.commission ?? 0}"),
+          _buildNotesCell(m),
+          DataCell(
+            m.status != 12 && m.image != null && m.image!.isNotEmpty
+                ? InkWell(
+                    onTap: () {
+                      final url = _getImageUrl(m.image!);
+                      showImagePreviewDialog(
+                        context: StackedService.navigatorKey!.currentContext!,
+                        imageUrl: url,
+                      );
+                    },
+                    child: const Center(
+                      child: Icon(
+                        Icons.receipt_long,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  )
+                : const SizedBox(),
+          ),
+          DataCell(Center(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Success',
+                      style: fontFamilySemiBold.size13.continueButton,
+                    ),
+                    TextSpan(
+                      text:
+                          " / ${DateFormatter.formatToDDMMMYYYY(m.dates!.payment.toString()) ?? ""}",
+                      style: fontFamilyRegular.size13.black,
+                    ),
+                  ],
+                ),
               ),
-              horizontalSpacing4,
-              Text(
-                  " / ${DateFormatter.formatToDDMMMYYYY(m.dates!.payment.toString()) ?? ""}"),
-            ],
+            ),
           )),
         ];
       case "client_payment_verified":
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(InkWell(
-              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
-          DataCell(Text("${m.client!.name ?? ""} ")),
-          DataCell(Text(m.client!.mobileNumber ?? "")),
-          DataCell(Text("${m.payment!.totalAmount ?? 0}")),
-          DataCell(Text(
-              m.payment!.amount != null ? m.payment!.amount.toString() : "")),
-          DataCell(Text("${m.payment!.commission ?? 0}")),
-          DataCell(PermissionHelper.instance.has('edit_requests')
-              ? InkWell(
-                  onTap: () => onClientPaymentVerified(m),
-                  child: Center(
-                    child: Text(
-                      'Check & Verify',
-                      style: fontFamilySemiBold.size13.continueButton,
+          _textCell('${index + 1}'),
+          _clickableTextCell(m.projectId, () => showNote!(m)),
+          _textCell("${m.client?.name ?? ""} "),
+          _textCell(m.client?.mobileNumber),
+          _textCell("${m.payment?.totalAmount ?? 0}"),
+          _textCell(
+              m.payment?.amount != null ? m.payment!.amount.toString() : ""),
+          _textCell("${m.payment?.commission ?? 0}"),
+          _buildNotesCell(m),
+          DataCell(
+            m.status != 12 && m.image != null && m.image!.isNotEmpty
+                ? InkWell(
+                    onTap: () {
+                      final url = _getImageUrl(m.image!);
+                      showImagePreviewDialog(
+                        context: StackedService.navigatorKey!.currentContext!,
+                        imageUrl: url,
+                      );
+                    },
+                    child: const Center(
+                      child: Icon(
+                        Icons.receipt_long,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  )
+                : const SizedBox(),
+          ),
+          DataCell(
+            m.status == 12
+                ? (PermissionHelper.instance.has('edit_requests')
+                    ? InkWell(
+                        onTap: () => onClientPaymentVerified(m),
+                        child: Center(
+                          child: Text(
+                            'Check & Verify',
+                            style: fontFamilySemiBold.size13.continueButton,
+                          ),
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          'Check & Verify',
+                          style: fontFamilySemiBold.size13.greyColor,
+                        ),
+                      ))
+                : Center(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        _getStatusString(m.status),
+                        style: _getStatusStyle(m.status),
+                      ),
                     ),
                   ),
-                )
-              : const SizedBox()),
+          ),
         ];
 
       case "refund":
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(InkWell(
-              onTap: () => showNote!(m), child: Text(m.projectId ?? ""))),
-          DataCell(Text(m.client!.name ?? "")),
-          DataCell(Text(m.client!.mobileNumber ?? "")),
-          DataCell(Text(m.payment!.totalAmount != null
+          _textCell('${index + 1}'),
+          _clickableTextCell(m.projectId, () => showNote!(m)),
+          _textCell(m.client?.name),
+          _textCell(m.client?.mobileNumber),
+          _textCell(m.payment?.totalAmount != null
               ? m.payment!.totalAmount.toString()
-              : m.payment!.amount.toString())),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(m.dates!.refund.toString()))),
-          DataCell(Text(DateFormatter.formatToDDMMMYYYY(
-              m.dates!.refundUpdated.toString()))),
-          DataCell(Text(m.refundStatus == 2 ? "Completed" : "Pending")),
+              : m.payment?.amount?.toString() ?? ""),
+          _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.refund)),
+          _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.refundUpdated)),
+          _textCell(m.refundStatus == 2 ? "Completed" : "Pending"),
+          _buildNotesCell(m),
           DataCell(InkWell(
             onTap: () => m.refundStatus == 2 ? null : onRefundDialog(m),
             child: Center(
-              child: Text(
-                m.refundStatus == 2 ? "Completed" : "Refund initiated",
-                style: m.refundStatus == 2
-                    ? fontFamilyBold.size13.appGreen400
-                    : fontFamilySemiBold.size13.continueButton,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  m.refundStatus == 2 ? "Completed" : "Refund initiated",
+                  style: m.refundStatus == 2
+                      ? fontFamilyBold.size13.appGreen400
+                      : fontFamilySemiBold.size13.continueButton,
+                ),
               ),
             ),
           )),
@@ -767,6 +876,101 @@ class RequestTableSource extends DataTableSource {
       default:
         return [];
     }
+  }
+
+  String _getStatusString(int? status) {
+    switch (status) {
+      case 1:
+        return 'Request';
+      case 2:
+        return 'Request Waiting';
+      case 3:
+        return 'Waiting Accept';
+      case 4:
+        return 'Completed Pending';
+      case 5:
+        return 'Rework';
+      case 6:
+        return 'Completed';
+      case 7:
+        return 'inf cancelled';
+      case 8:
+        return 'Admin Rejected';
+      case 9:
+        return 'Promote-Verified';
+      case 10:
+        return 'Promote-Pay';
+      case 11:
+        return 'Promote Commission';
+      case 12:
+        return 'client payment-verified';
+      case 13:
+        return 'refunded';
+      default:
+        return '';
+    }
+  }
+
+  TextStyle _getStatusStyle(int? status) {
+    switch (status) {
+      case 5: // Rework
+        return fontFamilySemiBold.size13.red;
+      case 6: // Completed
+      case 9: // Promote-Verified
+      case 10: // Promote-Pay
+      case 11: // Promote-Commission
+        return fontFamilySemiBold.size13.completedColor;
+      default:
+        return fontFamilySemiBold.size13.pendingColor;
+    }
+  }
+
+  String _getImageUrl(String path) {
+    if (path.startsWith('http')) {
+      return path;
+    }
+    String cleanPath = path;
+    if (cleanPath.startsWith('/')) {
+      cleanPath = cleanPath.substring(1);
+    }
+    if (cleanPath.startsWith('storage/')) {
+      return "http://172.20.25.23:8001/$cleanPath";
+    }
+    return "http://172.20.25.23:8001/storage/$cleanPath";
+  }
+
+  DataCell _textCell(String? text, {bool center = false}) {
+    final widget = SelectableText(
+      text ?? "",
+      textAlign: center ? TextAlign.center : TextAlign.start,
+      style: fontFamilyRegular.size12.black,
+    );
+    return DataCell(center ? Center(child: widget) : widget);
+  }
+
+  DataCell _clickableTextCell(String? text, VoidCallback onTap) {
+    return DataCell(InkWell(
+      onTap: onTap,
+      child: Text(
+        text ?? "",
+        style: fontFamilyRegular.size12.black,
+      ),
+    ));
+  }
+
+  DataCell _buildNotesCell(request_model.Datum m) {
+    return DataCell(
+      m.payment?.note != null && m.payment!.note!.isNotEmpty
+          ? Tooltip(
+              message: m.payment!.note!,
+              child: Text(
+                m.payment!.note!,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            )
+          : const Text("-"),
+    );
   }
 
   @override

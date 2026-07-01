@@ -3,6 +3,7 @@ import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/core/helper/date_helper.dart';
 import 'package:webapp/core/model/get_user_model.dart' as user_model;
 import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/services/theme_service.dart';
 
 class UserTableSource extends DataTableSource {
@@ -51,7 +52,7 @@ class UserTableSource extends DataTableSource {
     if (filteredList.isEmpty) {
       return DataRow(
         cells: List.generate(
-          8,
+          9,
           (i) {
             if (i == 4) {
               return const DataCell(
@@ -87,11 +88,30 @@ class UserTableSource extends DataTableSource {
         },
       ),
       cells: [
-        DataCell(Text("${index + 1}")),
-        DataCell(Text(user.name ?? "")),
-        DataCell(Text(user.email ?? "")),
-        DataCell(Text(user.mobileNumber ?? "")),
-        DataCell(Text(user.type ?? "")),
+        DataCell(SelectableText(
+          "${index + 1}",
+          style: fontFamilyRegular.size12.black,
+        )),
+        DataCell(SelectableText(
+          user.name ?? "",
+          style: fontFamilyRegular.size12.black,
+        )),
+        DataCell(SelectableText(
+          user.email ?? "",
+          style: fontFamilyRegular.size12.black,
+        )),
+        DataCell(SelectableText(
+          user.mobileNumber ?? "",
+          style: fontFamilyRegular.size12.black,
+        )),
+        DataCell(SelectableText(
+          user.type ?? "",
+          style: fontFamilyRegular.size12.black,
+        )),
+        DataCell(SelectableText(
+          DateFormatter.formatToDDMMMYYYY(user.createdAt),
+          style: fontFamilyRegular.size12.black,
+        )),
         DataCell(Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -113,7 +133,10 @@ class UserTableSource extends DataTableSource {
             ),
           ],
         )),
-        DataCell(Text("${user.city}/${user.state}")),
+        DataCell(SelectableText(
+          "${user.city}/${user.state}",
+          style: fontFamilyRegular.size12.black,
+        )),
         DataCell(
           IconButton(
             icon: const Icon(
@@ -126,34 +149,34 @@ class UserTableSource extends DataTableSource {
             },
           ),
         ),
-        // DataCell(CommonButton(
-        //   text: 'ADD',
-        //   textStyle: fontFamilyBold.size12.white,
-        //   buttonColor: continueButton,
-        //   width: 85,
-        //   padding: zeroPadding,
-        //   margin: zeroPadding,
-        //   icon: const Icon(
-        //     Icons.add,
-        //     color: white,
-        //   ),
-        //   onTap: () => onAdd(),
-        //   height: 30,
-        // )
-        // Row(
-        //   children: [
-        //     IconButton(
-        //       icon: const Icon(Icons.edit, color: Colors.blue),
-        //       onPressed: () => onEdit(user),
-        //     ),
-        //     IconButton(
-        //       icon: const Icon(Icons.delete, color: red),
-        //       onPressed: () => onDelete(user),
-        //     ),
-        //   ],
-        // ),
-        // ),
       ],
+      // DataCell(CommonButton(
+      //   text: 'ADD',
+      //   textStyle: fontFamilyBold.size12.white,
+      //   buttonColor: continueButton,
+      //   width: 85,
+      //   padding: zeroPadding,
+      //   margin: zeroPadding,
+      //   icon: const Icon(
+      //     Icons.add,
+      //     color: white,
+      //   ),
+      //   onTap: () => onAdd(),
+      //   height: 30,
+      // )
+      // Row(
+      //   children: [
+      //     IconButton(
+      //       icon: const Icon(Icons.edit, color: Colors.blue),
+      //       onPressed: () => onEdit(user),
+      //     ),
+      //     IconButton(
+      //       icon: const Icon(Icons.delete, color: red),
+      //       onPressed: () => onDelete(user),
+      //     ),
+      //   ],
+      // ),
+      // ),
     );
   }
 
@@ -202,15 +225,19 @@ class UserTableSource extends DataTableSource {
                               Colors.grey.shade200,
                             ),
                             columns: const [
+                              DataColumn(label: Text("S.No")),
                               DataColumn(label: Text("Category")),
                               DataColumn(label: Text("Sub Plan")),
                               DataColumn(label: Text("Total")),
                               DataColumn(label: Text("Used")),
                               DataColumn(label: Text("Plan Created")),
                             ],
-                            rows: user.plans!.map((plan) {
+                            rows: user.plans!.asMap().entries.map((entry) {
+                              final index = entry.key + 1;
+                              final plan = entry.value;
                               return DataRow(
                                 cells: [
+                                  DataCell(Text("$index")),
                                   DataCell(Text(plan.categoryName ?? "")),
                                   DataCell(Text(plan.subName ?? "")),
                                   DataCell(Text(plan.totalConnection ?? "")),

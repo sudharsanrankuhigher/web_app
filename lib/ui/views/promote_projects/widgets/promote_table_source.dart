@@ -92,10 +92,10 @@ class PromoteTableSource extends DataTableSource {
     switch (status) {
       case PromoteStatus.assigned:
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(Text(item.subId ?? "")),
-          DataCell(Text("${item.influencerName} / ${item.influencerId}")),
-          DataCell(Text(item.influencerPhone.toString() ?? "")),
+          _textCell('${index + 1}'),
+          _textCell(item.subId),
+          _textCell("${item.influencerName} / ${item.influencerId}"),
+          _textCell(item.influencerPhone?.toString()),
           DataCell(Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -118,8 +118,8 @@ class PromoteTableSource extends DataTableSource {
               ),
             ],
           )),
-          DataCell(Text(item.amount.toString() ?? "")),
-          DataCell(Text(DateFormatter.formatToDDMMMYYYY(item.createdAt))),
+          _textCell(item.amount?.toString()),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
           DataCell(Center(
             child: Container(
                 padding: defaultPadding4 + rightPadding8 + leftPadding8,
@@ -145,10 +145,10 @@ class PromoteTableSource extends DataTableSource {
         ];
       case PromoteStatus.infAccepted:
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(Text(item.subId ?? "")),
-          DataCell(Text("${item.influencerName} / ${item.influencerId}")),
-          DataCell(Text(item.influencerPhone.toString() ?? "")),
+          _textCell('${index + 1}'),
+          _textCell(item.subId),
+          _textCell("${item.influencerName} / ${item.influencerId}"),
+          _textCell(item.influencerPhone?.toString()),
           DataCell(Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -171,8 +171,8 @@ class PromoteTableSource extends DataTableSource {
               ),
             ],
           )),
-          DataCell(Text(item.amount.toString() ?? "")),
-          DataCell(Text(DateFormatter.formatToDDMMMYYYY(item.createdAt))),
+          _textCell(item.amount?.toString()),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
           DataCell(Center(
             child: Container(
                 padding: defaultPadding4 + rightPadding8 + leftPadding8,
@@ -188,10 +188,10 @@ class PromoteTableSource extends DataTableSource {
         ];
       case PromoteStatus.infCompleted:
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(Text(item.subId ?? "")),
-          DataCell(Text("${item.influencerName} / ${item.influencerId}")),
-          DataCell(Text(item.influencerPhone.toString() ?? "")),
+          _textCell('${index + 1}'),
+          _textCell(item.subId),
+          _textCell("${item.influencerName} / ${item.influencerId}"),
+          _textCell(item.influencerPhone?.toString()),
           DataCell(Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -214,8 +214,8 @@ class PromoteTableSource extends DataTableSource {
               ),
             ],
           )),
-          DataCell(Text(item.amount.toString() ?? "")),
-          DataCell(Text(DateFormatter.formatToDDMMMYYYY(item.createdAt))),
+          _textCell(item.amount?.toString()),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
           DataCell(
             Center(
               child: Column(
@@ -284,16 +284,12 @@ class PromoteTableSource extends DataTableSource {
 
       case PromoteStatus.adminVerified:
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(Text(item.influencerId.toString() ?? "")),
-          DataCell(Text(item.influencerName ?? "")),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(item.createdAt.toString()) ??
-                  "")),
-          DataCell(Text(item.subId.toString() ?? "")),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(item.infCompleted.toString()) ??
-                  "")),
+          _textCell('${index + 1}'),
+          _textCell(item.influencerId?.toString()),
+          _textCell(item.influencerName),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
+          _textCell(item.subId?.toString()),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.infCompleted)),
           DataCell(
             Center(
               child: PermissionHelper.instance.has('edit_promotion_projects')
@@ -319,11 +315,11 @@ class PromoteTableSource extends DataTableSource {
 
       case PromoteStatus.promoteVerified:
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(Text(item.subId.toString() ?? "")),
-          DataCell(Text(item.influencerName ?? "")),
-          DataCell(Text(item.influencerId.toString() ?? "")),
-          DataCell(Text(item.influencerPhone ?? "")),
+          _textCell('${index + 1}'),
+          _textCell(item.subId?.toString()),
+          _textCell(item.influencerName),
+          _textCell(item.influencerId?.toString()),
+          _textCell(item.influencerPhone),
           DataCell(
             Center(
               child: Column(
@@ -363,13 +359,9 @@ class PromoteTableSource extends DataTableSource {
               ),
             ),
           ),
-          DataCell(Text(item.amount.toString())),
-          DataCell(Text((item.createdAt != null)
-              ? DateFormatter.formatToDDMMMYYYY(item.createdAt.toString())
-              : "")),
-          DataCell(Text((item.infCompleted != null)
-              ? DateFormatter.formatToDDMMMYYYY(item.infCompleted.toString())
-              : "")),
+          _textCell(item.amount?.toString()),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.infCompleted)),
           DataCell(
             Center(
               child: PermissionHelper.instance.has('edit_promotion_projects')
@@ -402,25 +394,20 @@ class PromoteTableSource extends DataTableSource {
 
       case PromoteStatus.promotePay:
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(Text(item.subId.toString() ?? "")),
-          DataCell(Text(item.influencerName ?? "")),
-          DataCell(Text(item.influencerId.toString() ?? "")),
-          DataCell(Text(item.influencerPhone ?? "")),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(item.createdAt.toString()) ??
-                  "")),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(item.infCompleted.toString()) ??
-                  "")),
-          DataCell(InkWell(
-              onTap: () => showBankDetails?.call(item),
-              child: Text(item.payment!.upi.toString() ?? ""))),
-          DataCell(Text(item.amount.toString())),
-          DataCell(
-            PermissionHelper.instance.has('edit_promotion_projects')
-                ? (item.status.toString() == "7")
-                    ? Padding(
+          _textCell('${index + 1}'),
+          _textCell(item.subId?.toString()),
+          _textCell(item.influencerName),
+          _textCell(item.influencerId?.toString()),
+          _textCell(item.influencerPhone),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.infCompleted)),
+          _clickableTextCell(
+              item.payment?.upi?.toString(), () => showBankDetails?.call(item)),
+          _textCell(item.amount?.toString()),
+          PermissionHelper.instance.has('edit_promotion_projects')
+              ? (item.status.toString() == "7")
+                  ? DataCell(
+                      Padding(
                         padding: defaultPadding4,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
@@ -436,45 +423,40 @@ class PromoteTableSource extends DataTableSource {
                             textAlign: TextAlign.center,
                           )),
                         ),
-                      )
-                    : Center(
-                        child: Text(
-                            "Success / ${DateFormatter.formatToDDMMMYYYY(item.paymentAt.toString()) ?? "-"}"))
-                : const SizedBox(),
-          ),
+                      ),
+                    )
+                  : _textCell(
+                      "Success / ${DateFormatter.formatToDDMMMYYYY(item.paymentAt) ?? "-"}",
+                      center: true,
+                    )
+              : const DataCell(SizedBox()),
         ];
 
       case PromoteStatus.promoteCommission:
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(Text(item.subId.toString() ?? "")),
-          DataCell(Text(item.influencerName ?? "")),
-          DataCell(Text(item.influencerId.toString() ?? "")),
-          DataCell(Text(item.influencerPhone ?? "")),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(item.createdAt.toString()) ??
-                  "")),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(item.paymentAt.toString()) ??
-                  "")),
-          DataCell(InkWell(
-              onTap: () => showBankDetails?.call(item),
-              child: Text(item.payment!.upi.toString() ?? ""))),
-          DataCell(Text(item.commisionAmount.toString())),
+          _textCell('${index + 1}'),
+          _textCell(item.subId?.toString()),
+          _textCell(item.influencerName),
+          _textCell(item.influencerId?.toString()),
+          _textCell(item.influencerPhone),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.paymentAt)),
+          _clickableTextCell(
+              item.payment?.upi?.toString(), () => showBankDetails?.call(item)),
+          _textCell(item.commisionAmount?.toString()),
         ];
       case PromoteStatus.companyPaymentVerified:
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(Text(item.subId.toString() ?? "")),
-          DataCell(Text(item.influencerName ?? "")),
-          DataCell(Text(item.influencerId.toString() ?? "")),
-          DataCell(Text(item.influencerPhone ?? "")),
-          DataCell(Text(item.createdAt.toString() ?? "")),
-          DataCell(Text(item.completedAt.toString() ?? "")),
-          DataCell(InkWell(
-              onTap: () => showBankDetails?.call(item),
-              child: Text(item.payment!.upi.toString() ?? ""))),
-          DataCell(Text(item.amount.toString())),
+          _textCell('${index + 1}'),
+          _textCell(item.subId?.toString()),
+          _textCell(item.influencerName),
+          _textCell(item.influencerId?.toString()),
+          _textCell(item.influencerPhone),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.completedAt)),
+          _clickableTextCell(
+              item.payment?.upi?.toString(), () => showBankDetails?.call(item)),
+          _textCell(item.amount?.toString()),
           DataCell(
             PermissionHelper.instance.has('edit_promotion_projects')
                 ? ElevatedButton(
@@ -495,21 +477,16 @@ class PromoteTableSource extends DataTableSource {
         ];
       case PromoteStatus.rejected:
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(Text(item.subId.toString() ?? "")),
-          DataCell(Text(item.influencerName ?? "")),
-          DataCell(Text(item.influencerId.toString() ?? "")),
-          DataCell(Text(item.influencerPhone ?? "")),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(item.createdAt.toString()) ??
-                  "")),
-          DataCell(Text(
-              DateFormatter.formatToDDMMMYYYY(item.completedAt.toString()) ??
-                  "")),
-          DataCell(InkWell(
-              onTap: () => showBankDetails?.call(item),
-              child: Text(item.payment!.upi.toString() ?? ""))),
-          DataCell(Text(item.amount.toString())),
+          _textCell('${index + 1}'),
+          _textCell(item.subId?.toString()),
+          _textCell(item.influencerName),
+          _textCell(item.influencerId?.toString()),
+          _textCell(item.influencerPhone),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.completedAt)),
+          _clickableTextCell(
+              item.payment?.upi?.toString(), () => showBankDetails?.call(item)),
+          _textCell(item.amount?.toString()),
           DataCell(PermissionHelper.instance.has('edit_promotion_projects')
               ? Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -537,7 +514,7 @@ class PromoteTableSource extends DataTableSource {
             PermissionHelper.instance.has('edit_promotion_projects')
                 ? InkWell(
                     onTap: () => refunInit!(item),
-                    child: Text(
+                    child: SelectableText(
                       'Refund',
                       style: fontFamilySemiBold.size11.continueButton,
                     ),
@@ -548,19 +525,14 @@ class PromoteTableSource extends DataTableSource {
 
       case PromoteStatus.refund:
         return [
-          DataCell(Text('${index + 1}')),
-          DataCell(Text(item.subId.toString() ?? "")),
-          DataCell(Text(item.influencerName ?? "")),
-          DataCell(Text(item.influencerId.toString() ?? "")),
-          DataCell(Text(item.amount.toString())),
-          DataCell(
-              Text(item.refundStatus == 1 ? 'Refund Initiated' : 'Completed')),
-          DataCell(Text(DateFormatter.formatToDDMMMYYYY(
-                  item.refundInitiatedAt.toString()) ??
-              "")),
-          DataCell(Text(DateFormatter.formatToDDMMMYYYY(
-                  item.refundCompletedAt.toString()) ??
-              "")),
+          _textCell('${index + 1}'),
+          _textCell(item.subId?.toString()),
+          _textCell(item.influencerName),
+          _textCell(item.influencerId?.toString()),
+          _textCell(item.amount?.toString()),
+          _textCell(item.refundStatus == 1 ? 'Refund Initiated' : 'Completed'),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.refundInitiatedAt)),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.refundCompletedAt)),
           DataCell(
             Center(
               child: PermissionHelper.instance.has('edit_promotion_projects')
@@ -611,6 +583,25 @@ class PromoteTableSource extends DataTableSource {
       default:
         return 0;
     }
+  }
+
+  DataCell _textCell(String? text, {bool center = false}) {
+    final widget = SelectableText(
+      text ?? "",
+      textAlign: center ? TextAlign.center : TextAlign.start,
+      style: fontFamilyRegular.size12.black,
+    );
+    return DataCell(center ? Center(child: widget) : widget);
+  }
+
+  DataCell _clickableTextCell(String? text, VoidCallback onTap) {
+    return DataCell(InkWell(
+      onTap: onTap,
+      child: Text(
+        text ?? "",
+        style: fontFamilyRegular.size12.black,
+      ),
+    ));
   }
 
   @override

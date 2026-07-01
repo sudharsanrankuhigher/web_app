@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:webapp/core/helper/date_helper.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
     as influencer_model;
 import 'package:webapp/ui/views/services/model/service_model.dart'
@@ -134,9 +135,11 @@ class InfluencerTableSource extends DataTableSource {
         },
       ),
       cells: [
-        DataCell(Text("${index + 1}")),
+        DataCell(SelectableText(
+          "${index + 1}",
+          style: fontFamilyRegular.size12.black,
+        )),
         DataCell(
-
             // Text(row.imageUrl)
             IgnorePointer(
           ignoring: true,
@@ -150,20 +153,51 @@ class InfluencerTableSource extends DataTableSource {
           ),
         )), // Name
 
-        DataCell(Text(getFormattedId(item.category, item.id))),
-        DataCell(Text(item.name!)),
-        DataCell(Text(item.phone!)),
-        DataCell(Text("${item.city}/${item.state}")),
+        DataCell(SelectableText(
+          getFormattedId(item.category, item.id),
+          style: fontFamilyRegular.size12.black,
+        )),
+        DataCell(SelectableText(
+          item.name!,
+          style: fontFamilyRegular.size12.black,
+        )),
+        DataCell(SelectableText(
+          item.phone!,
+          style: fontFamilyRegular.size12.black,
+        )),
+        DataCell(SelectableText(
+          "${item.city}/${item.state}",
+          style: fontFamilyRegular.size12.black,
+        )),
         DataCell(
-          Text(_getServiceNames(item.service)),
+          SelectableText(
+            _getServiceNames(item.service),
+            style: fontFamilyRegular.size12.black,
+          ),
         ),
-        DataCell(Text(getCategoryName(item.category))),
+        DataCell(SelectableText(
+          getCategoryName(item.category),
+          style: fontFamilyRegular.size12.black,
+        )),
 
-        DataCell(Text(item.instagramFollowers!.toString())),
-        DataCell(Text(item.youtubeFollowers.toString())),
-        DataCell(Text(item.facebookFollowers.toString())),
+        DataCell(SelectableText(
+          item.instagramFollowers!.toString(),
+          style: fontFamilyRegular.size12.black,
+        )),
+        DataCell(SelectableText(
+          item.youtubeFollowers.toString(),
+          style: fontFamilyRegular.size12.black,
+        )),
+        DataCell(SelectableText(
+          item.facebookFollowers.toString(),
+          style: fontFamilyRegular.size12.black,
+        )),
         DataCell(
-            Text(DateFormatter.formatToDDMMMYYYY(item.createdAt!).toString())),
+          SelectableText(
+            DateFormatter.formatToDDMMMYYYY(item.createdAt!).toString(),
+            style: fontFamilyRegular.size12.black,
+          ),
+        ),
 
         /// ACTION BUTTONS
         DataCell(

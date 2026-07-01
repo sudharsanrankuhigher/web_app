@@ -45,6 +45,7 @@ class Datum {
   int? id;
   String? projectId;
   String? remark;
+  String? image;
   Client? client;
   Inf? inf;
   Dates? dates;
@@ -61,6 +62,7 @@ class Datum {
     this.id,
     this.projectId,
     this.remark,
+    this.image,
     this.client,
     this.inf,
     this.dates,
@@ -78,6 +80,7 @@ class Datum {
         id: json["id"],
         projectId: json["project_id"],
         remark: json["remark"]?.toString(),
+        image: json["image"]?.toString(),
         client: json["client"] == null ? null : Client.fromJson(json["client"]),
         inf: json["inf"] == null ? null : Inf.fromJson(json["inf"]),
         dates: json["dates"] == null ? null : Dates.fromJson(json["dates"]),
@@ -104,6 +107,7 @@ class Datum {
         "id": id,
         "project_id": projectId,
         "remark": remark,
+        "image": image,
         "client": client?.toJson(),
         "inf": inf?.toJson(),
         "dates": dates?.toJson(),

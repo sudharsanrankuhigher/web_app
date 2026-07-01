@@ -5,6 +5,8 @@ import 'package:webapp/ui/views/promote_projects/model/promote_project_model.dar
 import 'package:webapp/ui/views/promote_projects/promote_projects_viewmodel.dart';
 import 'package:webapp/widgets/over_lapping_avatar.dart';
 import 'package:webapp/services/theme_service.dart';
+import 'package:webapp/ui/common/shared/styles.dart';
+import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 
 class PromoteProjectsTableSource extends DataTableSource {
   List<project_model.Message> data;
@@ -66,7 +68,7 @@ class PromoteProjectsTableSource extends DataTableSource {
   List<DataCell> _inProgressCells(project_model.Message item,
       project_model.PaymentElement? pay, int index) {
     return [
-      DataCell(Text('${index + 1}')),
+      _textCell('${index + 1}'),
       DataCell(
         vm.isDialogOpen
             ? Container(
@@ -80,26 +82,20 @@ class PromoteProjectsTableSource extends DataTableSource {
                 size: 34,
               ),
       ),
-      DataCell(Text(item.projectCode ?? '')),
-      DataCell(Text(item.companyName ?? '')),
-      DataCell(Text(item.projectName ?? '')),
-      DataCell(Text('${item.influencers?.length ?? 0}')),
+      _textCell(item.projectCode),
+      _textCell(item.companyName),
+      _textCell(item.projectName),
+      _textCell('${item.influencers?.length ?? 0}'),
       DataCell(
         Tooltip(
             message: item.description ?? '',
             child: Text(item.description ?? '')),
       ),
-      DataCell(Text(
-          DateFormatter.formatToDDMMMYYYY(item.payment?.validDate ?? '-'))),
-      DataCell(Container(
-          alignment: Alignment.centerRight,
-          child: Text('₹${pay?.totalAmount ?? 0}'))),
-      DataCell(Container(
-          alignment: Alignment.centerRight,
-          child: Text('₹${pay?.payment ?? 0}'))),
-      DataCell(Container(
-          alignment: Alignment.centerRight,
-          child: Text('₹${pay?.commission ?? 0}'))),
+      _textCell(
+          DateFormatter.formatToDDMMMYYYY(item.payment?.validDate ?? '-')),
+      _textCell('₹${pay?.totalAmount ?? 0}', alignment: Alignment.centerRight),
+      _textCell('₹${pay?.payment ?? 0}', alignment: Alignment.centerRight),
+      _textCell('₹${pay?.commission ?? 0}', alignment: Alignment.centerRight),
       DataCell(Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -119,7 +115,7 @@ class PromoteProjectsTableSource extends DataTableSource {
   List<DataCell> _completedCells(project_model.Message item,
       project_model.PaymentElement? pay, int index) {
     return [
-      DataCell(Text('${index + 1}')),
+      _textCell('${index + 1}'),
       DataCell(
         OverlappingAvatars(
           imageUrls:
@@ -128,19 +124,30 @@ class PromoteProjectsTableSource extends DataTableSource {
           size: 34,
         ),
       ),
-      DataCell(Text(item.projectCode ?? '')),
-      DataCell(Text(item.companyName ?? '')),
-      DataCell(Text(item.projectName ?? '')),
-      DataCell(Text(item.description ?? '')),
-      DataCell(Text(
-          DateFormatter.formatToDDMMMYYYY(item.payment?.validDate ?? '-'))),
-      DataCell(Container(
-          alignment: Alignment.centerRight,
-          child: Text('₹${pay?.totalAmount ?? 0}'))),
-      DataCell(Text('₹${pay?.payment ?? "0"}')),
-      DataCell(Text('₹${pay?.commission ?? "0"}')),
-      const DataCell(Text('Paid')),
+      _textCell(item.projectCode),
+      _textCell(item.companyName),
+      _textCell(item.projectName),
+      _textCell(item.description),
+      _textCell(
+          DateFormatter.formatToDDMMMYYYY(item.payment?.validDate ?? '-')),
+      _textCell('₹${pay?.totalAmount ?? 0}', alignment: Alignment.centerRight),
+      _textCell('₹${pay?.payment ?? "0"}'),
+      _textCell('₹${pay?.commission ?? "0"}'),
+      _textCell('Paid'),
     ];
+  }
+
+  DataCell _textCell(String? text,
+      {bool center = false, AlignmentGeometry? alignment}) {
+    final widget = SelectableText(
+      text ?? "",
+      textAlign: center ? TextAlign.center : TextAlign.start,
+      style: fontFamilyRegular.size12.black,
+    );
+    final child = center ? Center(child: widget) : widget;
+    return DataCell(
+      alignment != null ? Align(alignment: alignment, child: child) : child,
+    );
   }
 
   @override

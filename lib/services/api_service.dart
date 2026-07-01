@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -1216,8 +1217,39 @@ class ApiService {
 
   ///POST: /api/admin/client/status/change
   Future<void> statusChange(request) async {
+    dynamic requestData = request;
+
+    if (request["image"] != null) {
+      final Map<String, dynamic> formMap = {
+        "id": request["id"],
+        "status": request["status"],
+        "client_id": request["client_id"],
+        if (request["category_id"] != null)
+          "category_id": request["category_id"],
+        "link": request["link"] ?? "",
+        "remark": request["remark"] ?? "",
+      };
+
+      final image = request["image"];
+      if (image is Uint8List) {
+        formMap["image"] = MultipartFile.fromBytes(
+          image,
+          filename: "screenshot.png",
+        );
+      } else if (image is String) {
+        formMap["image"] = await MultipartFile.fromFile(
+          image,
+          filename: image.split('/').last,
+        );
+      } else {
+        formMap["image"] = image;
+      }
+
+      requestData = FormData.fromMap(formMap);
+    }
+
     final response = await _dio.post('api/admin/status/change',
-        data: request,
+        data: requestData,
         options: Options(
           validateStatus: (status) => status != null && status < 500,
         ));

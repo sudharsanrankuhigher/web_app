@@ -133,7 +133,54 @@ class MonthlyBarChart extends StatelessWidget {
               ),
             ),
 
-            barTouchData: const BarTouchData(enabled: false),
+            barTouchData: BarTouchData(
+              enabled: true,
+              touchTooltipData: BarTouchTooltipData(
+                getTooltipColor: (group) {
+                  return isDark ? const Color(0xFF1E293B) : Colors.white;
+                },
+                tooltipBorder: BorderSide(
+                  color:
+                      isDark ? const Color(0xFF334155) : Colors.grey.shade300,
+                  width: 1,
+                ),
+                tooltipPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                  final isClient = rodIndex == 0;
+                  final title = isClient ? 'Client Comm.' : 'Promote Comm.';
+                  final value = rod.toY;
+
+                  String formatCurrency(double amount) {
+                    if (amount >= 1000000) {
+                      return '₹${(amount / 1000000).toStringAsFixed(2)}M';
+                    } else if (amount >= 1000) {
+                      return '₹${(amount / 1000).toStringAsFixed(1)}K';
+                    } else {
+                      return '₹${amount.toStringAsFixed(0)}';
+                    }
+                  }
+
+                  return BarTooltipItem(
+                    '$title\n',
+                    fontFamilyRegular.size10.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.7),
+                    ),
+                    children: [
+                      TextSpan(
+                        text: formatCurrency(value),
+                        style: fontFamilyBold.size14.copyWith(
+                          color: rod.color,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
           ),
         ),
       ),
