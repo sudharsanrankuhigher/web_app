@@ -13,7 +13,7 @@ import 'package:stacked_services/stacked_services.dart';
 
 class RequestTableSource extends DataTableSource {
   final List<request_model.Datum> data;
-  final void Function(request_model.Datum) onReject;
+  final void Function(request_model.Datum, {bool isWaiting}) onReject;
   final void Function(request_model.Datum) onWaiting;
   final void Function(request_model.Datum) onProceed;
   final void Function(request_model.Datum) onPreparing;
@@ -125,7 +125,7 @@ class RequestTableSource extends DataTableSource {
                 children: [
                   if (PermissionHelper.instance.has('edit_requests'))
                     CommonStatusChip(
-                      onTap: () => onReject(m),
+                      onTap: () => onReject(m, isWaiting: true),
                       imageheight: 22,
                       imagewidth: 22,
                       margin: zeroPadding,
@@ -198,7 +198,7 @@ class RequestTableSource extends DataTableSource {
             PermissionHelper.instance.has('edit_requests')
                 ? Center(
                     child: CommonStatusChip(
-                      onTap: () => onReject(m),
+                      onTap: () => onReject(m, isWaiting: true),
                       imageheight: 20,
                       imagewidth: 20,
                       margin: zeroPadding,

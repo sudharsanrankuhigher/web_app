@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -17,10 +18,12 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double deviceWidth = ui.PlatformDispatcher.instance.views.first.physicalSize.width /
+        ui.PlatformDispatcher.instance.views.first.devicePixelRatio;
     return ScreenUtilInit(
-      designSize: kIsWeb
-          ? const Size(1440, 1024) // Web design reference
-          : const Size(375, 812), // Your design reference size
+      designSize: deviceWidth < 768
+          ? const Size(375, 812)
+          : const Size(1440, 1024),
       minTextAdapt: true,
       builder: (context, child) {
         return ListenableBuilder(

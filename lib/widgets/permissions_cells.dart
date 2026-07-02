@@ -39,7 +39,9 @@ class TextCell extends StatelessWidget {
         padding: const EdgeInsets.only(left: 8),
         child: Text(
           text,
-          style: fontFamilyBold.size14.black,
+          style: fontFamilyBold.size14.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
         ),
       ),
     );

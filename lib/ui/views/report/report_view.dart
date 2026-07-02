@@ -4,6 +4,7 @@ import 'package:webapp/core/enum/report_enum.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/ui/views/report/widgets/widget/info_card.dart';
 
 import 'package:webapp/widgets/common_data_table.dart';
@@ -22,6 +23,8 @@ class ReportView extends StackedView<ReportViewModel> {
     ReportViewModel viewModel,
     Widget? child,
   ) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
     final isExtends = MediaQuery.of(context).size.width > 1200;
 
     final rowCount = viewModel.tableSource?.rowCount ?? 0;
@@ -39,26 +42,35 @@ class ReportView extends StackedView<ReportViewModel> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
+        leading: isMobile
+            ? IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () =>
+                    HomeView.scaffoldKey.currentState?.openDrawer(),
+              )
+            : null,
         title: Text(
           'Reports',
           style: fontFamilyBold.size20
               .copyWith(color: Theme.of(context).colorScheme.onSurface),
         ),
-        actions: [
-          Padding(
-            padding: defaultPadding12,
-            child: MonthYearPickerField(
-              selectedDate: viewModel.selectedMonth,
-              onChanged: (viewDate) {
-                viewModel.selectedMonth = viewDate;
-                print(viewModel.selectedMonth.toString());
-                viewModel.loadReport(viewModel.selectedMonth);
-                viewModel.notifyListeners();
-                print(viewDate);
-              },
-            ),
-          ),
-        ],
+        actions: isMobile
+            ? null
+            : [
+                Padding(
+                  padding: defaultPadding12,
+                  child: MonthYearPickerField(
+                    selectedDate: viewModel.selectedMonth,
+                    onChanged: (viewDate) {
+                      viewModel.selectedMonth = viewDate;
+                      print(viewModel.selectedMonth.toString());
+                      viewModel.loadReport(viewModel.selectedMonth);
+                      viewModel.notifyListeners();
+                      print(viewDate);
+                    },
+                  ),
+                ),
+              ],
       ),
       body: viewModel.isBusy
           ? const Center(child: CircularProgressIndicator())
@@ -68,14 +80,31 @@ class ReportView extends StackedView<ReportViewModel> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (isMobile) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: MonthYearPickerField(
+                          selectedDate: viewModel.selectedMonth,
+                          onChanged: (viewDate) {
+                            viewModel.selectedMonth = viewDate;
+                            viewModel.loadReport(viewModel.selectedMonth);
+                            viewModel.notifyListeners();
+                          },
+                        ),
+                      ),
+                    ],
                     verticalSpacing12,
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.end,
                       children: [
                         /// 🔹 LEFT → Dropdown
                         SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.4,
+                          width: isMobile
+                              ? screenWidth * 0.9
+                              : MediaQuery.of(context).size.width * 0.4,
                           child: DynamicSingleSearchDropdown(
                             label: 'Select Reports',
                             onChanged: (val) {
@@ -110,7 +139,9 @@ class ReportView extends StackedView<ReportViewModel> {
                                   ? const Color(0xFFA7F3D0)
                                   : white; // sleek light green vs white
 
-                              return Row(
+                              return Wrap(
+                                spacing: 10,
+                                runSpacing: 10,
                                 children: [
                                   ElevatedButton.icon(
                                     style: ButtonStyle(
@@ -138,7 +169,6 @@ class ReportView extends StackedView<ReportViewModel> {
                                           .copyWith(color: pdfFg),
                                     ),
                                   ),
-                                  const SizedBox(width: 10),
                                   ElevatedButton.icon(
                                     style: ButtonStyle(
                                       backgroundColor:
@@ -403,13 +433,13 @@ class ReportView extends StackedView<ReportViewModel> {
                     verticalSpacing12,
                     GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: isExtends ? 4 : 2,
-                        childAspectRatio: 3,
+                        crossAxisCount: isMobile ? 1 : (isExtends ? 4 : 2),
+                        childAspectRatio: isMobile ? 3.5 : 3,
                         crossAxisSpacing: 12,
                         mainAxisSpacing: 12,
                       ),
                       shrinkWrap: true,
-                      // physics: const NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: viewModel.monthlyReport.length,
                       itemBuilder: (context, index) => InfoSalesProjectCard(
                         title:

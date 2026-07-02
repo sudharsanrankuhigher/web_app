@@ -116,7 +116,11 @@ class _StateCityDynamicDropdownState extends State<StateCityDynamicDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.isVertical == false
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
+    final bool renderVertical = widget.isVertical == false || isMobile;
+
+    return renderVertical
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

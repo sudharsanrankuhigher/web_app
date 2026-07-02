@@ -99,26 +99,48 @@ class PlanTableSource extends DataTableSource {
                 )
               : const DataCell(SizedBox()),
           DataCell(Row(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(
-                  icon: const Icon(
+              InkWell(
+                onTap: () => onView(plan),
+                borderRadius: BorderRadius.circular(12),
+                child: const Padding(
+                  padding: EdgeInsets.all(6.0),
+                  child: Icon(
                     Icons.visibility,
                     size: 16,
                     color: Colors.blue,
                   ),
-                  onPressed: () => onView(plan)),
-              IconButton(
-                  icon: const Icon(
+                ),
+              ),
+              const SizedBox(width: 4),
+              InkWell(
+                onTap: () => onEdit(plan),
+                borderRadius: BorderRadius.circular(12),
+                child: const Padding(
+                  padding: EdgeInsets.all(6.0),
+                  child: Icon(
                     Icons.edit,
                     size: 16,
                     color: grey,
                   ),
-                  onPressed: () => onEdit(plan)),
-              IconButton(
-                  icon: const Icon(Icons.delete, size: 16, color: red),
-                  onPressed: () => onDelete(plan)),
+                ),
+              ),
+              const SizedBox(width: 4),
+              InkWell(
+                onTap: () => onDelete(plan),
+                borderRadius: BorderRadius.circular(12),
+                child: const Padding(
+                  padding: EdgeInsets.all(6.0),
+                  child: Icon(
+                    Icons.delete,
+                    size: 16,
+                    color: red,
+                  ),
+                ),
+              ),
             ],
           )),
         ]);

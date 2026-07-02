@@ -3,6 +3,7 @@ import 'package:stacked/stacked.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/ui/views/permissions/widgets/permission_table.dart';
 import 'package:webapp/ui/views/permissions/widgets/simple_permission_table.dart';
 import 'package:webapp/widgets/common_button.dart';
@@ -20,6 +21,9 @@ class PermissionsView extends StackedView<PermissionsViewModel> {
     PermissionsViewModel viewModel,
     Widget? child,
   ) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
+
     return PermissionHelper.instance.canView('permissions')
         ? Scaffold(
             backgroundColor: Theme.of(context).colorScheme.surface,
@@ -41,9 +45,22 @@ class PermissionsView extends StackedView<PermissionsViewModel> {
                                       bottomLeft: Radius.circular(12),
                                       bottomRight: Radius.circular(12)),
                                 ),
-                                child: Text(
-                                  'Permissions',
-                                  style: fontFamilyBold.size26.black,
+                                child: Row(
+                                  children: [
+                                    if (isMobile) ...[
+                                      IconButton(
+                                        icon: const Icon(Icons.menu),
+                                        onPressed: () => HomeView.scaffoldKey.currentState?.openDrawer(),
+                                      ),
+                                      horizontalSpacing8,
+                                    ],
+                                    Expanded(
+                                      child: Text(
+                                        'Permissions',
+                                        style: fontFamilyBold.size26.black,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               verticalSpacing12,

@@ -5,6 +5,7 @@ import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/ui/views/influencers/widgets/add_edit_influencer_dialog.dart';
 import 'package:webapp/ui/views/influencers/widgets/inf_filter.dart';
 import 'package:webapp/widgets/common_button.dart';
@@ -23,6 +24,8 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
     InfluencersViewModel viewModel,
     Widget? child,
   ) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
     final bool isExtended = MediaQuery.of(context).size.width > 1200;
 
     return Scaffold(
@@ -41,24 +44,39 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                             bottomLeft: Radius.circular(12),
                             bottomRight: Radius.circular(12)),
                       ),
-                      child: Text(
-                        'Influencers Management',
-                        style: fontFamilyBold.size26.black,
+                      child: Row(
+                        children: [
+                          if (isMobile) ...[
+                            IconButton(
+                              icon: const Icon(Icons.menu),
+                              onPressed: () => HomeView.scaffoldKey.currentState?.openDrawer(),
+                            ),
+                            horizontalSpacing8,
+                          ],
+                          Expanded(
+                            child: Text(
+                              'Influencers Management',
+                              style: fontFamilyBold.size26.black,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     verticalSpacing12,
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      // spacing: 40, // horizontal spacing between items
-                      // runSpacing: 16, // vertical spacing when wrapping
-                      // crossAxisAlignment: WrapCrossAlignment.start,
-                      // alignment: WrapAlignment.start,
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        Row(
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             SizedBox(
                               height: 47.h,
-                              width: isExtended ? 500 : 500.w,
+                              width: isMobile ? (screenWidth - 60) : 300,
                               child: SearchTextField(
                                 controller: viewModel.searchController,
                                 hintText: "Search name, phone, city...",
@@ -74,8 +92,8 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                             if (viewModel.currentSearch.isNotEmpty ||
                                 viewModel.currentSort.isNotEmpty)
                               Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  horizontalSpacing4,
                                   Text("clear filter",
                                       style: fontFamilyRegular.size12.red),
                                   const SizedBox(width: 4),
@@ -93,7 +111,10 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                               ),
                           ],
                         ),
-                        Row(
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             SizedBox(
                               width: isExtended ? 180 : null,
@@ -120,14 +141,6 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                                   ),
                                 ),
                                 onTap: () {
-                                  // CommonFilterDialog.show(
-                                  //   context,
-                                  //   initialCheckbox: false,
-                                  //   initialSort: "A-Z",
-                                  //   onApply: (isChecked, sortType) {
-                                  //     viewModel.applySort(isChecked, sortType);
-                                  //   },
-                                  // );
                                   InfFilter.show(
                                     context,
                                     categoryList: viewModel.categoryList,
@@ -145,7 +158,6 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                                 },
                               ),
                             ),
-                            horizontalSpacing10,
                             if (PermissionHelper.instance.canAdd('influencers'))
                               CommonButton(
                                   width: isExtended ? 180 : null,
@@ -172,7 +184,6 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
 
                                               viewModel
                                                   .addInfluencer(newInfluencer);
-                                              viewModel.notifyListeners();
                                             },
                                           ),
                                         ),

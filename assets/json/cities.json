@@ -1,9 +1,9 @@
-[   {
-        "id":"0",
+[
+    {
+        "id": "0",
         "name": "All",
         "state": "Tamil Nadu"
     },
-
     {
         "id": "1",
         "name": "Mumbai",
@@ -6085,28 +6085,88 @@
         "state": "Gujarat"
     },
     {
-        "id":"1217",
-        "name":"Kullu",
-        "state":"Himachal Pradesh"
+        "id": "1217",
+        "name": "Kullu",
+        "state": "Himachal Pradesh"
     },
     {
-        "id":"1218",
-        "name":"Manali",
-        "state":"Himachal Praddesh"
+        "id": "1218",
+        "name": "Manali",
+        "state": "Himachal Praddesh"
     },
     {
-        "id":"1219",
-        "name":"Mirzapur",
-        "state":"Uttar Pradesh"
+        "id": "1219",
+        "name": "Mirzapur",
+        "state": "Uttar Pradesh"
     },
     {
-        "id":"1220",
-        "name":"Kota",
-        "state":"Rajasthan"
+        "id": "1220",
+        "name": "Kota",
+        "state": "Rajasthan"
     },
     {
-      "id":"1221",
-       "name":"Dispur",
-       "state":"Assam"
+        "id": "1221",
+        "name": "Dispur",
+        "state": "Assam"
+    },
+    {
+        "id": "1222",
+        "name": "Ariyalur",
+        "state": "Tamil Nadu"
+    },
+    {
+        "id": "1223",
+        "name": "Chengalpattu",
+        "state": "Tamil Nadu"
+    },
+    {
+        "id": "1224",
+        "name": "Cuddalore",
+        "state": "Tamil Nadu"
+    },
+    {
+        "id": "1225",
+        "name": "Dharmapuri",
+        "state": "Tamil Nadu"
+    },
+    {
+        "id": "1226",
+        "name": "Dindigul",
+        "state": "Tamil Nadu"
+    },
+    {
+        "id": "1227",
+        "name": "Krishnagiri",
+        "state": "Tamil Nadu"
+    },
+    {
+        "id": "1228",
+        "name": "Mayiladuthurai",
+        "state": "Tamil Nadu"
+    },
+    {
+        "id": "1229",
+        "name": "Nilgiris",
+        "state": "Tamil Nadu"
+    },
+    {
+        "id": "1230",
+        "name": "Theni",
+        "state": "Tamil Nadu"
+    },
+    {
+        "id": "1231",
+        "name": "Thoothukudi",
+        "state": "Tamil Nadu"
+    },
+    {
+        "id": "1232",
+        "name": "Tiruvallur",
+        "state": "Tamil Nadu"
+    },
+    {
+        "id": "1233",
+        "name": "Tiruvarur",
+        "state": "Tamil Nadu"
     }
 ]

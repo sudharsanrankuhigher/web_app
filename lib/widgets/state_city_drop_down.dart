@@ -98,7 +98,11 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.isVertical == false
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
+    final bool renderVertical = widget.isVertical == false || isMobile;
+
+    return renderVertical
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -117,7 +121,9 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                 },
                 dropdownBuilder: (context, selectedItem) => Text(
                   selectedItem ?? "",
-                  style: fontFamilyMedium.size12.black,
+                  style: fontFamilyMedium.size12.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
                 popupProps: PopupProps.menu(
                   showSearchBox: true,
@@ -191,7 +197,9 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                   },
                   dropdownBuilder: (context, selectedItem) => Text(
                     selectedItem ?? "",
-                    style: fontFamilyMedium.size12.black,
+                    style: fontFamilyMedium.size12.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
                   popupProps: PopupProps.menu(
                     showSearchBox: true,
@@ -278,7 +286,9 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                   },
                   dropdownBuilder: (context, selectedItem) => Text(
                     selectedItem ?? "",
-                    style: fontFamilyMedium.size12.black,
+                    style: fontFamilyMedium.size12.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
                   popupProps: PopupProps.menu(
                     showSearchBox: true,
@@ -354,10 +364,12 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                               c.toLowerCase().contains(filter.toLowerCase()))
                           .toList();
                     },
-                    dropdownBuilder: (context, selectedItem) => Text(
-                      selectedItem ?? "",
-                      style: fontFamilyMedium.size12.black,
-                    ),
+                     dropdownBuilder: (context, selectedItem) => Text(
+                       selectedItem ?? "",
+                       style: fontFamilyMedium.size12.copyWith(
+                         color: Theme.of(context).colorScheme.onSurface,
+                       ),
+                     ),
                     popupProps: PopupProps.menu(
                       showSearchBox: true,
                       itemBuilder:

@@ -48,7 +48,7 @@ class MultiSelectFormField extends FormField<List<String>> {
                         overflow: TextOverflow.ellipsis,
                         color: (state.value == null || state.value!.isEmpty)
                             ? Colors.grey
-                            : Colors.black,
+                            : Theme.of(state.context).colorScheme.onSurface,
                       ),
                     ),
                   ),

@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
-import 'package:webapp/services/profile_service.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/views/sub_admin/model/sub_admin_model.dart'
     as sub_admin_model;
@@ -188,13 +187,17 @@ class SubAdminTableSource extends DataTableSource {
         ),
         // Attendance history
         DataCell(
-          IconButton(
-            icon: const Icon(
-              Icons.history,
-              color: Colors.blue,
-              size: 18,
+          InkWell(
+            onTap: () => viewHistory(row.id.toString()),
+            borderRadius: BorderRadius.circular(12),
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Icon(
+                Icons.history,
+                color: Colors.blue,
+                size: 18,
+              ),
             ),
-            onPressed: () => viewHistory(row.id.toString()),
           ),
         ),
 
@@ -209,41 +212,55 @@ class SubAdminTableSource extends DataTableSource {
         // Action Buttons
         DataCell(
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              IconButton(
-                icon: const Icon(Icons.edit, color: Colors.blue),
-                onPressed: () => (PermissionHelper.instance
-                        .canEdit('sub_admin'))
+              InkWell(
+                onTap: () => (PermissionHelper.instance.canEdit('sub_admin'))
                     ? onEdit(row)
                     : _dialogService.showDialog(
                         title: "Warning",
                         description:
                             "Locked 🔒 – You need special permission to access this.",
                         buttonTitle: 'ok'),
+                borderRadius: BorderRadius.circular(12),
+                child: const Padding(
+                  padding: EdgeInsets.all(6.0),
+                  child: Icon(Icons.edit, color: Colors.blue, size: 18),
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.delete, color: red),
-                onPressed: () => (PermissionHelper.instance
-                        .canDelete('sub_admin'))
+              const SizedBox(width: 4),
+              InkWell(
+                onTap: () => (PermissionHelper.instance.canDelete('sub_admin'))
                     ? onDelete(row)
                     : _dialogService.showDialog(
                         title: "Warning",
                         description:
                             "Locked 🔒 – You need special permission to access this.",
                         buttonTitle: 'ok'),
+                borderRadius: BorderRadius.circular(12),
+                child: const Padding(
+                  padding: EdgeInsets.all(6.0),
+                  child: Icon(Icons.delete, color: red, size: 18),
+                ),
               ),
             ],
           ),
         ),
 
-        DataCell(IconButton(
-          icon: const Icon(
-            Icons.visibility,
-            color: Colors.blue,
-            size: 18,
+        DataCell(
+          InkWell(
+            onTap: () => viewDoc(row.docImg ?? ''),
+            borderRadius: BorderRadius.circular(12),
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Icon(
+                Icons.visibility,
+                color: Colors.blue,
+                size: 18,
+              ),
+            ),
           ),
-          onPressed: () => viewDoc(row.docImg ?? ''),
-        )),
+        ),
 
         // Status Switch
         DataCell(row.roleId.toString() != '1'

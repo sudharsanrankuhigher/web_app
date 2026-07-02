@@ -44,6 +44,7 @@ class ProjectRequestModel {
 class Datum {
   int? id;
   String? projectId;
+  bool? revertStatus;
   String? remark;
   String? image;
   Client? client;
@@ -61,6 +62,7 @@ class Datum {
   Datum({
     this.id,
     this.projectId,
+    this.revertStatus, 
     this.remark,
     this.image,
     this.client,
@@ -79,6 +81,7 @@ class Datum {
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         id: json["id"],
         projectId: json["project_id"],
+        revertStatus: json["revert_status"],
         remark: json["remark"]?.toString(),
         image: json["image"]?.toString(),
         client: json["client"] == null ? null : Client.fromJson(json["client"]),
@@ -106,6 +109,7 @@ class Datum {
   Map<String, dynamic> toJson() => {
         "id": id,
         "project_id": projectId,
+        "revert_status": revertStatus,
         "remark": remark,
         "image": image,
         "client": client?.toJson(),

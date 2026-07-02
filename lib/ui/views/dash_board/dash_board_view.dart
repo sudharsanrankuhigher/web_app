@@ -3,9 +3,11 @@ import 'package:stacked/stacked.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/widgets/client_project_info_card.dart';
 import 'package:webapp/widgets/monthly_bar_chart.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
+import 'package:webapp/widgets/responsive_menu_button.dart';
 
 import 'dash_board_viewmodel.dart';
 
@@ -54,12 +56,22 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 12,
+                        runSpacing: 12,
                         children: [
-                          Text(
-                            'Dashboard',
-                            style: fontFamilyBold.size26.black,
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (MediaQuery.of(context).size.width < 768)
+                                const ResponsiveMenuButton(),
+                              Text(
+                                'Dashboard',
+                                style: fontFamilyBold.size26.black,
+                              ),
+                            ],
                           ),
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
@@ -197,7 +209,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                   width: 150,
                                   height: 42,
                                   child: DropdownButtonFormField<String>(
-                                    value: viewModel.selectedMonth,
+                                    initialValue: viewModel.selectedMonth,
                                     decoration: InputDecoration(
                                       contentPadding:
                                           const EdgeInsets.symmetric(
@@ -218,8 +230,9 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                       );
                                     }).toList(),
                                     onChanged: (val) {
-                                      if (val != null)
+                                      if (val != null) {
                                         viewModel.setSelectedMonth(val);
+                                      }
                                     },
                                   ),
                                 ),
@@ -237,7 +250,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                 width: 120,
                                 height: 42,
                                 child: DropdownButtonFormField<String>(
-                                  value: viewModel.selectedYear,
+                                  initialValue: viewModel.selectedYear,
                                   decoration: InputDecoration(
                                     contentPadding: const EdgeInsets.symmetric(
                                         horizontal: 12, vertical: 8),
@@ -256,8 +269,9 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                     );
                                   }).toList(),
                                   onChanged: (val) {
-                                    if (val != null)
+                                    if (val != null) {
                                       viewModel.setSelectedYear(val);
+                                    }
                                   },
                                 ),
                               ),
@@ -276,7 +290,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                 height: 42,
                                 child: DropdownButtonFormField<String>(
                                   isExpanded: true,
-                                  value: viewModel.selectedState,
+                                  initialValue: viewModel.selectedState,
                                   decoration: InputDecoration(
                                     prefixIcon: const Icon(
                                         Icons.location_on_outlined,
@@ -302,8 +316,9 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                     );
                                   }).toList(),
                                   onChanged: (val) {
-                                    if (val != null)
+                                    if (val != null) {
                                       viewModel.setSelectedState(val);
+                                    }
                                   },
                                 ),
                               ),
@@ -318,7 +333,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                       padding: const EdgeInsets.only(bottom: 12, top: 4),
                       child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.calendar_today_outlined,
                             size: 16,
                             color: continueButton,
@@ -620,11 +635,13 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                     ],
                                   ),
                                   verticalSpacing16,
-                                  MonthlyBarChart(
-                                    ongoing: viewModel
-                                        .getMonthlyPromoteCommissions(),
-                                    completed:
-                                        viewModel.getMonthlyClientCommissions(),
+                                  Expanded(
+                                    child: MonthlyBarChart(
+                                      ongoing: viewModel
+                                          .getMonthlyPromoteCommissions(),
+                                      completed:
+                                          viewModel.getMonthlyClientCommissions(),
+                                    ),
                                   ),
                                 ],
                               ),

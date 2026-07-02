@@ -23,10 +23,13 @@ class FullPreviewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
+
     return Stack(
       children: [
         Container(
-          width: 400,
+          width: isMobile ? screenWidth * 0.9 : 400,
           height: 450,
           color: Colors.white,
           child: Stack(

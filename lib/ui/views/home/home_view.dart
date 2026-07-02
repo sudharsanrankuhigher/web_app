@@ -16,9 +16,14 @@ class HomeView extends StackedView<HomeViewModel> {
   final Widget child;
   const HomeView({Key? key, required this.child}) : super(key: key);
 
+  static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget builder(BuildContext context, HomeViewModel viewModel, Widget? _) {
-    final bool isExtended = MediaQuery.of(context).size.width > 900;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
+    final bool isExtended = screenWidth >= 1100;
+    
     final currentLocation =
         GoRouter.of(context).routerDelegate.currentConfiguration.fullPath;
     viewModel.updateIndexFromRoute(currentLocation);
@@ -35,407 +40,31 @@ class HomeView extends StackedView<HomeViewModel> {
     });
 
     return Scaffold(
+      key: HomeView.scaffoldKey,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      drawer: isMobile
+          ? Drawer(
+              child: Container(
+                color: Theme.of(context).colorScheme.surface,
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                child: SafeArea(
+                  child: _buildSidebarContent(context, viewModel, isExtended: true, isDrawer: true),
+                ),
+              ),
+            )
+          : null,
       body: Stack(
         children: [
           Row(
             children: [
-              Container(
-                width: isExtended ? 230 : 80,
-                color: Theme.of(context).colorScheme.surface,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-                child: Column(
-                  crossAxisAlignment: isExtended
-                      ? CrossAxisAlignment.start
-                      : CrossAxisAlignment.center,
-                  children: [
-                    // Logo + App Name
-                    InkWell(
-                      onTap: () => viewModel.onMenuTap(0, context),
-                      child: Row(
-                        children: [
-                          Container(
-                            color: Colors.transparent,
-                            child: CircleAvatar(
-                              backgroundColor: Colors.transparent,
-                              radius: 22,
-                              backgroundImage:
-                                  const AssetImage("assets/images/logo.png"),
-                              child: SvgPicture.asset(
-                                "assets/images/logo.svg",
-                                color: Theme.of(context).colorScheme.onSurface,
-                                height: 24,
-                                width: 24,
-                                package: null,
-                              ),
-                            ),
-                          ),
-                          if (isExtended) ...[
-                            const SizedBox(width: 10),
-                            RichText(
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: "promote",
-                                    style: TextStyle(
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Colors.white
-                                          : const Color(0xff0B0952),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                  const TextSpan(
-                                    text: "app",
-                                    style: TextStyle(
-                                      color: Colors.blue,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    verticalSpacing16,
-
-                    // Menu Items
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: viewModel.railLabel.length,
-                        itemBuilder: (context, index) {
-                          final bool selected =
-                              viewModel.selectedIndex == index;
-
-                          return Padding(
-                            padding: defaultPadding4,
-                            child: GestureDetector(
-                              onTap: () => viewModel.onMenuTap(index, context),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 250),
-                                height: 48.h,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                decoration: BoxDecoration(
-                                  color: selected
-                                      ? const Color(0xFF1DA1F2)
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Tooltip(
-                                      message: viewModel.railLabel[index],
-                                      child: Builder(
-                                        builder: (context) {
-                                          final isNotification =
-                                              viewModel.railLabel[index] ==
-                                                  'Notifications';
-                                          final isClientRequests =
-                                              viewModel.railLabel[index] ==
-                                                  'Client Requests';
-                                          Widget icon = SvgPicture.asset(
-                                            viewModel.railIcon[index],
-                                            height: isExtended ? 24.h : 34.h,
-                                            width: isExtended ? 24.w : 34.w,
-                                            color: selected
-                                                ? Colors.white
-                                                : Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface
-                                                    .withValues(alpha: 0.8),
-                                          );
-
-                                          if (isNotification &&
-                                              viewModel
-                                                      .unreadNotificationsCount >
-                                                  0 &&
-                                              !isExtended) {
-                                            return Stack(
-                                              clipBehavior: Clip.none,
-                                              children: [
-                                                icon,
-                                                Positioned(
-                                                  right: -6,
-                                                  top: -6,
-                                                  child:
-                                                      _buildNotificationBadge(
-                                                    viewModel
-                                                        .unreadNotificationsCount,
-                                                    selected,
-                                                    isMini: true,
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          }
-
-                                          if (isClientRequests &&
-                                              viewModel.pendingRequestsCount >
-                                                  0 &&
-                                              !isExtended) {
-                                            return Stack(
-                                              clipBehavior: Clip.none,
-                                              children: [
-                                                icon,
-                                                Positioned(
-                                                  right: -6,
-                                                  top: -6,
-                                                  child:
-                                                      _buildNotificationBadge(
-                                                    viewModel
-                                                        .pendingRequestsCount,
-                                                    selected,
-                                                    isMini: true,
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          }
-                                          return icon;
-                                        },
-                                      ),
-                                    ),
-                                    if (isExtended) ...[
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Text(
-                                          viewModel.railLabel[index],
-                                          style: TextStyle(
-                                            color: selected
-                                                ? Colors.white
-                                                : Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface,
-                                            fontSize: 15,
-                                            fontWeight: selected
-                                                ? FontWeight.bold
-                                                : FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                      if (viewModel.railLabel[index] ==
-                                              'Notifications' &&
-                                          viewModel.unreadNotificationsCount >
-                                              0)
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 8.0),
-                                          child: _buildNotificationBadge(
-                                            viewModel.unreadNotificationsCount,
-                                            selected,
-                                            isMini: false,
-                                          ),
-                                        ),
-                                      if (viewModel.railLabel[index] ==
-                                              'Client Requests' &&
-                                          viewModel.pendingRequestsCount > 0)
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 8.0),
-                                          child: _buildNotificationBadge(
-                                            viewModel.pendingRequestsCount,
-                                            selected,
-                                            isMini: false,
-                                          ),
-                                        ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-
-                    verticalSpacing12,
-
-                    // Profile & Logout
-                    Padding(
-                      padding: leftPadding12,
-                      child: Column(
-                        crossAxisAlignment: isExtended
-                            ? CrossAxisAlignment.start
-                            : CrossAxisAlignment.center,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              viewModel.toggleProfilePanel();
-                            },
-                            borderRadius: BorderRadius.circular(12),
-                            hoverColor: Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withOpacity(0.08),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 4),
-                              child: Column(
-                                crossAxisAlignment: isExtended
-                                    ? CrossAxisAlignment.start
-                                    : CrossAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        color: Colors.transparent,
-                                        child: kIsWeb
-                                            ? ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(22),
-                                                child: WebImage(
-                                                  imageUrl:
-                                                      viewModel.profileImageUrl,
-                                                  width: 44,
-                                                  height: 44,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              )
-                                            : CachedNetworkImage(
-                                                imageUrl:
-                                                    viewModel.profileImageUrl,
-                                                imageBuilder:
-                                                    (context, imageProvider) =>
-                                                        CircleAvatar(
-                                                  radius: 22,
-                                                  backgroundImage:
-                                                      imageProvider,
-                                                ),
-                                                errorWidget:
-                                                    (context, url, error) =>
-                                                        const CircleAvatar(
-                                                  radius: 22,
-                                                  backgroundImage: NetworkImage(
-                                                      "https://tse4.mm.bing.net/th/id/OIP.K_MocKRlIvuJ7ryQAtlErwHaIS?w=559&h=626&rs=1&pid=ImgDetMain&o=7&rm=3"),
-                                                ),
-                                                placeholder: (context, url) =>
-                                                    CircleAvatar(
-                                                  radius: 22,
-                                                  backgroundImage:
-                                                      const AssetImage(
-                                                          "assets/images/logo.png",
-                                                          package: null),
-                                                  child: SvgPicture.asset(
-                                                    "assets/images/logo.svg",
-                                                    color: Colors.black,
-                                                    height: 24,
-                                                    width: 24,
-                                                    package: null,
-                                                  ),
-                                                ),
-                                              ),
-                                      ),
-                                      if (isExtended) ...[
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: Text(
-                                            viewModel.name ?? "Admin Name",
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 1,
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                overflow:
-                                                    TextOverflow.ellipsis),
-                                          ),
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                  if (isExtended) ...[
-                                    const SizedBox(height: 4),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 54),
-                                      child: Text(
-                                        viewModel.role ?? "Administrator",
-                                        style: const TextStyle(
-                                            color: Colors.grey, fontSize: 12),
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                          ),
-                          verticalSpacing16,
-                          ListenableBuilder(
-                            listenable: ThemeService.instance,
-                            builder: (context, _) {
-                              final isDark = ThemeService.instance.isDarkMode;
-                              return InkWell(
-                                onTap: () =>
-                                    ThemeService.instance.toggleTheme(),
-                                borderRadius: BorderRadius.circular(10),
-                                child: Container(
-                                  height: 48.h,
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 0),
-                                  child: Row(
-                                    mainAxisAlignment: isExtended
-                                        ? MainAxisAlignment.start
-                                        : MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        isDark
-                                            ? Icons.light_mode_rounded
-                                            : Icons.dark_mode_rounded,
-                                        color: isDark
-                                            ? Colors.amber
-                                            : Colors.indigo[800],
-                                        size: isExtended ? 22 : 28,
-                                      ),
-                                      if (isExtended) ...[
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Text(
-                                            isDark ? "Light Mode" : "Dark Mode",
-                                            style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                          verticalSpacing12,
-                          GestureDetector(
-                            onTap: () {
-                              viewModel.logOut(context);
-                            },
-                            child: Row(
-                              mainAxisAlignment: isExtended
-                                  ? MainAxisAlignment.start
-                                  : MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.logout, color: Colors.red),
-                                if (isExtended) const SizedBox(width: 10),
-                                if (isExtended)
-                                  const Text(
-                                    "Logout",
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+              if (!isMobile)
+                Container(
+                  width: isExtended ? 230 : 80,
+                  color: Theme.of(context).colorScheme.surface,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                  child: _buildSidebarContent(context, viewModel, isExtended: isExtended, isDrawer: false),
                 ),
-              ),
               Expanded(
                 child:
                     child ?? const Center(child: CircularProgressIndicator()),
@@ -451,6 +80,421 @@ class HomeView extends StackedView<HomeViewModel> {
 
   @override
   HomeViewModel viewModelBuilder(BuildContext context) => HomeViewModel();
+
+  Widget _buildSidebarContent(
+    BuildContext context,
+    HomeViewModel viewModel, {
+    required bool isExtended,
+    required bool isDrawer,
+  }) {
+    final bool selectedMode = Theme.of(context).brightness == Brightness.dark;
+    return Column(
+      crossAxisAlignment: isExtended
+          ? CrossAxisAlignment.start
+          : CrossAxisAlignment.center,
+      children: [
+        // Logo + App Name
+        InkWell(
+          onTap: () {
+            if (isDrawer) {
+              Navigator.of(context).pop();
+            }
+            viewModel.onMenuTap(0, context);
+          },
+          child: Row(
+            children: [
+              Container(
+                color: Colors.transparent,
+                child: CircleAvatar(
+                  backgroundColor: Colors.transparent,
+                  radius: 22,
+                  backgroundImage:
+                      const AssetImage("assets/images/logo.png"),
+                  child: SvgPicture.asset(
+                    "assets/images/logo.svg",
+                    color: Theme.of(context).colorScheme.onSurface,
+                    height: 24,
+                    width: 24,
+                    package: null,
+                  ),
+                ),
+              ),
+              if (isExtended) ...[
+                const SizedBox(width: 10),
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "promote",
+                        style: TextStyle(
+                          color: Theme.of(context).brightness ==
+                                  Brightness.dark
+                              ? Colors.white
+                              : const Color(0xff0B0952),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const TextSpan(
+                        text: "app",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+        verticalSpacing16,
+
+        // Menu Items
+        Expanded(
+          child: ListView.builder(
+            itemCount: viewModel.railLabel.length,
+            itemBuilder: (context, index) {
+              final bool selected =
+                  viewModel.selectedIndex == index;
+
+              return Padding(
+                padding: defaultPadding4,
+                child: GestureDetector(
+                  onTap: () {
+                    if (isDrawer) {
+                      Navigator.of(context).pop();
+                    }
+                    viewModel.onMenuTap(index, context);
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    height: 48.h,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: selected
+                          ? const Color(0xFF1DA1F2)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      children: [
+                        Tooltip(
+                          message: viewModel.railLabel[index],
+                          child: Builder(
+                            builder: (context) {
+                              final isNotification =
+                                  viewModel.railLabel[index] ==
+                                      'Notifications';
+                              final isClientRequests =
+                                  viewModel.railLabel[index] ==
+                                      'Client Requests';
+                              Widget icon = SvgPicture.asset(
+                                viewModel.railIcon[index],
+                                height: isExtended ? 24.h : 34.h,
+                                width: isExtended ? 24.w : 34.w,
+                                color: selected
+                                    ? Colors.white
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.8),
+                              );
+
+                              if (isNotification &&
+                                  viewModel
+                                          .unreadNotificationsCount >
+                                      0 &&
+                                  !isExtended) {
+                                return Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    icon,
+                                    Positioned(
+                                      right: -6,
+                                      top: -6,
+                                      child:
+                                          _buildNotificationBadge(
+                                        viewModel
+                                            .unreadNotificationsCount,
+                                        selected,
+                                        isMini: true,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }
+
+                              if (isClientRequests &&
+                                  viewModel.pendingRequestsCount >
+                                      0 &&
+                                  !isExtended) {
+                                return Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    icon,
+                                    Positioned(
+                                      right: -6,
+                                      top: -6,
+                                      child:
+                                          _buildNotificationBadge(
+                                        viewModel
+                                            .pendingRequestsCount,
+                                        selected,
+                                        isMini: true,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }
+                              return icon;
+                            },
+                          ),
+                        ),
+                        if (isExtended) ...[
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              viewModel.railLabel[index],
+                              style: TextStyle(
+                                color: selected
+                                    ? Colors.white
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurface,
+                                fontSize: 15,
+                                fontWeight: selected
+                                    ? FontWeight.bold
+                                    : FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          if (viewModel.railLabel[index] ==
+                                  'Notifications' &&
+                              viewModel.unreadNotificationsCount >
+                                  0)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 8.0),
+                              child: _buildNotificationBadge(
+                                viewModel.unreadNotificationsCount,
+                                selected,
+                                isMini: false,
+                              ),
+                            ),
+                          if (viewModel.railLabel[index] ==
+                                  'Client Requests' &&
+                              viewModel.pendingRequestsCount > 0)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 8.0),
+                              child: _buildNotificationBadge(
+                                viewModel.pendingRequestsCount,
+                                selected,
+                                isMini: false,
+                              ),
+                            ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+
+        verticalSpacing12,
+
+        // Profile & Logout
+        Padding(
+          padding: leftPadding12,
+          child: Column(
+            crossAxisAlignment: isExtended
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.center,
+            children: [
+              InkWell(
+                onTap: () {
+                  if (isDrawer) {
+                    Navigator.of(context).pop();
+                  }
+                  viewModel.toggleProfilePanel();
+                },
+                borderRadius: BorderRadius.circular(12),
+                hoverColor: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withOpacity(0.08),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 8, horizontal: 4),
+                  child: Column(
+                    crossAxisAlignment: isExtended
+                        ? CrossAxisAlignment.start
+                        : CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            color: Colors.transparent,
+                            child: kIsWeb
+                                ? ClipRRect(
+                                    borderRadius:
+                                        BorderRadius.circular(22),
+                                    child: WebImage(
+                                      imageUrl:
+                                          viewModel.profileImageUrl,
+                                      width: 44,
+                                      height: 44,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : CachedNetworkImage(
+                                    imageUrl:
+                                        viewModel.profileImageUrl,
+                                    imageBuilder:
+                                        (context, imageProvider) =>
+                                            CircleAvatar(
+                                      radius: 22,
+                                      backgroundImage:
+                                          imageProvider,
+                                    ),
+                                    errorWidget:
+                                        (context, url, error) =>
+                                            const CircleAvatar(
+                                      radius: 22,
+                                      backgroundImage: NetworkImage(
+                                          "https://tse4.mm.bing.net/th/id/OIP.K_MocKRlIvuJ7ryQAtlErwHaIS?w=559&h=626&rs=1&pid=ImgDetMain&o=7&rm=3"),
+                                    ),
+                                    placeholder: (context, url) =>
+                                        CircleAvatar(
+                                      radius: 22,
+                                      backgroundImage:
+                                          const AssetImage(
+                                              "assets/images/logo.png",
+                                              package: null),
+                                      child: SvgPicture.asset(
+                                        "assets/images/logo.svg",
+                                        color: Colors.black,
+                                        height: 24,
+                                        width: 24,
+                                        package: null,
+                                      ),
+                                    ),
+                                  ),
+                          ),
+                          if (isExtended) ...[
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                viewModel.name ?? "Admin Name",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    overflow:
+                                        TextOverflow.ellipsis),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      if (isExtended) ...[
+                        const SizedBox(height: 4),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 54),
+                          child: Text(
+                            viewModel.role ?? "Administrator",
+                            style: const TextStyle(
+                                color: Colors.grey, fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              verticalSpacing16,
+              ListenableBuilder(
+                listenable: ThemeService.instance,
+                builder: (context, _) {
+                  final isDark = ThemeService.instance.isDarkMode;
+                  return InkWell(
+                    onTap: () =>
+                        ThemeService.instance.toggleTheme(),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      height: 48.h,
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 0),
+                      child: Row(
+                        mainAxisAlignment: isExtended
+                            ? MainAxisAlignment.start
+                            : MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            isDark
+                                ? Icons.light_mode_rounded
+                                : Icons.dark_mode_rounded,
+                            color: isDark
+                                ? Colors.amber
+                                : Colors.indigo[800],
+                            size: isExtended ? 22 : 28,
+                          ),
+                          if (isExtended) ...[
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                isDark ? "Light Mode" : "Dark Mode",
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+              verticalSpacing12,
+              GestureDetector(
+                onTap: () {
+                  if (isDrawer) {
+                    Navigator.of(context).pop();
+                  }
+                  viewModel.logOut(context);
+                },
+                child: Row(
+                  mainAxisAlignment: isExtended
+                      ? MainAxisAlignment.start
+                      : MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.logout, color: Colors.red),
+                    if (isExtended) const SizedBox(width: 10),
+                    if (isExtended)
+                      const Text(
+                        "Logout",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 
   Widget _buildNotificationBadge(int count, bool selected,
       {required bool isMini}) {
@@ -746,8 +790,9 @@ class HomeView extends StackedView<HomeViewModel> {
                                           );
                                         }).toList(),
                                         onChanged: (val) {
-                                          if (val != null)
+                                          if (val != null) {
                                             viewModel.setSelectedMonth(val);
+                                          }
                                         },
                                       ),
                                     ),

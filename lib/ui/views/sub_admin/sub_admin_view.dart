@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stacked/stacked.dart';
@@ -7,6 +8,7 @@ import 'package:webapp/widgets/web_image_loading.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
@@ -24,6 +26,8 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
     SubAdminViewModel viewModel,
     Widget? child,
   ) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
     final bool isExtended = MediaQuery.of(context).size.width > 1000;
 
     return Scaffold(
@@ -45,18 +49,34 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                 bottomLeft: Radius.circular(12),
                                 bottomRight: Radius.circular(12)),
                           ),
-                          child: Text(
-                            'Sub-Admin Management',
-                            style: fontFamilyBold.size26.black,
+                          child: Row(
+                            children: [
+                              if (isMobile) ...[
+                                IconButton(
+                                  icon: const Icon(Icons.menu),
+                                  onPressed: () => HomeView.scaffoldKey.currentState?.openDrawer(),
+                                ),
+                                horizontalSpacing8,
+                              ],
+                              Expanded(
+                                child: Text(
+                                  'Sub-Admin Management',
+                                  style: fontFamilyBold.size26.black,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         verticalSpacing12,
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          alignment: WrapAlignment.spaceBetween,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             SizedBox(
                               height: 55.h,
-                              width: isExtended ? 500.w : 500.w,
+                              width: isMobile ? screenWidth * 0.9 : 300,
                               child: SearchTextField(
                                 hintText: "Search name, email, phone...",
                                 onChanged: (value) =>
@@ -64,6 +84,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                               ),
                             ),
                             Row(
+                              mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 CommonButton(
@@ -138,7 +159,9 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                     DataColumn(label: Text("Attendance")),
                                     DataColumn(label: Text("Online At")),
                                     DataColumn(label: Text("Access")),
-                                    DataColumn(label: Text("Action")),
+                                    DataColumn2(
+                                        fixedWidth: 80,
+                                        label: Text("Action")),
                                     DataColumn(label: Text("View Id")),
                                     DataColumn(label: Text("Status")),
                                   ],
@@ -438,8 +461,9 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                           );
                                         }).toList(),
                                         onChanged: (val) {
-                                          if (val != null)
+                                          if (val != null) {
                                             viewModel.setSelectedMonth(val);
+                                          }
                                         },
                                       ),
                                     ),

@@ -21,6 +21,7 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
   }
 
   final _dialogService = locator<DialogService>();
+
   final _apiService = locator<ApiService>();
 
   DateTime selectedMonth = DateTime.now();

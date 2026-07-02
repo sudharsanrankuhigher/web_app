@@ -35,8 +35,7 @@ class MonthlyBarChart extends StatelessWidget {
     final gridLineColor =
         isDark ? Colors.grey.withOpacity(0.2) : Colors.grey.withOpacity(0.4);
 
-    return Expanded(
-      child: Container(
+    return Container(
         padding: defaultPadding12,
         color: Colors
             .transparent, // Seamlessly blend with the parent themed container
@@ -181,7 +180,6 @@ class MonthlyBarChart extends StatelessWidget {
                 },
               ),
             ),
-          ),
         ),
       ),
     );

@@ -244,7 +244,7 @@ class UserTableSource extends DataTableSource {
                                   DataCell(Text("${plan.connection ?? 0}")),
                                   DataCell(
                                     Text(
-                                      "${DateFormatter.formatToDDMMMYYYY(plan.createdAt!)}",
+                                      DateFormatter.formatToDDMMMYYYY(plan.createdAt!),
                                     ),
                                   ),
                                 ],

@@ -4,6 +4,7 @@ import 'package:stacked/stacked.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
@@ -21,6 +22,8 @@ class BannerView extends StackedView<BannerViewModel> {
     BannerViewModel viewModel,
     Widget? child,
   ) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
     final bool isExtended = MediaQuery.of(context).size.width > 1200;
     final rowCount = viewModel.bannerTableSource.rowCount ?? 0;
 
@@ -40,20 +43,34 @@ class BannerView extends StackedView<BannerViewModel> {
                           bottomLeft: Radius.circular(12),
                           bottomRight: Radius.circular(12)),
                     ),
-                    child: Text(
-                      'Banner Management',
-                      style: fontFamilyBold.size26.black,
+                    child: Row(
+                      children: [
+                        if (isMobile) ...[
+                          IconButton(
+                            icon: const Icon(Icons.menu),
+                            onPressed: () => HomeView.scaffoldKey.currentState?.openDrawer(),
+                          ),
+                          horizontalSpacing8,
+                        ],
+                        Expanded(
+                          child: Text(
+                            'Banner Management',
+                            style: fontFamilyBold.size26.black,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   verticalSpacing12,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       SizedBox(
                         height: 55.h,
-                        width: isExtended
-                            ? 500
-                            : 500.w, // search field fixed width (responsive)
+                        width: isMobile ? screenWidth * 0.9 : 300,
                         child: SearchTextField(
                           hintText:
                               "Search banners (influencer, amount, priority)...",

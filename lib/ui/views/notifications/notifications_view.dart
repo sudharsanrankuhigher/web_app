@@ -4,7 +4,9 @@ import 'package:stacked/stacked.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/widgets/initial_textform.dart';
+import 'package:webapp/widgets/responsive_menu_button.dart';
 
 import 'notifications_viewmodel.dart';
 import 'package:webapp/services/notification_service.dart';
@@ -19,6 +21,8 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
     NotificationsViewModel viewModel,
     Widget? child,
   ) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
     final bool isExtended = MediaQuery.of(context).size.width > 900;
 
     // Fallback: If permissions is not empty, respect canView('notifications'), otherwise allow in debug/development.
@@ -67,19 +71,31 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Notifications Center',
-                          style: fontFamilyBold.size24.black,
-                        ),
-                        verticalSpacing4,
-                        Text(
-                          'Manage, filter, and track system notifications.',
-                          style: fontFamilyMedium.size12.greyColor,
-                        ),
-                      ],
+                    Expanded(
+                      child: Row(
+                        children: [
+                          if (isMobile) ...[
+                            const ResponsiveMenuButton(),
+                            horizontalSpacing8,
+                          ],
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Notifications Center',
+                                  style: fontFamilyBold.size24.black,
+                                ),
+                                verticalSpacing4,
+                                Text(
+                                  'Manage, filter, and track system notifications.',
+                                  style: fontFamilyMedium.size12.greyColor,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     if (viewModel.unreadCount > 0 &&
                         viewModel.activeSection == 'inbox')
@@ -112,7 +128,9 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                       : const Color(0xFFF3F4F6),
                   thickness: 1.5,
                 ),
-                Row(
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
                   children: [
                     _buildSectionTab(
                       context,
@@ -122,7 +140,6 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                       label: 'Inbox',
                     ),
                     if (hasAccess) ...[
-                      horizontalSpacing16,
                       _buildSectionTab(
                         context,
                         viewModel,
@@ -130,7 +147,6 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                         icon: Icons.dashboard_customize_rounded,
                         label: 'Create Template',
                       ),
-                      horizontalSpacing16,
                       _buildSectionTab(
                         context,
                         viewModel,
@@ -447,7 +463,7 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                       style: fontFamilySemiBold.size13.black,
                     ),
                     verticalSpacing8,
-                    _buildAudienceSelector(viewModel),
+                    _buildAudienceSelector(context, viewModel),
                     const SizedBox(height: 20),
 
                     // Broadcast Option Selector
@@ -456,7 +472,7 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                       style: fontFamilySemiBold.size13.black,
                     ),
                     verticalSpacing8,
-                    _buildBroadcastTypeSelector(viewModel),
+                    _buildBroadcastTypeSelector(context, viewModel),
                     const SizedBox(height: 20),
 
                     // If Separately selected, show custom selector
@@ -848,10 +864,13 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
     );
   }
 
-  Widget _buildCategorySelector({
+  Widget _buildCategorySelector(
+    BuildContext context, {
     required String selectedCategory,
     required ValueChanged<String> onCategorySelected,
   }) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
     final categories = [
       {
         'value': 'info',
@@ -879,46 +898,46 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
       },
     ];
 
-    return Row(
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
       children: categories.map((cat) {
         final bool isSelected = selectedCategory == cat['value'];
         final Color catColor = cat['color'] as Color;
-        return Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: GestureDetector(
-              onTap: () => onCategorySelected(cat['value'] as String),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? catColor.withValues(alpha: 0.1)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isSelected ? catColor : Colors.grey[300]!,
-                    width: isSelected ? 1.5 : 1.0,
+        return SizedBox(
+          width: isMobile ? (screenWidth - 80) / 2 : 120,
+          child: GestureDetector(
+            onTap: () => onCategorySelected(cat['value'] as String),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? catColor.withValues(alpha: 0.1)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: isSelected ? catColor : Colors.grey[300]!,
+                  width: isSelected ? 1.5 : 1.0,
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    cat['icon'] as IconData,
+                    color: isSelected ? catColor : Colors.grey[500],
+                    size: 20,
                   ),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      cat['icon'] as IconData,
-                      color: isSelected ? catColor : Colors.grey[500],
-                      size: 20,
-                    ),
-                    verticalSpacing4,
-                    Text(
-                      cat['label'] as String,
-                      style: isSelected
-                          ? fontFamilyBold.size12.copyWith(color: catColor)
-                          : fontFamilyMedium.size12
-                              .copyWith(color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
+                  verticalSpacing4,
+                  Text(
+                    cat['label'] as String,
+                    style: isSelected
+                        ? fontFamilyBold.size12.copyWith(color: catColor)
+                        : fontFamilyMedium.size12
+                            .copyWith(color: Colors.grey[600]),
+                  ),
+                ],
               ),
             ),
           ),
@@ -927,53 +946,55 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
     );
   }
 
-  Widget _buildAudienceSelector(NotificationsViewModel viewModel) {
+  Widget _buildAudienceSelector(
+      BuildContext context, NotificationsViewModel viewModel) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
     final audiences = [
       {'value': 'Users', 'icon': Icons.people_outline_rounded},
       {'value': 'Influencers', 'icon': Icons.campaign_outlined},
     ];
 
-    return Row(
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
       children: audiences.map((aud) {
         final bool isSelected = viewModel.formTargetAudience == aud['value'];
-        return Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: GestureDetector(
-              onTap: () =>
-                  viewModel.setFormTargetAudience(aud['value'] as String),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? continueButton.withValues(alpha: 0.08)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isSelected ? continueButton : Colors.grey[300]!,
-                    width: isSelected ? 1.5 : 1.0,
+        return SizedBox(
+          width: isMobile ? (screenWidth - 80) / 2 : 250,
+          child: GestureDetector(
+            onTap: () =>
+                viewModel.setFormTargetAudience(aud['value'] as String),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? continueButton.withValues(alpha: 0.08)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: isSelected ? continueButton : Colors.grey[300]!,
+                  width: isSelected ? 1.5 : 1.0,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    aud['icon'] as IconData,
+                    color: isSelected ? continueButton : Colors.grey[500],
+                    size: 16,
                   ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      aud['icon'] as IconData,
-                      color: isSelected ? continueButton : Colors.grey[500],
-                      size: 16,
-                    ),
-                    horizontalSpacing8,
-                    Text(
-                      aud['value'] as String,
-                      style: isSelected
-                          ? fontFamilyBold.size12
-                              .copyWith(color: continueButton)
-                          : fontFamilyMedium.size12
-                              .copyWith(color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
+                  horizontalSpacing8,
+                  Text(
+                    aud['value'] as String,
+                    style: isSelected
+                        ? fontFamilyBold.size12.copyWith(color: continueButton)
+                        : fontFamilyMedium.size12
+                            .copyWith(color: Colors.grey[600]),
+                  ),
+                ],
               ),
             ),
           ),
@@ -982,7 +1003,10 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
     );
   }
 
-  Widget _buildBroadcastTypeSelector(NotificationsViewModel viewModel) {
+  Widget _buildBroadcastTypeSelector(
+      BuildContext context, NotificationsViewModel viewModel) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
     final types = [
       {
         'value': 'all',
@@ -996,49 +1020,48 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
       },
     ];
 
-    return Row(
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
       children: types.map((type) {
         final bool isSelected = viewModel.broadcastType == type['value'];
-        return Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: GestureDetector(
-              onTap: () {
-                viewModel.setBroadcastType(type['value'] as String);
-                viewModel.clearSelectedTargets();
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? continueButton.withValues(alpha: 0.08)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isSelected ? continueButton : Colors.grey[300]!,
-                    width: isSelected ? 1.5 : 1.0,
+        return SizedBox(
+          width: isMobile ? (screenWidth - 80) / 2 : 250,
+          child: GestureDetector(
+            onTap: () {
+              viewModel.setBroadcastType(type['value'] as String);
+              viewModel.clearSelectedTargets();
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? continueButton.withValues(alpha: 0.08)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: isSelected ? continueButton : Colors.grey[300]!,
+                  width: isSelected ? 1.5 : 1.0,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    type['icon'] as IconData,
+                    color: isSelected ? continueButton : Colors.grey[500],
+                    size: 16,
                   ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      type['icon'] as IconData,
-                      color: isSelected ? continueButton : Colors.grey[500],
-                      size: 16,
-                    ),
-                    horizontalSpacing8,
-                    Text(
-                      type['label'] as String,
-                      style: isSelected
-                          ? fontFamilyBold.size12
-                              .copyWith(color: continueButton)
-                          : fontFamilyMedium.size12
-                              .copyWith(color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
+                  horizontalSpacing8,
+                  Text(
+                    type['label'] as String,
+                    style: isSelected
+                        ? fontFamilyBold.size12.copyWith(color: continueButton)
+                        : fontFamilyMedium.size12
+                            .copyWith(color: Colors.grey[600]),
+                  ),
+                ],
               ),
             ),
           ),
@@ -1739,6 +1762,7 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                           ),
                           verticalSpacing8,
                           _buildCategorySelector(
+                            context,
                             selectedCategory: viewModel.templateCategory,
                             onCategorySelected: viewModel.setTemplateCategory,
                           ),

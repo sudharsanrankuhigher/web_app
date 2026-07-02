@@ -358,8 +358,8 @@ class DashBoardViewModel extends BaseViewModel with NavigationMixin {
             headerStyle: pw.TextStyle(
                 font: ttf, fontWeight: pw.FontWeight.bold, fontSize: 10),
             cellStyle: pw.TextStyle(font: ttf, fontSize: 9),
-            headerDecoration: pw.BoxDecoration(color: PdfColors.grey300),
-            rowDecoration: pw.BoxDecoration(
+            headerDecoration: const pw.BoxDecoration(color: PdfColors.grey300),
+            rowDecoration: const pw.BoxDecoration(
               border: pw.Border(
                   bottom: pw.BorderSide(color: PdfColors.grey200, width: 0.5)),
             ),

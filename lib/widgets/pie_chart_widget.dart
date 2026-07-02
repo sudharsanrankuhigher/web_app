@@ -15,6 +15,7 @@ class PieChartWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final total = completed + pending;
+    final double percentage = total == 0 ? 0.0 : (completed / total) * 100;
 
     return Stack(
       alignment: Alignment.center,
@@ -57,7 +58,7 @@ class PieChartWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '${((completed / total) * 100).toStringAsFixed(0)}%',
+              '${percentage.toStringAsFixed(0)}%',
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,

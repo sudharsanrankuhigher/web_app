@@ -8,8 +8,6 @@ import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
     as influencer_model;
 import 'package:webapp/widgets/web_image_loading.dart';
 import 'package:webapp/widgets/image_picker.dart';
-import 'package:flutter/foundation.dart';
-import 'dart:typed_data';
 
 Future<void> showRejectConfirmationDialog({
   required BuildContext context,

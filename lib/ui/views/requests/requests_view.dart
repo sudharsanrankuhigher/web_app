@@ -4,6 +4,7 @@ import 'package:stacked/stacked.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_chips.dart';
 import 'package:webapp/widgets/common_data_table.dart';
@@ -27,7 +28,9 @@ class RequestsView extends StackedView<RequestsViewModel> {
       return const Scaffold(body: NoAccessWidget());
     }
 
-    final bool isExtended = MediaQuery.of(context).size.width > 900;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
+    final bool isExtended = screenWidth > 900;
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -53,14 +56,30 @@ class RequestsView extends StackedView<RequestsViewModel> {
                               bottomLeft: Radius.circular(12),
                               bottomRight: Radius.circular(12)),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Wrap(
+                          alignment: WrapAlignment.spaceBetween,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 12,
+                          runSpacing: 12,
                           children: [
-                            Text(
-                              'Client Projects',
-                              style: fontFamilyBold.size26.black,
-                            ),
                             Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (isMobile)
+                                  IconButton(
+                                    icon: const Icon(Icons.menu),
+                                    onPressed: () => HomeView.scaffoldKey.currentState?.openDrawer(),
+                                  ),
+                                Text(
+                                  'Client Projects',
+                                  style: fontFamilyBold.size26.black,
+                                ),
+                              ],
+                            ),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
                                 Padding(
                                   padding: defaultPadding12,
@@ -313,12 +332,15 @@ class RequestsView extends StackedView<RequestsViewModel> {
                         ],
                       ),
                       verticalSpacing20,
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           SizedBox(
                             height: 45.h,
-                            width: 500.w,
+                            width: isMobile ? screenWidth * 0.9 : 400,
                             child: SearchTextField(
                               hintText:
                                   "Search requests (service, client, phone, project)...",
@@ -326,7 +348,7 @@ class RequestsView extends StackedView<RequestsViewModel> {
                             ),
                           ),
                           SizedBox(
-                            width: 180,
+                            width: isExtended ? 180 : null,
                             child: CommonButton(
                               buttonColor: continueButton,
                               margin: EdgeInsets.zero,

@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -79,8 +78,8 @@ class ApiService {
 
     final dio = Dio(
       BaseOptions(
-        baseUrl: 'https://admin.promoteapp.in/',
-        // baseUrl: 'http://172.20.25.23:8001/', //saran
+        // baseUrl: 'https://admin.promoteapp.in/',0
+        baseUrl: 'http://172.20.25.23:8003/', //saran
         // baseUrl: 'http://172.20.25.55:8888/', //shy
         // baseUrl: 'http://172.20.25.23:8002/',
         // baseUrl: 'http://172.20.25.54:8005/',//deepak

@@ -5,6 +5,7 @@ import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/roles/widgets/role_add_edit_dialog.dart';
+import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
@@ -20,6 +21,9 @@ class RolesView extends StackedView<RolesViewModel> {
     RolesViewModel viewModel,
     Widget? child,
   ) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
+
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: PermissionHelper.instance.canView('role')
@@ -36,9 +40,22 @@ class RolesView extends StackedView<RolesViewModel> {
                             bottomLeft: Radius.circular(12),
                             bottomRight: Radius.circular(12)),
                       ),
-                      child: Text(
-                        'Roles Management',
-                        style: fontFamilyBold.size26.black,
+                      child: Row(
+                        children: [
+                          if (isMobile) ...[
+                            IconButton(
+                              icon: const Icon(Icons.menu),
+                              onPressed: () => HomeView.scaffoldKey.currentState?.openDrawer(),
+                            ),
+                            horizontalSpacing8,
+                          ],
+                          Expanded(
+                            child: Text(
+                              'Roles Management',
+                              style: fontFamilyBold.size26.black,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     verticalSpacing12,

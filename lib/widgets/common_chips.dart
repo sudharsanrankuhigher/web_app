@@ -104,9 +104,12 @@ class CommonStatusChip extends StatelessWidget {
               ),
             ),
             horizontalSpacing4,
-            Text(
-              text,
-              style: resolvedTextStyle,
+            Flexible(
+              child: Text(
+                text,
+                style: resolvedTextStyle,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),

@@ -76,10 +76,12 @@ class CommonButton extends StatelessWidget {
                   : Container(),
             ],
             if (text.isNotEmpty || textStyle != null)
-              Text(
-                overflow: TextOverflow.ellipsis,
-                text,
-                style: resolvedTextStyle,
+              Flexible(
+                child: Text(
+                  overflow: TextOverflow.ellipsis,
+                  text,
+                  style: resolvedTextStyle,
+                ),
               ),
             if (icon1 != null) ...[
               horizontalSpacing10,

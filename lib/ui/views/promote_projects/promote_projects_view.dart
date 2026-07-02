@@ -4,6 +4,7 @@ import 'package:stacked/stacked.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_chips.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
@@ -26,6 +27,8 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
       return const Scaffold(body: NoAccessWidget());
     }
 
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
     final bool isExtended = MediaQuery.of(context).size.width > 1440;
 
     return Scaffold(
@@ -45,20 +48,34 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                             bottomLeft: Radius.circular(12),
                             bottomRight: Radius.circular(12)),
                       ),
-                      child: Text(
-                        'Promote Projects',
-                        style: fontFamilyBold.size26.black,
+                      child: Row(
+                        children: [
+                          if (isMobile) ...[
+                            IconButton(
+                              icon: const Icon(Icons.menu),
+                              onPressed: () => HomeView.scaffoldKey.currentState?.openDrawer(),
+                            ),
+                            horizontalSpacing8,
+                          ],
+                          Expanded(
+                            child: Text(
+                              'Promote Projects',
+                              style: fontFamilyBold.size26.black,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     verticalSpacing12,
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         SizedBox(
                           height: 45.h,
-                          width: isExtended
-                              ? 450
-                              : 130, // search field fixed width (responsive)
+                          width: isMobile ? screenWidth * 0.9 : 300,
                           child: SearchTextField(
                             hintText: "Search plans...",
                             onChanged: (value) => viewModel.searchPlans(value),
@@ -69,6 +86,7 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
 
                         // Add Plan Button
                         Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             SizedBox(
                               // width: 180,

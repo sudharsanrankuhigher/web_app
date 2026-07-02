@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/ui/views/plans/widgets/common_plans_dialog.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
+import 'package:webapp/widgets/responsive_menu_button.dart';
 
 import 'package:webapp/widgets/search_text_field.dart';
 import 'plans_viewmodel.dart';
@@ -23,6 +26,8 @@ class PlansView extends StackedView<PlansViewModel> {
     PlansViewModel viewModel,
     Widget? child,
   ) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
     final bool isExtended = MediaQuery.of(context).size.width > 1440;
 
     return Scaffold(
@@ -42,20 +47,31 @@ class PlansView extends StackedView<PlansViewModel> {
                             bottomLeft: Radius.circular(12),
                             bottomRight: Radius.circular(12)),
                       ),
-                      child: Text(
-                        'Plans Management',
-                        style: fontFamilyBold.size26.black,
+                      child: Row(
+                        children: [
+                          if (isMobile) ...[
+                            const ResponsiveMenuButton(),
+                            horizontalSpacing8,
+                          ],
+                          Expanded(
+                            child: Text(
+                              'Plans Management',
+                              style: fontFamilyBold.size26.black,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     verticalSpacing12,
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         SizedBox(
                           height: 45.h,
-                          width: isExtended
-                              ? 500
-                              : 450.w, // search field fixed width (responsive)
+                          width: isMobile ? screenWidth * 0.9 : 300,
                           child: SearchTextField(
                             hintText: "Search plan name...",
                             onChanged: viewModel.searchPlans,
@@ -63,6 +79,7 @@ class PlansView extends StackedView<PlansViewModel> {
                         ),
 
                         Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             SizedBox(
                               width: isExtended ? 180 : null,
@@ -201,7 +218,8 @@ class PlansView extends StackedView<PlansViewModel> {
                                 DataColumn(label: Text("GST")),
                                 DataColumn(label: Text("Category")),
                                 DataColumn(label: Text("Badge")),
-                                DataColumn(
+                                DataColumn2(
+                                    fixedWidth: 100,
                                     headingRowAlignment:
                                         MainAxisAlignment.center,
                                     label: Text("Actions")),

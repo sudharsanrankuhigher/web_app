@@ -4,11 +4,13 @@ import 'package:stacked/stacked.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
+import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_data_table.dart';
 import 'package:webapp/widgets/common_dialog.dart';
 import 'package:webapp/widgets/month_year_picker.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
+import 'package:webapp/widgets/responsive_menu_button.dart';
 import 'package:webapp/widgets/search_text_field.dart';
 import 'users_viewmodel.dart';
 
@@ -21,152 +23,181 @@ class UsersView extends StackedView<UsersViewModel> {
     UsersViewModel viewModel,
     Widget? child,
   ) {
-    final bool isExtended = MediaQuery.of(context).size.width > 1000;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
+    final bool isExtended = screenWidth > 1000;
 
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.surface,
           elevation: 0,
+          leading: isMobile ? const ResponsiveMenuButton() : null,
           title: Text(
             'User Management',
             style: fontFamilyBold.size20.black,
           ),
-          actions: [
-            Padding(
-              padding: defaultPadding12,
-              child: InkWell(
-                onTap: () {
-                  viewModel.loadUsers(getAll: true);
-                },
-                child: Container(
-                    padding: defaultPadding8,
-                    decoration: BoxDecoration(
-                      border:
-                          Border.all(color: Colors.grey.shade300, width: 2.w),
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.grey.shade50,
+          actions: isMobile
+              ? null
+              : [
+                  Padding(
+                    padding: defaultPadding12,
+                    child: InkWell(
+                      onTap: () {
+                        viewModel.loadUsers(getAll: true);
+                      },
+                      child: Container(
+                          padding: defaultPadding8,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                color: Colors.grey.shade300, width: 2.w),
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.grey.shade50,
+                          ),
+                          child: Text(
+                            'Get All Users',
+                            style: fontFamilySemiBold.size11.black,
+                          )),
                     ),
-                    child: Text(
-                      'Get All Users',
-                      style: fontFamilySemiBold.size11.black,
-                    )),
-              ),
-            ),
-            Padding(
-              padding: defaultPadding12,
-              child: MonthYearPickerField(
-                selectedDate: viewModel.selectedMonth,
-                onChanged: (viewDate) {
-                  viewModel.selectedMonth = viewDate;
-                  print(viewModel.selectedMonth.toString());
-                  viewModel.loadUsers();
-                  viewModel.notifyListeners();
-                  print(viewDate);
-                },
-              ),
-            ),
-          ],
+                  ),
+                  Padding(
+                    padding: defaultPadding12,
+                    child: MonthYearPickerField(
+                      selectedDate: viewModel.selectedMonth,
+                      onChanged: (viewDate) {
+                        viewModel.selectedMonth = viewDate;
+                        print(viewModel.selectedMonth.toString());
+                        viewModel.loadUsers();
+                        viewModel.notifyListeners();
+                        print(viewDate);
+                      },
+                    ),
+                  ),
+                ],
         ),
         body: PermissionHelper.instance.canView('users')
             ? Padding(
                 padding: defaultPadding20 - topPadding20,
-                child: Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Container(
-                      //   width: double.infinity,
-                      //   padding: defaultPadding16,
-                      //   decoration: const BoxDecoration(
-                      //     color: white,
-                      //     borderRadius: BorderRadius.only(
-                      //         bottomLeft: Radius.circular(12),
-                      //         bottomRight: Radius.circular(12)),
-                      //   ),
-                      //   child: Text(
-                      //     'User Management',
-                      //     style: fontFamilyBold.size26.black,
-                      //   ),
-                      // ),
-                      // verticalSpacing12,
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (isMobile) ...[
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
-                          SizedBox(
-                            height: 48.h,
-                            width: isExtended ? 500 : 200,
-                            child: SearchTextField(
-                              hintText: "Search name, email, phone...",
-                              onChanged: viewModel.searchUser,
-                            ),
-                          ),
-                          SizedBox(
-                            width: isExtended ? 180 : null,
-                            child: CommonButton(
-                              buttonColor: continueButton,
-                              margin: EdgeInsets.zero,
-                              padding: defaultPadding4 - leftPadding4,
-                              text: isExtended ? "Filter & Sort" : "",
-                              borderRadius: 10,
-                              textStyle: fontFamilyMedium.size14.white
-                                  .copyWith(overflow: TextOverflow.ellipsis),
-                              icon: SizedBox(
-                                height: 35,
-                                width: 35,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(80),
-                                  child: Image.asset(
-                                    height: 34,
-                                    width: 34,
-                                    'assets/images/filter.jpg',
-                                  ),
+                          InkWell(
+                            onTap: () {
+                              viewModel.loadUsers(getAll: true);
+                            },
+                            child: Container(
+                                padding: defaultPadding8,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: Colors.grey.shade300, width: 2.w),
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.grey.shade50,
                                 ),
-                              ),
-                              onTap: () {
-                                CommonFilterDialog.show(
-                                  context,
-                                  initialCheckbox: false,
-                                  initialSort: "A-Z",
-                                  onApply: (isChecked, sortType) {
-                                    viewModel.applySort(isChecked, sortType);
-                                  },
-                                );
-                              },
-                            ),
+                                child: Text(
+                                  'Get All Users',
+                                  style: fontFamilySemiBold.size11.black,
+                                )),
+                          ),
+                          MonthYearPickerField(
+                            selectedDate: viewModel.selectedMonth,
+                            onChanged: (viewDate) {
+                              viewModel.selectedMonth = viewDate;
+                              print(viewModel.selectedMonth.toString());
+                              viewModel.loadUsers();
+                              viewModel.notifyListeners();
+                              print(viewDate);
+                            },
                           ),
                         ],
                       ),
-                      verticalSpacing20,
-                      Expanded(
-                        child: viewModel.isBusy
-                            ? const Center(child: CircularProgressIndicator())
-                            : CommonPaginatedTable(
-                                columns: const [
-                                  DataColumn(label: Text("S.No")),
-                                  DataColumn(label: Text("Name")),
-                                  DataColumn(label: Text("Email")),
-                                  DataColumn(label: Text("Phone")),
-                                  DataColumn(label: Text("Type")),
-                                  DataColumn(label: Text("Onboard")),
-                                  DataColumn(
-                                    label: Text("notes"),
-                                    headingRowAlignment:
-                                        MainAxisAlignment.center,
-                                  ),
-                                  DataColumn(label: Text("City/State")),
-                                  DataColumn(label: Text("View")),
-                                  // DataColumn(label: Text("Actions")),
-                                ],
-                                source: viewModel.tableSource,
-                                rowsperPage: viewModel.tableSource.rowCount < 10
-                                    ? viewModel.tableSource.rowCount
-                                    : 10,
-                                minWidth: 1000,
-                              ),
-                      ),
+                      verticalSpacing12,
                     ],
-                  ),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: 48.h,
+                          width: isMobile
+                              ? screenWidth * 0.9
+                              : (isExtended ? 500 : 250),
+                          child: SearchTextField(
+                            hintText: "Search name, email, phone...",
+                            onChanged: viewModel.searchUser,
+                          ),
+                        ),
+                        SizedBox(
+                          width: isExtended ? 180 : null,
+                          child: CommonButton(
+                            buttonColor: continueButton,
+                            margin: EdgeInsets.zero,
+                            padding: defaultPadding4 - leftPadding4,
+                            text: isExtended ? "Filter & Sort" : "",
+                            borderRadius: 10,
+                            textStyle: fontFamilyMedium.size14.white
+                                .copyWith(overflow: TextOverflow.ellipsis),
+                            icon: SizedBox(
+                              height: 35,
+                              width: 35,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(80),
+                                child: Image.asset(
+                                  height: 34,
+                                  width: 34,
+                                  'assets/images/filter.jpg',
+                                ),
+                              ),
+                            ),
+                            onTap: () {
+                              CommonFilterDialog.show(
+                                context,
+                                initialCheckbox: false,
+                                initialSort: "A-Z",
+                                onApply: (isChecked, sortType) {
+                                  viewModel.applySort(isChecked, sortType);
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    verticalSpacing20,
+                    Expanded(
+                      child: viewModel.isBusy
+                          ? const Center(child: CircularProgressIndicator())
+                          : CommonPaginatedTable(
+                              columns: const [
+                                DataColumn(label: Text("S.No")),
+                                DataColumn(label: Text("Name")),
+                                DataColumn(label: Text("Email")),
+                                DataColumn(label: Text("Phone")),
+                                DataColumn(label: Text("Type")),
+                                DataColumn(label: Text("Onboard")),
+                                DataColumn(
+                                  label: Text("notes"),
+                                  headingRowAlignment: MainAxisAlignment.center,
+                                ),
+                                DataColumn(label: Text("City/State")),
+                                DataColumn(label: Text("View")),
+                                // DataColumn(label: Text("Actions")),
+                              ],
+                              source: viewModel.tableSource,
+                              rowsperPage: viewModel.tableSource.rowCount < 10
+                                  ? viewModel.tableSource.rowCount
+                                  : 10,
+                              minWidth: 1000,
+                            ),
+                    ),
+                  ],
                 ),
               )
             : const NoAccessWidget());

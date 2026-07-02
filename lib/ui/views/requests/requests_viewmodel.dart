@@ -602,9 +602,10 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       "link": data["link"] ?? "",
       "remark": data["remark"] ?? "",
       if (data["image"] != null) "image": data["image"],
+      if (data["revert_status"] != null) "revert_status": data["revert_status"],
     };
 
-    print("data request ${req}");
+    print("data request $req");
 
     try {
       final res = await _apiService.statusChange(req);
@@ -674,7 +675,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
 
   /// functions
   /// request & waiting
-  onReject(request_model.Datum model) {
+  onReject(request_model.Datum model, {bool isWaiting = false}) {
     showRejectConfirmationDialog(
         context: StackedService.navigatorKey!.currentContext!,
         itemName: "${model.projectId}",
@@ -683,7 +684,8 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
             "id": model.id,
             "status": 8,
             "client_id": model.client!.id,
-            "category_id": model.category
+            "category_id": model.category,
+            "revert_status": isWaiting,
           };
           await statusChange(data);
         });
@@ -987,7 +989,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       onConfirm: () {
         final data = {
           "id": model.id,
-          "status": 3,
+          "status": model.revertStatus == true ? 2 : 3,
           "client_id": model.client!.id,
         };
         statusChange(data);
@@ -1007,7 +1009,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       final data = {
         "client_project_id": model.id,
         "inf_id": selected.id,
-        "status": 3
+        "status": model.revertStatus == true ? 2 : 3
       };
       await assignInfluencer(data);
       print(data);
