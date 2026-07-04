@@ -47,6 +47,8 @@ class Datum {
   String? note;
   String? description;
   String? status;
+  DateTime? createdAt;
+  DateTime? updatedAt;
   bool isSelected = false;
 
   Datum({
@@ -59,6 +61,8 @@ class Datum {
     this.note,
     this.description,
     this.status,
+    this.createdAt,
+    this.updatedAt,
     this.isSelected = false, // default false
   });
 
@@ -72,6 +76,12 @@ class Datum {
         note: json["note"],
         description: json["description"],
         status: json["status"],
+        createdAt: json["created_at"] == null
+            ? null
+            : DateTime.tryParse(json["created_at"].toString()),
+        updatedAt: json["updated_at"] == null
+            ? null
+            : DateTime.tryParse(json["updated_at"].toString()),
       );
 
   Map<String, dynamic> toJson() => {
@@ -84,5 +94,7 @@ class Datum {
         "note": note,
         "description": description,
         "status": status,
+        "created_at": createdAt?.toIso8601String(),
+        "updated_at": updatedAt?.toIso8601String(),
       };
 }

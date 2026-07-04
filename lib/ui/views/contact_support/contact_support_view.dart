@@ -10,6 +10,8 @@ import 'package:webapp/widgets/common_dialog.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
 
 import 'contact_support_viewmodel.dart';
+import 'package:webapp/widgets/search_text_field.dart';
+import 'package:webapp/services/profile_service.dart';
 
 class ContactSupportView extends StackedView<ContactSupportViewModel> {
   const ContactSupportView({Key? key}) : super(key: key);
@@ -46,7 +48,8 @@ class ContactSupportView extends StackedView<ContactSupportViewModel> {
                           if (isMobile) ...[
                             IconButton(
                               icon: const Icon(Icons.menu),
-                              onPressed: () => HomeView.scaffoldKey.currentState?.openDrawer(),
+                              onPressed: () => HomeView.scaffoldKey.currentState
+                                  ?.openDrawer(),
                             ),
                             horizontalSpacing8,
                           ],
@@ -72,10 +75,66 @@ class ContactSupportView extends StackedView<ContactSupportViewModel> {
                           buttonColor: white,
                           borderRadius: 12,
                         ),
+                        // Search bar
+                        SizedBox(
+                          height: 45,
+                          width: isMobile ? screenWidth * 0.9 : 300,
+                          child: SearchTextField(
+                            hintText: "Search name, phone, status, ID...",
+                            onChanged: (val) {
+                              viewModel.setSearchQuery(val);
+                            },
+                          ),
+                        ),
+                        // Status Filter Dropdown
+                        Container(
+                          height: 45,
+                          width: isMobile ? screenWidth * 0.9 : 160,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Theme.of(context)
+                                  .dividerColor
+                                  .withOpacity(0.3),
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            color: Theme.of(context).colorScheme.surface,
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: viewModel.selectedStatus,
+                              isExpanded: true,
+                              icon:
+                                  const Icon(Icons.keyboard_arrow_down_rounded),
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              items: <String>[
+                                'All',
+                                'Pending',
+                                'Completed',
+                                'Processing'
+                              ].map((String status) {
+                                return DropdownMenuItem<String>(
+                                  value: status,
+                                  child: Text(status),
+                                );
+                              }).toList(),
+                              onChanged: (val) {
+                                if (val != null) {
+                                  viewModel.setSelectedStatus(val);
+                                }
+                              },
+                            ),
+                          ),
+                        ),
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            if (viewModel.selectedIds.isNotEmpty)
+                            if (ProfileService.instance.roleId == '1' &&
+                                viewModel.selectedIds.isNotEmpty) ...[
                               IconButton(
                                 onPressed: () {
                                   viewModel.selectedIds.isEmpty
@@ -86,7 +145,8 @@ class ContactSupportView extends StackedView<ContactSupportViewModel> {
                                 iconSize: 35,
                                 color: red,
                               ),
-                            horizontalSpacing10,
+                              horizontalSpacing10,
+                            ],
                             SizedBox(
                               width: isExtended ? 180 : null,
                               child: CommonButton(
@@ -131,14 +191,18 @@ class ContactSupportView extends StackedView<ContactSupportViewModel> {
                                 viewModel.isRequestLoading == true
                             ? const Center(child: CircularProgressIndicator())
                             : CommonPaginatedTable(
-                                enableCheckBox: true,
+                                enableCheckBox:
+                                    ProfileService.instance.roleId == '1',
                                 columns: const [
                                   DataColumn(label: Text('S.No')),
+                                  DataColumn(label: Text('ID')),
                                   DataColumn(label: Text('Client Name')),
                                   DataColumn(label: Text('City / State')),
                                   DataColumn(label: Text('Phone')),
                                   DataColumn(label: Text('description')),
                                   DataColumn(label: Text('Note')),
+                                  DataColumn(label: Text('Create Ticket')),
+                                  DataColumn(label: Text('Update Ticket')),
                                   DataColumn(label: Text('status')),
                                   DataColumn(label: Text('Actions')),
                                 ],

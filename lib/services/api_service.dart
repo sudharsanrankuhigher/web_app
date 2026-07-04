@@ -78,8 +78,8 @@ class ApiService {
 
     final dio = Dio(
       BaseOptions(
-        // baseUrl: 'https://admin.promoteapp.in/',0
-        baseUrl: 'http://172.20.25.23:8003/', //saran
+        baseUrl: 'https://admin.promoteapp.in/',
+        // baseUrl: 'http://172.20.25.23:8003/', //saran
         // baseUrl: 'http://172.20.25.55:8888/', //shy
         // baseUrl: 'http://172.20.25.23:8002/',
         // baseUrl: 'http://172.20.25.54:8005/',//deepak
@@ -853,6 +853,7 @@ class ApiService {
       'api/admin/add-role',
       data: {
         'name': role['name'], // ✅ map access
+        if (role['id'] != null) 'id': role['id'],
       },
     );
     if (response.statusCode == 200) {
@@ -1808,9 +1809,12 @@ class ApiService {
   }
 
   /// POST: /api/admin/notification-delete
-  Future<dynamic> deleteNotification(int id) async {
-    final response = await _dio
-        .delete('api/admin/notification-delete', queryParameters: {'id': id});
+  Future<dynamic> deleteNotification(List<int> ids) async {
+    final response = await _dio.delete(
+      'api/admin/notification-delete',
+      data: {'id': ids},
+      queryParameters: {'id': ids},
+    );
     if (response.statusCode == 200) {
       return response.data;
     } else {

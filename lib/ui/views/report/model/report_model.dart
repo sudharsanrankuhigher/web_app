@@ -160,7 +160,7 @@ String getFormattedId(int? categoryId, int? id) {
 }
 
 class Datum {
-  int? id;
+  String? id;
   String? clientName;
   String? clientPhone;
   String? infId;

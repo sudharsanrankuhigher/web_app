@@ -188,6 +188,14 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
           if (!hasMatch) return false;
         }
 
+        // 🔹 Gender filter
+        if (gender.isNotEmpty && gender.toLowerCase() != 'both') {
+          if (inf['gender'] == null ||
+              inf['gender'].toString().toLowerCase() != gender.toLowerCase()) {
+            return false;
+          }
+        }
+
         return true;
       }).toList();
     }
@@ -256,7 +264,14 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
     taxPercentCtrl.addListener(_calculateValues);
     commPercentCtrl.addListener(_calculateValues);
 
-    gender = widget.model.gender ?? genders.first;
+    final rawGender = widget.model.gender ?? "Male";
+    if (rawGender.toLowerCase() == 'both') {
+      gender = 'Both';
+    } else if (rawGender.toLowerCase() == 'female') {
+      gender = 'Female';
+    } else {
+      gender = 'Male';
+    }
     state = widget.model.state ?? "Tamil Nadu";
     city = widget.model.city ?? "Coimbatore";
     selectedCities = widget.model.cities ?? [];
@@ -302,7 +317,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
           .map((e) => {
                 'id': e.id,
                 'name': e.name,
-                // 'gender': e.gender,
+                'gender': e.gender,
                 'state': e.state,
                 'city': e.city,
                 'services': e.service, // must be List<int>
@@ -381,6 +396,8 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
         );
       });
     }
+
+    _filterInfluencers();
   }
 
   @override
@@ -440,6 +457,26 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                         ),
                         Row(
                           children: [
+                            if (isView && widget.model.isEditable != 0)
+                              TextButton.icon(
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                ),
+                                icon: const Icon(Icons.edit_note_rounded,
+                                    size: 20, color: continueButton),
+                                label: Text(
+                                  "Add Image & Description",
+                                  style: fontFamilySemiBold.size13
+                                      .copyWith(color: continueButton),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    isView = false;
+                                    isEdit = true;
+                                  });
+                                },
+                              ),
                             if (isView && widget.model.isEditable == 0)
                               IconButton(
                                 icon: const Icon(Icons.edit),
@@ -696,7 +733,9 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                   // ),
                                   // horizontalSpacing12,
                                   IgnorePointer(
-                                    ignoring: isView,
+                                    ignoring: isView ||
+                                        (isEdit &&
+                                            widget.model.isEditable != 0),
                                     child: _buildField(
                                       label: 'Company Name',
                                       child: DynamicSingleSearchDropdown(
@@ -730,7 +769,10 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                             radius: 10,
                                             controller: titleCtrl,
                                             hintText: 'Project Title',
-                                            readOnly: isView,
+                                            readOnly: isView ||
+                                                (isEdit &&
+                                                    widget.model.isEditable !=
+                                                        0),
                                             validator: (val) {
                                               if (val == null || val.isEmpty) {
                                                 return 'Project Title is required';
@@ -743,7 +785,9 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                       horizontalSpacing12,
                                       Expanded(
                                         child: IgnorePointer(
-                                          ignoring: isView,
+                                          ignoring: isView ||
+                                              (isEdit &&
+                                                  widget.model.isEditable != 0),
                                           child: _buildField(
                                             label: 'Services',
                                             child: DynamicMultiSearchDropdown(
@@ -805,7 +849,10 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                             ],
                                             controller: paymentCtrl,
                                             hintText: 'Payment',
-                                            readOnly: isView,
+                                            readOnly: isView ||
+                                                (isEdit &&
+                                                    widget.model.isEditable !=
+                                                        0),
                                             keyboardType: TextInputType.number,
                                             validator: (val) {
                                               if (val == null || val.isEmpty) {
@@ -827,7 +874,10 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                             radius: 10,
                                             controller: taxPercentCtrl,
                                             hintText: 'Tax %',
-                                            readOnly: isView,
+                                            readOnly: isView ||
+                                                (isEdit &&
+                                                    widget.model.isEditable !=
+                                                        0),
                                             keyboardType: TextInputType.number,
                                             suffixIcon: const Icon(
                                                 Icons.percent,
@@ -865,7 +915,10 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                             radius: 10,
                                             controller: commPercentCtrl,
                                             hintText: 'Comm %',
-                                            readOnly: isView,
+                                            readOnly: isView ||
+                                                (isEdit &&
+                                                    widget.model.isEditable !=
+                                                        0),
                                             keyboardType: TextInputType.number,
                                             suffixIcon: const Icon(
                                                 Icons.percent,
@@ -904,36 +957,42 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                       horizontalSpacing12,
                                       const SizedBox(width: 12),
                                       Expanded(
-                                          child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const IconTextLabel(
-                                            icon: Icons.calendar_month,
-                                            text: "Validity date",
-                                            iconColor: Colors.black,
-                                            textColor: Colors.black,
-                                            iconSize: 16,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          verticalSpacing10,
-                                          DOBField(
-                                            label: "Validity date",
-                                            selectedDate: dob ?? DateTime.now(),
-                                            lastdate: DateTime(2200),
-                                            isError: dobError,
-                                            onDateSelected: (date) {
-                                              setState(() {
-                                                dobString = "${date.year}-"
-                                                    "${date.month.toString().padLeft(2, '0')}-"
-                                                    "${date.day.toString().padLeft(2, '0')}";
-                                                dob = date;
-                                                dobError = false;
-                                              });
-                                            },
-                                          )
-                                        ],
+                                          child: IgnorePointer(
+                                        ignoring: isView ||
+                                            (isEdit &&
+                                                widget.model.isEditable != 0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const IconTextLabel(
+                                              icon: Icons.calendar_month,
+                                              text: "Validity date",
+                                              iconColor: Colors.black,
+                                              textColor: Colors.black,
+                                              iconSize: 16,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                            verticalSpacing10,
+                                            DOBField(
+                                              label: "Validity date",
+                                              selectedDate:
+                                                  dob ?? DateTime.now(),
+                                              lastdate: DateTime(2200),
+                                              isError: dobError,
+                                              onDateSelected: (date) {
+                                                setState(() {
+                                                  dobString = "${date.year}-"
+                                                      "${date.month.toString().padLeft(2, '0')}-"
+                                                      "${date.day.toString().padLeft(2, '0')}";
+                                                  dob = date;
+                                                  dobError = false;
+                                                });
+                                              },
+                                            )
+                                          ],
+                                        ),
                                       )),
                                     ],
                                   ),
@@ -964,7 +1023,9 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                   //   ),
                                   // ),
                                   IgnorePointer(
-                                    ignoring: isView,
+                                    ignoring: isView ||
+                                        (isEdit &&
+                                            widget.model.isEditable != 0),
                                     child: _buildField(
                                       label: 'Location',
                                       child: StateCityDynamicDropdown(
@@ -1023,7 +1084,9 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
 
                                   /// Gender & influencer
                                   IgnorePointer(
-                                    ignoring: isView,
+                                    ignoring: isView ||
+                                        (isEdit &&
+                                            widget.model.isEditable != 0),
                                     child: Row(
                                       children: [
                                         Expanded(
@@ -1033,11 +1096,14 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                               items: const [
                                                 "Male",
                                                 "Female",
-                                                "Others",
+                                                "Both",
                                               ],
                                               selectedItem: gender,
                                               onChanged: (v) {
-                                                gender = v!;
+                                                setState(() {
+                                                  gender = v!;
+                                                });
+                                                _filterInfluencers();
                                               },
                                               label: "Gender",
                                               isError: isGenderError,
@@ -1047,91 +1113,78 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                         ),
                                         horizontalSpacing12,
                                         Expanded(
-                                          child: _buildField(
-                                            label: 'Influencers',
-                                            child: Builder(
-                                              builder: (context) {
-                                                // 🔹 Debug: check the data before passing to dropdown
-                                                for (var e
-                                                    in (widget.influencers ??
-                                                        [])) {
-                                                  debugPrint(
-                                                      "id=${e.id}, name=${e.name}, image=${e.image}");
-                                                }
-
-                                                return DynamicMultiSearchDropdown(
-                                                  label: 'Influencers',
-                                                  selectedItems:
-                                                      selectedInfluencers,
-                                                  // items:
-
-                                                  // (widget.influencers ?? [])
-                                                  //     .map((e) => {
-                                                  //           'id': e.id,
-                                                  //           'name': e.name,
-                                                  //           // 🔹 Normalize image to full URL if needed
-                                                  //           'image': (e.image !=
-                                                  //                       null &&
-                                                  //                   e.image!
-                                                  //                       .isNotEmpty)
-                                                  //               ? "${e.image}"
-                                                  //               : null,
-                                                  //         })
-                                                  //     .toList(),
-                                                  items: filteredInfluencers
-                                                      .map((e) => {
-                                                            'id': e['id'],
-                                                            'name': e['name'],
-                                                            'image': (e['image'] !=
-                                                                        null &&
-                                                                    e['image']
-                                                                        .toString()
-                                                                        .isNotEmpty)
-                                                                ? "${e['image']}"
-                                                                : null,
-                                                          })
-                                                      .toList(),
-
-                                                  onChanged: isView
-                                                      ? (_) {} // 🔒 view mode
-                                                      : (values) {
-                                                          setState(() {
-                                                            selectedInfluencers = (widget
-                                                                        .influencers ??
-                                                                    [])
-                                                                .map((e) => {
-                                                                      'id':
-                                                                          e.id,
-                                                                      'name': e
-                                                                          .name,
-                                                                      'image': (e.image != null &&
-                                                                              e.image!.isNotEmpty)
-                                                                          ? "https://yourserver.com/${e.image}"
-                                                                          : null,
-                                                                    })
-                                                                .where((item) =>
-                                                                    values.any((v) =>
-                                                                        v['id'] ==
-                                                                        item[
-                                                                            'id']))
-                                                                .toList();
-
-                                                            selectedInfluencerIds =
-                                                                selectedInfluencers
-                                                                    .map((e) =>
-                                                                        e['id'])
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              _buildField(
+                                                label:
+                                                    'Influencers (${filteredInfluencers.length})',
+                                                child: Builder(
+                                                  builder: (context) {
+                                                    return DynamicMultiSearchDropdown(
+                                                      label:
+                                                          'Select Influencers',
+                                                      selectedItems:
+                                                          selectedInfluencers,
+                                                      items: filteredInfluencers
+                                                          .map((e) => {
+                                                                'id': e['id'],
+                                                                'name':
+                                                                    e['name'],
+                                                                'image': (e['image'] !=
+                                                                            null &&
+                                                                        e['image']
+                                                                            .toString()
+                                                                            .isNotEmpty)
+                                                                    ? "${e['image']}"
+                                                                    : null,
+                                                              })
+                                                          .toList(),
+                                                      onChanged: isView
+                                                          ? (_) {}
+                                                          : (values) {
+                                                              setState(() {
+                                                                selectedInfluencers = (widget
+                                                                            .influencers ??
+                                                                        [])
+                                                                    .map(
+                                                                        (e) => {
+                                                                              'id': e.id,
+                                                                              'name': e.name,
+                                                                              'image': (e.image != null && e.image!.isNotEmpty) ? "https://yourserver.com/${e.image}" : null,
+                                                                            })
+                                                                    .where((item) =>
+                                                                        values.any((v) =>
+                                                                            v['id'] ==
+                                                                            item['id']))
                                                                     .toList();
-                                                          });
-
-                                                          debugPrint(
-                                                              "Selected Influencer IDs: $selectedInfluencerIds");
-                                                        },
-                                                  isError: isInfluencerSelected,
-                                                  errorText:
-                                                      "Please select at least one influencer",
-                                                );
-                                              },
-                                            ),
+                                                                selectedInfluencerIds =
+                                                                    selectedInfluencers
+                                                                        .map((e) =>
+                                                                            e['id'])
+                                                                        .toList();
+                                                              });
+                                                            },
+                                                      isError:
+                                                          isInfluencerSelected,
+                                                      errorText:
+                                                          "Please select at least one influencer",
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                "Selected: ${selectedInfluencers.length}",
+                                                style: fontFamilyRegular.size12
+                                                    .copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
@@ -1143,7 +1196,9 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       IgnorePointer(
-                                        ignoring: isView,
+                                        ignoring: isView ||
+                                            (isEdit &&
+                                                widget.model.isEditable != 0),
                                         child: _buildField(
                                           label: "Social media platforms",
                                           child: Row(

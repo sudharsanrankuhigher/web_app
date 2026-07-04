@@ -3,7 +3,6 @@ import 'package:stacked/stacked.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
-import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/widgets/client_project_info_card.dart';
 import 'package:webapp/widgets/monthly_bar_chart.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
@@ -412,14 +411,14 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                     ),
 
                     // SECTION 3: Influencers Breakdown
-                    _buildSectionHeader('Influencers Count'),
+                    _buildSectionHeader('Influencers Count (500)'),
                     Wrap(
                       spacing: 16,
                       runSpacing: 16,
                       children: [
                         _buildPremiumMetricCard(
                           context: context,
-                          title: 'Total Influencers',
+                          title: 'Influencers',
                           count: formatNumber(viewModel.totalInfluencersCount),
                           color: continueButton,
                           icon: Icons.group_outlined,
@@ -533,10 +532,31 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                         ),
                         _buildPremiumMetricCard(
                           context: context,
+                          title: 'Total Client Count',
+                          count: formatNumber(viewModel.packageClientCount),
+                          color: pending,
+                          icon: Icons.people_outline_rounded,
+                        ),
+                        _buildPremiumMetricCard(
+                          context: context,
                           title: 'Banner Revenue',
                           count: formatCurrency(viewModel.bannerRevenue),
                           color: publisButtonColor,
                           icon: Icons.featured_video_outlined,
+                        ),
+                        _buildPremiumMetricCard(
+                          context: context,
+                          title: 'Total Influencer Count',
+                          count: formatNumber(viewModel.packageInfluencerCount),
+                          color: red,
+                          icon: Icons.campaign_outlined,
+                        ),
+                        _buildPremiumMetricCard(
+                          context: context,
+                          title: 'Paid Count',
+                          count: formatNumber(viewModel.packagePaidCount),
+                          color: appGreen600,
+                          icon: Icons.check_circle_outline_rounded,
                         ),
                       ],
                     ),
@@ -639,8 +659,8 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                     child: MonthlyBarChart(
                                       ongoing: viewModel
                                           .getMonthlyPromoteCommissions(),
-                                      completed:
-                                          viewModel.getMonthlyClientCommissions(),
+                                      completed: viewModel
+                                          .getMonthlyClientCommissions(),
                                     ),
                                   ),
                                 ],

@@ -252,6 +252,7 @@ class NotificationsViewModel extends BaseViewModel {
 
   void setActiveSection(String section) {
     _activeSection = section;
+    clearSelection();
     if (_activeSection == 'send') {
       fetchTargetOptions();
     }
@@ -279,7 +280,75 @@ class NotificationsViewModel extends BaseViewModel {
 
   void setFilter(String filter) {
     _currentFilter = filter;
+    clearSelection();
     notifyListeners();
+  }
+
+  // Selection State
+  final Set<String> _selectedNotificationIds = {};
+  Set<String> get selectedNotificationIds => _selectedNotificationIds;
+
+  bool isNotificationSelected(String id) {
+    return _selectedNotificationIds.contains(id);
+  }
+
+  void toggleNotificationSelection(String id) {
+    if (_selectedNotificationIds.contains(id)) {
+      _selectedNotificationIds.remove(id);
+    } else {
+      _selectedNotificationIds.add(id);
+    }
+    notifyListeners();
+  }
+
+  void selectAllNotifications() {
+    final allFilteredIds = filteredNotifications.map((n) => n.id).toList();
+    final allSelected = allFilteredIds.isNotEmpty &&
+        allFilteredIds.every((id) => _selectedNotificationIds.contains(id));
+
+    if (allSelected) {
+      for (final id in allFilteredIds) {
+        _selectedNotificationIds.remove(id);
+      }
+    } else {
+      _selectedNotificationIds.addAll(allFilteredIds);
+    }
+    notifyListeners();
+  }
+
+  void clearSelection() {
+    _selectedNotificationIds.clear();
+    notifyListeners();
+  }
+
+  Future<void> deleteSelectedNotifications() async {
+    if (_selectedNotificationIds.isEmpty) return;
+    setBusy(true);
+    try {
+      final List<String> idsToDelete = _selectedNotificationIds.toList();
+      await NotificationService.instance.deleteNotifications(idsToDelete);
+      _selectedNotificationIds.clear();
+    } catch (e) {
+      debugPrint('Error deleting selected notifications: $e');
+    } finally {
+      setBusy(false);
+      notifyListeners();
+    }
+  }
+
+  Future<void> markSelectedAsRead() async {
+    if (_selectedNotificationIds.isEmpty) return;
+    setBusy(true);
+    try {
+      final List<String> idsToMark = _selectedNotificationIds.toList();
+      await NotificationService.instance.markNotificationsAsRead(idsToMark);
+      _selectedNotificationIds.clear();
+    } catch (e) {
+      debugPrint('Error marking selected notifications as read: $e');
+    } finally {
+      setBusy(false);
+      notifyListeners();
+    }
   }
 
   // Inbox Actions

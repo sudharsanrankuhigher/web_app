@@ -364,12 +364,12 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
                               c.toLowerCase().contains(filter.toLowerCase()))
                           .toList();
                     },
-                     dropdownBuilder: (context, selectedItem) => Text(
-                       selectedItem ?? "",
-                       style: fontFamilyMedium.size12.copyWith(
-                         color: Theme.of(context).colorScheme.onSurface,
-                       ),
-                     ),
+                    dropdownBuilder: (context, selectedItem) => Text(
+                      selectedItem ?? "",
+                      style: fontFamilyMedium.size12.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
                     popupProps: PopupProps.menu(
                       showSearchBox: true,
                       itemBuilder:

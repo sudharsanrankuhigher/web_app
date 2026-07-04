@@ -4,13 +4,13 @@ import 'package:stacked/stacked.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
-import 'package:webapp/ui/views/home/home_view.dart';
 import 'package:webapp/widgets/initial_textform.dart';
 import 'package:webapp/widgets/responsive_menu_button.dart';
 
 import 'notifications_viewmodel.dart';
 import 'package:webapp/services/notification_service.dart';
 import 'widgets/notification_card.dart';
+import 'widgets/delete_confirmation_dialog.dart';
 
 class NotificationsView extends StackedView<NotificationsViewModel> {
   const NotificationsView({Key? key}) : super(key: key);
@@ -172,30 +172,32 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Sub Header / Stats Panel
+                    // Sub Header / Stats Panel OR Bulk Actions Bar
                     Padding(
                       padding: EdgeInsets.symmetric(
                           horizontal: 24.w, vertical: 16.h),
-                      child: Row(
-                        children: [
-                          _buildStatChip(
-                            context,
-                            title: 'Total',
-                            count: viewModel.notifications.length,
-                            color: continueButton,
-                            icon: Icons.notifications_none_rounded,
-                          ),
-                          horizontalSpacing12,
-                          _buildStatChip(
-                            context,
-                            title: 'Unread',
-                            count: viewModel.unreadCount,
-                            color: red,
-                            icon: Icons.mark_chat_unread_outlined,
-                            isActive: viewModel.unreadCount > 0,
-                          ),
-                        ],
-                      ),
+                      child: viewModel.selectedNotificationIds.isEmpty
+                          ? Row(
+                              children: [
+                                _buildStatChip(
+                                  context,
+                                  title: 'Total',
+                                  count: viewModel.notifications.length,
+                                  color: continueButton,
+                                  icon: Icons.notifications_none_rounded,
+                                ),
+                                horizontalSpacing12,
+                                _buildStatChip(
+                                  context,
+                                  title: 'Unread',
+                                  count: viewModel.unreadCount,
+                                  color: red,
+                                  icon: Icons.mark_chat_unread_outlined,
+                                  isActive: viewModel.unreadCount > 0,
+                                ),
+                              ],
+                            )
+                          : _buildBulkActionBar(context, viewModel),
                     ),
 
                     // Filter Tabs Section
@@ -252,10 +254,26 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
                                           child: NotificationCard(
                                             item: item,
                                             index: index,
+                                            isSelected: viewModel
+                                                .isNotificationSelected(
+                                                    item.id),
+                                            onSelectedChanged: (val) {
+                                              viewModel
+                                                  .toggleNotificationSelection(
+                                                      item.id);
+                                            },
                                             onTap: () {
-                                              viewModel.markAsRead(item.id);
-                                              _showNotificationDetails(
-                                                  context, item);
+                                              if (viewModel
+                                                  .selectedNotificationIds
+                                                  .isNotEmpty) {
+                                                viewModel
+                                                    .toggleNotificationSelection(
+                                                        item.id);
+                                              } else {
+                                                viewModel.markAsRead(item.id);
+                                                _showNotificationDetails(
+                                                    context, item);
+                                              }
                                             },
                                             onToggleRead: () => viewModel
                                                 .toggleReadState(item.id),
@@ -1141,166 +1159,95 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            final isDark = Theme.of(context).brightness == Brightness.dark;
-            final searchController = TextEditingController();
-            List<dynamic> filteredOptions = viewModel.targetOptions;
-
-            void filterSearch(String query) {
-              setState(() {
-                filteredOptions = viewModel.targetOptions
-                    .where((option) => option['name']
-                        .toString()
-                        .toLowerCase()
-                        .contains(query.toLowerCase()))
-                    .toList();
-              });
-            }
-
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: ConstrainedBox(
-                constraints:
-                    const BoxConstraints(maxWidth: 500, maxHeight: 600),
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Select ${viewModel.formTargetAudience}',
-                        style: fontFamilyBold.size16.black,
-                      ),
-                      verticalSpacing12,
-                      // Search Bar
-                      TextField(
-                        controller: searchController,
-                        onChanged: filterSearch,
-                        decoration: InputDecoration(
-                          hintText: 'Search by name...',
-                          prefixIcon: const Icon(Icons.search_rounded),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10,
-                            horizontal: 12,
-                          ),
-                        ),
-                      ),
-                      verticalSpacing16,
-                      // Selected list count
-                      Text(
-                        '${viewModel.selectedTargets.length} selected',
-                        style: fontFamilySemiBold.size12
-                            .copyWith(color: continueButton),
-                      ),
-                      verticalSpacing8,
-                      // Scrollable List of options
-                      Expanded(
-                        child: filteredOptions.isEmpty
-                            ? Center(
-                                child: Text(
-                                  'No options found',
-                                  style: fontFamilyMedium.size12.greyColor,
-                                ),
-                              )
-                            : ListView.builder(
-                                itemCount: filteredOptions.length,
-                                itemBuilder: (context, index) {
-                                  final option = filteredOptions[index];
-                                  final bool isSelected = viewModel
-                                      .selectedTargets
-                                      .any((e) => e['id'] == option['id']);
-
-                                  final image = option['image'];
-                                  final hasImage =
-                                      image != null && image.isNotEmpty;
-
-                                  return ListTile(
-                                    contentPadding: EdgeInsets.zero,
-                                    leading: hasImage
-                                        ? ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            child: Image.network(
-                                              image,
-                                              height: 36,
-                                              width: 36,
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (_, __, ___) =>
-                                                  CircleAvatar(
-                                                radius: 18,
-                                                child: Text(option['name'][0]
-                                                    .toUpperCase()),
-                                              ),
-                                            ),
-                                          )
-                                        : CircleAvatar(
-                                            radius: 18,
-                                            child: Text(option['name'][0]
-                                                .toUpperCase()),
-                                          ),
-                                    title: Text(
-                                      option['name'],
-                                      style: fontFamilyMedium.size13.black,
-                                    ),
-                                    trailing: Checkbox(
-                                      value: isSelected,
-                                      activeColor: continueButton,
-                                      onChanged: (bool? checked) {
-                                        setState(() {
-                                          viewModel
-                                              .toggleTargetSelection(option);
-                                        });
-                                      },
-                                    ),
-                                    onTap: () {
-                                      setState(() {
-                                        viewModel.toggleTargetSelection(option);
-                                      });
-                                    },
-                                  );
-                                },
-                              ),
-                      ),
-                      verticalSpacing16,
-                      // Done Button
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () => Navigator.pop(context),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: continueButton,
-                              foregroundColor: white,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 12,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Text(
-                              'Done',
-                              style: fontFamilySemiBold.size13.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
+        return _RecipientSelectionDialog(viewModel: viewModel);
       },
+    );
+  }
+
+  Widget _buildBulkActionBar(
+    BuildContext context,
+    NotificationsViewModel viewModel,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final allFiltered = viewModel.filteredNotifications;
+    final allSelected = allFiltered.isNotEmpty &&
+        allFiltered.every((n) => viewModel.isNotificationSelected(n.id));
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFEEF2F6),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: continueButton.withValues(alpha: 0.15),
+        ),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 24.w,
+            height: 24.h,
+            child: Checkbox(
+              value: allSelected,
+              onChanged: (val) {
+                viewModel.selectAllNotifications();
+              },
+              activeColor: continueButton,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+          horizontalSpacing8,
+          Text(
+            '${viewModel.selectedNotificationIds.length} Selected',
+            style: fontFamilyBold.size14.copyWith(
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+          ),
+          const Spacer(),
+          // Mark as Read button
+          Tooltip(
+            message: 'Mark selected as read',
+            child: IconButton(
+              icon: const Icon(Icons.mark_chat_read_rounded, size: 20),
+              color: continueButton,
+              onPressed: () => viewModel.markSelectedAsRead(),
+            ),
+          ),
+          horizontalSpacing8,
+          // Delete button
+          Tooltip(
+            message: 'Delete selected',
+            child: IconButton(
+              icon: const Icon(Icons.delete_outline_rounded, size: 20),
+              color: red,
+              onPressed: () async {
+                final confirmed = await showDeleteConfirmationDialog(
+                  context: context,
+                  title: 'Delete Selected Notifications?',
+                  message:
+                      'Are you sure you want to permanently delete all ${viewModel.selectedNotificationIds.length} selected notifications? This action cannot be undone.',
+                );
+                if (confirmed == true) {
+                  await viewModel.deleteSelectedNotifications();
+                }
+              },
+            ),
+          ),
+          horizontalSpacing8,
+          // Cancel/Clear button
+          Tooltip(
+            message: 'Clear selection',
+            child: IconButton(
+              icon: const Icon(Icons.close_rounded, size: 20),
+              color: Colors.grey,
+              onPressed: viewModel.clearSelection,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -2108,5 +2055,188 @@ class NotificationsView extends StackedView<NotificationsViewModel> {
         break;
     }
     return Icon(iconData, size: 14, color: color);
+  }
+}
+
+class _RecipientSelectionDialog extends StatefulWidget {
+  final NotificationsViewModel viewModel;
+
+  const _RecipientSelectionDialog({
+    Key? key,
+    required this.viewModel,
+  }) : super(key: key);
+
+  @override
+  State<_RecipientSelectionDialog> createState() =>
+      __RecipientSelectionDialogState();
+}
+
+class __RecipientSelectionDialogState extends State<_RecipientSelectionDialog> {
+  late final TextEditingController _searchController;
+  late List<dynamic> _filteredOptions;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+    _filteredOptions = List.from(widget.viewModel.targetOptions);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterSearch(String query) {
+    setState(() {
+      _filteredOptions = widget.viewModel.targetOptions
+          .where((option) => option['name']
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase()))
+          .toList();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = widget.viewModel;
+
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500, maxHeight: 600),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Select ${viewModel.formTargetAudience}',
+                style: fontFamilyBold.size16.black,
+              ),
+              verticalSpacing12,
+              // Search Bar
+              TextField(
+                controller: _searchController,
+                onChanged: _filterSearch,
+                decoration: InputDecoration(
+                  hintText: 'Search by name...',
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 12,
+                  ),
+                ),
+              ),
+              verticalSpacing16,
+              // Selected list count
+              Text(
+                '${viewModel.selectedTargets.length} selected',
+                style:
+                    fontFamilySemiBold.size12.copyWith(color: continueButton),
+              ),
+              verticalSpacing8,
+              // Scrollable List of options
+              Expanded(
+                child: _filteredOptions.isEmpty
+                    ? Center(
+                        child: Text(
+                          'No options found',
+                          style: fontFamilyMedium.size12.greyColor,
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: _filteredOptions.length,
+                        itemBuilder: (context, index) {
+                          final option = _filteredOptions[index];
+                          final bool isSelected = viewModel.selectedTargets
+                              .any((e) => e['id'] == option['id']);
+
+                          final image = option['image'];
+                          final hasImage = image != null && image.isNotEmpty;
+
+                          return ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: hasImage
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(50),
+                                    child: Image.network(
+                                      image,
+                                      height: 36,
+                                      width: 36,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) =>
+                                          CircleAvatar(
+                                        radius: 18,
+                                        child: Text(
+                                            option['name'][0].toUpperCase()),
+                                      ),
+                                    ),
+                                  )
+                                : CircleAvatar(
+                                    radius: 18,
+                                    child:
+                                        Text(option['name'][0].toUpperCase()),
+                                  ),
+                            title: Text(
+                              option['name'],
+                              style: fontFamilyMedium.size13.black,
+                            ),
+                            trailing: Checkbox(
+                              value: isSelected,
+                              activeColor: continueButton,
+                              onChanged: (bool? checked) {
+                                setState(() {
+                                  viewModel.toggleTargetSelection(option);
+                                });
+                              },
+                            ),
+                            onTap: () {
+                              setState(() {
+                                viewModel.toggleTargetSelection(option);
+                              });
+                            },
+                          );
+                        },
+                      ),
+              ),
+              verticalSpacing16,
+              // Done Button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: continueButton,
+                      foregroundColor: white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'Done',
+                      style: fontFamilySemiBold.size13.white,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

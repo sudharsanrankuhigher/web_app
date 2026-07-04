@@ -62,7 +62,7 @@ class Datum {
   Datum({
     this.id,
     this.projectId,
-    this.revertStatus, 
+    this.revertStatus,
     this.remark,
     this.image,
     this.client,

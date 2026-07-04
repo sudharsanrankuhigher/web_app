@@ -16,14 +16,15 @@ class HomeView extends StackedView<HomeViewModel> {
   final Widget child;
   const HomeView({Key? key, required this.child}) : super(key: key);
 
-  static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  static final GlobalKey<ScaffoldState> scaffoldKey =
+      GlobalKey<ScaffoldState>();
 
   @override
   Widget builder(BuildContext context, HomeViewModel viewModel, Widget? _) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final bool isMobile = screenWidth < 768;
     final bool isExtended = screenWidth >= 1100;
-    
+
     final currentLocation =
         GoRouter.of(context).routerDelegate.currentConfiguration.fullPath;
     viewModel.updateIndexFromRoute(currentLocation);
@@ -46,9 +47,11 @@ class HomeView extends StackedView<HomeViewModel> {
           ? Drawer(
               child: Container(
                 color: Theme.of(context).colorScheme.surface,
-                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
                 child: SafeArea(
-                  child: _buildSidebarContent(context, viewModel, isExtended: true, isDrawer: true),
+                  child: _buildSidebarContent(context, viewModel,
+                      isExtended: true, isDrawer: true),
                 ),
               ),
             )
@@ -63,7 +66,8 @@ class HomeView extends StackedView<HomeViewModel> {
                   color: Theme.of(context).colorScheme.surface,
                   padding:
                       const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-                  child: _buildSidebarContent(context, viewModel, isExtended: isExtended, isDrawer: false),
+                  child: _buildSidebarContent(context, viewModel,
+                      isExtended: isExtended, isDrawer: false),
                 ),
               Expanded(
                 child:
@@ -89,9 +93,8 @@ class HomeView extends StackedView<HomeViewModel> {
   }) {
     final bool selectedMode = Theme.of(context).brightness == Brightness.dark;
     return Column(
-      crossAxisAlignment: isExtended
-          ? CrossAxisAlignment.start
-          : CrossAxisAlignment.center,
+      crossAxisAlignment:
+          isExtended ? CrossAxisAlignment.start : CrossAxisAlignment.center,
       children: [
         // Logo + App Name
         InkWell(
@@ -108,8 +111,7 @@ class HomeView extends StackedView<HomeViewModel> {
                 child: CircleAvatar(
                   backgroundColor: Colors.transparent,
                   radius: 22,
-                  backgroundImage:
-                      const AssetImage("assets/images/logo.png"),
+                  backgroundImage: const AssetImage("assets/images/logo.png"),
                   child: SvgPicture.asset(
                     "assets/images/logo.svg",
                     color: Theme.of(context).colorScheme.onSurface,
@@ -127,8 +129,7 @@ class HomeView extends StackedView<HomeViewModel> {
                       TextSpan(
                         text: "promote",
                         style: TextStyle(
-                          color: Theme.of(context).brightness ==
-                                  Brightness.dark
+                          color: Theme.of(context).brightness == Brightness.dark
                               ? Colors.white
                               : const Color(0xff0B0952),
                           fontWeight: FontWeight.bold,
@@ -157,8 +158,7 @@ class HomeView extends StackedView<HomeViewModel> {
           child: ListView.builder(
             itemCount: viewModel.railLabel.length,
             itemBuilder: (context, index) {
-              final bool selected =
-                  viewModel.selectedIndex == index;
+              final bool selected = viewModel.selectedIndex == index;
 
               return Padding(
                 padding: defaultPadding4,
@@ -172,8 +172,7 @@ class HomeView extends StackedView<HomeViewModel> {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
                     height: 48.h,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
                       color: selected
                           ? const Color(0xFF1DA1F2)
@@ -187,8 +186,7 @@ class HomeView extends StackedView<HomeViewModel> {
                           child: Builder(
                             builder: (context) {
                               final isNotification =
-                                  viewModel.railLabel[index] ==
-                                      'Notifications';
+                                  viewModel.railLabel[index] == 'Notifications';
                               final isClientRequests =
                                   viewModel.railLabel[index] ==
                                       'Client Requests';
@@ -205,9 +203,7 @@ class HomeView extends StackedView<HomeViewModel> {
                               );
 
                               if (isNotification &&
-                                  viewModel
-                                          .unreadNotificationsCount >
-                                      0 &&
+                                  viewModel.unreadNotificationsCount > 0 &&
                                   !isExtended) {
                                 return Stack(
                                   clipBehavior: Clip.none,
@@ -216,10 +212,8 @@ class HomeView extends StackedView<HomeViewModel> {
                                     Positioned(
                                       right: -6,
                                       top: -6,
-                                      child:
-                                          _buildNotificationBadge(
-                                        viewModel
-                                            .unreadNotificationsCount,
+                                      child: _buildNotificationBadge(
+                                        viewModel.unreadNotificationsCount,
                                         selected,
                                         isMini: true,
                                       ),
@@ -229,8 +223,7 @@ class HomeView extends StackedView<HomeViewModel> {
                               }
 
                               if (isClientRequests &&
-                                  viewModel.pendingRequestsCount >
-                                      0 &&
+                                  viewModel.pendingRequestsCount > 0 &&
                                   !isExtended) {
                                 return Stack(
                                   clipBehavior: Clip.none,
@@ -239,10 +232,8 @@ class HomeView extends StackedView<HomeViewModel> {
                                     Positioned(
                                       right: -6,
                                       top: -6,
-                                      child:
-                                          _buildNotificationBadge(
-                                        viewModel
-                                            .pendingRequestsCount,
+                                      child: _buildNotificationBadge(
+                                        viewModel.pendingRequestsCount,
                                         selected,
                                         isMini: true,
                                       ),
@@ -262,9 +253,7 @@ class HomeView extends StackedView<HomeViewModel> {
                               style: TextStyle(
                                 color: selected
                                     ? Colors.white
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .onSurface,
+                                    : Theme.of(context).colorScheme.onSurface,
                                 fontSize: 15,
                                 fontWeight: selected
                                     ? FontWeight.bold
@@ -272,25 +261,20 @@ class HomeView extends StackedView<HomeViewModel> {
                               ),
                             ),
                           ),
-                          if (viewModel.railLabel[index] ==
-                                  'Notifications' &&
-                              viewModel.unreadNotificationsCount >
-                                  0)
+                          if (viewModel.railLabel[index] == 'Notifications' &&
+                              viewModel.unreadNotificationsCount > 0)
                             Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 8.0),
+                              padding: const EdgeInsets.only(left: 8.0),
                               child: _buildNotificationBadge(
                                 viewModel.unreadNotificationsCount,
                                 selected,
                                 isMini: false,
                               ),
                             ),
-                          if (viewModel.railLabel[index] ==
-                                  'Client Requests' &&
+                          if (viewModel.railLabel[index] == 'Client Requests' &&
                               viewModel.pendingRequestsCount > 0)
                             Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 8.0),
+                              padding: const EdgeInsets.only(left: 8.0),
                               child: _buildNotificationBadge(
                                 viewModel.pendingRequestsCount,
                                 selected,
@@ -325,13 +309,11 @@ class HomeView extends StackedView<HomeViewModel> {
                   viewModel.toggleProfilePanel();
                 },
                 borderRadius: BorderRadius.circular(12),
-                hoverColor: Theme.of(context)
-                    .colorScheme
-                    .primary
-                    .withOpacity(0.08),
+                hoverColor:
+                    Theme.of(context).colorScheme.primary.withOpacity(0.08),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 8, horizontal: 4),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                   child: Column(
                     crossAxisAlignment: isExtended
                         ? CrossAxisAlignment.start
@@ -343,40 +325,32 @@ class HomeView extends StackedView<HomeViewModel> {
                             color: Colors.transparent,
                             child: kIsWeb
                                 ? ClipRRect(
-                                    borderRadius:
-                                        BorderRadius.circular(22),
+                                    borderRadius: BorderRadius.circular(22),
                                     child: WebImage(
-                                      imageUrl:
-                                          viewModel.profileImageUrl,
+                                      imageUrl: viewModel.profileImageUrl,
                                       width: 44,
                                       height: 44,
                                       fit: BoxFit.cover,
                                     ),
                                   )
                                 : CachedNetworkImage(
-                                    imageUrl:
-                                        viewModel.profileImageUrl,
-                                    imageBuilder:
-                                        (context, imageProvider) =>
-                                            CircleAvatar(
+                                    imageUrl: viewModel.profileImageUrl,
+                                    imageBuilder: (context, imageProvider) =>
+                                        CircleAvatar(
                                       radius: 22,
-                                      backgroundImage:
-                                          imageProvider,
+                                      backgroundImage: imageProvider,
                                     ),
-                                    errorWidget:
-                                        (context, url, error) =>
-                                            const CircleAvatar(
+                                    errorWidget: (context, url, error) =>
+                                        const CircleAvatar(
                                       radius: 22,
                                       backgroundImage: NetworkImage(
                                           "https://tse4.mm.bing.net/th/id/OIP.K_MocKRlIvuJ7ryQAtlErwHaIS?w=559&h=626&rs=1&pid=ImgDetMain&o=7&rm=3"),
                                     ),
-                                    placeholder: (context, url) =>
-                                        CircleAvatar(
+                                    placeholder: (context, url) => CircleAvatar(
                                       radius: 22,
-                                      backgroundImage:
-                                          const AssetImage(
-                                              "assets/images/logo.png",
-                                              package: null),
+                                      backgroundImage: const AssetImage(
+                                          "assets/images/logo.png",
+                                          package: null),
                                       child: SvgPicture.asset(
                                         "assets/images/logo.svg",
                                         color: Colors.black,
@@ -396,8 +370,7 @@ class HomeView extends StackedView<HomeViewModel> {
                                 maxLines: 1,
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    overflow:
-                                        TextOverflow.ellipsis),
+                                    overflow: TextOverflow.ellipsis),
                               ),
                             ),
                           ],
@@ -424,13 +397,11 @@ class HomeView extends StackedView<HomeViewModel> {
                 builder: (context, _) {
                   final isDark = ThemeService.instance.isDarkMode;
                   return InkWell(
-                    onTap: () =>
-                        ThemeService.instance.toggleTheme(),
+                    onTap: () => ThemeService.instance.toggleTheme(),
                     borderRadius: BorderRadius.circular(10),
                     child: Container(
                       height: 48.h,
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 0),
+                      padding: const EdgeInsets.symmetric(horizontal: 0),
                       child: Row(
                         mainAxisAlignment: isExtended
                             ? MainAxisAlignment.start
@@ -440,9 +411,7 @@ class HomeView extends StackedView<HomeViewModel> {
                             isDark
                                 ? Icons.light_mode_rounded
                                 : Icons.dark_mode_rounded,
-                            color: isDark
-                                ? Colors.amber
-                                : Colors.indigo[800],
+                            color: isDark ? Colors.amber : Colors.indigo[800],
                             size: isExtended ? 22 : 28,
                           ),
                           if (isExtended) ...[
@@ -451,9 +420,8 @@ class HomeView extends StackedView<HomeViewModel> {
                               child: Text(
                                 isDark ? "Light Mode" : "Dark Mode",
                                 style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                   fontSize: 15,
                                   fontWeight: FontWeight.w500,
                                 ),

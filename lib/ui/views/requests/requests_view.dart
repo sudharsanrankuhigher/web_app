@@ -68,7 +68,9 @@ class RequestsView extends StackedView<RequestsViewModel> {
                                 if (isMobile)
                                   IconButton(
                                     icon: const Icon(Icons.menu),
-                                    onPressed: () => HomeView.scaffoldKey.currentState?.openDrawer(),
+                                    onPressed: () => HomeView
+                                        .scaffoldKey.currentState
+                                        ?.openDrawer(),
                                   ),
                                 Text(
                                   'Client Projects',

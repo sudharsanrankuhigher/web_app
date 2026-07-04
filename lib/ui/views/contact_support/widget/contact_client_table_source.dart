@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
-import 'package:webapp/core/helper/string_extensions.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/contact_support/contact_support_viewmodel.dart';
@@ -9,6 +8,8 @@ import 'package:webapp/ui/views/contact_support/model/client_model.dart'
     as client_model;
 import 'package:webapp/services/theme_service.dart';
 import 'package:webapp/ui/views/contact_support/widget/show_note_dialog.dart';
+import 'package:webapp/services/profile_service.dart';
+import 'package:webapp/core/helper/date_helper.dart';
 
 class ClientTableSource extends DataTableSource {
   List<client_model.Datum> data;
@@ -38,9 +39,9 @@ class ClientTableSource extends DataTableSource {
     if (data.isEmpty) {
       return DataRow(
         cells: List.generate(
-          8, // total columns
+          11, // total columns
           (i) {
-            if (i == 3) {
+            if (i == 5) {
               // column index where message should show
               return const DataCell(
                 Center(
@@ -77,24 +78,35 @@ class ClientTableSource extends DataTableSource {
       ),
       index: index,
       selected: item.isSelected,
-      onSelectChanged: (value) {
-        item.isSelected = value ?? false;
+      onSelectChanged: ProfileService.instance.roleId == '1'
+          ? (value) {
+              item.isSelected = value ?? false;
 
-        // Update ViewModel selection
-        _notifySelection();
+              // Update ViewModel selection
+              _notifySelection();
 
-        // Rebuild table
-        notifyListeners();
+              // Rebuild table
+              notifyListeners();
 
-        print('Selected IDs: ${vm.selectedIds}');
-      },
+              print('Selected IDs: ${vm.selectedIds}');
+            }
+          : null,
       cells: [
         DataCell(Text('${index + 1}')), // S.No
+        DataCell(Text(item.id?.toString() ?? '')), // ID
         DataCell(Text(item.name!)), // Client Name
         DataCell(Text('${item.city}/${item.state}')), // City / State
         DataCell(Text(item.mobile!)), // Phone
-        DataCell(Text(item.description!)), // Phone
-        DataCell(Text(item.note!)), // Note
+        DataCell(Tooltip(
+            message: item.description ?? 'No Description',
+            child: Text(item.description!))), // Phone
+        DataCell(Tooltip(
+            message: item.note ?? 'No Note',
+            child: Text(item.note ?? ''))), // Note
+        DataCell(Text(
+            DateFormatter.formatToDDMMMYYYY(item.createdAt))), // Create Ticket
+        DataCell(Text(
+            DateFormatter.formatToDDMMMYYYY(item.updatedAt))), // Update Ticket
         DataCell((status == 'completed')
             ? Container(
                 decoration: BoxDecoration(
@@ -103,27 +115,37 @@ class ClientTableSource extends DataTableSource {
                 ),
                 padding: defaultPadding8 - topPadding4 - bottomPadding4,
                 child: Text(
-                  item.status!,
+                  'Completed',
                   style: fontFamilySemiBold.size12.white,
                 ),
               )
-            : Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: red,
-                ),
-                padding: defaultPadding8 - topPadding4 - bottomPadding4,
-                child: Text(
-                  item.status.toString().capitalizeFirst(),
-                  style: fontFamilySemiBold.size12.white,
-                ),
-              )), // Note
-        // DataCell(Text(item.alternativeNo!)), // Contact No
+            : (status == 'rejected')
+                ? Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: onGoing,
+                    ),
+                    padding: defaultPadding8 - topPadding4 - bottomPadding4,
+                    child: Text(
+                      'Processing',
+                      style: fontFamilySemiBold.size12.white,
+                    ),
+                  )
+                : Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: pendingColor,
+                    ),
+                    padding: defaultPadding8 - topPadding4 - bottomPadding4,
+                    child: Text(
+                      'Pending',
+                      style: fontFamilySemiBold.size12.white,
+                    ),
+                  )), // Status
         DataCell((status != 'completed')
             ? IgnorePointer(
-                ignoring: PermissionHelper.instance.has('contact_support')
-                    ? false
-                    : true,
+                ignoring:
+                    PermissionHelper.instance.has('add_call') ? false : true,
                 child: Row(
                   children: [
                     IconButton(
@@ -146,14 +168,15 @@ class ClientTableSource extends DataTableSource {
                       },
                     ),
                     IconButton(
-                        icon: const Icon(Icons.close, color: Colors.red),
+                        icon: const Icon(Icons.hourglass_empty_rounded,
+                            color: onGoing),
                         onPressed: () {
-                          print('Rejected ${item.id}');
+                          print('Processing ${item.id}');
                           showNoteDialog(
                             context:
                                 StackedService.navigatorKey!.currentContext!,
-                            noteString: 'Rejected',
-                            title: "Add Rejected Note",
+                            noteString: 'Processing',
+                            title: "Add Processing Note",
                             onSubmit: (note) {
                               print("Submitted note: $note");
                               vm.updateContactSupport(

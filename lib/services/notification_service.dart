@@ -172,12 +172,85 @@ class NotificationService extends ChangeNotifier {
     try {
       final intId = int.tryParse(id);
       if (intId != null) {
-        await locator<ApiService>().deleteNotification(intId);
+        await locator<ApiService>().deleteNotification([intId]);
       }
     } catch (e) {
       debugPrint('Error deleting notification: $e');
       // Rollback on error
       _notifications.insert(removedIndex, removedItem);
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteNotifications(List<String> ids) async {
+    if (ids.isEmpty) return;
+
+    // Keep copies for rollback
+    final List<NotificationItem> removedItems = [];
+    final Map<int, NotificationItem> indexMap = {};
+
+    // Optimistically delete locally
+    for (final id in ids) {
+      final index = _notifications.indexWhere((n) => n.id == id);
+      if (index != -1) {
+        indexMap[index] = _notifications[index];
+        removedItems.add(_notifications[index]);
+      }
+    }
+
+    _notifications.removeWhere((n) => ids.contains(n.id));
+    notifyListeners();
+
+    try {
+      final List<int> intIds = ids
+          .map((id) => int.tryParse(id))
+          .where((id) => id != null)
+          .cast<int>()
+          .toList();
+      if (intIds.isNotEmpty) {
+        await locator<ApiService>().deleteNotification(intIds);
+      }
+    } catch (e) {
+      debugPrint('Error deleting multiple notifications: $e');
+      // Rollback on error
+      final sortedIndices = indexMap.keys.toList()..sort();
+      for (final index in sortedIndices) {
+        _notifications.insert(index, indexMap[index]!);
+      }
+      notifyListeners();
+    }
+  }
+
+  Future<void> markNotificationsAsRead(List<String> ids) async {
+    if (ids.isEmpty) return;
+
+    // Track original states for rollback
+    final Map<String, bool> originalStates = {};
+    for (var n in _notifications) {
+      if (ids.contains(n.id)) {
+        originalStates[n.id] = n.isRead;
+        n.isRead = true;
+      }
+    }
+    notifyListeners();
+
+    try {
+      await Future.wait(
+        ids.map((id) async {
+          final intId = int.tryParse(id);
+          if (intId != null) {
+            await locator<ApiService>().readNotification(intId);
+          }
+        }),
+      );
+    } catch (e) {
+      debugPrint('Error marking multiple notifications as read: $e');
+      // Rollback
+      for (var n in _notifications) {
+        if (originalStates.containsKey(n.id)) {
+          n.isRead = originalStates[n.id]!;
+        }
+      }
       notifyListeners();
     }
   }

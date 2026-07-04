@@ -49,7 +49,8 @@ class InfluencersView extends StackedView<InfluencersViewModel> {
                           if (isMobile) ...[
                             IconButton(
                               icon: const Icon(Icons.menu),
-                              onPressed: () => HomeView.scaffoldKey.currentState?.openDrawer(),
+                              onPressed: () => HomeView.scaffoldKey.currentState
+                                  ?.openDrawer(),
                             ),
                             horizontalSpacing8,
                           ],

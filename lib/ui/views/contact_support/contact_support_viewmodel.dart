@@ -4,17 +4,25 @@ import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/app.locator.dart';
 import 'package:webapp/services/api_service.dart';
+import 'package:webapp/services/profile_service.dart';
 import 'package:webapp/ui/views/contact_support/model/client_model.dart'
     as client_model;
 import 'package:webapp/ui/views/contact_support/widget/contact_client_table_source.dart';
 import 'package:webapp/ui/views/contact_support/widget/show_note_dialog.dart';
 
 class ContactSupportViewModel extends BaseViewModel {
+  List<client_model.Datum> allClients = [];
   List<client_model.Datum> clients = [];
   late ClientTableSource tableSource;
 
   bool hasSelection = false;
   final Set<int> selectedIds = {};
+
+  String _searchQuery = '';
+  String get searchQuery => _searchQuery;
+
+  String _selectedStatus = 'All';
+  String get selectedStatus => _selectedStatus;
 
   ContactSupportViewModel() {
     // Initialize the table source first
@@ -41,18 +49,69 @@ class ContactSupportViewModel extends BaseViewModel {
     setLoading(true);
     try {
       final response = await _apiService.getAllContactSupport();
-      clients = response.data ?? [];
-      tableSource = ClientTableSource(data: clients, vm: this);
-
-      // allCities = List.from(response); // 🔥 MASTER LIST
-      // filteredCities = List.from(response); // 🔥 INITIAL TABLE DATA
+      allClients = response.data ?? [];
+      _applySearchAndFilter();
     } catch (e) {
+      allClients = [];
       clients = [];
+      tableSource.updateData([]);
     } finally {
       setBusy(false);
       _refreshTable();
       setLoading(false);
     }
+  }
+
+  void setSearchQuery(String query) {
+    _searchQuery = query;
+    _applySearchAndFilter();
+  }
+
+  void setSelectedStatus(String status) {
+    _selectedStatus = status;
+    _applySearchAndFilter();
+  }
+
+  void _applySearchAndFilter() {
+    List<client_model.Datum> filtered = List.from(allClients);
+
+    // 1. Apply Status Filter
+    if (_selectedStatus != 'All') {
+      filtered = filtered.where((client) {
+        final status = client.status?.toLowerCase() ?? '';
+        if (_selectedStatus.toLowerCase() == 'completed') {
+          return status == 'completed';
+        } else if (_selectedStatus.toLowerCase() == 'pending') {
+          return status == 'pending';
+        } else if (_selectedStatus.toLowerCase() == 'processing') {
+          return status == 'rejected';
+        }
+        return true;
+      }).toList();
+    }
+
+    // 2. Apply Search Query
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
+      filtered = filtered.where((client) {
+        final name = client.name?.toLowerCase() ?? '';
+        final mobile = client.mobile?.toLowerCase() ?? '';
+        final id = client.id?.toString() ?? '';
+
+        String statusText = client.status?.toLowerCase() ?? '';
+        if (statusText == 'rejected') {
+          statusText = 'processing';
+        }
+
+        return name.contains(query) ||
+            mobile.contains(query) ||
+            id.contains(query) ||
+            statusText.contains(query);
+      }).toList();
+    }
+
+    clients = filtered;
+    tableSource.updateData(clients);
   }
 
   Future<void> updateContactSupport({note, id, status}) async {
@@ -143,6 +202,7 @@ class ContactSupportViewModel extends BaseViewModel {
   }
 
   Future<void> deleteSelected() async {
+    if (ProfileService.instance.roleId != '1') return;
     setLoading(true);
     try {
       final res = await _apiService.deleteContactSupport(selectedIds.toList());
@@ -170,6 +230,7 @@ class ContactSupportViewModel extends BaseViewModel {
   }
 
   void delete(BuildContext context) {
+    if (ProfileService.instance.roleId != '1') return;
     showBulkDeleteDialog(
       context: context,
       itemName: "clients",
@@ -179,14 +240,14 @@ class ContactSupportViewModel extends BaseViewModel {
 
   void applySort(bool isChecked, String sortType) {
     if (sortType == "A-Z") {
-      clients.sort((a, b) =>
+      allClients.sort((a, b) =>
           (a.name ?? '').toLowerCase().compareTo((b.name ?? '').toLowerCase()));
     } else if (sortType == "older") {
-      clients.sort((a, b) => (a.id ?? 0).compareTo(b.id ?? 0));
+      allClients.sort((a, b) => (a.id ?? 0).compareTo(b.id ?? 0));
     } else if (sortType == "newer") {
-      clients.sort((a, b) => (b.id ?? 0).compareTo(a.id ?? 0));
+      allClients.sort((a, b) => (b.id ?? 0).compareTo(a.id ?? 0));
     }
-    tableSource.updateData(clients);
+    _applySearchAndFilter();
     notifyListeners();
   }
 }

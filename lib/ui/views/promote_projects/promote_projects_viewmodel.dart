@@ -474,7 +474,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     DataColumn(label: Text("Client Name")),
     DataColumn(label: Text("Project Title")),
     DataColumn(label: Text("Project Count")),
-    DataColumn(label: Text("Note")),
+    DataColumn(label: Text("Description")),
     DataColumn(label: Text("Valid Date")),
     DataColumn(
         label: Text("Total Amount"),
@@ -500,7 +500,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     DataColumn(label: Text("Project Code")),
     DataColumn(label: Text("Client Name")),
     DataColumn(label: Text("Project Title")),
-    DataColumn(label: Text("Notes")),
+    DataColumn(label: Text("Description")),
     DataColumn(label: Text("Valid date")),
     DataColumn(label: Text("Total Amount")),
     DataColumn(label: Text("Total promotepay")),
@@ -530,10 +530,28 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
 
   String? _projectCode;
   String? get projectCode => _projectCode;
+
+  String? get commissionAmount {
+    if (tableData.isNotEmpty) {
+      return tableData.first.commisionAmount;
+    }
+    return null;
+  }
+
   int? _selectedProjectId;
   int? _selectedSubProjectId;
   int? get selectedSubProjectId => _selectedSubProjectId;
   int? get selectedProjectId => _selectedProjectId;
+
+  String? get projectDescription {
+    if (_selectedProjectId == null) return null;
+    for (var plan in plans) {
+      if (plan.id == _selectedProjectId) {
+        return plan.description;
+      }
+    }
+    return null;
+  }
 
   List<dynamic> dataLists = [];
   String? _totalSplitAmount;
@@ -672,7 +690,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Project Code")),
           DataColumn(label: Text("Inf_name / Inf_ID")),
           DataColumn(label: Text("Inf_Number")),
-          DataColumn(label: Text("Note")),
+          DataColumn(label: Text("Notes")),
           DataColumn(label: Text("Amount")),
           DataColumn(label: Text("Assigned Date")),
           DataColumn(
@@ -689,15 +707,12 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Project Code")),
           DataColumn(label: Text("Inf_name / Inf_ID")),
           DataColumn(label: Text("Inf_Number")),
-          DataColumn(label: Text("Note")),
+          DataColumn(label: Text("Notes")),
           DataColumn(label: Text("Amount")),
           DataColumn(label: Text("Assigned Date")),
           DataColumn(
               label: Text("Status"),
               headingRowAlignment: MainAxisAlignment.center),
-          // DataColumn(
-          //     label: Text("Action"),
-          //     headingRowAlignment: MainAxisAlignment.center), // 9 columns
         ];
       case PromoteStatus.infCompleted:
         return const [
@@ -706,7 +721,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Project Code")),
           DataColumn(label: Text("Inf_name / Inf_ID")),
           DataColumn(label: Text("Inf_Number")),
-          DataColumn(label: Text("Note")),
+          DataColumn(label: Text("Notes")),
           DataColumn(label: Text("Amount")),
           DataColumn(label: Text("Assigned Date")),
           DataColumn(
@@ -728,10 +743,11 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("T-Code")),
           DataColumn(label: Text("Assigned Date")),
           DataColumn(label: Text("Project Code")),
+          DataColumn(label: Text("Notes")),
           DataColumn(label: Text("Completed Date")),
           DataColumn(
               label: Text("Action"),
-              headingRowAlignment: MainAxisAlignment.center), // 7 columns
+              headingRowAlignment: MainAxisAlignment.center), // 8 columns
         ];
 
       case PromoteStatus.promoteVerified:
@@ -741,13 +757,14 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Influencers")),
           DataColumn(label: Text("Influencer ID")),
           DataColumn(label: Text("Phone No")),
+          DataColumn(label: Text("Notes")),
           DataColumn(label: Text("View Link")),
           DataColumn(label: Text("Promote Pay")),
           DataColumn(label: Text("Assigned Date")),
           DataColumn(label: Text("Completed Date")),
           DataColumn(
               label: Text("Action"),
-              headingRowAlignment: MainAxisAlignment.center), // 10 columns
+              headingRowAlignment: MainAxisAlignment.center), // 11 columns
         ];
 
       case PromoteStatus.promotePay:
@@ -757,6 +774,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Influencers")),
           DataColumn(label: Text("Influencer ID")),
           DataColumn(label: Text("Phone No")),
+          DataColumn(label: Text("Notes")),
           DataColumn(label: Text("Assigned Date")),
           DataColumn(label: Text("Completed Date")),
           DataColumn(label: Text("Bank Details")),
@@ -764,7 +782,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(
             label: Text("Action"),
             headingRowAlignment: MainAxisAlignment.center,
-          ),
+          ), // 11 columns
         ];
 
       case PromoteStatus.promoteCommission:
@@ -774,10 +792,10 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Influencers")),
           DataColumn(label: Text("Influencer ID")),
           DataColumn(label: Text("Phone No")),
+          DataColumn(label: Text("Notes")),
           DataColumn(label: Text("Assigned Date")),
           DataColumn(label: Text("Completed Date")),
           DataColumn(label: Text("Bank Details")),
-          DataColumn(label: Text("Commission")),
         ];
       case PromoteStatus.companyPaymentVerified:
         return const [
@@ -786,11 +804,12 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Influencers")),
           DataColumn(label: Text("Influencer ID")),
           DataColumn(label: Text("Phone No")),
+          DataColumn(label: Text("Notes")),
           DataColumn(label: Text("Assigned Date")),
           DataColumn(label: Text("Completed Date")),
           DataColumn(label: Text("Bank Details")),
           DataColumn(label: Text("Commission")),
-          DataColumn(label: Text("Action")),
+          DataColumn(label: Text("Action")), // 11 columns
         ];
       case PromoteStatus.rejected:
         return const [
@@ -799,12 +818,13 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Influencers")),
           DataColumn(label: Text("Influencer ID")),
           DataColumn(label: Text("Phone No")),
+          DataColumn(label: Text("Notes")),
           DataColumn(label: Text("Assigned Date")),
           DataColumn(label: Text("Completed Date")),
           DataColumn(label: Text("Bank Details")),
           DataColumn(label: Text("Payment Amount")),
           DataColumn(label: Text("Action")),
-          DataColumn(label: Text("Refund ")),
+          DataColumn(label: Text("Refund ")), // 12 columns
         ];
 
       case PromoteStatus.refund:
@@ -813,11 +833,12 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Project Code")),
           DataColumn(label: Text("Influencers")),
           DataColumn(label: Text("Influencer ID")),
+          DataColumn(label: Text("Notes")),
           DataColumn(label: Text("Payment Amount")),
           DataColumn(label: Text("Refund status")),
           DataColumn(label: Text("refund initiated")),
           DataColumn(label: Text("refund Completed")),
-          DataColumn(label: Text("Action")),
+          DataColumn(label: Text("Action")), // 10 columns
         ];
 
       default:

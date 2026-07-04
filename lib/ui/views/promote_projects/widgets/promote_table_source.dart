@@ -96,28 +96,7 @@ class PromoteTableSource extends DataTableSource {
           _textCell(item.subId),
           _textCell("${item.influencerName} / ${item.influencerId}"),
           _textCell(item.influencerPhone?.toString()),
-          DataCell(Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              IconButton(
-                icon: const Icon(
-                  Icons.edit,
-                  color: Colors.blue,
-                  size: 15,
-                ),
-                onPressed: () =>
-                    onNotesEdit != null ? onNotesEdit!(item) : null,
-              ),
-              horizontalSpacing4,
-              Expanded(
-                child: Text(
-                  item.note ?? "",
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          )),
+          _noteCell(item),
           _textCell(item.amount?.toString()),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
           DataCell(Center(
@@ -149,28 +128,7 @@ class PromoteTableSource extends DataTableSource {
           _textCell(item.subId),
           _textCell("${item.influencerName} / ${item.influencerId}"),
           _textCell(item.influencerPhone?.toString()),
-          DataCell(Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              IconButton(
-                icon: const Icon(
-                  Icons.edit,
-                  color: Colors.blue,
-                  size: 15,
-                ),
-                onPressed: () =>
-                    onNotesEdit != null ? onNotesEdit!(item) : null,
-              ),
-              horizontalSpacing4,
-              Expanded(
-                child: Text(
-                  item.note ?? "",
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          )),
+          _noteCell(item),
           _textCell(item.amount?.toString()),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
           DataCell(Center(
@@ -192,28 +150,7 @@ class PromoteTableSource extends DataTableSource {
           _textCell(item.subId),
           _textCell("${item.influencerName} / ${item.influencerId}"),
           _textCell(item.influencerPhone?.toString()),
-          DataCell(Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              IconButton(
-                icon: const Icon(
-                  Icons.edit,
-                  color: Colors.blue,
-                  size: 15,
-                ),
-                onPressed: () =>
-                    onNotesEdit != null ? onNotesEdit!(item) : null,
-              ),
-              horizontalSpacing4,
-              Expanded(
-                child: Text(
-                  item.note ?? "",
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          )),
+          _noteCell(item),
           _textCell(item.amount?.toString()),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
           DataCell(
@@ -289,6 +226,7 @@ class PromoteTableSource extends DataTableSource {
           _textCell(item.influencerName),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
           _textCell(item.subId?.toString()),
+          _noteCell(item),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.infCompleted)),
           DataCell(
             Center(
@@ -320,6 +258,7 @@ class PromoteTableSource extends DataTableSource {
           _textCell(item.influencerName),
           _textCell(item.influencerId?.toString()),
           _textCell(item.influencerPhone),
+          _noteCell(item),
           DataCell(
             Center(
               child: Column(
@@ -399,6 +338,7 @@ class PromoteTableSource extends DataTableSource {
           _textCell(item.influencerName),
           _textCell(item.influencerId?.toString()),
           _textCell(item.influencerPhone),
+          _noteCell(item),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.infCompleted)),
           _clickableTextCell(
@@ -439,11 +379,11 @@ class PromoteTableSource extends DataTableSource {
           _textCell(item.influencerName),
           _textCell(item.influencerId?.toString()),
           _textCell(item.influencerPhone),
+          _noteCell(item),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.paymentAt)),
           _clickableTextCell(
               item.payment?.upi?.toString(), () => showBankDetails?.call(item)),
-          _textCell(item.commisionAmount?.toString()),
         ];
       case PromoteStatus.companyPaymentVerified:
         return [
@@ -452,6 +392,7 @@ class PromoteTableSource extends DataTableSource {
           _textCell(item.influencerName),
           _textCell(item.influencerId?.toString()),
           _textCell(item.influencerPhone),
+          _noteCell(item),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.completedAt)),
           _clickableTextCell(
@@ -482,6 +423,7 @@ class PromoteTableSource extends DataTableSource {
           _textCell(item.influencerName),
           _textCell(item.influencerId?.toString()),
           _textCell(item.influencerPhone),
+          _noteCell(item),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.completedAt)),
           _clickableTextCell(
@@ -529,6 +471,7 @@ class PromoteTableSource extends DataTableSource {
           _textCell(item.subId?.toString()),
           _textCell(item.influencerName),
           _textCell(item.influencerId?.toString()),
+          _noteCell(item),
           _textCell(item.amount?.toString()),
           _textCell(item.refundStatus == 1 ? 'Refund Initiated' : 'Completed'),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.refundInitiatedAt)),
@@ -565,24 +508,38 @@ class PromoteTableSource extends DataTableSource {
       case PromoteStatus.infAccepted:
         return 8;
       case PromoteStatus.adminVerified:
-        return 7;
+        return 8;
       case PromoteStatus.promoteVerified:
-        return 10;
+        return 11;
       case PromoteStatus.promotePay:
-        return 10;
+        return 11;
       case PromoteStatus.infCompleted:
         return 10;
       case PromoteStatus.rejected:
-        return 11;
+        return 12;
       case PromoteStatus.promoteCommission:
         return 9;
       case PromoteStatus.companyPaymentVerified:
-        return 10;
+        return 11;
       case PromoteStatus.refund:
-        return 9;
+        return 10;
       default:
         return 0;
     }
+  }
+
+  DataCell _descriptionCell(promote_table_model.Datum item) {
+    return DataCell(
+      Container(
+        constraints: const BoxConstraints(maxWidth: 150),
+        child: Text(
+          item.description ?? "",
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: fontFamilyRegular.size12.black,
+        ),
+      ),
+    );
   }
 
   DataCell _textCell(String? text, {bool center = false}) {
@@ -601,6 +558,30 @@ class PromoteTableSource extends DataTableSource {
         text ?? "",
         style: fontFamilyRegular.size12.black,
       ),
+    ));
+  }
+
+  DataCell _noteCell(promote_table_model.Datum item) {
+    return DataCell(Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        IconButton(
+          icon: const Icon(
+            Icons.edit,
+            color: Colors.blue,
+            size: 15,
+          ),
+          onPressed: () => onNotesEdit != null ? onNotesEdit!(item) : null,
+        ),
+        horizontalSpacing4,
+        Expanded(
+          child: Text(
+            item.note ?? "",
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     ));
   }
 

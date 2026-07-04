@@ -44,6 +44,7 @@ class Datum {
   List<City>? city;
   String? state;
   String? mobileNumber;
+  int? isHeadOffice;
   DateTime? createdAt;
   bool? isHeadoffice;
 
@@ -51,43 +52,43 @@ class Datum {
     this.id,
     this.city,
     this.state,
+    this.isHeadOffice,
     this.mobileNumber,
     this.createdAt,
     this.isHeadoffice,
   });
 
-  factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        id: json["id"],
-        city: json["city"] == null
-            ? []
-            : List<City>.from(json["city"]!.map((x) => City.fromJson(x))),
-        state: json["state"],
+  factory Datum.fromJson(Map<String, dynamic> json) {
+    bool? parseBool(dynamic val) {
+      if (val == null) return null;
+      if (val is bool) return val;
+      if (val is int) return val == 1;
+      final str = val.toString().toLowerCase().trim();
+      return str == '1' || str == 'true';
+    }
 
-        /// 🔥 FIX HERE
-        mobileNumber: json["mobile_number"] == null
-            ? null
-            : json["mobile_number"] is List
-                ? (json["mobile_number"] as List).join(", ")
-                : json["mobile_number"].toString(),
+    final rawHeadOffice =
+        json["head_office"] ?? json["is_head_office"] ?? json["isheadoffice"];
+    final parsedIsHeadOffice = parseBool(rawHeadOffice) ?? false;
 
-        createdAt: json["created_at"] == null
-            ? null
-            : DateTime.parse(json["created_at"]),
-        isHeadoffice: json["isheadoffice"] == null
-            ? (json["is_headoffice"] == null
-                ? false
-                : (json["is_headoffice"] is bool
-                    ? json["is_headoffice"]
-                    : (json["is_headoffice"] == 1 ||
-                        json["is_headoffice"] == '1' ||
-                        json["is_headoffice"].toString().toLowerCase() ==
-                            'true')))
-            : (json["isheadoffice"] is bool
-                ? json["isheadoffice"]
-                : (json["isheadoffice"] == 1 ||
-                    json["isheadoffice"] == '1' ||
-                    json["isheadoffice"].toString().toLowerCase() == 'true')),
-      );
+    return Datum(
+      id: json["id"],
+      city: json["city"] == null
+          ? []
+          : List<City>.from(json["city"]!.map((x) => City.fromJson(x))),
+      state: json["state"],
+      mobileNumber: json["mobile_number"] == null
+          ? null
+          : json["mobile_number"] is List
+              ? (json["mobile_number"] as List).join(", ")
+              : json["mobile_number"].toString(),
+      createdAt: json["created_at"] == null
+          ? null
+          : DateTime.tryParse(json["created_at"].toString()),
+      isHeadOffice: parsedIsHeadOffice ? 1 : 0,
+      isHeadoffice: parsedIsHeadOffice,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,
@@ -97,6 +98,7 @@ class Datum {
         "state": state,
         "mobile_number": mobileNumber,
         "created_at": createdAt?.toIso8601String(),
+        "head_office": isHeadOffice,
         "isheadoffice": isHeadoffice,
       };
 }

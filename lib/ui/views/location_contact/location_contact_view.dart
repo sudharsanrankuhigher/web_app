@@ -47,7 +47,8 @@ class LocationContactView extends StackedView<LocationContactViewModel> {
                           if (isMobile) ...[
                             IconButton(
                               icon: const Icon(Icons.menu),
-                              onPressed: () => HomeView.scaffoldKey.currentState?.openDrawer(),
+                              onPressed: () => HomeView.scaffoldKey.currentState
+                                  ?.openDrawer(),
                             ),
                             horizontalSpacing8,
                           ],
@@ -107,7 +108,6 @@ class LocationContactView extends StackedView<LocationContactViewModel> {
                               ),
                           ],
                         ),
-
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [

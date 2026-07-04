@@ -104,7 +104,7 @@ class LocationContactViewModel extends BaseViewModel with NavigationMixin {
                     {"id": city.id, "name": city.name}
                   ],
             "mobile_number": phone,
-            "is_head_office": isHeadoffice,
+            "is_head_office": isHeadoffice ? 1 : 0,
           };
           _saveOrUpdate(newContact);
         },
@@ -127,7 +127,7 @@ class LocationContactViewModel extends BaseViewModel with NavigationMixin {
                         })
                     .toList(),
             "mobile_number": phone,
-            "is_head_office": isHeadoffice,
+            "is_head_office": isHeadoffice ? 1 : 0,
           };
 
           print("ADD MULTI: $newContact");
@@ -195,7 +195,7 @@ class LocationContactViewModel extends BaseViewModel with NavigationMixin {
                         })
                     .toList(),
             "mobile_number": phone,
-            "is_head_office": isHeadoffice,
+            "is_head_office": isHeadoffice ? 1 : 0,
           };
 
           print("ADD MULTI: $newContact");

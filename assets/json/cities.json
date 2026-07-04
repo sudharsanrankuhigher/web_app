@@ -1,5 +1,165 @@
 [
     {
+        "id": "1234",
+        "name": "All",
+        "state": "Andaman and Nicobar Islands"
+    },
+    {
+        "id": "1235",
+        "name": "All",
+        "state": "Andhra Pradesh"
+    },
+    {
+        "id": "1236",
+        "name": "All",
+        "state": "Arunachal Pradesh"
+    },
+    {
+        "id": "1237",
+        "name": "All",
+        "state": "Assam"
+    },
+    {
+        "id": "1238",
+        "name": "All",
+        "state": "Bihar"
+    },
+    {
+        "id": "1239",
+        "name": "All",
+        "state": "Chandigarh"
+    },
+    {
+        "id": "1240",
+        "name": "All",
+        "state": "Chhattisgarh"
+    },
+    {
+        "id": "1241",
+        "name": "All",
+        "state": "Dadra and Nagar Haveli"
+    },
+    {
+        "id": "1242",
+        "name": "All",
+        "state": "Delhi"
+    },
+    {
+        "id": "1243",
+        "name": "All",
+        "state": "Goa"
+    },
+    {
+        "id": "1244",
+        "name": "All",
+        "state": "Gujarat"
+    },
+    {
+        "id": "1245",
+        "name": "All",
+        "state": "Haryana"
+    },
+    {
+        "id": "1246",
+        "name": "All",
+        "state": "Himachal Pradesh"
+    },
+    {
+        "id": "1247",
+        "name": "All",
+        "state": "Jammu and Kashmir"
+    },
+    {
+        "id": "1248",
+        "name": "All",
+        "state": "Jharkhand"
+    },
+    {
+        "id": "1249",
+        "name": "All",
+        "state": "Karnataka"
+    },
+    {
+        "id": "1250",
+        "name": "All",
+        "state": "Kerala"
+    },
+    {
+        "id": "1251",
+        "name": "All",
+        "state": "Madhya Pradesh"
+    },
+    {
+        "id": "1252",
+        "name": "All",
+        "state": "Maharashtra"
+    },
+    {
+        "id": "1253",
+        "name": "All",
+        "state": "Manipur"
+    },
+    {
+        "id": "1254",
+        "name": "All",
+        "state": "Meghalaya"
+    },
+    {
+        "id": "1255",
+        "name": "All",
+        "state": "Mizoram"
+    },
+    {
+        "id": "1256",
+        "name": "All",
+        "state": "Nagaland"
+    },
+    {
+        "id": "1257",
+        "name": "All",
+        "state": "Odisha"
+    },
+    {
+        "id": "1258",
+        "name": "All",
+        "state": "Puducherry"
+    },
+    {
+        "id": "1259",
+        "name": "All",
+        "state": "Punjab"
+    },
+    {
+        "id": "1260",
+        "name": "All",
+        "state": "Rajasthan"
+    },
+    {
+        "id": "1261",
+        "name": "All",
+        "state": "Telangana"
+    },
+    {
+        "id": "1262",
+        "name": "All",
+        "state": "Tripura"
+    },
+    {
+        "id": "1263",
+        "name": "All",
+        "state": "Uttar Pradesh"
+    },
+    {
+        "id": "1264",
+        "name": "All",
+        "state": "Uttarakhand"
+    },
+    {
+        "id": "1265",
+        "name": "All",
+        "state": "West Bengal"
+    },
+    {
         "id": "0",
         "name": "All",
         "state": "Tamil Nadu"
@@ -6092,7 +6252,7 @@
     {
         "id": "1218",
         "name": "Manali",
-        "state": "Himachal Praddesh"
+        "state": "Himachal Pradesh"
     },
     {
         "id": "1219",

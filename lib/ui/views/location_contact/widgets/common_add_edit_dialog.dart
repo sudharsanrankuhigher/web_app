@@ -134,7 +134,13 @@ class _AddressDialogState extends State<AddressDialog> {
   void initState() {
     if (widget.initialData != null) {
       selectedState = widget.initialData!['state'];
-      isHeadoffice = widget.initialData!['isheadoffice'] ?? false;
+      final rawHeadOffice = widget.initialData!['isheadoffice'] ??
+          widget.initialData!['head_office'] ??
+          widget.initialData!['is_head_office'];
+      isHeadoffice = rawHeadOffice == 1 ||
+          rawHeadOffice == '1' ||
+          rawHeadOffice == true ||
+          rawHeadOffice.toString().toLowerCase() == 'true';
 
       /// 🔥 FIX CITY LIST
       final cityData = widget.initialData!['city'];

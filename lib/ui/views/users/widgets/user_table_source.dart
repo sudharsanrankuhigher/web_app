@@ -229,7 +229,7 @@ class UserTableSource extends DataTableSource {
                               DataColumn(label: Text("Category")),
                               DataColumn(label: Text("Sub Plan")),
                               DataColumn(label: Text("Total")),
-                              DataColumn(label: Text("Used")),
+                              DataColumn(label: Text("Balance")),
                               DataColumn(label: Text("Plan Created")),
                             ],
                             rows: user.plans!.asMap().entries.map((entry) {
@@ -244,7 +244,8 @@ class UserTableSource extends DataTableSource {
                                   DataCell(Text("${plan.connection ?? 0}")),
                                   DataCell(
                                     Text(
-                                      DateFormatter.formatToDDMMMYYYY(plan.createdAt!),
+                                      DateFormatter.formatToDDMMMYYYY(
+                                          plan.createdAt!),
                                     ),
                                   ),
                                 ],

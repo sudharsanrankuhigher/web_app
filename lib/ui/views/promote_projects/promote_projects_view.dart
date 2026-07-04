@@ -5,6 +5,7 @@ import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/home/home_view.dart';
+import 'package:webapp/ui/views/promote_projects/widgets/promote_status.dart';
 import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/common_chips.dart';
 import 'package:webapp/widgets/no_access_widget.dart';
@@ -53,7 +54,8 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                           if (isMobile) ...[
                             IconButton(
                               icon: const Icon(Icons.menu),
-                              onPressed: () => HomeView.scaffoldKey.currentState?.openDrawer(),
+                              onPressed: () => HomeView.scaffoldKey.currentState
+                                  ?.openDrawer(),
                             ),
                             horizontalSpacing8,
                           ],
@@ -516,6 +518,103 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                             ],
                           ),
                           verticalSpacing12,
+                          if (viewModel.projectDescription != null &&
+                              viewModel.projectDescription!.isNotEmpty) ...[
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              margin: const EdgeInsets.only(bottom: 12),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .secondaryContainer
+                                    .withOpacity(0.2),
+                                border: Border.all(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .secondary
+                                      .withOpacity(0.3),
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.description_rounded,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
+                                        size: 20,
+                                      ),
+                                      horizontalSpacing10,
+                                      Text(
+                                        "Project Description",
+                                        style: fontFamilyBold.size14.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  verticalSpacing10,
+                                  SelectableText(
+                                    viewModel.projectDescription ?? "",
+                                    style: fontFamilyRegular.size13.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                          if (viewModel.promoteTableSource.status ==
+                                  PromoteStatus.promoteCommission &&
+                              viewModel.commissionAmount != null) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              margin: const EdgeInsets.only(bottom: 12),
+                              decoration: BoxDecoration(
+                                color: appGreen400.withOpacity(0.1),
+                                border: Border.all(
+                                  color: appGreen400.withOpacity(0.4),
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.monetization_on_rounded,
+                                    color: appGreen400,
+                                    size: 20,
+                                  ),
+                                  horizontalSpacing8,
+                                  Text(
+                                    "Commission Amount: ",
+                                    style: fontFamilyMedium.size14.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
+                                  ),
+                                  Text(
+                                    "₹${viewModel.commissionAmount}",
+                                    style: fontFamilyBold.size16.copyWith(
+                                      color: appGreen400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                           SizedBox(
                             height: MediaQuery.of(context).size.height * 0.75,
                             width: double.infinity,

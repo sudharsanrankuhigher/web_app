@@ -2107,10 +2107,11 @@ class MockApiService extends _i1.Mock implements _i26.ApiService {
       ) as _i24.Future<dynamic>);
 
   @override
-  _i24.Future<dynamic> deleteNotification(int? id) => (super.noSuchMethod(
+  _i24.Future<dynamic> deleteNotification(List<int>? ids) =>
+      (super.noSuchMethod(
         Invocation.method(
           #deleteNotification,
-          [id],
+          [ids],
         ),
         returnValue: _i24.Future<dynamic>.value(),
         returnValueForMissingStub: _i24.Future<dynamic>.value(),

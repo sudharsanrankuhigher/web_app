@@ -85,9 +85,10 @@ class RolesViewModel extends BaseViewModel {
 
     // Create updated model
     final updated = {
-      'id': roles,
+      'id': roles.id,
       "name": result["name"],
     };
+    print(updated);
 
     saveOrUpdate(updated);
   }

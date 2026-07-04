@@ -143,6 +143,12 @@ class DashBoardViewModel extends BaseViewModel with NavigationMixin {
   // 6. Package and Banner Revenue
   double get packageRevenue => 25000.0 * _getScaleFactor();
   double get bannerRevenue => 18000.0 * _getScaleFactor();
+  int get packageClientCount =>
+      (120 * _getScaleFactor() * (isMonthly ? 8 : 1)).round().clamp(3, 4000);
+  int get packageInfluencerCount =>
+      (160 * _getScaleFactor() * (isMonthly ? 8 : 1)).round().clamp(4, 5000);
+  int get packagePaidCount =>
+      (98 * _getScaleFactor() * (isMonthly ? 8 : 1)).round().clamp(2, 3000);
 
   // 7. Client Projects Status
   int get clientPendingCount => (35 * _getScaleFactor()).round().clamp(1, 1000);
@@ -318,7 +324,18 @@ class DashBoardViewModel extends BaseViewModel with NavigationMixin {
                 "Package Revenue",
                 formatCurrency(packageRevenue)
               ],
+              [
+                "Advertising",
+                "Total Client Count (Package)",
+                formatNumber(packageClientCount)
+              ],
               ["Advertising", "Banner Revenue", formatCurrency(bannerRevenue)],
+              [
+                "Advertising",
+                "Total Influencer Count (Package)",
+                formatNumber(packageInfluencerCount)
+              ],
+              ["Advertising", "Paid Count", formatNumber(packagePaidCount)],
               [
                 "Client Projects Status",
                 "Pending",

@@ -11,6 +11,8 @@ class NotificationCard extends StatefulWidget {
   final VoidCallback onTap;
   final VoidCallback onDelete;
   final VoidCallback onToggleRead;
+  final bool isSelected;
+  final ValueChanged<bool?>? onSelectedChanged;
 
   const NotificationCard({
     Key? key,
@@ -19,6 +21,8 @@ class NotificationCard extends StatefulWidget {
     required this.onTap,
     required this.onDelete,
     required this.onToggleRead,
+    this.isSelected = false,
+    this.onSelectedChanged,
   }) : super(key: key);
 
   @override
@@ -137,10 +141,24 @@ class _NotificationCardState extends State<NotificationCard> {
                         ),
 
                       Padding(
-                        padding: EdgeInsets.fromLTRB(20.w, 16.h, 16.w, 16.h),
+                        padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 16.h),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // ─── Selection Checkbox ───
+                            SizedBox(
+                              width: 24.w,
+                              height: 24.h,
+                              child: Checkbox(
+                                value: widget.isSelected,
+                                onChanged: widget.onSelectedChanged,
+                                activeColor: categoryColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ),
+                            horizontalSpacing12,
                             // ─── Category Icon Container ───
                             Container(
                               padding: const EdgeInsets.all(8),
