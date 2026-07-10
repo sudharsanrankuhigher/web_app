@@ -78,9 +78,9 @@ class ApiService {
 
     final dio = Dio(
       BaseOptions(
-        baseUrl: 'https://admin.promoteapp.in/',
+        // baseUrl: 'https://admin.promoteapp.in/',
         // baseUrl: 'http://172.20.25.23:8003/', //saran
-        // baseUrl: 'http://172.20.25.55:8888/', //shy
+        baseUrl: 'http://172.20.25.55:8888/', //shy
         // baseUrl: 'http://172.20.25.23:8002/',
         // baseUrl: 'http://172.20.25.54:8005/',//deepak
         followRedirects: true,
@@ -1443,8 +1443,36 @@ class ApiService {
 
   ///POST: /api/admin/promote/status
   Future<dynamic> changePromoteStatus(request) async {
+    dynamic requestData = request;
+
+    if (request is Map && request["image"] != null) {
+      final Map<String, dynamic> formMap = {
+        "promote_project_id": request["promote_project_id"],
+        "status": request["status"],
+        if (request["rework"] != null) "rework": request["rework"],
+        if (request["link"] != null) "link": request["link"],
+      };
+
+      final image = request["image"];
+      if (image is Uint8List) {
+        formMap["image"] = MultipartFile.fromBytes(
+          image,
+          filename: "screenshot.png",
+        );
+      } else if (image is String) {
+        formMap["image"] = await MultipartFile.fromFile(
+          image,
+          filename: image.split('/').last,
+        );
+      } else {
+        formMap["image"] = image;
+      }
+
+      requestData = FormData.fromMap(formMap);
+    }
+
     final response = await _dio.post('api/admin/promote/status',
-        data: request,
+        data: requestData,
         options: Options(
           validateStatus: (status) => status != null && status < 500,
         ));

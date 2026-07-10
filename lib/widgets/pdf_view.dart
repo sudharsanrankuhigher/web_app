@@ -1,7 +1,6 @@
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
 import 'dart:ui_web' as ui;
 import 'package:flutter/material.dart';
+import 'package:web/web.dart' as web;
 
 class PdfWebView extends StatelessWidget {
   final String url;
@@ -17,7 +16,7 @@ class PdfWebView extends StatelessWidget {
     ui.platformViewRegistry.registerViewFactory(
       viewId,
       (int viewId) {
-        final iframe = html.IFrameElement()
+        final iframe = web.HTMLIFrameElement()
           ..src = sanitizedUrl
           ..style.border = 'none'
           ..style.width = '100%'
@@ -34,7 +33,7 @@ class PdfWebView extends StatelessWidget {
   }
 
   String _sanitizeUrl(String url) {
-    if (html.window.location.protocol == 'https:' &&
+    if (web.window.location.protocol == 'https:' &&
         url.startsWith('http://')) {
       return url.replaceFirst('http://', 'https://');
     }

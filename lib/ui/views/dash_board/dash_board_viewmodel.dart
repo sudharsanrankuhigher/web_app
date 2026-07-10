@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'dart:html' as html;
+import 'dart:js_interop';
+import 'package:web/web.dart' as web;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -396,17 +397,18 @@ class DashBoardViewModel extends BaseViewModel with NavigationMixin {
 
     final bytes = await pdf.save();
 
-    final blob = html.Blob([bytes], 'application/pdf');
-    final url = html.Url.createObjectUrlFromBlob(blob);
+    final blob = web.Blob([bytes.toJS].toJS, web.BlobPropertyBag(type: 'application/pdf'));
+    final url = web.URL.createObjectURL(blob);
 
-    html.window.open(url, "_blank");
+    web.window.open(url, "_blank");
 
-    html.AnchorElement(href: url)
+    web.HTMLAnchorElement()
+      ..href = url
       ..setAttribute("download",
           "Dashboard_Report_${selectedState}_${periodStr.replaceAll(' ', '_')}.pdf")
       ..click();
 
-    html.Url.revokeObjectUrl(url);
+    web.URL.revokeObjectURL(url);
 
     Fluttertoast.showToast(
       msg: "PDF downloaded successfully! 📄",

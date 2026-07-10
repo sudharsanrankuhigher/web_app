@@ -21,7 +21,8 @@ import 'package:webapp/ui/views/report/widgets/table_source/company_table_source
 import 'package:webapp/ui/views/report/widgets/table_source/inf_highlight_table_source.dart';
 import 'package:webapp/ui/views/report/widgets/table_source/inf_report_table_source.dart';
 import 'package:webapp/ui/views/report/widgets/table_source/subscription_report_table_source.dart';
-import 'dart:html' as html; // 🔥 required for web download
+import 'dart:js_interop';
+import 'package:web/web.dart' as web;
 
 class ReportViewModel extends BaseViewModel with NavigationMixin {
   // ReportViewModel() {
@@ -134,6 +135,7 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
     DataColumn(label: Text("inf Id/ inf name")),
     DataColumn(label: Text("client payment")),
     DataColumn(label: Text("client commission")),
+    DataColumn(label: Text("GST Amount")),
     DataColumn(label: Text("influencer paid")),
   ];
   final promoteProjectDetails = const [
@@ -144,6 +146,7 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
     // DataColumn(label: Text("inf Id/ inf name")),
     DataColumn(label: Text("Company payment")),
     DataColumn(label: Text("Company commission")),
+    DataColumn(label: Text("GST Amount")),
     DataColumn(label: Text("influencer paid")),
   ];
 
@@ -323,11 +326,13 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
             (_safeText("${item.infId ?? ''} / ${item.infName ?? ''}")),
             _toDouble(item.clientPayment),
             _toDouble(item.clientCommission),
+            _toDouble(item.companyTax),
             _toDouble(item.infPayment),
           ];
         }).toList();
 
         if (clientProjectDetailedList.isNotEmpty) {
+          final totalGST = clientProjectDetailedList.fold<double>(0.0, (sum, item) => sum + (double.tryParse(item.companyTax?.toString() ?? '0') ?? 0.0));
           rows.add([
             "",
             "",
@@ -336,6 +341,7 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
             "TOTAL",
             clientProjectTotal?.clientPayment ?? 0,
             clientProjectTotal?.commission ?? 0,
+            totalGST,
             clientProjectTotal?.infPayment ?? 0,
           ]);
         }
@@ -352,22 +358,25 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
             item.id ?? "-",
             item.companyName ?? "-",
             item.companyMobile ?? "-",
-            item.companyPayment ?? 0,
-            item.companyCommission ?? 0,
-            item.infPayment ?? 0,
+            _toDouble(item.companyPayment),
+            _toDouble(item.companyCommission),
+            _toDouble(item.companyTax),
+            _toDouble(item.infPayment),
           ];
         }).toList();
 
         if (promoteProjectes!.isNotEmpty) {
+          final totalGST = promoteProjectes!.fold<double>(0.0, (sum, item) => sum + (double.tryParse(item.companyTax?.toString() ?? '0') ?? 0.0));
           rows.add([
             "",
             "",
             "",
             "",
             "TOTAL",
-            totalPayments ?? 0,
-            totalCommissionAmount ?? 0,
-            totalAmounts ?? 0,
+            _toDouble(totalPayments),
+            _toDouble(totalCommissionAmount),
+            totalGST,
+            _toDouble(totalAmounts),
           ]);
         }
 
@@ -481,14 +490,15 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
 
     final bytes = utf8.encode(csv);
 
-    final blob = html.Blob([bytes]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
+    final blob = web.Blob([bytes.toJS].toJS);
+    final url = web.URL.createObjectURL(blob);
 
-    html.AnchorElement(href: url)
+    web.HTMLAnchorElement()
+      ..href = url
       ..setAttribute("download", "${_selectedReportType?.title}.csv")
       ..click();
 
-    html.Url.revokeObjectUrl(url);
+    web.URL.revokeObjectURL(url);
   }
 
   Future<void> exportPdfWeb() async {
@@ -537,15 +547,16 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
 
     final bytes = await pdf.save();
 
-    final blob = html.Blob([bytes], 'application/pdf');
-    final url = html.Url.createObjectUrlFromBlob(blob);
+    final blob = web.Blob([bytes.toJS].toJS, web.BlobPropertyBag(type: 'application/pdf'));
+    final url = web.URL.createObjectURL(blob);
 
-    html.window.open(url, "_blank");
+    web.window.open(url, "_blank");
 
-    html.AnchorElement(href: url)
+    web.HTMLAnchorElement()
+      ..href = url
       ..setAttribute("download", "${_selectedReportType?.title}.pdf")
       ..click();
 
-    html.Url.revokeObjectUrl(url);
+    web.URL.revokeObjectURL(url);
   }
 }

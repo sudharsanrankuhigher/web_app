@@ -163,6 +163,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         final infId = (e.inf?.infId ?? "").toString().toLowerCase();
         final infPhone = (e.inf?.phone ?? "").toString().toLowerCase();
         final projectId = (e.projectId ?? "").toString().toLowerCase();
+        final requestId = (e.id ?? "").toString().toLowerCase();
         final search = value.toLowerCase();
 
         return clientName.contains(search) ||
@@ -170,7 +171,8 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
             infName.contains(search) ||
             infId.contains(search) ||
             infPhone.contains(search) ||
-            projectId.contains(search);
+            projectId.contains(search) ||
+            requestId.contains(search);
       }).toList();
     }
 
@@ -492,6 +494,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Bank Details")),
           DataColumn(label: Text("Payment Amount")),
           DataColumn(label: Text("Commision Amount")),
+          DataColumn(label: Text("GST Amount")),
           DataColumn(label: Text("Notes")),
           DataColumn(
               label: Text("Doc"),
@@ -517,6 +520,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Inf_Phone")),
           DataColumn(label: Text("Inf_Payment date")),
           DataColumn(label: Text("Commission Amount")),
+          DataColumn(label: Text("GST Amount")),
           DataColumn(label: Text("Notes")),
           DataColumn(
               label: Text("Doc"),
@@ -543,6 +547,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Total amount")),
           DataColumn(label: Text("Payment amount")),
           DataColumn(label: Text("Commission Amount")),
+          DataColumn(label: Text("GST Amount")),
           DataColumn(label: Text("Notes")),
           DataColumn(
               label: Text("Doc"),
@@ -603,6 +608,8 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       "remark": data["remark"] ?? "",
       if (data["image"] != null) "image": data["image"],
       if (data["revert_status"] != null) "revert_status": data["revert_status"],
+      if (data['client_payment_verified'] != null)
+        "client_payment_verified": data['client_payment_verified'],
     };
 
     print("data request $req");
@@ -949,7 +956,8 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
           "id": model.id,
           "status": 7,
           "client_id": model.client!.id,
-          "category_id": model.category
+          "category_id": model.category,
+          "client_payment_verified": true
         };
         statusChange(data);
       },

@@ -210,9 +210,9 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
 
     print("====================================");
 
-    // ❗ Remove invalid selected influencers
+    // ❗ Remove invalid selected influencers (ensure they exist in the master list)
     selectedInfluencers = selectedInfluencers
-        .where((s) => filteredInfluencers.any((f) => f['id'] == s['id']))
+        .where((s) => allInfluencers.any((f) => f['id'] == s['id']))
         .toList();
 
     selectedInfluencerIds = selectedInfluencers.map((e) => e['id']).toList();
@@ -304,6 +304,10 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
           .map((influencer_model.Datum influencer) => {
                 'id': influencer.id,
                 'name': influencer.name,
+                'image':
+                    (influencer.image != null && influencer.image!.isNotEmpty)
+                        ? influencer.image
+                        : null,
               })
           .toList();
       print("selectedInfluencers: $selectedInfluencers");
@@ -1152,7 +1156,7 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                                                         (e) => {
                                                                               'id': e.id,
                                                                               'name': e.name,
-                                                                              'image': (e.image != null && e.image!.isNotEmpty) ? "https://yourserver.com/${e.image}" : null,
+                                                                              'image': (e.image != null && e.image!.isNotEmpty) ? e.image : null,
                                                                             })
                                                                     .where((item) =>
                                                                         values.any((v) =>

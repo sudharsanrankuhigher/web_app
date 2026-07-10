@@ -1,8 +1,8 @@
-import 'dart:html' as html;
 import 'dart:ui_web' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:web/web.dart' as web;
 
 class WebImage extends StatelessWidget {
   final String imageUrl;
@@ -21,14 +21,14 @@ class WebImage extends StatelessWidget {
     ui.platformViewRegistry.registerViewFactory(
       this.imageUrl,
       (int viewId) {
-        final img = html.ImageElement()
+        final img = web.HTMLImageElement()
           ..src = this.imageUrl
           ..style.width = '100%'
           ..style.height = '100%'
           ..style.objectFit = fit.name
           // ..style.borderRadius = '50%' // 👈 circular
           ..style.border = 'none'
-          ..classes.add('web-image-two');
+          ..classList.add('web-image-two');
 
         return img;
       },
@@ -52,7 +52,7 @@ class WebImage extends StatelessWidget {
   }
 
   static String _sanitizeUrl(String url) {
-    if (html.window.location.protocol == 'https:' &&
+    if (web.window.location.protocol == 'https:' &&
         url.startsWith('http://')) {
       return url.replaceFirst('http://', 'https://');
     }

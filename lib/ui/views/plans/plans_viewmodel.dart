@@ -73,7 +73,8 @@ class PlansViewModel extends BaseViewModel {
   void searchPlans(String query) {
     final filtered = plans.where((p) {
       return p.name!.toLowerCase().contains(query.toLowerCase()) ||
-          p.badge!.toLowerCase().contains(query.toLowerCase());
+          p.badge!.toLowerCase().contains(query.toLowerCase()) ||
+          (p.id?.toString().contains(query) ?? false);
     }).toList();
 
     _refreshTable(filtered: filtered);

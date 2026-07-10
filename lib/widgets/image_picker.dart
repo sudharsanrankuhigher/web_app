@@ -1,6 +1,8 @@
+import 'dart:async';
+import 'dart:js_interop';
 import 'package:flutter/foundation.dart';
-import 'dart:html' as html;
 import 'package:image_picker/image_picker.dart';
+import 'package:web/web.dart' as web;
 
 class UniversalImagePicker {
   static Future<Map<String, dynamic>?> pickImage() async {
@@ -22,24 +24,44 @@ class UniversalImagePicker {
 
   // --- WEB PICKER (Generic) ---
   static Future<Map<String, dynamic>?> _pickFileWeb({String? accept}) async {
-    final html.FileUploadInputElement uploadInput =
-        html.FileUploadInputElement();
+    final web.HTMLInputElement uploadInput =
+        web.document.createElement('input') as web.HTMLInputElement;
+    uploadInput.type = 'file';
     if (accept != null) {
       uploadInput.accept = accept;
     }
+
+    final changeCompleter = Completer<void>();
+    final changeListener = (web.Event event) {
+      changeCompleter.complete();
+    }.toJS;
+
+    uploadInput.addEventListener('change', changeListener);
     uploadInput.click();
 
-    await uploadInput.onChange.first;
+    await changeCompleter.future;
+    uploadInput.removeEventListener('change', changeListener);
 
-    final file = uploadInput.files?.first;
+    final file = uploadInput.files?.item(0);
     if (file == null) return null;
 
-    final reader = html.FileReader();
+    final reader = web.FileReader();
     reader.readAsArrayBuffer(file);
-    await reader.onLoad.first;
+
+    final loadCompleter = Completer<void>();
+    final loadListener = (web.Event event) {
+      loadCompleter.complete();
+    }.toJS;
+
+    reader.addEventListener('load', loadListener);
+    await loadCompleter.future;
+    reader.removeEventListener('load', loadListener);
+
+    final result = reader.result;
+    if (result == null) return null;
 
     return {
-      'bytes': reader.result as Uint8List,
+      'bytes': (result as JSArrayBuffer).toDart.asUint8List(),
       'path': file.name,
     };
   }

@@ -51,6 +51,7 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
     const DataColumn(label: Text("Priority")),
     const DataColumn(label: Text("Start Date")),
     const DataColumn(label: Text("End Date")),
+    const DataColumn(label: Text("State/City")),
     const DataColumn(label: Text("status")),
     const DataColumn(
         label: Text('Action'), headingRowAlignment: MainAxisAlignment.center)
@@ -91,6 +92,7 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
     }
   }
 
+  /// create banner ///
   Future<void> createBanner(data) async {
     try {
       FormData formData = FormData();
@@ -100,7 +102,11 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
         formData.fields.add(MapEntry("id", data['id'].toString()));
       }
 
-      formData.fields.add(MapEntry("inf_id", data['inf_id'].toString()));
+      if (data['is_promote'] != null) {
+        formData.fields.add(
+            MapEntry("is_promote", (data['is_promote'] == true ? 1 : 0).toString()));
+      }
+
       if (data["inf_id"] != null) {
         if (data["inf_id"] is List) {
           formData.fields.add(
@@ -114,14 +120,24 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
             MapEntry("inf_id", data["inf_id"].toString()),
           );
         }
+      } else {
+        formData.fields.add(const MapEntry("inf_id", ""));
       }
-      formData.fields.add(MapEntry("amount", data['amount'].toString()));
+      formData.fields.add(MapEntry("amount", (data['amount'] ?? "").toString()));
       formData.fields
           .add(MapEntry("start_date", data['start_date'].toString()));
       formData.fields.add(MapEntry("end_date", data['end_date'].toString()));
 
       if (data['priority'] != null) {
         formData.fields.add(MapEntry("priority", data['priority'].toString()));
+      }
+
+      if (data['state'] != null) {
+        formData.fields.add(MapEntry("state", data['state'].toString()));
+      }
+
+      if (data['city'] != null) {
+        formData.fields.add(MapEntry("city", data['city'].toString()));
       }
 
       if (data['existing_image'] != null) {
@@ -328,11 +344,14 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
 
       final amount = item.amount?.toLowerCase() ?? '';
       final priority = item.priority?.toString() ?? '';
+      final isPromoteMatch =
+          item.isPromote == true && 'promoted'.contains(search);
 
       return search.isEmpty ||
           influencerName.toLowerCase().contains(search) ||
           amount.contains(search) ||
-          priority.contains(search);
+          priority.contains(search) ||
+          isPromoteMatch;
     }).toList();
 
     refreshBanner(); // ✅ important

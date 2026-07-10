@@ -196,7 +196,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                             ],
                           ),
 
-                          // Monthly Filter (Month Selector Dropdown)
+                          // Monthly Filter (Month Selector Calendar Picker)
                           if (viewModel.isMonthly)
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,74 +204,186 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                 Text('Select Month',
                                     style: fontFamilyMedium.size11.greyColor),
                                 verticalSpacing8,
-                                SizedBox(
-                                  width: 150,
-                                  height: 42,
-                                  child: DropdownButtonFormField<String>(
-                                    initialValue: viewModel.selectedMonth,
-                                    decoration: InputDecoration(
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 12, vertical: 8),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: BorderSide(
-                                            color:
-                                                Colors.grey.withOpacity(0.3)),
-                                      ),
+                                InkWell(
+                                  onTap: () async {
+                                    final int currentMonthIndex = viewModel
+                                        .months
+                                        .indexOf(viewModel.selectedMonth);
+                                    final String? picked =
+                                        await showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text("Select Month"),
+                                          content: SizedBox(
+                                            width: 320,
+                                            height: 240,
+                                            child: GridView.builder(
+                                              shrinkWrap: true,
+                                              gridDelegate:
+                                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                                crossAxisCount: 3,
+                                                childAspectRatio: 1.5,
+                                                mainAxisSpacing: 8,
+                                                crossAxisSpacing: 8,
+                                              ),
+                                              itemCount: 12,
+                                              itemBuilder: (context, index) {
+                                                final monthName =
+                                                    viewModel.months[index];
+                                                final isSelected =
+                                                    index == currentMonthIndex;
+                                                return InkWell(
+                                                  onTap: () {
+                                                    Navigator.pop(
+                                                        context, monthName);
+                                                  },
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: isSelected
+                                                          ? continueButton
+                                                          : Colors.transparent,
+                                                      border: Border.all(
+                                                        color: isSelected
+                                                            ? continueButton
+                                                            : Colors.grey
+                                                                .withOpacity(
+                                                                    0.3),
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                    ),
+                                                    child: Center(
+                                                      child: Text(
+                                                        monthName.substring(0,
+                                                            3), // e.g. "Jan", "Feb"
+                                                        style: TextStyle(
+                                                          color: isSelected
+                                                              ? Colors.white
+                                                              : Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .onSurface,
+                                                          fontWeight: isSelected
+                                                              ? FontWeight.bold
+                                                              : FontWeight
+                                                                  .normal,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                    if (picked != null) {
+                                      viewModel.setSelectedMonth(picked);
+                                    }
+                                  },
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Container(
+                                    width: 150,
+                                    height: 42,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: Colors.grey.withOpacity(0.3)),
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                    items: viewModel.months.map((m) {
-                                      return DropdownMenuItem<String>(
-                                        value: m,
-                                        child: Text(m,
-                                            style:
-                                                fontFamilyRegular.size12.black),
-                                      );
-                                    }).toList(),
-                                    onChanged: (val) {
-                                      if (val != null) {
-                                        viewModel.setSelectedMonth(val);
-                                      }
-                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          viewModel.selectedMonth,
+                                          style: fontFamilyRegular.size12.black,
+                                        ),
+                                        Icon(
+                                          Icons.calendar_month,
+                                          size: 16,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
 
-                          // Year Selector Dropdown
+                          // Year Selector Calendar Picker
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('Select Year',
                                   style: fontFamilyMedium.size11.greyColor),
                               verticalSpacing8,
-                              SizedBox(
-                                width: 120,
-                                height: 42,
-                                child: DropdownButtonFormField<String>(
-                                  initialValue: viewModel.selectedYear,
-                                  decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 8),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      borderSide: BorderSide(
-                                          color: Colors.grey.withOpacity(0.3)),
-                                    ),
+                              InkWell(
+                                onTap: () async {
+                                  final int initialYear =
+                                      int.tryParse(viewModel.selectedYear) ??
+                                          DateTime.now().year;
+                                  final DateTime? picked =
+                                      await showDialog<DateTime>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text("Select Year"),
+                                        content: SizedBox(
+                                          width: 300,
+                                          height: 300,
+                                          child: YearPicker(
+                                            firstDate: DateTime(2020),
+                                            lastDate: DateTime(2035),
+                                            initialDate:
+                                                DateTime(initialYear, 1),
+                                            selectedDate:
+                                                DateTime(initialYear, 1),
+                                            onChanged: (DateTime dateTime) {
+                                              Navigator.pop(context, dateTime);
+                                            },
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                  if (picked != null) {
+                                    viewModel.setSelectedYear(
+                                        picked.year.toString());
+                                  }
+                                },
+                                borderRadius: BorderRadius.circular(10),
+                                child: Container(
+                                  width: 120,
+                                  height: 42,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Colors.grey.withOpacity(0.3)),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                  items: viewModel.years.map((y) {
-                                    return DropdownMenuItem<String>(
-                                      value: y,
-                                      child: Text(y,
-                                          style:
-                                              fontFamilyRegular.size12.black),
-                                    );
-                                  }).toList(),
-                                  onChanged: (val) {
-                                    if (val != null) {
-                                      viewModel.setSelectedYear(val);
-                                    }
-                                  },
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        viewModel.selectedYear,
+                                        style: fontFamilyRegular.size12.black,
+                                      ),
+                                      Icon(
+                                        Icons.calendar_today,
+                                        size: 16,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],

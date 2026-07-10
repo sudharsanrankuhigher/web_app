@@ -14,6 +14,7 @@ import 'package:webapp/widgets/initial_textform.dart';
 import 'package:webapp/widgets/label_text.dart';
 import 'package:webapp/widgets/search_drop_down_widget.dart';
 import 'package:webapp/widgets/web_image_two.dart';
+import 'package:webapp/widgets/state_city_drop_down.dart';
 import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
     as influencer_model;
 import 'package:webapp/ui/views/banner/model/all_banner_model.dart'
@@ -30,13 +31,19 @@ class AddEditBannerDialog {
 
     String? title;
     String? amount;
+    bool isPromote = false;
 
     DateTime? startDate = DateTime.now();
     String? startDateString;
     bool? startDateError = false;
-    DateTime? endDate = DateTime.now().add(const Duration(days: 20));
+    DateTime? endDate = DateTime.now().add(const Duration(days: 3));
     String? endDateString;
     bool? endDateError = false;
+
+    String? stateValue;
+    String? cityValue;
+    bool isStateError = false;
+    bool isCityError = false;
 
     final formKey = GlobalKey<FormState>();
 
@@ -65,6 +72,8 @@ class AddEditBannerDialog {
 
     /// ================= PRESELECT (EDIT MODE) =================
     if (initial != null) {
+      isPromote = initial.isPromote ?? false;
+
       final infId = initial.infId;
 
       if (infId != null) {
@@ -78,6 +87,8 @@ class AddEditBannerDialog {
 
       title = initial.priority?.toString();
       amount = initial.amount;
+      stateValue = initial.state;
+      cityValue = initial.city;
     }
 
     /// ================= LOAD INITIAL IMAGE =================
@@ -161,10 +172,33 @@ class AddEditBannerDialog {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        /// PROMOTE TOGGLE
+                        SwitchListTile(
+                          title: Text(
+                            "Promote",
+                            style: fontFamilyMedium.size13.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                          value: isPromote,
+                          activeThumbColor: continueButton,
+                          contentPadding: EdgeInsets.zero,
+                          onChanged: isReadOnly
+                              ? null
+                              : (val) {
+                                  setDialogState(() {
+                                    isPromote = val;
+                                  });
+                                },
+                        ),
+
+                        verticalSpacing20,
+
                         /// ================= INFLUENCER DROPDOWN =================
                         buildField(
                           label: 'Influencer',
                           child: DynamicSingleSearchDropdown(
+                            enabled: !isReadOnly && !isPromote,
                             label: 'Influencers',
                             items: filteredInfluencers,
                             selectedItem: selectedInfluencers.isNotEmpty
@@ -185,7 +219,7 @@ class AddEditBannerDialog {
                                 }
                               });
                             },
-                            isError: !isInfluencerSelected,
+                            isError: !isPromote && !isInfluencerSelected,
                             errorText: "Please select an influencer",
                           ),
                         ),
@@ -199,12 +233,16 @@ class AddEditBannerDialog {
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
                             ],
-                            readOnly: isReadOnly,
+                            readOnly: isReadOnly || isPromote,
                             radius: 14,
                             keyboardType: TextInputType.number,
                             initialValue: initial?.amount?.toString() ?? "",
-                            validator: (v) =>
-                                v == null || v.isEmpty ? "Enter amount" : null,
+                            validator: (v) {
+                              if (isPromote) return null;
+                              return v == null || v.isEmpty
+                                  ? "Enter amount"
+                                  : null;
+                            },
                             onSaved: (v) => amount = v,
                           ),
                         ),
@@ -220,12 +258,49 @@ class AddEditBannerDialog {
                             ],
                             radius: 14,
                             hintText: 'Priority count',
-                            readOnly: isReadOnly,
-                            initialValue: initial?.priority?.toString() ?? "",
-                            validator: (v) => v == null || v.isEmpty
-                                ? "Enter Priority"
-                                : null,
+                            readOnly: isReadOnly || isPromote,
+                            initialValue: title,
+                            validator: (v) {
+                              if (isPromote) return null;
+                              if (v == null || v.isEmpty) {
+                                return "Enter Priority";
+                              }
+                              if (v == "1") {
+                                return "Priority cannot be 1";
+                              }
+                              return null;
+                            },
                             onSaved: (v) => title = v,
+                          ),
+                        ),
+
+                        verticalSpacing20,
+
+                        // -------- STATE & CITY --------
+                        buildField(
+                          label: 'State & City',
+                          child: IgnorePointer(
+                            ignoring: isReadOnly,
+                            child: StateCityDropdown(
+                              showCity: true,
+                              initialState: stateValue,
+                              initialCity: cityValue,
+                              isStateError: isStateError,
+                              isCityError: isCityError,
+                              onStateChanged: (state) {
+                                setDialogState(() {
+                                  stateValue = state;
+                                  cityValue = null;
+                                  isStateError = false;
+                                });
+                              },
+                              onCityChanged: (city) {
+                                setDialogState(() {
+                                  cityValue = city;
+                                  isCityError = false;
+                                });
+                              },
+                            ),
                           ),
                         ),
 
@@ -280,10 +355,10 @@ class AddEditBannerDialog {
                             DOBField(
                               label: "End Date",
                               fistDate:
-                                  DateTime.now().add(const Duration(days: 20)),
+                                  DateTime.now().add(const Duration(days: 3)),
                               lastdate: DateTime(2100),
                               selectedDate: endDate ??
-                                  DateTime.now().add(const Duration(days: 20)),
+                                  DateTime.now().add(const Duration(days: 3)),
                               isError: endDateError ?? false,
                               onDateSelected: (date) {
                                 setDialogState(() {
@@ -358,7 +433,7 @@ class AddEditBannerDialog {
                       backgroundColor: WidgetStatePropertyAll(continueButton),
                     ),
                     onPressed: () {
-                      if (selectedInfluencerIds.isEmpty) {
+                      if (!isPromote && selectedInfluencerIds.isEmpty) {
                         setDialogState(() {
                           isInfluencerSelected = false;
                         });
@@ -366,20 +441,38 @@ class AddEditBannerDialog {
                       }
                       if (!formKey.currentState!.validate()) return;
 
+                      if (stateValue == null || stateValue!.isEmpty) {
+                        setDialogState(() => isStateError = true);
+                        return;
+                      }
+
+                      if (cityValue == null || cityValue!.isEmpty) {
+                        setDialogState(() => isCityError = true);
+                        return;
+                      }
+
                       formKey.currentState!.save();
 
+                      if (isPromote) {
+                        title = "1";
+                      }
+
                       Navigator.pop(context, {
-                        "priority": title,
-                        "amount": amount,
+                        "is_promote": isPromote,
+                        "priority": isPromote ? "1" : title,
+                        "amount": isPromote ? null : amount,
                         if (imageItem != null) "image": imageItem,
                         if (imageItem?.url != null)
                           "existing_image": imageItem!.url,
-                        "inf_id": selectedInfluencerIds.isNotEmpty
-                            ? selectedInfluencerIds.first
-                            : null,
+                        "inf_id":
+                            (!isPromote && selectedInfluencerIds.isNotEmpty)
+                                ? selectedInfluencerIds.first
+                                : null,
                         if (initial != null) "id": initial.id,
                         "start_date": startDate,
                         "end_date": endDate,
+                        "state": stateValue,
+                        "city": cityValue,
                       });
                     },
                     child: Text(

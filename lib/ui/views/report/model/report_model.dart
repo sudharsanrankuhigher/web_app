@@ -168,6 +168,7 @@ class Datum {
   int? clientPayment;
   dynamic clientCommission;
   dynamic infPayment;
+  dynamic companyTax;
 
   Datum({
     this.id,
@@ -178,6 +179,7 @@ class Datum {
     this.clientPayment,
     this.clientCommission,
     this.infPayment,
+    this.companyTax,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -189,6 +191,7 @@ class Datum {
         clientPayment: json["client_payment"],
         clientCommission: json["client_commission"],
         infPayment: json["inf_payment"],
+        companyTax: json["company_tax"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -200,6 +203,7 @@ class Datum {
         "client_payment": clientPayment,
         "client_commission": clientCommission,
         "inf_payment": infPayment,
+        "company_tax": companyTax,
       };
 }
 
@@ -374,6 +378,7 @@ class PromoteProject {
   String? companyPayment;
   String? companyCommission;
   String? infPayment;
+  dynamic companyTax;
 
   PromoteProject({
     this.id,
@@ -384,6 +389,7 @@ class PromoteProject {
     this.companyPayment,
     this.companyCommission,
     this.infPayment,
+    this.companyTax,
   });
 
   factory PromoteProject.fromJson(Map<String, dynamic> json) => PromoteProject(
@@ -397,6 +403,7 @@ class PromoteProject {
             : json["company_payment"]?.toString(),
         companyCommission: json["company_commission"]?.toString(),
         infPayment: json["inf_payment"]?.toString(),
+        companyTax: json["company_tax"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -408,6 +415,7 @@ class PromoteProject {
         "company_payment": companyPayment,
         "company_commission": companyCommission,
         "inf_payment": infPayment,
+        "company_tax": companyTax,
       };
 }
 

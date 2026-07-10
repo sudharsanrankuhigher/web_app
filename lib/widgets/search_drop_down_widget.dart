@@ -15,6 +15,7 @@ class DynamicSingleSearchDropdown<T> extends StatelessWidget {
   final String Function(T)? itemLabelMapper;
   final String? Function(T)? itemImageMapper;
   final bool Function(T, T)? compareFn;
+  final bool enabled;
 
   const DynamicSingleSearchDropdown({
     super.key,
@@ -28,6 +29,7 @@ class DynamicSingleSearchDropdown<T> extends StatelessWidget {
     this.itemLabelMapper,
     this.itemImageMapper,
     this.compareFn,
+    this.enabled = true,
   });
 
   String getLabel(T? item) {
@@ -52,6 +54,7 @@ class DynamicSingleSearchDropdown<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownSearch<T>(
+      enabled: enabled,
       selectedItem: selectedItem,
       itemAsString: (item) => getLabel(item),
 

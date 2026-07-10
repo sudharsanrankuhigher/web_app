@@ -673,6 +673,7 @@ class RequestTableSource extends DataTableSource {
           _clickableTextCell(m.inf?.upiId, () => onBankDetails(m)),
           _textCell("${m.payment?.amount ?? 0}"),
           _textCell("${m.payment?.commission ?? 0}"),
+          _textCell("${m.payment?.gstAmount ?? 0}"),
           _buildNotesCell(m),
           DataCell(
             m.status != 12 && m.image != null && m.image!.isNotEmpty
@@ -742,6 +743,7 @@ class RequestTableSource extends DataTableSource {
           _textCell(m.inf?.phone),
           _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.payment)),
           _textCell("${m.payment?.commission ?? 0}"),
+          _textCell("${m.payment?.gstAmount ?? 0}"),
           _buildNotesCell(m),
           DataCell(
             m.status != 12 && m.image != null && m.image!.isNotEmpty
@@ -794,6 +796,7 @@ class RequestTableSource extends DataTableSource {
           _textCell(
               m.payment?.amount != null ? m.payment!.amount.toString() : ""),
           _textCell("${m.payment?.commission ?? 0}"),
+          _textCell("${m.payment?.gstAmount ?? 0}"),
           _buildNotesCell(m),
           DataCell(
             m.status != 12 && m.image != null && m.image!.isNotEmpty

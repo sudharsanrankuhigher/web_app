@@ -94,6 +94,7 @@ class Datum {
   DateTime? refundCompletedAt;
   Link? link;
   String? description;
+  String? image;
 
   Datum({
     this.id,
@@ -122,6 +123,7 @@ class Datum {
     this.refundCompletedAt,
     this.link,
     this.description,
+    this.image,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -153,6 +155,7 @@ class Datum {
         refundCompletedAt: parseDate(json["refund_updated_at"]),
         link: _parseLink(json["link"]),
         description: json["description"],
+        image: json["image"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -181,6 +184,7 @@ class Datum {
         "refund_updated_at": refundCompletedAt?.toIso8601String(),
         "link": link?.toJson(),
         "description": description,
+        "image": image,
       };
 
   static Link? _parseLink(dynamic linkData) {

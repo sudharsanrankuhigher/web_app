@@ -48,6 +48,9 @@ class Datum {
   DateTime? endDate;
   DateTime? createdAt;
   DateTime? updatedAt;
+  String? state;
+  String? city;
+  bool? isPromote;
 
   Datum({
     this.id,
@@ -60,6 +63,9 @@ class Datum {
     this.updatedAt,
     this.startDate,
     this.endDate,
+    this.state,
+    this.city,
+    this.isPromote,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -75,8 +81,18 @@ class Datum {
         endDate: json["end_date"] == null
             ? null
             : DateTime.tryParse(json["end_date"].toString()),
-        createdAt: DateTime.parse(json["created_at"]),
-        updatedAt: DateTime.parse(json["updated_at"]),
+        createdAt: json["created_at"] == null
+            ? null
+            : DateTime.tryParse(json["created_at"].toString()),
+        updatedAt: json["updated_at"] == null
+            ? null
+            : DateTime.tryParse(json["updated_at"].toString()),
+        state: json["state"],
+        city: json["city"],
+        isPromote: json["is_promote"] == true ||
+            json["is_promote"] == 1 ||
+            json["is_promote"] == "1" ||
+            json["is_promote"] == "true",
       );
 
   Map<String, dynamic> toJson() => {
@@ -90,5 +106,8 @@ class Datum {
         "end_date": endDate?.toIso8601String(),
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
+        "state": state,
+        "city": city,
+        "is_promote": isPromote == true ? 1 : 0,
       };
 }

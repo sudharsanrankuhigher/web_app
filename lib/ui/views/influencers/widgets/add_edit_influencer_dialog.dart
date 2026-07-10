@@ -18,6 +18,7 @@ import 'package:webapp/widgets/profile_image.dart';
 import 'package:webapp/widgets/search_drop_down_widget.dart';
 import 'package:webapp/widgets/state_city_drop_down.dart';
 import 'package:webapp/core/helper/string_extensions.dart';
+import 'package:webapp/services/profile_service.dart';
 
 class InfluencerDialog extends StatefulWidget {
   final influencer_model.Datum? influencer;
@@ -438,43 +439,30 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
                 ),
                 const SizedBox(height: 8),
 
-                Row(
-                  children: [
-                    Expanded(
-                      child: IconTextFormField(
-                        isView: _isView,
-                        icon: Icons.phone,
-                        label: "Alternative Phone",
-                        controller: altPhoneController,
-                        keyBoardType: TextInputType.number,
-                        validator: (phone) {
-                          if (altPhoneController.text.isEmpty ||
-                              !RegExp(r'^\d{10}$')
-                                  .hasMatch(altPhoneController.text)) {
-                            return 'Please enter a valid 10-digit phone number';
-                          }
-                          return null;
-                        },
+                if (ProfileService.instance.roleId == '1') ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: IconTextFormField(
+                          isView: _isView,
+                          icon: Icons.phone,
+                          label: "Alternative Phone",
+                          controller: altPhoneController,
+                          keyBoardType: TextInputType.number,
+                          validator: (phone) {
+                            if (altPhoneController.text.isEmpty ||
+                                !RegExp(r'^\d{10}$')
+                                    .hasMatch(altPhoneController.text)) {
+                              return 'Please enter a valid 10-digit phone number';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
-                    ),
-                    // const SizedBox(width: 12),
-                    // Expanded(
-                    //   child: IconTextFormField(
-                    //     validator: (id) {
-                    //       if (idController.text.isEmpty) {
-                    //         return 'Please enter ID Number';
-                    //       }
-                    //       return null;
-                    //     },
-                    //     isView: widget.isView,
-                    //     icon: Icons.perm_identity,
-                    //     label: "ID Number",
-                    //     controller: idController,
-                    //   ),
-                    // ),
-                  ],
-                ),
-                const SizedBox(height: 8),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                ],
 
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

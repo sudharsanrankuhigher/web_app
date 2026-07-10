@@ -46,6 +46,12 @@ class ClientDetailedTableSource extends DataTableSource {
           ),
           DataCell(
             Text(
+              data.fold<double>(0.0, (sum, item) => sum + (double.tryParse(item.companyTax?.toString() ?? '0') ?? 0.0)).toStringAsFixed(0),
+              style: fontFamilySemiBold.size13.black,
+            ),
+          ),
+          DataCell(
+            Text(
               total!.infPayment!.toStringAsFixed(0),
               style: fontFamilySemiBold.size13.black,
             ),
@@ -60,6 +66,7 @@ class ClientDetailedTableSource extends DataTableSource {
           DataCell(Text("")),
           DataCell(Text("")),
           DataCell(Center(child: Text("No data found"))),
+          DataCell(Text("")),
           DataCell(Text("")),
           DataCell(Text("")),
           DataCell(Text("")),
@@ -112,13 +119,13 @@ class ClientDetailedTableSource extends DataTableSource {
           style: fontFamilySemiBold.size13.black,
         )),
         DataCell(Text(
+          "${item.companyTax ?? 0}",
+          style: fontFamilySemiBold.size13.black,
+        )),
+        DataCell(Text(
           "${item.infPayment ?? 0}",
           style: fontFamilySemiBold.size13.black,
         )),
-        // DataCell(Text(
-        //   " ${DateFormatter.formatToDDMMMYYYY(item.date) ?? 0}",
-        //   style: fontFamilySemiBold.size13.black,
-        // )),
       ],
     );
   }

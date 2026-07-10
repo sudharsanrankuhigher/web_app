@@ -648,7 +648,8 @@ class SubAdminViewModel extends BaseViewModel with NavigationMixin {
       return inf.name!.toLowerCase().contains(query) ||
           inf.state!.contains(query) ||
           inf.city!.toLowerCase().contains(query) ||
-          inf.state!.toLowerCase().contains(query);
+          inf.state!.toLowerCase().contains(query) ||
+          (inf.id?.toString().contains(query) ?? false);
     }).toList();
 
     tableSource = SubAdminTableSource(filtered, onEdit, confirmDelete, roles,

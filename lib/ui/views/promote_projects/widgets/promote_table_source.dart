@@ -9,6 +9,8 @@ import 'package:webapp/widgets/common_button.dart';
 import 'package:webapp/widgets/view_link.dart';
 import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/services/theme_service.dart';
+import 'package:webapp/ui/views/requests/widgets/confirmation_dialog.dart';
+import 'package:stacked_services/stacked_services.dart';
 
 class PromoteTableSource extends DataTableSource {
   List<promote_table_model.Datum> data;
@@ -301,6 +303,7 @@ class PromoteTableSource extends DataTableSource {
           _textCell(item.amount?.toString()),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.infCompleted)),
+          _docCell(item),
           DataCell(
             Center(
               child: PermissionHelper.instance.has('edit_promotion_projects')
@@ -344,6 +347,7 @@ class PromoteTableSource extends DataTableSource {
           _clickableTextCell(
               item.payment?.upi?.toString(), () => showBankDetails?.call(item)),
           _textCell(item.amount?.toString()),
+          _docCell(item),
           PermissionHelper.instance.has('edit_promotion_projects')
               ? (item.status.toString() == "7")
                   ? DataCell(
@@ -384,6 +388,7 @@ class PromoteTableSource extends DataTableSource {
           _textCell(DateFormatter.formatToDDMMMYYYY(item.paymentAt)),
           _clickableTextCell(
               item.payment?.upi?.toString(), () => showBankDetails?.call(item)),
+          _docCell(item),
         ];
       case PromoteStatus.companyPaymentVerified:
         return [
@@ -394,7 +399,7 @@ class PromoteTableSource extends DataTableSource {
           _textCell(item.influencerPhone),
           _noteCell(item),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
-          _textCell(DateFormatter.formatToDDMMMYYYY(item.completedAt)),
+          _textCell(DateFormatter.formatToDDMMMYYYY(item.infCompleted)),
           _clickableTextCell(
               item.payment?.upi?.toString(), () => showBankDetails?.call(item)),
           _textCell(item.amount?.toString()),
@@ -425,7 +430,7 @@ class PromoteTableSource extends DataTableSource {
           _textCell(item.influencerPhone),
           _noteCell(item),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
-          _textCell(DateFormatter.formatToDDMMMYYYY(item.completedAt)),
+          // _textCell(DateFormatter.formatToDDMMMYYYY(item.completedAt)),
           _clickableTextCell(
               item.payment?.upi?.toString(), () => showBankDetails?.call(item)),
           _textCell(item.amount?.toString()),
@@ -456,7 +461,7 @@ class PromoteTableSource extends DataTableSource {
             PermissionHelper.instance.has('edit_promotion_projects')
                 ? InkWell(
                     onTap: () => refunInit!(item),
-                    child: SelectableText(
+                    child: Text(
                       'Refund',
                       style: fontFamilySemiBold.size11.continueButton,
                     ),
@@ -510,15 +515,15 @@ class PromoteTableSource extends DataTableSource {
       case PromoteStatus.adminVerified:
         return 8;
       case PromoteStatus.promoteVerified:
-        return 11;
+        return 12;
       case PromoteStatus.promotePay:
-        return 11;
+        return 12;
       case PromoteStatus.infCompleted:
         return 10;
       case PromoteStatus.rejected:
-        return 12;
+        return 11;
       case PromoteStatus.promoteCommission:
-        return 9;
+        return 10;
       case PromoteStatus.companyPaymentVerified:
         return 11;
       case PromoteStatus.refund:
@@ -583,6 +588,45 @@ class PromoteTableSource extends DataTableSource {
         ),
       ],
     ));
+  }
+
+  String _getImageUrl(String path) {
+    if (path.startsWith('http')) {
+      return path;
+    }
+    String cleanPath = path;
+    if (cleanPath.startsWith('/')) {
+      cleanPath = cleanPath.substring(1);
+    }
+    if (cleanPath.startsWith('storage/')) {
+      return "http://172.20.25.23:8001/$cleanPath";
+    }
+    return "http://172.20.25.23:8001/storage/$cleanPath";
+  }
+
+  DataCell _docCell(promote_table_model.Datum item) {
+    final hasImage = item.image != null && item.image!.isNotEmpty;
+    return DataCell(
+      hasImage
+          ? InkWell(
+              onTap: () {
+                final url = _getImageUrl(item.image!);
+                showImagePreviewDialog(
+                  context: StackedService.navigatorKey!.currentContext!,
+                  imageUrl: url,
+                );
+              },
+              child: const Center(
+                child: Icon(
+                  Icons.receipt_long,
+                  color: Colors.blue,
+                ),
+              ),
+            )
+          : const Center(
+              child: Text("-"),
+            ),
+    );
   }
 
   @override

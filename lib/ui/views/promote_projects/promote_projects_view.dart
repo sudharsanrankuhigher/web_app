@@ -591,7 +591,7 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     Icons.monetization_on_rounded,
                                     color: appGreen400,
                                     size: 20,

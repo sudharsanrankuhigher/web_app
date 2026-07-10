@@ -38,6 +38,7 @@ class BannerTableSource extends DataTableSource {
           DataCell(Text("")),
           DataCell(Text("")),
           DataCell(Text("")),
+          DataCell(Text("")),
         ],
       );
     }
@@ -47,6 +48,12 @@ class BannerTableSource extends DataTableSource {
       (inf) => inf.id == item.infId,
       orElse: () => influencer_model.Datum(),
     );
+
+    final isPromoteBanner = item.isPromote == true ||
+        ((item.infId == null || item.infId == 0) &&
+            (item.amount == null ||
+                item.amount!.isEmpty ||
+                item.amount == "null"));
 
     return DataRow(
       color: WidgetStateProperty.resolveWith<Color?>(
@@ -74,8 +81,10 @@ class BannerTableSource extends DataTableSource {
           ),
         )),
         DataCell(Text(
-          influencer.name ?? '-',
-          style: fontFamilySemiBold.size13.black,
+          isPromoteBanner ? 'Promote' : (influencer.name ?? '-'),
+          style: isPromoteBanner
+              ? fontFamilySemiBold.size13.appGreen400
+              : fontFamilySemiBold.size13.black,
         )),
         DataCell(Text(
           (item.amount ?? '-').toString(),
@@ -91,6 +100,10 @@ class BannerTableSource extends DataTableSource {
         )),
         DataCell(Text(
           DateFormatter.formatToDDMMMYYYY(item.endDate) ?? '-',
+          style: fontFamilySemiBold.size13.black,
+        )),
+        DataCell(Text(
+          "${item.city ?? '-'}/${item.state ?? '-'}",
           style: fontFamilySemiBold.size13.black,
         )),
         DataCell(Text(

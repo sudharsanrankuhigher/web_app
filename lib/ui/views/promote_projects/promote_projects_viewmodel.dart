@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:typed_data';
 
 import 'package:http_parser/http_parser.dart';
 import 'package:dio/dio.dart';
@@ -512,8 +513,8 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     final filtered = plans.where((p) {
       return p.companyName!.toLowerCase().contains(query.toLowerCase()) ||
           p.projectCode!.toLowerCase().contains(query.toLowerCase()) ||
-          p.projectCode!.toLowerCase().contains(query.toLowerCase()) ||
-          p.projectName!.toLowerCase().contains(query.toLowerCase());
+          p.projectName!.toLowerCase().contains(query.toLowerCase()) ||
+          (p.id?.toString().contains(query) ?? false);
     }).toList();
     tableSource.updateData(filtered);
     notifyListeners();
@@ -740,7 +741,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           // Columns
           DataColumn(label: Text("S.No")),
           DataColumn(label: Text("Influencer ID")),
-          DataColumn(label: Text("T-Code")),
+          DataColumn(label: Text("Influencer Name")),
           DataColumn(label: Text("Assigned Date")),
           DataColumn(label: Text("Project Code")),
           DataColumn(label: Text("Notes")),
@@ -762,6 +763,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Promote Pay")),
           DataColumn(label: Text("Assigned Date")),
           DataColumn(label: Text("Completed Date")),
+          DataColumn(label: Text("Doc")),
           DataColumn(
               label: Text("Action"),
               headingRowAlignment: MainAxisAlignment.center), // 11 columns
@@ -779,6 +781,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Completed Date")),
           DataColumn(label: Text("Bank Details")),
           DataColumn(label: Text("Payment Amount")),
+          DataColumn(label: Text("Doc")),
           DataColumn(
             label: Text("Action"),
             headingRowAlignment: MainAxisAlignment.center,
@@ -796,6 +799,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Assigned Date")),
           DataColumn(label: Text("Completed Date")),
           DataColumn(label: Text("Bank Details")),
+          DataColumn(label: Text("Doc")),
         ];
       case PromoteStatus.companyPaymentVerified:
         return const [
@@ -820,7 +824,7 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
           DataColumn(label: Text("Phone No")),
           DataColumn(label: Text("Notes")),
           DataColumn(label: Text("Assigned Date")),
-          DataColumn(label: Text("Completed Date")),
+          // DataColumn(label: Text("Completed Date")),
           DataColumn(label: Text("Bank Details")),
           DataColumn(label: Text("Payment Amount")),
           DataColumn(label: Text("Action")),
@@ -1120,17 +1124,21 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
   onCompanyPaymentVerified(model) {
     showActionConfirmationDialog(
       context: StackedService.navigatorKey!.currentContext!,
-      title: 'Company Payment Verified to Promote verified',
+      title: 'Company Payment Verified',
       confirmText: "Move",
+      image: "assets/images/pay.svg",
       message:
-          "Are you sure you want to move the ${model.subId} to the company payment verified section?",
-      icon: Icons.hourglass_top,
+          "Are you sure you want to move the ${model.subId} to the promote verified section?",
+      icon: Icons.free_cancellation,
       confirmColor: greenShade1,
-      onConfirm: () async {
-        await changeStatus({
+      previewImage: true,
+      onConfirm: (Uint8List? bytes, String? path) async {
+        final data = {
           "promote_project_id": model.subId,
           "status": 6,
-        });
+          if (bytes != null || path != null) "image": bytes ?? path,
+        };
+        await changeStatus(data);
       },
     );
   }

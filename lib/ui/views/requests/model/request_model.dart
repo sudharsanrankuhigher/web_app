@@ -294,6 +294,7 @@ class Payment {
   DateTime? paidDate;
   int? commission;
   String? bankDetails;
+  int? gstAmount;
 
   Payment({
     this.amount,
@@ -303,6 +304,7 @@ class Payment {
     this.commission,
     this.bankDetails,
     this.totalAmount,
+    this.gstAmount,
   });
 
   factory Payment.fromJson(Map<String, dynamic> json) => Payment(
@@ -319,6 +321,11 @@ class Payment {
         totalAmount: json["total_amount"] == null
             ? null
             : int.tryParse(json["total_amount"].toString()),
+        gstAmount: json["gst_amount"] != null
+            ? int.tryParse(json["gst_amount"].toString())
+            : (json["gst"] != null
+                ? int.tryParse(json["gst"].toString())
+                : null),
       );
 
   Map<String, dynamic> toJson() => {
@@ -329,6 +336,7 @@ class Payment {
         "bank_details": bankDetails,
         "note": note,
         "total_amount": totalAmount,
+        "gst_amount": gstAmount,
       };
 }
 
