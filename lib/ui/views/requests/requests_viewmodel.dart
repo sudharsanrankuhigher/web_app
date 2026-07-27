@@ -22,7 +22,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     // Moved to onViewModelReady in RequestsView
   }
   DateTime selectedMonth = DateTime.now();
-  String? _selectedString;
+  String? _selectedString = RequestStatus.requested.value;
   int _isSelected = 0;
   int get isSelected => _isSelected;
   String? get selectedString => _selectedString;
@@ -84,12 +84,18 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
     _isRequest = true;
     print(tabStatus.value);
     setBusy(true);
-    _selectedString = tabStatus.value;
 
     try {
       final formattedMonth = DateFormat('yyyy-MM').format(selectedMonth);
       final res = await _apiService.getClientRequest(tabStatus.apiCode,
           month: getAll ? null : formattedMonth);
+
+      // Prevent updating UI state if the user switched tabs during load
+      if (_isSelected != _tabs.indexOf(tabStatus)) {
+        print("Ignoring outdated response for ${tabStatus.value}");
+        return;
+      }
+
       requests = res.data ?? [];
       print("Total requests fetched: ${requests.length}");
       filteredData = requests.where((e) {
@@ -98,6 +104,7 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       }).toList();
 
       requests = filteredData;
+      _selectedString = tabStatus.value;
       tableSource = RequestTableSource(
         filteredData,
         tabStatus.value,
@@ -122,7 +129,13 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
 
       _isRequest = false;
     } catch (e) {
+      if (_isSelected != _tabs.indexOf(tabStatus)) {
+        print("Ignoring outdated catch block for ${tabStatus.value}");
+        return;
+      }
+
       requests = [];
+      _selectedString = tabStatus.value;
       tableSource = RequestTableSource(
         [],
         tabStatus.value,

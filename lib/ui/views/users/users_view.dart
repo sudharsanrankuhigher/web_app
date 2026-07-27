@@ -1,3 +1,4 @@
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stacked/stacked.dart';
@@ -43,7 +44,7 @@ class UsersView extends StackedView<UsersViewModel> {
                     padding: defaultPadding12,
                     child: InkWell(
                       onTap: () {
-                        viewModel.loadUsers(getAll: true);
+                        viewModel.loadUsers(getAll: true, ignoreState: true);
                       },
                       child: Container(
                           padding: defaultPadding8,
@@ -88,7 +89,8 @@ class UsersView extends StackedView<UsersViewModel> {
                         children: [
                           InkWell(
                             onTap: () {
-                              viewModel.loadUsers(getAll: true);
+                              viewModel.loadUsers(
+                                  getAll: true, ignoreState: true);
                             },
                             child: Container(
                                 padding: defaultPadding8,
@@ -133,6 +135,86 @@ class UsersView extends StackedView<UsersViewModel> {
                             onChanged: viewModel.searchUser,
                           ),
                         ),
+                        if (viewModel.isSuperAdmin)
+                          SizedBox(
+                            height: 48.h,
+                            width: isMobile ? screenWidth * 0.9 : 200,
+                            child: DropdownSearch<String>(
+                              selectedItem: viewModel.selectedState,
+                              items: (String filter, LoadProps? props) async {
+                                final search = filter
+                                    .trim()
+                                    .toLowerCase()
+                                    .replaceAll(' ', '');
+                                return viewModel.states.where((s) {
+                                  if (search.isEmpty) return true;
+                                  return s
+                                      .toLowerCase()
+                                      .replaceAll(' ', '')
+                                      .contains(search);
+                                }).toList();
+                              },
+                              dropdownBuilder: (context, selectedItem) =>
+                                  FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  selectedItem ?? "All",
+                                  style: fontFamilyMedium.size12.copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                ),
+                              ),
+                              popupProps: PopupProps.menu(
+                                showSearchBox: true,
+                                itemBuilder: (context, String item,
+                                    bool isSelected, bool _) {
+                                  return ListTile(
+                                    title: Text(item),
+                                    selected: isSelected,
+                                  );
+                                },
+                              ),
+                              decoratorProps: DropDownDecoratorProps(
+                                decoration: InputDecoration(
+                                  isDense: true,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 12,
+                                  ),
+                                  fillColor: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF334155)
+                                      : backgroundColor,
+                                  filled: true,
+                                  hintText: "Filter by State",
+                                  hintStyle: fontFamilyMedium.size12.greyColor,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.grey[700]!
+                                          : disableColor,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: const BorderSide(
+                                      color: Colors.blue,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  border: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                ),
+                              ),
+                              onChanged: viewModel.onStateChanged,
+                            ),
+                          ),
                         SizedBox(
                           width: isExtended ? 180 : null,
                           child: CommonButton(
@@ -210,6 +292,9 @@ class UsersView extends StackedView<UsersViewModel> {
 
   @override
   void onViewModelReady(UsersViewModel viewModel) {
+    if (viewModel.isSuperAdmin) {
+      viewModel.loadStates();
+    }
     viewModel.loadUsers();
     super.onViewModelReady(viewModel);
   }

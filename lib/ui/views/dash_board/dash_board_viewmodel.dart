@@ -397,7 +397,8 @@ class DashBoardViewModel extends BaseViewModel with NavigationMixin {
 
     final bytes = await pdf.save();
 
-    final blob = web.Blob([bytes.toJS].toJS, web.BlobPropertyBag(type: 'application/pdf'));
+    final blob = web.Blob(
+        [bytes.toJS].toJS, web.BlobPropertyBag(type: 'application/pdf'));
     final url = web.URL.createObjectURL(blob);
 
     web.window.open(url, "_blank");

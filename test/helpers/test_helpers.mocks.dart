@@ -1369,10 +1369,12 @@ class MockApiService extends _i1.Mock implements _i26.ApiService {
       ) as _i24.Future<dynamic>);
 
   @override
-  _i24.Future<_i8.InfluencerModel> getAllInfluencer() => (super.noSuchMethod(
+  _i24.Future<_i8.InfluencerModel> getAllInfluencer({dynamic data}) =>
+      (super.noSuchMethod(
         Invocation.method(
           #getAllInfluencer,
           [],
+          {#data: data},
         ),
         returnValue:
             _i24.Future<_i8.InfluencerModel>.value(_FakeInfluencerModel_6(
@@ -1380,6 +1382,7 @@ class MockApiService extends _i1.Mock implements _i26.ApiService {
           Invocation.method(
             #getAllInfluencer,
             [],
+            {#data: data},
           ),
         )),
         returnValueForMissingStub:
@@ -1388,6 +1391,7 @@ class MockApiService extends _i1.Mock implements _i26.ApiService {
           Invocation.method(
             #getAllInfluencer,
             [],
+            {#data: data},
           ),
         )),
       ) as _i24.Future<_i8.InfluencerModel>);

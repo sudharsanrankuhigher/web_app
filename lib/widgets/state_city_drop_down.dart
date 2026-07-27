@@ -13,7 +13,7 @@ class StateCityDropdown extends StatefulWidget {
   final String? initialCity;
   final Function(String) onStateChanged;
   final Function(String?)? onCityChanged;
-  final Function(String?)? onChangeId;
+  final Function(int?)? onChangeId;
   final String? Function(dynamic)? stateValidator;
   final String? Function(dynamic)? cityValidator;
   final bool? isCityError;
@@ -49,7 +49,7 @@ class _StateCityDropdownState extends State<StateCityDropdown> {
   List<String> states = [];
   String? selectedState;
   String? selectedCity;
-  String? selectedStateId;
+  int? selectedStateId;
 
   @override
   void initState() {

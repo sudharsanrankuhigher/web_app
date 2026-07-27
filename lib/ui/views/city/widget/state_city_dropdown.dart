@@ -11,7 +11,7 @@ class StateCityDropdownWidget extends StatefulWidget {
   final List<StateModel.Datum> states; // API states
   final bool showCity;
   final int? initialStateId;
-  final String? initialCityId;
+  final dynamic initialCityId;
   final String? initialCityName;
   final bool isStateError;
   final bool isCityError;
@@ -78,8 +78,8 @@ class _StateCityDropdownWidgetState extends State<StateCityDropdownWidget> {
     if (widget.initialCityId != null || widget.initialCityName != null) {
       // Search by ID first
       if (widget.initialCityId != null) {
-        selectedCity = allCities
-            .firstWhereOrNull((c) => c.id == widget.initialCityId.toString());
+        selectedCity = allCities.firstWhereOrNull(
+            (c) => c.id.toString() == widget.initialCityId.toString());
       }
 
       // If not found by ID or you want to select by city name

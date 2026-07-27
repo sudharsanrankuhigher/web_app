@@ -51,7 +51,15 @@ class CompanyDetailedTableSource extends DataTableSource {
             ),
             DataCell(
               Text(
-                data.fold<double>(0.0, (sum, item) => sum + (double.tryParse(item.companyTax?.toString() ?? '0') ?? 0.0)).toStringAsFixed(0),
+                data
+                    .fold<double>(
+                        0.0,
+                        (sum, item) =>
+                            sum +
+                            (double.tryParse(
+                                    item.companyTax?.toString() ?? '0') ??
+                                0.0))
+                    .toStringAsFixed(0),
                 style: fontFamilySemiBold.size13.black,
               ),
             ),

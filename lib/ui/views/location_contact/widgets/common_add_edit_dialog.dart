@@ -49,7 +49,7 @@ class _AddressDialogState extends State<AddressDialog> {
   List<String> selectedCities = []; // 🔥 NEW
   bool isHeadoffice = false; // 🔥 NEW
 
-  String? selectedId;
+  dynamic selectedId;
 
   bool isStateError = false;
   bool isCityError = false;
@@ -115,13 +115,13 @@ class _AddressDialogState extends State<AddressDialog> {
           ? null
           : cities.firstWhere(
               (c) => c.name == selectedCity,
-              orElse: () => CityModel(id: '', name: '', state: ''),
+              orElse: () => CityModel(id: 0, name: '', state: ''),
             );
 
       /// 🔥 CALLBACK
       widget.onSave!(
         state: selectedState!,
-        city: cityModel ?? CityModel(id: '', name: '', state: ''),
+        city: cityModel ?? CityModel(id: 0, name: '', state: ''),
         phone: _phoneController.text.trim(),
         isHeadoffice: isHeadoffice,
       );

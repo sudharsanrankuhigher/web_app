@@ -169,7 +169,9 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
       "service_ids": request["selectedServiceIds"],
       "state": request["state"],
       "cities": request["cities"],
-      "gender": request["gender"].toLowerCase(),
+      "gender": request["gender"].toString().toLowerCase() == 'both'
+          ? 'other'
+          : request["gender"].toString().toLowerCase(),
       "inf_ids": request["selectedInfluencerIds"],
       "payment": [
         {

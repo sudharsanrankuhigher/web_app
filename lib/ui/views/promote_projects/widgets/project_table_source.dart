@@ -70,17 +70,17 @@ class PromoteProjectsTableSource extends DataTableSource {
     return [
       _textCell('${index + 1}'),
       DataCell(
-        vm.isDialogOpen
-            ? Container(
-                padding: const EdgeInsets.all(4),
-              )
-            : OverlappingAvatars(
-                imageUrls: item.influencers!
-                    .map<String>((e) => e.image ?? '')
-                    .toList(),
-                maxVisible: 2,
-                size: 34,
-              ),
+        // vm.isDialogOpen
+        //     ? Container(
+        //         padding: const EdgeInsets.all(4),
+        //       )
+        //     :
+        OverlappingAvatars(
+          imageUrls:
+              item.influencers!.map<String>((e) => e.image ?? '').toList(),
+          maxVisible: 2,
+          size: 34,
+        ),
       ),
       _textCell(item.projectCode),
       _textCell(item.companyName),

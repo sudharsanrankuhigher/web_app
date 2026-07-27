@@ -44,8 +44,7 @@ class WebImageTwo extends StatelessWidget {
   }
 
   static String _sanitizeUrl(String url) {
-    if (web.window.location.protocol == 'https:' &&
-        url.startsWith('http://')) {
+    if (web.window.location.protocol == 'https:' && url.startsWith('http://')) {
       return url.replaceFirst('http://', 'https://');
     }
     return url;

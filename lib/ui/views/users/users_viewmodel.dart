@@ -1,12 +1,16 @@
 import 'dart:developer';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/app.locator.dart';
+import 'package:webapp/core/model/cities_model.dart';
 import 'package:webapp/core/model/get_user_model.dart' as user_model;
 import 'package:webapp/core/navigation/navigation_mixin.dart';
 import 'package:webapp/services/api_service.dart';
+import 'package:webapp/services/profile_service.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/users/widgets/common_user_dialog.dart';
@@ -44,14 +48,51 @@ class UsersViewModel extends BaseViewModel with NavigationMixin {
     notifyListeners();
   }
 
+  bool get isSuperAdmin => ProfileService.instance.roleId == '1';
+
+  List<String> states = ["All"];
+  String selectedState = "All";
+
+  Future<void> loadStates() async {
+    try {
+      final String data =
+          await rootBundle.loadString('assets/json/cities.json');
+      final List jsonData = json.decode(data);
+      final List<CityModel> cities =
+          jsonData.map((e) => CityModel.fromJson(e)).toList();
+      final uniqueStates = cities.map((e) => e.state).toSet().toList();
+      uniqueStates.sort();
+      states = ["All", ...uniqueStates];
+      notifyListeners();
+    } catch (e) {
+      log('Error loading states: $e');
+    }
+  }
+
+  void onStateChanged(String? state) {
+    if (state != null) {
+      selectedState = state;
+      loadUsers(getAll: true);
+    }
+  }
+
   // ---------------- Load Users ----------------
-  Future<void> loadUsers({bool getAll = false}) async {
+  Future<void> loadUsers(
+      {bool getAll = false, bool ignoreState = false}) async {
     setBusy(true);
 
+    if (ignoreState) {
+      selectedState = "All";
+    }
+
     try {
-      final data = {
+      final data = <String, dynamic>{
         "month": getAll ? null : DateFormat('yyyy-MM').format(selectedMonth),
       };
+
+      if (isSuperAdmin && !ignoreState) {
+        data["state"] = selectedState;
+      }
 
       final res = await _apiService.getUsers(data: data);
       users = res.data ?? [];

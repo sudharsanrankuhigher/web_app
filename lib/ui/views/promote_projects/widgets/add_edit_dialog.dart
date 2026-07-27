@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webapp/core/helper/dialog_state.dart';
+import 'package:webapp/core/helper/permission_helper.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/promote_projects/model/promote_project_model.dart'
@@ -265,7 +266,8 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
     commPercentCtrl.addListener(_calculateValues);
 
     final rawGender = widget.model.gender ?? "Male";
-    if (rawGender.toLowerCase() == 'both') {
+    if (rawGender.toLowerCase() == 'both' ||
+        rawGender.toLowerCase() == 'other') {
       gender = 'Both';
     } else if (rawGender.toLowerCase() == 'female') {
       gender = 'Female';
@@ -461,7 +463,10 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                         ),
                         Row(
                           children: [
-                            if (isView && widget.model.isEditable != 0)
+                            if (isView &&
+                                widget.model.isEditable != 0 &&
+                                PermissionHelper.instance
+                                    .canEdit('promotion_projects'))
                               TextButton.icon(
                                 style: TextButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(
@@ -481,7 +486,10 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                   });
                                 },
                               ),
-                            if (isView && widget.model.isEditable == 0)
+                            if (isView &&
+                                widget.model.isEditable == 0 &&
+                                PermissionHelper.instance
+                                    .canEdit('promotion_projects'))
                               IconButton(
                                 icon: const Icon(Icons.edit),
                                 onPressed: () {

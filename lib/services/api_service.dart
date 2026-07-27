@@ -78,9 +78,9 @@ class ApiService {
 
     final dio = Dio(
       BaseOptions(
-        // baseUrl: 'https://admin.promoteapp.in/',
+        baseUrl: 'https://admin.promoteapp.in/',
         // baseUrl: 'http://172.20.25.23:8003/', //saran
-        baseUrl: 'http://172.20.25.55:8888/', //shy
+        // baseUrl: 'http://172.20.25.55:8888/', //shy
         // baseUrl: 'http://172.20.25.23:8002/',
         // baseUrl: 'http://172.20.25.54:8005/',//deepak
         followRedirects: true,
@@ -750,8 +750,9 @@ class ApiService {
   }
 
   /// GET: /api/admin/get-all-plan
-  Future<influencer_model.InfluencerModel> getAllInfluencer() async {
-    final response = await _dio.get('api/admin/get-all-influencer');
+  Future<influencer_model.InfluencerModel> getAllInfluencer({data}) async {
+    final response =
+        await _dio.post('api/admin/get-all-influencer', data: data);
     if (response.statusCode == 200) {
       // Fluttertoast.showToast(msg: response.data["message"].toString());
 

@@ -1,10 +1,14 @@
 import 'package:dio/dio.dart';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:webapp/app/app.locator.dart';
+import 'package:webapp/core/model/cities_model.dart';
 import 'package:webapp/services/api_service.dart';
+import 'package:webapp/services/profile_service.dart';
 import 'package:webapp/ui/common/shared/styles.dart';
 import 'package:webapp/ui/common/shared/text_style_helpers.dart';
 import 'package:webapp/ui/views/influencers/model/influencers_model.dart'
@@ -40,6 +44,34 @@ class InfluencersViewModel extends BaseViewModel {
   bool? get isLoading => _isLoading;
 
   String selectedCategory = "All";
+
+  bool get isSuperAdmin => ProfileService.instance.roleId == '1';
+
+  List<String> states = ["All"];
+  String selectedState = "All";
+
+  Future<void> loadStates() async {
+    try {
+      final String data =
+          await rootBundle.loadString('assets/json/cities.json');
+      final List jsonData = json.decode(data);
+      final List<CityModel> cities =
+          jsonData.map((e) => CityModel.fromJson(e)).toList();
+      final uniqueStates = cities.map((e) => e.state).toSet().toList();
+      uniqueStates.sort();
+      states = ["All", ...uniqueStates];
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error loading states: $e');
+    }
+  }
+
+  void onStateChanged(String? state) {
+    if (state != null) {
+      selectedState = state;
+      loadInfluencers();
+    }
+  }
 
   Future<void> getServices() async {
     try {
@@ -265,12 +297,20 @@ class InfluencersViewModel extends BaseViewModel {
       []; // after filter (service/category)
   List<influencer_model.Datum> displayInfluencers = []; // after search + sort
 
-  Future<void> loadInfluencers() async {
+  Future<void> loadInfluencers({bool ignoreState = false}) async {
     setBusy(true);
     _setLoading(true);
 
+    if (ignoreState) {
+      selectedState = "All";
+    }
+
     try {
-      final res = await _apiService.getAllInfluencer();
+      final data = <String, dynamic>{};
+      if (isSuperAdmin && !ignoreState) {
+        data["state"] = selectedState;
+      }
+      final res = await _apiService.getAllInfluencer(data: data);
       influencers = res.data ?? [];
       filteredInfluencers = List.from(influencers);
       displayInfluencers = List.from(influencers);
@@ -640,6 +680,6 @@ class InfluencersViewModel extends BaseViewModel {
     filteredInfluencers = List.from(influencers);
     currentSearch = "";
     currentSort = "";
-    applySearchAndSort();
+    loadInfluencers(ignoreState: true);
   }
 }

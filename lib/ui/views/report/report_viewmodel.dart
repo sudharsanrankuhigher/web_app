@@ -332,7 +332,11 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
         }).toList();
 
         if (clientProjectDetailedList.isNotEmpty) {
-          final totalGST = clientProjectDetailedList.fold<double>(0.0, (sum, item) => sum + (double.tryParse(item.companyTax?.toString() ?? '0') ?? 0.0));
+          final totalGST = clientProjectDetailedList.fold<double>(
+              0.0,
+              (sum, item) =>
+                  sum +
+                  (double.tryParse(item.companyTax?.toString() ?? '0') ?? 0.0));
           rows.add([
             "",
             "",
@@ -366,7 +370,11 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
         }).toList();
 
         if (promoteProjectes!.isNotEmpty) {
-          final totalGST = promoteProjectes!.fold<double>(0.0, (sum, item) => sum + (double.tryParse(item.companyTax?.toString() ?? '0') ?? 0.0));
+          final totalGST = promoteProjectes!.fold<double>(
+              0.0,
+              (sum, item) =>
+                  sum +
+                  (double.tryParse(item.companyTax?.toString() ?? '0') ?? 0.0));
           rows.add([
             "",
             "",
@@ -547,7 +555,8 @@ class ReportViewModel extends BaseViewModel with NavigationMixin {
 
     final bytes = await pdf.save();
 
-    final blob = web.Blob([bytes.toJS].toJS, web.BlobPropertyBag(type: 'application/pdf'));
+    final blob = web.Blob(
+        [bytes.toJS].toJS, web.BlobPropertyBag(type: 'application/pdf'));
     final url = web.URL.createObjectURL(blob);
 
     web.window.open(url, "_blank");

@@ -103,8 +103,8 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
       }
 
       if (data['is_promote'] != null) {
-        formData.fields.add(
-            MapEntry("is_promote", (data['is_promote'] == true ? 1 : 0).toString()));
+        formData.fields.add(MapEntry(
+            "is_promote", (data['is_promote'] == true ? 1 : 0).toString()));
       }
 
       if (data["inf_id"] != null) {
@@ -123,7 +123,8 @@ class BannerViewModel extends BaseViewModel with NavigationMixin {
       } else {
         formData.fields.add(const MapEntry("inf_id", ""));
       }
-      formData.fields.add(MapEntry("amount", (data['amount'] ?? "").toString()));
+      formData.fields
+          .add(MapEntry("amount", (data['amount'] ?? "").toString()));
       formData.fields
           .add(MapEntry("start_date", data['start_date'].toString()));
       formData.fields.add(MapEntry("end_date", data['end_date'].toString()));
