@@ -253,25 +253,38 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                     ),
                                   ],
                                 ),
-                                if (viewModel.roleId == "1")
-                                  InkWell(
-                                    onTap: () => viewModel.splitAmount(context),
-                                    child: RichText(
-                                        text: TextSpan(children: [
-                                      const WidgetSpan(
-                                          child: Icon(Icons.splitscreen)),
-                                      WidgetSpan(
-                                          child: Center(
-                                        child: Container(
-                                          child: Text(
-                                            'Split Amount',
-                                            style:
-                                                fontFamilyMedium.size14.black,
-                                          ),
-                                        ),
-                                      ))
-                                    ])),
-                                  )
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.refresh),
+                                      tooltip: 'Refresh',
+                                      onPressed: () =>
+                                          viewModel.refreshProjectDetails(),
+                                    ),
+                                    if (viewModel.roleId == "1") ...[
+                                      horizontalSpacing10,
+                                      InkWell(
+                                        onTap: () =>
+                                            viewModel.splitAmount(context),
+                                        child: RichText(
+                                            text: TextSpan(children: [
+                                          const WidgetSpan(
+                                              child: Icon(Icons.splitscreen)),
+                                          WidgetSpan(
+                                              child: Center(
+                                            child: Container(
+                                              child: Text(
+                                                'Split Amount',
+                                                style: fontFamilyMedium
+                                                    .size14.black,
+                                              ),
+                                            ),
+                                          ))
+                                        ])),
+                                      ),
+                                    ],
+                                  ],
+                                )
                               ],
                             ),
                           ),

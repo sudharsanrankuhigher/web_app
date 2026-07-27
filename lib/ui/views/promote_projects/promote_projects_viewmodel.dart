@@ -900,6 +900,13 @@ class PromoteProjectsViewModel extends BaseViewModel with NavigationMixin {
     notifyListeners();
   }
 
+  Future<void> refreshProjectDetails() async {
+    if (_selectedProjectId != null) {
+      await getPaymentList();
+    }
+    await setChipSelected(_isChipSelected);
+  }
+
   Future<void> getPaymentList() async {
     try {
       final res = await runBusyFuture(
