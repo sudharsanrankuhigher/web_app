@@ -153,8 +153,8 @@ class _StateCityDynamicDropdownState extends State<StateCityDynamicDropdown> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     fillColor: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white.withOpacity(0.1)
-                        : Colors.white.withOpacity(0.5),
+                        ? Colors.white.withValues(alpha: 0.1)
+                        : Colors.white.withValues(alpha: 0.5),
                     filled: true,
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 10),
@@ -207,8 +207,8 @@ class _StateCityDynamicDropdownState extends State<StateCityDynamicDropdown> {
                             ),
                             fillColor:
                                 Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white.withOpacity(0.1)
-                                    : Colors.white.withOpacity(0.5),
+                                    ? Colors.white.withValues(alpha: 0.1)
+                                    : Colors.white.withValues(alpha: 0.5),
                             filled: true,
                             contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 10),
@@ -229,8 +229,8 @@ class _StateCityDynamicDropdownState extends State<StateCityDynamicDropdown> {
                             ),
                             fillColor:
                                 Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white.withOpacity(0.1)
-                                    : Colors.white.withOpacity(0.5),
+                                    ? Colors.white.withValues(alpha: 0.1)
+                                    : Colors.white.withValues(alpha: 0.5),
                             filled: true,
                             contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 10),
@@ -279,8 +279,8 @@ class _StateCityDynamicDropdownState extends State<StateCityDynamicDropdown> {
                               ),
                               fillColor: Theme.of(context).brightness ==
                                       Brightness.dark
-                                  ? Colors.white.withOpacity(0.1)
-                                  : Colors.white.withOpacity(0.7),
+                                  ? Colors.white.withValues(alpha: 0.1)
+                                  : Colors.white.withValues(alpha: 0.7),
                               filled: true,
                               contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 10),
@@ -322,14 +322,14 @@ class _StateCityDynamicDropdownState extends State<StateCityDynamicDropdown> {
             border: OutlineInputBorder(
               borderSide: BorderSide(
                 color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white.withOpacity(0.2)
-                    : Colors.white.withOpacity(0.7),
+                    ? Colors.white.withValues(alpha: 0.2)
+                    : Colors.white.withValues(alpha: 0.7),
               ),
               borderRadius: BorderRadius.circular(6),
             ),
             fillColor: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white.withOpacity(0.1)
-                : Colors.white.withOpacity(0.7),
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.white.withValues(alpha: 0.7),
             filled: true,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 12, vertical: 10),

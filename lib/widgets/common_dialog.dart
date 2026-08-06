@@ -111,7 +111,8 @@ class CommonFilterDialog extends StatelessWidget {
       context: context,
       barrierDismissible: false,
       barrierLabel: "Filter",
-      barrierColor: Colors.black.withOpacity(0.3), // semi-transparent overlay
+      barrierColor:
+          Colors.black.withValues(alpha: 0.3), // semi-transparent overlay
       pageBuilder: (_, __, ___) {
         return Center(
           child: CommonFilterDialog(

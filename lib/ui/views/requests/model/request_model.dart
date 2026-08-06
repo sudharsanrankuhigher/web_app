@@ -45,6 +45,7 @@ class Datum {
   int? id;
   String? projectId;
   bool? revertStatus;
+  int? connection;
   String? remark;
   String? image;
   Client? client;
@@ -64,6 +65,7 @@ class Datum {
     this.projectId,
     this.revertStatus,
     this.remark,
+    this.connection,
     this.image,
     this.client,
     this.inf,
@@ -82,6 +84,9 @@ class Datum {
         id: json["id"],
         projectId: json["project_id"],
         revertStatus: json["revert_status"],
+        connection: json["connection"] == null
+            ? null
+            : int.tryParse(json["connection"].toString()),
         remark: json["remark"]?.toString(),
         image: json["image"]?.toString(),
         client: json["client"] == null ? null : Client.fromJson(json["client"]),
@@ -111,6 +116,7 @@ class Datum {
         "project_id": projectId,
         "revert_status": revertStatus,
         "remark": remark,
+        "connection": connection,
         "image": image,
         "client": client?.toJson(),
         "inf": inf?.toJson(),

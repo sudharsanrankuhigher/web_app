@@ -82,7 +82,8 @@ class CommonServiceDialog {
                               },
                             ),
                             Icon(Icons.cloud_upload,
-                                size: 30, color: Colors.black.withOpacity(0.7))
+                                size: 30,
+                                color: Colors.black.withValues(alpha: 0.7))
                           ],
                         ),
                       ),

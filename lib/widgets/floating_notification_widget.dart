@@ -196,21 +196,21 @@ class _FloatingNotificationWidgetState extends State<FloatingNotificationWidget>
                       gradient: LinearGradient(
                         colors: [
                           continueButton, // Color(0xFF2B5CFF)
-                          continueButton.withOpacity(0.85),
+                          continueButton.withValues(alpha: 0.85),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: continueButton.withOpacity(0.4),
+                          color: continueButton.withValues(alpha: 0.4),
                           blurRadius: 15,
                           spreadRadius: 2,
                           offset: const Offset(0, 6),
                         ),
                       ],
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.4),
+                        color: Colors.white.withValues(alpha: 0.4),
                         width: 1.5,
                       ),
                     ),
@@ -261,7 +261,8 @@ class _FloatingNotificationWidgetState extends State<FloatingNotificationWidget>
                             borderRadius: BorderRadius.circular(10),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFFFF416C).withOpacity(0.3),
+                                color: const Color(0xFFFF416C)
+                                    .withValues(alpha: 0.3),
                                 blurRadius: 4,
                                 spreadRadius: 1,
                                 offset: const Offset(0, 2),

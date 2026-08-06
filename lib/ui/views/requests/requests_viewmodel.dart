@@ -999,6 +999,10 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
   }
 
   onRevoke(request_model.Datum model) {
+    if (model.connection == null || model.connection == 0) {
+      Fluttertoast.showToast(msg: "Cannot Revoke this request connection is 0");
+      return;
+    }
     showActionConfirmationDialog(
       context: StackedService.navigatorKey!.currentContext!,
       title: 'Revoke',
@@ -1019,6 +1023,11 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
   }
 
   onReAssign(request_model.Datum model) async {
+    if (model.connection == null || model.connection == 0) {
+      Fluttertoast.showToast(
+          msg: "Cannot Reassign this request connection is 0");
+      return;
+    }
     final selected = await showReassignInfluencerDialog(
         context: StackedService.navigatorKey!.currentContext!,
         influencers: influencers,

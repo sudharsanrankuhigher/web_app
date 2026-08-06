@@ -25,7 +25,7 @@ class SuccessDialog extends StatelessWidget {
       onWillPop: () async => false,
       child: Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        backgroundColor: backgroundColor.withOpacity(0.7),
+        backgroundColor: backgroundColor.withValues(alpha: 0.7),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

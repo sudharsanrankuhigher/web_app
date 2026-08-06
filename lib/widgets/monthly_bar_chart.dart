@@ -30,10 +30,11 @@ class MonthlyBarChart extends StatelessWidget {
 
     // Subtly styled axis text and line borders
     final axisTitleStyle = fontFamilyMedium.size10.copyWith(
-      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
     );
-    final gridLineColor =
-        isDark ? Colors.grey.withOpacity(0.2) : Colors.grey.withOpacity(0.4);
+    final gridLineColor = isDark
+        ? Colors.grey.withValues(alpha: 0.2)
+        : Colors.grey.withValues(alpha: 0.4);
 
     return Container(
       padding: defaultPadding12,
@@ -165,7 +166,7 @@ class MonthlyBarChart extends StatelessWidget {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurface
-                        .withOpacity(0.7),
+                        .withValues(alpha: 0.7),
                   ),
                   children: [
                     TextSpan(

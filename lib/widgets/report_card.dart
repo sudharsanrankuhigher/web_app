@@ -55,7 +55,8 @@ class ReportCard extends StatelessWidget {
                     width: 50,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
-                        color: currencyColor ?? cardColor.withOpacity(0.1)),
+                        color:
+                            currencyColor ?? cardColor.withValues(alpha: 0.1)),
                     padding: defaultPadding8,
                     child: Center(child: SvgPicture.asset(asset!)),
                   )
@@ -71,7 +72,7 @@ class ReportCard extends StatelessWidget {
                   },
                   Text("${subtitle!}% last month",
                       style: fontFamilyMedium.size12
-                          .copyWith(color: subText.withOpacity(0.60))),
+                          .copyWith(color: subText.withValues(alpha: 0.60))),
                 ],
               ),
             ],

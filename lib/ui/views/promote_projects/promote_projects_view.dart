@@ -542,12 +542,12 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                 color: Theme.of(context)
                                     .colorScheme
                                     .secondaryContainer
-                                    .withOpacity(0.2),
+                                    .withValues(alpha: 0.2),
                                 border: Border.all(
                                   color: Theme.of(context)
                                       .colorScheme
                                       .secondary
-                                      .withOpacity(0.3),
+                                      .withValues(alpha: 0.3),
                                 ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -595,9 +595,9 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                                   horizontal: 16, vertical: 12),
                               margin: const EdgeInsets.only(bottom: 12),
                               decoration: BoxDecoration(
-                                color: appGreen400.withOpacity(0.1),
+                                color: appGreen400.withValues(alpha: 0.1),
                                 border: Border.all(
-                                  color: appGreen400.withOpacity(0.4),
+                                  color: appGreen400.withValues(alpha: 0.4),
                                 ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -659,7 +659,7 @@ class PromoteProjectsView extends StackedView<PromoteProjectsViewModel> {
                   ),
                   if (viewModel.isRequest == true)
                     Container(
-                      color: grey.withOpacity(0.1),
+                      color: grey.withValues(alpha: 0.1),
                     ),
                 ],
               ));

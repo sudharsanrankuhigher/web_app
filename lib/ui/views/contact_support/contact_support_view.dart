@@ -95,7 +95,7 @@ class ContactSupportView extends StackedView<ContactSupportViewModel> {
                             border: Border.all(
                               color: Theme.of(context)
                                   .dividerColor
-                                  .withOpacity(0.3),
+                                  .withValues(alpha: 0.3),
                             ),
                             borderRadius: BorderRadius.circular(12),
                             color: Theme.of(context).colorScheme.surface,

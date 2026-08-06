@@ -78,10 +78,10 @@ class ApiService {
 
     final dio = Dio(
       BaseOptions(
-        baseUrl: 'https://admin.promoteapp.in/',
+        // baseUrl: 'https://admin.promoteapp.in/',
         // baseUrl: 'http://172.20.25.23:8003/', //saran
         // baseUrl: 'http://172.20.25.55:8888/', //shy
-        // baseUrl: 'http://172.20.25.23:8002/',
+        baseUrl: 'http://172.20.25.23:8002/',
         // baseUrl: 'http://172.20.25.54:8005/',//deepak
         followRedirects: true,
         validateStatus: (status) => status != null && status < 500,
@@ -93,7 +93,6 @@ class ApiService {
         onRequest: (options, handler) {
           final prefs = locator<SharedPreferences>();
           final token = prefs.getString('accessToken');
-
           if (token != null && token.isNotEmpty) {
             log('Adding Authorization header with token: $token');
             options.headers['Authorization'] = 'Bearer $token';

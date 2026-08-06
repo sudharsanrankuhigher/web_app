@@ -105,13 +105,13 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: isDark
-                              ? Colors.white.withOpacity(0.05)
-                              : Colors.grey.withOpacity(0.12),
+                              ? Colors.white.withValues(alpha: 0.05)
+                              : Colors.grey.withValues(alpha: 0.12),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color:
-                                Colors.black.withOpacity(isDark ? 0.25 : 0.04),
+                            color: Colors.black
+                                .withValues(alpha: isDark ? 0.25 : 0.04),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -249,8 +249,8 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                                         color: isSelected
                                                             ? continueButton
                                                             : Colors.grey
-                                                                .withOpacity(
-                                                                    0.3),
+                                                                .withValues(
+                                                                    alpha: 0.3),
                                                       ),
                                                       borderRadius:
                                                           BorderRadius.circular(
@@ -294,7 +294,8 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                         horizontal: 12, vertical: 8),
                                     decoration: BoxDecoration(
                                       border: Border.all(
-                                          color: Colors.grey.withOpacity(0.3)),
+                                          color: Colors.grey
+                                              .withValues(alpha: 0.3)),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Row(
@@ -366,7 +367,8 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                       horizontal: 12, vertical: 8),
                                   decoration: BoxDecoration(
                                     border: Border.all(
-                                        color: Colors.grey.withOpacity(0.3)),
+                                        color:
+                                            Colors.grey.withValues(alpha: 0.3)),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Row(
@@ -412,7 +414,8 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10),
                                       borderSide: BorderSide(
-                                          color: Colors.grey.withOpacity(0.3)),
+                                          color: Colors.grey
+                                              .withValues(alpha: 0.3)),
                                     ),
                                   ),
                                   items: viewModel.states.map((s) {
@@ -751,7 +754,8 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 12, vertical: 6),
                                         decoration: BoxDecoration(
-                                          color: appGreen600.withOpacity(0.12),
+                                          color: appGreen600.withValues(
+                                              alpha: 0.12),
                                           borderRadius:
                                               BorderRadius.circular(8),
                                         ),
@@ -808,7 +812,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                     ),
                                     verticalSpacing12,
                                     ClientProjectInfoCard(
-                                      boxColor: pending.withOpacity(0.10),
+                                      boxColor: pending.withValues(alpha: 0.10),
                                       dotColor: pending,
                                       text: "Pending",
                                       textColor: isDark
@@ -820,7 +824,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                           isDark ? Colors.white : Colors.black,
                                     ),
                                     ClientProjectInfoCard(
-                                      boxColor: onGoing.withOpacity(0.10),
+                                      boxColor: onGoing.withValues(alpha: 0.10),
                                       dotColor: onGoing,
                                       text: "Ongoing",
                                       textColor: isDark
@@ -832,7 +836,8 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                           isDark ? Colors.white : Colors.black,
                                     ),
                                     ClientProjectInfoCard(
-                                      boxColor: greenShade1.withOpacity(0.10),
+                                      boxColor:
+                                          greenShade1.withValues(alpha: 0.10),
                                       dotColor: greenShade1,
                                       text: "Completed",
                                       textColor: isDark
@@ -844,8 +849,8 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                           isDark ? Colors.white : Colors.black,
                                     ),
                                     ClientProjectInfoCard(
-                                      boxColor:
-                                          monthlyProjects.withOpacity(0.10),
+                                      boxColor: monthlyProjects.withValues(
+                                          alpha: 0.10),
                                       dotColor: monthlyProjects,
                                       text: "Monthly Project",
                                       textColor: isDark
@@ -881,8 +886,8 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                     ),
                                     verticalSpacing12,
                                     ClientProjectInfoCard(
-                                      boxColor:
-                                          publisButtonColor.withOpacity(0.10),
+                                      boxColor: publisButtonColor.withValues(
+                                          alpha: 0.10),
                                       dotColor: publisButtonColor,
                                       text: "In Progress",
                                       textColor: isDark
@@ -894,7 +899,8 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                           isDark ? Colors.white : Colors.black,
                                     ),
                                     ClientProjectInfoCard(
-                                      boxColor: appGreen400.withOpacity(0.10),
+                                      boxColor:
+                                          appGreen400.withValues(alpha: 0.10),
                                       dotColor: appGreen400,
                                       text: "Completed",
                                       textColor: isDark
@@ -906,8 +912,8 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
                                           isDark ? Colors.white : Colors.black,
                                     ),
                                     ClientProjectInfoCard(
-                                      boxColor:
-                                          continueButton.withOpacity(0.10),
+                                      boxColor: continueButton.withValues(
+                                          alpha: 0.10),
                                       dotColor: continueButton,
                                       text: "Monthly Project",
                                       textColor: isDark
@@ -961,12 +967,12 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.05)
-              : Colors.grey.withOpacity(0.12),
+              ? Colors.white.withValues(alpha: 0.05)
+              : Colors.grey.withValues(alpha: 0.12),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.25 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.04),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -989,7 +995,7 @@ class DashBoardView extends StackedView<DashBoardViewModel> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: color, size: 18),

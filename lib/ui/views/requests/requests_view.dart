@@ -414,7 +414,7 @@ class RequestsView extends StackedView<RequestsViewModel> {
           ),
           if (viewModel.isRequest == true)
             Container(
-              color: grey.withOpacity(0.1),
+              color: grey.withValues(alpha: 0.1),
             ),
         ],
       ),

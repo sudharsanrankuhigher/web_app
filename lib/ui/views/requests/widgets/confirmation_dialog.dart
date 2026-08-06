@@ -19,7 +19,7 @@ Future<void> showRejectConfirmationDialog({
     context: context,
     barrierDismissible: false,
     barrierLabel: "reject",
-    barrierColor: Colors.black.withOpacity(0.5),
+    barrierColor: Colors.black.withValues(alpha: 0.5),
     transitionDuration: const Duration(milliseconds: 250),
     pageBuilder: (_, __, ___) {
       return const SizedBox.shrink();
@@ -49,7 +49,7 @@ Future<void> showRejectConfirmationDialog({
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.12),
+                          color: Colors.red.withValues(alpha: 0.12),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -146,7 +146,7 @@ Future<void> showActionConfirmationDialog({
     context: context,
     barrierDismissible: false,
     barrierLabel: confirmText,
-    barrierColor: Colors.black.withOpacity(0.5),
+    barrierColor: Colors.black.withValues(alpha: 0.5),
     transitionDuration: const Duration(milliseconds: 250),
     pageBuilder: (_, __, ___) => const SizedBox.shrink(),
     transitionBuilder: (context, animation, _, __) {
@@ -245,7 +245,7 @@ class _ActionConfirmationDialogContentState
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: widget.confirmColor.withOpacity(0.12),
+                    color: widget.confirmColor.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
                   child: (widget.image != null && widget.image!.isNotEmpty)
@@ -360,7 +360,7 @@ class _ActionConfirmationDialogContentState
                                 Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(11),
-                                    color: Colors.black.withOpacity(0.3),
+                                    color: Colors.black.withValues(alpha: 0.3),
                                   ),
                                 ),
                                 Center(
@@ -1169,7 +1169,7 @@ Future<void> showPaymentStatusDialog({
     context: context,
     barrierDismissible: false,
     barrierLabel: "Payment",
-    barrierColor: Colors.black.withOpacity(0.5),
+    barrierColor: Colors.black.withValues(alpha: 0.5),
     transitionDuration: const Duration(milliseconds: 250),
     pageBuilder: (_, __, ___) => const SizedBox.shrink(),
     transitionBuilder: (context, animation, _, __) {
@@ -1570,7 +1570,7 @@ void showImagePreviewDialog({
                 right: 8,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(

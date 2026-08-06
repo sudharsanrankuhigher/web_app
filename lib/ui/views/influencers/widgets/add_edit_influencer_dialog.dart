@@ -139,7 +139,8 @@ class _InfluencerDialogState extends State<InfluencerDialog> {
         TextEditingController(text: _safeString(inf?.youtubeName));
     facebookNameController =
         TextEditingController(text: _safeString(inf?.facebookName));
-    descriptionController = TextEditingController();
+    descriptionController =
+        TextEditingController(text: _safeString(inf?.description));
     isCategoryError = false;
 
     // inf.category is int (from previous screen)

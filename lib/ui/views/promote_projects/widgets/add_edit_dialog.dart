@@ -635,7 +635,8 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                                                         decoration:
                                                             BoxDecoration(
                                                           color: Colors.black
-                                                              .withOpacity(0.6),
+                                                              .withValues(
+                                                                  alpha: 0.6),
                                                           shape:
                                                               BoxShape.circle,
                                                         ),

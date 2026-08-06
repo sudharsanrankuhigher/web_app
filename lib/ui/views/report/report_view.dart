@@ -412,7 +412,8 @@ class ReportView extends StackedView<ReportViewModel> {
                           key: const ValueKey("promote"),
 
                           headingTextStyle: fontFamilySemiBold.size12.greyColor,
-                          heddingRowColor: publisButtonColor.withOpacity(0.5),
+                          heddingRowColor:
+                              publisButtonColor.withValues(alpha: 0.5),
                           columns: viewModel.promoteProjectDetails,
                           source: viewModel.companyDetailedTableSource!,
                           rowsperPage:

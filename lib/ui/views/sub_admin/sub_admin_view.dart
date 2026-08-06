@@ -209,7 +209,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
           GestureDetector(
             onTap: () => viewModel.closeProfilePanel(),
             child: Container(
-              color: Colors.black.withOpacity(0.4),
+              color: Colors.black.withValues(alpha: 0.4),
             ),
           ),
           // Right aligned sliding panel
@@ -222,14 +222,15 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                 color: Theme.of(context).colorScheme.surface,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
+                    color: Colors.black.withValues(alpha: 0.15),
                     blurRadius: 24,
                     offset: const Offset(-8, 0),
                   ),
                 ],
                 border: Border(
                   left: BorderSide(
-                    color: Theme.of(context).dividerColor.withOpacity(0.1),
+                    color:
+                        Theme.of(context).dividerColor.withValues(alpha: 0.1),
                     width: 1,
                   ),
                 ),
@@ -257,7 +258,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                             hoverColor: Theme.of(context)
                                 .colorScheme
                                 .error
-                                .withOpacity(0.08),
+                                .withValues(alpha: 0.08),
                           ),
                         ],
                       ),
@@ -281,12 +282,13 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                     color: Theme.of(context)
                                         .colorScheme
                                         .primary
-                                        .withOpacity(0.15),
+                                        .withValues(alpha: 0.15),
                                     width: 4,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.06),
+                                      color:
+                                          Colors.black.withValues(alpha: 0.06),
                                       blurRadius: 12,
                                       offset: const Offset(0, 4),
                                     ),
@@ -344,7 +346,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                 color: Theme.of(context)
                                     .colorScheme
                                     .primary
-                                    .withOpacity(0.1),
+                                    .withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
@@ -368,7 +370,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                   color: Theme.of(context)
                                       .colorScheme
                                       .onSurface
-                                      .withOpacity(0.6),
+                                      .withValues(alpha: 0.6),
                                 ),
                                 const SizedBox(width: 8),
                                 Flexible(
@@ -381,7 +383,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                       color: Theme.of(context)
                                           .colorScheme
                                           .onSurface
-                                          .withOpacity(0.7),
+                                          .withValues(alpha: 0.7),
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -407,7 +409,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: Colors.blue.withOpacity(0.1),
+                                    color: Colors.blue.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: const Text(
@@ -435,7 +437,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                       border: Border.all(
                                         color: Theme.of(context)
                                             .dividerColor
-                                            .withOpacity(0.3),
+                                            .withValues(alpha: 0.3),
                                       ),
                                       borderRadius: BorderRadius.circular(8),
                                       color:
@@ -485,7 +487,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                         border: Border.all(
                                           color: Theme.of(context)
                                               .dividerColor
-                                              .withOpacity(0.3),
+                                              .withValues(alpha: 0.3),
                                         ),
                                         borderRadius: BorderRadius.circular(8),
                                         color: Theme.of(context)
@@ -512,7 +514,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .onSurface
-                                                .withOpacity(0.6),
+                                                .withValues(alpha: 0.6),
                                           ),
                                         ],
                                       ),
@@ -543,7 +545,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                       color: Theme.of(context)
                                           .colorScheme
                                           .onSurface
-                                          .withOpacity(0.3),
+                                          .withValues(alpha: 0.3),
                                     ),
                                     const SizedBox(height: 10),
                                     Text(
@@ -552,7 +554,7 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                         color: Theme.of(context)
                                             .colorScheme
                                             .onSurface
-                                            .withOpacity(0.5),
+                                            .withValues(alpha: 0.5),
                                       ),
                                     ),
                                   ],
@@ -577,12 +579,12 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                       border: Border.all(
                                         color: Theme.of(context)
                                             .dividerColor
-                                            .withOpacity(0.12),
+                                            .withValues(alpha: 0.12),
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color:
-                                              Colors.black.withOpacity(0.015),
+                                          color: Colors.black
+                                              .withValues(alpha: 0.015),
                                           blurRadius: 6,
                                           offset: const Offset(0, 3),
                                         ),
@@ -626,11 +628,13 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                                         'Login',
                                                         style: TextStyle(
                                                           fontSize: 11,
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .colorScheme
-                                                              .onSurface
-                                                              .withOpacity(0.5),
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .onSurface
+                                                                  .withValues(
+                                                                      alpha:
+                                                                          0.5),
                                                         ),
                                                       ),
                                                       Text(
@@ -664,11 +668,13 @@ class SubAdminView extends StackedView<SubAdminViewModel> {
                                                         'Logout',
                                                         style: TextStyle(
                                                           fontSize: 11,
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .colorScheme
-                                                              .onSurface
-                                                              .withOpacity(0.5),
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .onSurface
+                                                                  .withValues(
+                                                                      alpha:
+                                                                          0.5),
                                                         ),
                                                       ),
                                                       Text(

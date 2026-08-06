@@ -31,15 +31,15 @@ class CommonCountBox extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
             gradient: LinearGradient(
               colors: [
-                color.withOpacity(0.9),
-                color.withOpacity(0.6),
+                color.withValues(alpha: 0.9),
+                color.withValues(alpha: 0.6),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.25),
+                color: color.withValues(alpha: 0.25),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -54,7 +54,7 @@ class CommonCountBox extends StatelessWidget {
               Text(
                 title,
                 style: fontFamilySemiBold.size16
-                    .copyWith(color: Colors.white.withOpacity(0.8)),
+                    .copyWith(color: Colors.white.withValues(alpha: 0.8)),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),

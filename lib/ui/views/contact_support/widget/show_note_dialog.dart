@@ -128,7 +128,7 @@ Future<void> showBulkDeleteDialog({
     context: context,
     barrierDismissible: false,
     barrierLabel: "BulkDelete",
-    barrierColor: Colors.black.withOpacity(0.5),
+    barrierColor: Colors.black.withValues(alpha: 0.5),
     transitionDuration: const Duration(milliseconds: 250),
     pageBuilder: (_, __, ___) {
       return const SizedBox.shrink();
@@ -158,7 +158,7 @@ Future<void> showBulkDeleteDialog({
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.12),
+                          color: Colors.red.withValues(alpha: 0.12),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(

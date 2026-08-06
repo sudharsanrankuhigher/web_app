@@ -74,7 +74,7 @@ class DashBoardCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
                         color: (resolvedTextColor ?? cardColor)
-                            .withOpacity(isDark ? 0.15 : 0.08),
+                            .withValues(alpha: isDark ? 0.15 : 0.08),
                       ),
                       padding: defaultPadding8,
                       child: Center(
@@ -94,8 +94,10 @@ class DashBoardCard extends StatelessWidget {
               Text(
                 subtitle!,
                 style: fontFamilyMedium.size12.copyWith(
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.6),
                 ),
               ),
             ],

@@ -35,7 +35,7 @@ class InfoSalesProjectCard extends StatelessWidget {
 
     // Smooth translucent or themed background for the icon container
     final resolvedIconBgColor =
-        isDark ? resolvedIconColor.withOpacity(0.15) : iconBgColor;
+        isDark ? resolvedIconColor.withValues(alpha: 0.15) : iconBgColor;
 
     return Container(
       padding: const EdgeInsets.all(12),

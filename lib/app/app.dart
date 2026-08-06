@@ -33,35 +33,7 @@ import 'package:webapp/ui/views/notifications/notifications_view.dart';
 
 // @stacked-import
 @StackedApp(
-  routes: [
-    MaterialRoute(
-      page: HomeView,
-      path: '/home',
-      children: [
-        MaterialRoute(page: DashBoardView, path: 'dashboard'),
-        MaterialRoute(page: UsersView, path: 'users'),
-        MaterialRoute(page: InfluencersView, path: 'influencers'),
-        MaterialRoute(page: ServicesView, path: 'services'),
-        MaterialRoute(page: PlansView, path: 'plans'),
-        MaterialRoute(page: RequestsView, path: 'requests'),
-      ],
-    ),
-    MaterialRoute(page: StartupView, path: "/startup"),
-    MaterialRoute(page: LoginView, path: "/login", initial: true),
-    MaterialRoute(page: SubAdminView),
-    MaterialRoute(page: StateView),
-    MaterialRoute(page: CityView),
-    MaterialRoute(page: ContactSupportView),
-    MaterialRoute(page: PromoteProjectsView),
-    MaterialRoute(page: ReportView),
-    MaterialRoute(page: PermissionsView),
-    MaterialRoute(page: RolesView),
-    MaterialRoute(page: AddCompanyView),
-    MaterialRoute(page: LocationContactView),
-    MaterialRoute(page: BannerView),
-    MaterialRoute(page: NotificationsView),
-// @stacked-route
-  ],
+  routes: [],
   dependencies: [
     LazySingleton(classType: BottomSheetService),
     LazySingleton(classType: DialogService),
