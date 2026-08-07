@@ -2,34 +2,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webapp/services/user_authentication_service.dart';
 import 'package:webapp/ui/bottom_sheets/notice/notice_sheet.dart';
 import 'package:webapp/ui/dialogs/info_alert/info_alert_dialog.dart';
-import 'package:webapp/ui/views/home/home_view.dart';
-import 'package:webapp/ui/views/startup/startup_view.dart';
 import 'package:stacked/stacked_annotations.dart';
 import 'package:stacked_services/stacked_services.dart';
-import 'package:webapp/ui/views/login/login_view.dart';
-import 'package:webapp/ui/views/dash_board/dash_board_view.dart';
-import 'package:webapp/ui/views/users/users_view.dart';
-import 'package:webapp/ui/views/influencers/influencers_view.dart';
-import 'package:webapp/ui/views/services/services_view.dart';
-import 'package:webapp/ui/views/plans/plans_view.dart';
-import 'package:webapp/ui/views/requests/requests_view.dart';
-import 'package:webapp/ui/views/sub_admin/sub_admin_view.dart';
-import 'package:webapp/ui/views/state/state_view.dart';
-import 'package:webapp/ui/views/city/city_view.dart';
-import 'package:webapp/ui/views/contact_support/contact_support_view.dart';
-import 'package:webapp/ui/views/promote_projects/promote_projects_view.dart';
-import 'package:webapp/ui/views/report/report_view.dart';
-import 'package:webapp/ui/views/permissions/permissions_view.dart';
-import 'package:webapp/ui/views/roles/roles_view.dart';
-import 'package:webapp/ui/views/add_company/add_company_view.dart';
 import 'package:webapp/services/api_service.dart';
-import 'package:webapp/ui/views/location_contact/location_contact_view.dart';
 
-import 'package:webapp/ui/views/banner/banner_view.dart';
 
 // part 'app.router.dart'; // <<– add this line
 
-import 'package:webapp/ui/views/notifications/notifications_view.dart';
 
 // @stacked-import
 @StackedApp(

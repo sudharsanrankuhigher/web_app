@@ -1015,7 +1015,9 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         final data = {
           "id": model.id,
           "status": model.revertStatus == true ? 2 : 3,
+          "category_id": model.category,
           "client_id": model.client!.id,
+          "client_payment_verified": model.revertStatus == true ? false : true
         };
         statusChange(data);
       },
@@ -1039,7 +1041,8 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
       final data = {
         "client_project_id": model.id,
         "inf_id": selected.id,
-        "status": model.revertStatus == true ? 2 : 3
+        "status": model.revertStatus == true ? 2 : 3,
+        "client_payment_verified": model.revertStatus == true ? false : true
       };
       await assignInfluencer(data);
       print(data);
