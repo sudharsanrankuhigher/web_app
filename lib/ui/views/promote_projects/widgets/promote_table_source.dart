@@ -134,16 +134,34 @@ class PromoteTableSource extends DataTableSource {
           _textCell(item.amount?.toString()),
           _textCell(DateFormatter.formatToDDMMMYYYY(item.createdAt)),
           DataCell(Center(
-            child: Container(
-                padding: defaultPadding4 + rightPadding8 + leftPadding8,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(25),
-                  color: continueButton,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                    padding: defaultPadding4 + rightPadding8 + leftPadding8,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      color: continueButton,
+                    ),
+                    child: Text(
+                      item.status == "2" ? "Accepted" : "Waiting",
+                      style: fontFamilyMedium.size11.white,
+                    )),
+                InkWell(
+                  onTap: () => onReject?.call(item),
+                  child: Container(
+                      padding: defaultPadding4 + rightPadding8 + leftPadding8,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        color: red,
+                      ),
+                      child: Text(
+                        "Reject",
+                        style: fontFamilyMedium.size11.white,
+                      )),
                 ),
-                child: Text(
-                  item.status == "2" ? "Accepted" : "Waiting",
-                  style: fontFamilyMedium.size11.white,
-                )),
+              ],
+            ),
           )),
         ];
       case PromoteStatus.infCompleted:
