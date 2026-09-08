@@ -15,9 +15,20 @@ class MonthlyBarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Convert int → double (safe on web)
-    final og = ongoing.map((e) => e.toDouble()).toList();
-    final cm = completed.map((e) => e.toDouble()).toList();
+    // Ensure lists always have exactly 12 elements (months), padding with 0.0 if necessary
+    final List<double> og = List.generate(12, (index) {
+      if (index < ongoing.length) {
+        return ongoing[index].toDouble();
+      }
+      return 0.0;
+    });
+
+    final List<double> cm = List.generate(12, (index) {
+      if (index < completed.length) {
+        return completed[index].toDouble();
+      }
+      return 0.0;
+    });
 
     // Get max value
     final maxValue = [...og, ...cm].reduce((a, b) => a > b ? a : b);

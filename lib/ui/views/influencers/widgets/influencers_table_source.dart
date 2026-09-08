@@ -158,15 +158,15 @@ class InfluencerTableSource extends DataTableSource {
           style: fontFamilyRegular.size12.black,
         )),
         DataCell(SelectableText(
-          item.name!,
+          item.name ?? '',
           style: fontFamilyRegular.size12.black,
         )),
         DataCell(SelectableText(
-          item.phone!,
+          item.phone ?? '',
           style: fontFamilyRegular.size12.black,
         )),
         DataCell(SelectableText(
-          "${item.city}/${item.state}",
+          "${item.city ?? ''}/${item.state ?? ''}",
           style: fontFamilyRegular.size12.black,
         )),
         DataCell(
@@ -181,20 +181,22 @@ class InfluencerTableSource extends DataTableSource {
         )),
 
         DataCell(SelectableText(
-          item.instagramFollowers!.toString(),
+          (item.instagramFollowers ?? 0).toString(),
           style: fontFamilyRegular.size12.black,
         )),
         DataCell(SelectableText(
-          item.youtubeFollowers.toString(),
+          (item.youtubeFollowers ?? 0).toString(),
           style: fontFamilyRegular.size12.black,
         )),
         DataCell(SelectableText(
-          item.facebookFollowers.toString(),
+          (item.facebookFollowers ?? 0).toString(),
           style: fontFamilyRegular.size12.black,
         )),
         DataCell(
           SelectableText(
-            DateFormatter.formatToDDMMMYYYY(item.createdAt!).toString(),
+            item.createdAt != null
+                ? DateFormatter.formatToDDMMMYYYY(item.createdAt!).toString()
+                : '',
             style: fontFamilyRegular.size12.black,
           ),
         ),

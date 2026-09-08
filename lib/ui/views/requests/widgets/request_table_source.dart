@@ -191,7 +191,8 @@ class RequestTableSource extends DataTableSource {
               ],
             ),
           ),
-          _textCell("${m.inf?.infId ?? ""} / ${(m.inf?.phone ?? "")}",
+          _textCell(
+              "${m.inf?.name ?? ""} / ${m.inf?.infId ?? ""} / ${m.inf?.phone ?? ""}",
               center: true),
           _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.requestedAt)),
           DataCell(
@@ -277,7 +278,8 @@ class RequestTableSource extends DataTableSource {
           _clickableTextCell(m.projectId, () => showNote!(m)),
           _textCell(m.client?.name),
           _textCell(m.client?.mobileNumber),
-          _textCell("${m.inf?.infId ?? ""} / ${m.inf?.phone ?? ""}"),
+          _textCell(
+              "${m.inf?.name ?? ""} / ${m.inf?.infId ?? ""} / ${m.inf?.phone ?? ""}"),
           _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.requestedAt)),
           _textCell(DateFormatter.formatToDDMMMYYYY(m.dates?.assignedAt)),
           // DataCell(
@@ -790,8 +792,9 @@ class RequestTableSource extends DataTableSource {
         return [
           _textCell('${index + 1}'),
           _clickableTextCell(m.projectId, () => showNote!(m)),
-          _textCell("${m.client?.name ?? ""} "),
-          _textCell(m.client?.mobileNumber),
+          _textCell("${m.client?.name ?? ""}  ${m.client?.mobileNumber}"),
+          _textCell(
+              "${m.inf?.name ?? ""} / ${m.inf?.infId ?? ""} / ${m.inf?.phone ?? ""}"),
           _textCell("${m.payment?.totalAmount ?? 0}"),
           _textCell(
               m.payment?.amount != null ? m.payment!.amount.toString() : ""),

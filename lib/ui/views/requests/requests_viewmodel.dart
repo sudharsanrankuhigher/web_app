@@ -555,8 +555,8 @@ class RequestsViewModel extends BaseViewModel with NavigationMixin {
         return const [
           DataColumn(label: Text("S.No")),
           DataColumn(label: Text("Project Code")),
-          DataColumn(label: Text("client_name")),
-          DataColumn(label: Text("client_Phone")),
+          DataColumn(label: Text("client")),
+          DataColumn(label: Text("Influencer")),
           DataColumn(label: Text("Total amount")),
           DataColumn(label: Text("Payment amount")),
           DataColumn(label: Text("Commission Amount")),

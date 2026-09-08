@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -25,6 +26,7 @@ import 'package:webapp/ui/views/services/model/service_model.dart' as service;
 import 'package:webapp/ui/views/state/model/state_model.dart' as state_model;
 import 'package:webapp/ui/views/sub_admin/model/sub_admin_model.dart'
     as sub_admin_model;
+import 'package:webapp/ui/views/dash_board/model/dashboard_model.dart';
 
 import 'package:webapp/ui/views/add_company/model/company_model.dart'
     as company_model;
@@ -79,12 +81,17 @@ class ApiService {
     final dio = Dio(
       BaseOptions(
         baseUrl: 'https://admin.promoteapp.in/',
-        // baseUrl: 'http://172.20.25.23:8003/', //saran
+        // baseUrl: 'http://172.20.25.23:8004/', //saran
         // baseUrl: 'http://172.20.25.55:8888/', //shy
         // baseUrl: 'http://172.20.25.23:8002/',
         // baseUrl: 'http://172.20.25.54:8005/',//deepak
         followRedirects: true,
         validateStatus: (status) => status != null && status < 500,
+        responseDecoder: (List<int> responseBytes, RequestOptions options,
+            ResponseBody responseBody) {
+          if (responseBytes.isEmpty) return null;
+          return utf8.decode(responseBytes, allowMalformed: true);
+        },
       ),
     );
 
@@ -94,7 +101,7 @@ class ApiService {
           final prefs = locator<SharedPreferences>();
           final token = prefs.getString('accessToken');
           if (token != null && token.isNotEmpty) {
-            log('Adding Authorization header with token: $token');
+            debugPrint('Authorization header added');
             options.headers['Authorization'] = 'Bearer $token';
           }
 
@@ -133,6 +140,8 @@ class ApiService {
       PrettyDioLogger(
         requestBody: true,
         requestHeader: true,
+        responseHeader: true,
+        responseBody: true,
       ),
     );
 
@@ -753,9 +762,18 @@ class ApiService {
     final response =
         await _dio.post('api/admin/get-all-influencer', data: data);
     if (response.statusCode == 200) {
-      // Fluttertoast.showToast(msg: response.data["message"].toString());
-
-      return influencer_model.InfluencerModel.fromJson(response.data);
+      debugPrint('Influencer API success: ${response.statusCode}');
+      try {
+        return influencer_model.InfluencerModel.fromJson(response.data);
+      } catch (e, stackTrace) {
+        debugPrint('Influencer parsing error: $e');
+        debugPrintStack(stackTrace: stackTrace);
+        return influencer_model.InfluencerModel(
+          success: 0,
+          message: 'Parsing failed: $e',
+          data: [],
+        );
+      }
     } else {
       final message = response.data?['message'] ?? 'Server error';
       Fluttertoast.showToast(
@@ -1985,6 +2003,31 @@ class ApiService {
     );
     if (response.statusCode == 200) {
       return response.data;
+    } else {
+      final message = response.data?['message'] ?? 'Server error';
+      throw Exception(message);
+    }
+  }
+
+  /// POST: /api/admin/dashboard
+  Future<DashboardViewModel> getDashboard(
+      {int? month, int? year, String? state}) async {
+    final Map<String, dynamic> requestData = {};
+    if (month != null) {
+      requestData['month'] = month;
+    }
+    if (year != null) {
+      requestData['year'] = year;
+    }
+    if (state != null) {
+      requestData['state'] = state;
+    }
+    final response = await _dio.post(
+      'api/admin/dashboard',
+      data: requestData,
+    );
+    if (response.statusCode == 200) {
+      return DashboardViewModel.fromJson(response.data);
     } else {
       final message = response.data?['message'] ?? 'Server error';
       throw Exception(message);

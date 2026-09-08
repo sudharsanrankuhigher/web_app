@@ -3,6 +3,35 @@
 //     final influencerModel = influencerModelFromJson(jsonString);
 
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
+
+String sanitizeApiText(dynamic value) {
+  if (value == null) return '';
+  return value.toString().replaceAll('\uFFFD', '').trim();
+}
+
+int? _safeInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return null;
+    return int.tryParse(trimmed);
+  }
+  return null;
+}
+
+String? _safeString(dynamic value) {
+  if (value == null) return null;
+  if (value is List || value is Map) return null;
+  return value.toString();
+}
+
+DateTime? _safeDateTime(dynamic value) {
+  if (value == null) return null;
+  return DateTime.tryParse(value.toString());
+}
 
 InfluencerModel influencerModelFromJson(String str) =>
     InfluencerModel.fromJson(json.decode(str));
@@ -21,14 +50,27 @@ class InfluencerModel {
     this.data,
   });
 
-  factory InfluencerModel.fromJson(Map<String, dynamic> json) =>
-      InfluencerModel(
-        success: json["success"],
-        message: json["message"],
-        data: json["data"] == null
-            ? []
-            : List<Datum>.from(json["data"]!.map((x) => Datum.fromJson(x))),
-      );
+  factory InfluencerModel.fromJson(Map<String, dynamic> json) {
+    final list = json["data"];
+    final parsedData = <Datum>[];
+    if (list is List) {
+      for (final item in list) {
+        try {
+          if (item is Map<String, dynamic>) {
+            parsedData.add(Datum.fromJson(item));
+          }
+        } catch (e, stackTrace) {
+          debugPrint('Influencer parsing error: $e');
+          debugPrintStack(stackTrace: stackTrace);
+        }
+      }
+    }
+    return InfluencerModel(
+      success: _safeInt(json["success"]),
+      message: _safeString(json["message"]),
+      data: parsedData,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "success": success,
@@ -105,44 +147,36 @@ class Datum {
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        id: json["id"],
-        name: json["name"],
-        category: json["category"] == null
-            ? null
-            : int.tryParse(json["category"].toString()),
-        image: json["image"],
-        email: json["email"],
-        phone: json["phone"],
-        altPhone: json["alt_phone"],
-        dob: json["dob"] == null ? null : DateTime.parse(json["dob"]),
-        infId: json["inf_id"],
-        state: json["state"],
-        service: json["service"] == null
-            ? []
-            : List<int>.from(json["service"]!.map((x) => x)),
-        city: json["city"],
-        gender: json["gender"],
-        instagramName: json["instagram_name"],
-        youtubeName: json["youtube_name"],
-        facebookName: json["facebook_name"],
-        instagramLink: json["instagram_link"],
-        facebookLink: json["facebook_link"],
-        youtubeLink: json["youtube_link"],
+        id: _safeInt(json["id"]),
+        name: sanitizeApiText(json["name"]),
+        category: _safeInt(json["category"]),
+        image: _safeString(json["image"]),
+        email: _safeString(json["email"]),
+        phone: _safeString(json["phone"]),
+        altPhone: _safeString(json["alt_phone"]),
+        dob: _safeDateTime(json["dob"]),
+        infId: _safeString(json["inf_id"]),
+        state: sanitizeApiText(json["state"]),
+        service: _parseService(json["service"]),
+        city: sanitizeApiText(json["city"]),
+        gender: _safeString(json["gender"]),
+        instagramName: sanitizeApiText(json["instagram_name"]),
+        youtubeName: sanitizeApiText(json["youtube_name"]),
+        facebookName: sanitizeApiText(json["facebook_name"]),
+        instagramLink: _safeString(json["instagram_link"]),
+        facebookLink: _safeString(json["facebook_link"]),
+        youtubeLink: _safeString(json["youtube_link"]),
         instagramFollowers: _parseInt(json["instagram_followers"]),
         facebookFollowers: _parseInt(json["facebook_followers"]),
         youtubeFollowers: _parseInt(json["youtube_followers"]),
-        accountNo: json["account_no"],
-        accountHolderName: json["account_holder_name"],
-        ifscCode: json["ifsc_code"],
-        upiId: json["upi_id"],
-        description: json["description"],
-        status: json["status"],
-        createdAt: json["created_at"] == null
-            ? null
-            : DateTime.parse(json["created_at"]),
-        updatedAt: json["updated_at"] == null
-            ? null
-            : DateTime.parse(json["updated_at"]),
+        accountNo: _safeString(json["account_no"]),
+        accountHolderName: _safeString(json["account_holder_name"]),
+        ifscCode: _safeString(json["ifsc_code"]),
+        upiId: _safeString(json["upi_id"]),
+        description: sanitizeApiText(json["description"]),
+        status: _safeInt(json["status"]),
+        createdAt: _safeDateTime(json["created_at"]),
+        updatedAt: _safeDateTime(json["updated_at"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -154,8 +188,9 @@ class Datum {
         "phone": phone,
         "alt_phone": altPhone,
         "gender": gender,
-        "dob":
-            "${dob!.year.toString().padLeft(4, '0')}-${dob!.month.toString().padLeft(2, '0')}-${dob!.day.toString().padLeft(2, '0')}",
+        "dob": dob == null
+            ? null
+            : "${dob!.year.toString().padLeft(4, '0')}-${dob!.month.toString().padLeft(2, '0')}-${dob!.day.toString().padLeft(2, '0')}",
         "inf_id": infId,
         "state": state,
         "service":
@@ -180,12 +215,42 @@ class Datum {
         "updated_at": updatedAt?.toIso8601String(),
       };
 
+  static List<int> _parseService(dynamic value) {
+    if (value == null) return [];
+    if (value is List) {
+      return value.map((e) => _safeInt(e)).whereType<int>().toList();
+    }
+    if (value is String) {
+      final trimmed = value.trim();
+      if (trimmed.isEmpty) return [];
+      if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+        try {
+          final decoded = json.decode(trimmed);
+          if (decoded is List) {
+            return decoded.map((e) => _safeInt(e)).whereType<int>().toList();
+          }
+        } catch (_) {}
+      }
+      return trimmed
+          .split(',')
+          .map((e) => int.tryParse(e.trim()))
+          .whereType<int>()
+          .toList();
+    }
+    if (value is int) {
+      return [value];
+    }
+    return [];
+  }
+
   static int _parseInt(dynamic value) {
     if (value == null) return 0;
     if (value is int) return value;
+    if (value is num) return value.toInt();
     if (value is String) {
-      if (value.trim().isEmpty) return 0;
-      return int.tryParse(value) ?? 0;
+      final trimmed = value.trim();
+      if (trimmed.isEmpty) return 0;
+      return int.tryParse(trimmed) ?? 0;
     }
     return 0;
   }
